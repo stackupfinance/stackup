@@ -1,0 +1,16 @@
+{
+  "name": "@stackupfinance/backend",
+  "version": "1.0.0",
+  "repository": "git@github.com:stackupfinance/stackup.git",
+  "author": "@stackupfinance",
+  "license": "GPL-3.0",
+  "private": true,
+  "scripts": {
+    "lint": "eslint . && prettier --check ."
+  },
+  "devDependencies": {
+    "eslint": "^7.32.0",
+    "eslint-config-prettier": "^8.3.0",
+    "prettier": "^2.4.1"
+  }
+}

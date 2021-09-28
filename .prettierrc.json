@@ -1,0 +1,4 @@
+yarn run v1.22.11
+$ /Users/hazim-j/Desktop/stackup/node_modules/.bin/lerna exec echo {}
+{}
+Done in 1.13s.

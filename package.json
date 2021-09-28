@@ -1,0 +1,17 @@
+{
+  "name": "@stackupfinance/monorepo",
+  "version": "1.0.0",
+  "repository": "git@github.com:stackupfinance/stackup.git",
+  "author": "@stackupfinance",
+  "license": "GPL-3.0",
+  "private": true,
+  "scripts": {
+    "lint": "lerna run lint"
+  },
+  "workspaces": [
+    "apps/*"
+  ],
+  "devDependencies": {
+    "lerna": "^4.0.0"
+  }
+}
