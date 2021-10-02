@@ -6,20 +6,15 @@ const { roles } = require('../config/roles');
 
 const userSchema = mongoose.Schema(
   {
-    name: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-    email: {
+    username: {
       type: String,
       required: true,
       unique: true,
       trim: true,
       lowercase: true,
       validate(value) {
-        if (!validator.isEmail(value)) {
-          throw new Error('Invalid email');
+        if (!value.match(/^[a-zA-Z0-9_.-]*$/)) {
+          throw new Error('Username can only contain alphanumeric characters, periods, underscores and hyphens');
         }
       },
     },
@@ -35,14 +30,29 @@ const userSchema = mongoose.Schema(
       },
       private: true, // used by the toJSON plugin
     },
+    email: {
+      type: String,
+      trim: true,
+      lowercase: true,
+      validate(value) {
+        if (!validator.isEmail(value)) {
+          throw new Error('Invalid email');
+        }
+      },
+    },
+    avatar: {
+      type: String,
+      trim: true,
+      validate(value) {
+        if (!validator.isURL(value)) {
+          throw new Error('Invalid URL');
+        }
+      },
+    },
     role: {
       type: String,
       enum: roles,
       default: 'user',
-    },
-    isEmailVerified: {
-      type: Boolean,
-      default: false,
     },
   },
   {
@@ -55,13 +65,13 @@ userSchema.plugin(toJSON);
 userSchema.plugin(paginate);
 
 /**
- * Check if email is taken
- * @param {string} email - The user's email
+ * Check if username is taken
+ * @param {string} username - The user's username
  * @param {ObjectId} [excludeUserId] - The id of the user to be excluded
  * @returns {Promise<boolean>}
  */
-userSchema.statics.isEmailTaken = async function (email, excludeUserId) {
-  const user = await this.findOne({ email, _id: { $ne: excludeUserId } });
+userSchema.statics.isUsernameTaken = async function (username, excludeUserId) {
+  const user = await this.findOne({ username, _id: { $ne: excludeUserId } });
   return !!user;
 };
 

@@ -6,8 +6,9 @@
   "license": "GPL-3.0",
   "private": true,
   "scripts": {
-    "test": "lerna run test",
-    "lint": "lerna run lint",
+    "test": "lerna run test --stream",
+    "lint": "lerna run lint --stream",
+    "lint:fix": "lerna run lint:fix --stream",
     "dev:dependencies": "yarn workspace @stackupfinance/backend run docker:dev:dependencies",
     "dev:backend": "yarn workspace @stackupfinance/backend run dev"
   },

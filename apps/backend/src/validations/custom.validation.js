@@ -5,6 +5,13 @@ const objectId = (value, helpers) => {
   return value;
 };
 
+const username = (value, helpers) => {
+  if (!value.match(/^[a-zA-Z0-9_.-]*$/)) {
+    return helpers.message('Username can only contain alphanumeric characters, periods, underscores and hyphens');
+  }
+  return value;
+};
+
 const password = (value, helpers) => {
   if (value.length < 8) {
     return helpers.message('password must be at least 8 characters');
@@ -17,5 +24,6 @@ const password = (value, helpers) => {
 
 module.exports = {
   objectId,
+  username,
   password,
 };
