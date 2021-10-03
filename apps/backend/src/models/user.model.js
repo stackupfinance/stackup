@@ -40,6 +40,10 @@ const userSchema = mongoose.Schema(
         }
       },
     },
+    isEmailVerified: {
+      type: Boolean,
+      default: false,
+    },
     avatar: {
       type: String,
       trim: true,
