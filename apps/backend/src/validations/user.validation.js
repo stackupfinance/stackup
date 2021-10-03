@@ -34,6 +34,9 @@ const updateUser = {
     .keys({
       email: Joi.string().email(),
       password: Joi.string().custom(password),
+      avatar: Joi.string().uri(),
+      bio: Joi.string().max(150),
+      unset: Joi.array().items(Joi.string().valid('email', 'avatar', 'bio')).default([]),
     })
     .min(1),
 };

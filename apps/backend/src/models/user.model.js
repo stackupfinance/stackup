@@ -22,7 +22,7 @@ const userSchema = mongoose.Schema(
       type: String,
       required: true,
       trim: true,
-      minlength: 8,
+      minLength: 8,
       validate(value) {
         if (!value.match(/\d/) || !value.match(/[a-zA-Z]/)) {
           throw new Error('Password must contain at least one letter and one number');
@@ -52,6 +52,11 @@ const userSchema = mongoose.Schema(
           throw new Error('Invalid URL');
         }
       },
+    },
+    bio: {
+      type: String,
+      trim: true,
+      maxLength: 150,
     },
     role: {
       type: String,
@@ -93,6 +98,9 @@ userSchema.pre('save', async function (next) {
   const user = this;
   if (user.isModified('password')) {
     user.password = await bcrypt.hash(user.password, 8);
+  }
+  if (user.isModified('email')) {
+    user.isEmailVerified = false;
   }
   next();
 });
