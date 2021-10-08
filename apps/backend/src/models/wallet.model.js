@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
 const { toJSON, paginate } = require('./plugins');
-const { walletTypes } = require('../config/wallets');
+const { types } = require('../config/wallets');
 const secretService = require('../services/secret.service');
 
 const walletSchema = mongoose.Schema(
@@ -14,7 +14,7 @@ const walletSchema = mongoose.Schema(
     type: {
       type: String,
       required: true,
-      enum: [walletTypes.internal],
+      enum: [types.internal],
     },
     name: {
       type: String,
@@ -36,7 +36,7 @@ const walletSchema = mongoose.Schema(
       type: String,
       required: [
         function () {
-          return this.type === walletTypes.internal;
+          return this.type === types.internal;
         },
         'A public key is required for internal type wallets',
       ],
@@ -45,7 +45,7 @@ const walletSchema = mongoose.Schema(
       type: String,
       required: [
         function () {
-          return this.type === walletTypes.internal;
+          return this.type === types.internal;
         },
         'A mnemonic is required for internal type wallets',
       ],

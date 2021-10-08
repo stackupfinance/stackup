@@ -1,7 +1,7 @@
-const walletTypes = {
+const types = {
   internal: 'internal',
 };
 
 module.exports = {
-  walletTypes,
+  types,
 };

@@ -49,7 +49,7 @@ const deleteUser = {
   }),
 };
 
-const getUserWallet = {
+const getUserWallets = {
   query: {
     withMnemonic: Joi.boolean().default(false),
   },
@@ -64,5 +64,5 @@ module.exports = {
   getUser,
   updateUser,
   deleteUser,
-  getUserWallet,
+  getUserWallets,
 };

@@ -1,6 +1,6 @@
 const Wallet = require('../models/wallet.model');
 const web3 = require('../utils/web3');
-const { walletTypes } = require('../config/wallets');
+const { types } = require('../config/wallets');
 
 /**
  * Create an internal wallet
@@ -11,7 +11,7 @@ const createInternalWallet = async (userId) => {
   const { address, publicKey, mnemonic } = web3.createWallet();
   return Wallet.create({
     user: userId,
-    type: walletTypes.internal,
+    type: types.internal,
     name: 'Stackup',
     address,
     publicKey,
@@ -33,7 +33,7 @@ const getUserWallets = async (userId) => {
 };
 
 /**
- * Get a users linked wallets with decrypted mnemonic.
+ * Get a users linked wallets with decrypted mnemonic
  * @param {ObjectId} userId
  * @returns {Promise<Array<Wallet>>}
  */
@@ -48,7 +48,7 @@ const getUserWalletsWithMnemonic = async (userId) => {
 };
 
 /**
- * delete all users linked wallets.
+ * delete all users linked wallets
  * @param {ObjectId} userId
  * @returns {Promise<Object>}
  */

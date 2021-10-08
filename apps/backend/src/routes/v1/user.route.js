@@ -19,6 +19,6 @@ router
 
 router
   .route('/:userId/wallets')
-  .get(auth('getUsers'), validate(userValidation.getUserWallet), userController.getUserWallets);
+  .get(auth('getUsers'), validate(userValidation.getUserWallets), userController.getUserWallets);
 
 module.exports = router;
