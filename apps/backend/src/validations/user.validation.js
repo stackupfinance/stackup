@@ -1,5 +1,6 @@
 const Joi = require('joi');
 const { password, objectId } = require('./custom.validation');
+const { status } = require('../config/users');
 
 const createUser = {
   body: Joi.object().keys({
@@ -36,6 +37,7 @@ const updateUser = {
       password: Joi.string().custom(password),
       avatar: Joi.string().uri(),
       bio: Joi.string().max(150),
+      status: Joi.string().valid(status.created, status.onboarded),
       unset: Joi.array().items(Joi.string().valid('email', 'avatar', 'bio')).default([]),
     })
     .min(1),
@@ -47,10 +49,20 @@ const deleteUser = {
   }),
 };
 
+const getUserWallet = {
+  query: {
+    withMnemonic: Joi.boolean().default(false),
+  },
+  params: Joi.object().keys({
+    userId: Joi.string().custom(objectId),
+  }),
+};
+
 module.exports = {
   createUser,
   getUsers,
   getUser,
   updateUser,
   deleteUser,
+  getUserWallet,
 };

@@ -2,7 +2,7 @@ const httpStatus = require('http-status');
 const pick = require('../utils/pick');
 const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
-const { userService } = require('../services');
+const { userService, walletService } = require('../services');
 
 const createUser = catchAsync(async (req, res) => {
   const user = await userService.createUser(req.body);
@@ -34,10 +34,19 @@ const deleteUser = catchAsync(async (req, res) => {
   res.status(httpStatus.NO_CONTENT).send();
 });
 
+const getUserWallets = catchAsync(async (req, res) => {
+  const { userId } = req.params;
+  const wallets = req.query.withMnemonic
+    ? await walletService.getUserWalletsWithMnemonic(userId)
+    : await walletService.getUserWallets(userId);
+  res.send(wallets);
+});
+
 module.exports = {
   createUser,
   getUsers,
   getUser,
   updateUser,
   deleteUser,
+  getUserWallets,
 };

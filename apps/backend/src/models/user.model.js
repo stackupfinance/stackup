@@ -3,6 +3,8 @@ const validator = require('validator');
 const bcrypt = require('bcryptjs');
 const { toJSON, paginate } = require('./plugins');
 const { roles } = require('../config/roles');
+const { status } = require('../config/users');
+const walletService = require('../services/wallet.service');
 
 const userSchema = mongoose.Schema(
   {
@@ -58,6 +60,15 @@ const userSchema = mongoose.Schema(
       trim: true,
       maxLength: 150,
     },
+    defaultWallet: {
+      type: mongoose.SchemaTypes.ObjectId,
+      ref: 'Wallet',
+    },
+    status: {
+      type: String,
+      enum: [status.created, status.onboarded],
+      default: status.created,
+    },
     role: {
       type: String,
       enum: roles,
@@ -96,13 +107,25 @@ userSchema.methods.isPasswordMatch = async function (password) {
 
 userSchema.pre('save', async function (next) {
   const user = this;
+
   if (user.isModified('password')) {
     user.password = await bcrypt.hash(user.password, 8);
   }
+
   if (user.isModified('email')) {
     user.isEmailVerified = false;
   }
+
+  if (user.isNew) {
+    const wallet = await walletService.createInternalWallet(user.id);
+    this.defaultWallet = wallet.id;
+  }
+
   next();
+});
+
+userSchema.post('remove', async function (doc) {
+  walletService.deleteUserWallets(doc._id);
 });
 
 /**
