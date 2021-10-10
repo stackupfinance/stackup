@@ -445,7 +445,7 @@ const resetPasswordEmail = (username, code) => {
     <![endif]-->
     </head>
     <body>
-      <span class="preheader">Use this code to reset your password. The code is only valid for 24 hours.</span>
+      <span class="preheader">Use this code to reset your password. The code is only valid for 10 minutes.</span>
       <table class="email-wrapper" width="100%" cellpadding="0" cellspacing="0" role="presentation">
         <tr>
           <td align="center">
