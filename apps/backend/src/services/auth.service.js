@@ -1,14 +1,17 @@
 const httpStatus = require('http-status');
 const tokenService = require('./token.service');
 const userService = require('./user.service');
+const codeService = require('./code.service');
 const Token = require('../models/token.model');
+const Code = require('../models/code.model');
 const ApiError = require('../utils/ApiError');
 const { tokenTypes } = require('../config/tokens');
+const { types } = require('../config/codes');
 
 /**
  * Login with username and password
- * @param {string} email
- * @param {string} password
+ * @param {String} email
+ * @param {String} password
  * @returns {Promise<User>}
  */
 const loginUserWithUsernameAndPassword = async (username, password) => {
@@ -21,7 +24,7 @@ const loginUserWithUsernameAndPassword = async (username, password) => {
 
 /**
  * Logout
- * @param {string} refreshToken
+ * @param {String} refreshToken
  * @returns {Promise}
  */
 const logout = async (refreshToken) => {
@@ -34,7 +37,7 @@ const logout = async (refreshToken) => {
 
 /**
  * Refresh auth tokens
- * @param {string} refreshToken
+ * @param {String} refreshToken
  * @returns {Promise<Object>}
  */
 const refreshAuth = async (refreshToken) => {
@@ -53,19 +56,25 @@ const refreshAuth = async (refreshToken) => {
 
 /**
  * Reset password
- * @param {string} resetPasswordToken
- * @param {string} newPassword
+ * @param {String} username
+ * @param {String} code
+ * @param {String} newPassword
  * @returns {Promise}
  */
-const resetPassword = async (resetPasswordToken, newPassword) => {
+const resetPassword = async (username, code, newPassword) => {
   try {
-    const resetPasswordTokenDoc = await tokenService.verifyToken(resetPasswordToken, tokenTypes.RESET_PASSWORD);
-    const user = await userService.getUserById(resetPasswordTokenDoc.user);
+    const user = await userService.getUserByUsername(username);
     if (!user) {
       throw new Error();
     }
+
+    const codeDoc = await codeService.checkCode(user.id, code, types.resetPassword);
+    if (!codeDoc) {
+      throw new Error();
+    }
+
+    await Code.deleteMany({ user: user.id, type: types.resetPassword });
     await userService.updateUserById(user.id, { password: newPassword });
-    await Token.deleteMany({ user: user.id, type: tokenTypes.RESET_PASSWORD });
   } catch (error) {
     throw new ApiError(httpStatus.UNAUTHORIZED, 'Password reset failed');
   }
@@ -73,18 +82,18 @@ const resetPassword = async (resetPasswordToken, newPassword) => {
 
 /**
  * Verify email
- * @param {string} verifyEmailToken
+ * @param {String} userId
+ * @param {String} code
  * @returns {Promise}
  */
-const verifyEmail = async (verifyEmailToken) => {
+const verifyEmail = async (userId, code) => {
   try {
-    const verifyEmailTokenDoc = await tokenService.verifyToken(verifyEmailToken, tokenTypes.VERIFY_EMAIL);
-    const user = await userService.getUserById(verifyEmailTokenDoc.user);
-    if (!user) {
+    const codeDoc = await codeService.checkCode(userId, code, types.verifyEmail);
+    if (!codeDoc) {
       throw new Error();
     }
-    await Token.deleteMany({ user: user.id, type: tokenTypes.VERIFY_EMAIL });
-    await userService.updateUserById(user.id, { isEmailVerified: true });
+    await Code.deleteMany({ user: userId, type: types.verifyEmail });
+    await userService.updateUserById(userId, { isEmailVerified: true });
   } catch (error) {
     throw new ApiError(httpStatus.UNAUTHORIZED, 'Email verification failed');
   }

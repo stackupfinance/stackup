@@ -25,6 +25,10 @@ const envVarsSchema = Joi.object()
     EMAIL_FROM: Joi.string().description('the from field in the emails sent by the app'),
     AKEYLESS_ACCESS_ID: Joi.string().required().description('Access ID for Akeyless vault'),
     AKEYLESS_ACCESS_KEY: Joi.string().required().description('Access key for Akeyless vault'),
+    PUSHER_APP_ID: Joi.string().required().description('App Id for Pusher channels'),
+    PUSHER_KEY: Joi.string().required().description('Key for Pusher channels'),
+    PUSHER_SECRET: Joi.string().required().description('Secret for Pusher channels'),
+    PUSHER_CLUSTER: Joi.string().required().description('Cluster for Pusher channels'),
   })
   .unknown();
 
@@ -63,6 +67,14 @@ module.exports = {
     akeyless: {
       accessId: envVars.AKEYLESS_ACCESS_ID,
       accessKey: envVars.AKEYLESS_ACCESS_KEY,
+    },
+    realTime: {
+      pusher: {
+        appId: envVars.PUSHER_APP_ID,
+        key: envVars.PUSHER_KEY,
+        secret: envVars.PUSHER_SECRET,
+        cluster: envVars.PUSHER_CLUSTER,
+      },
     },
   },
 };

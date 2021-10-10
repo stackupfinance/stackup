@@ -14,9 +14,9 @@ if (config.env !== 'test') {
 
 /**
  * Send an email
- * @param {string} to
- * @param {string} subject
- * @param {string} text
+ * @param {String} to
+ * @param {String} subject
+ * @param {String} text
  * @returns {Promise}
  */
 const sendEmail = async (to, subject, html) => {
@@ -26,30 +26,26 @@ const sendEmail = async (to, subject, html) => {
 
 /**
  * Send reset password email
- * @param {string} username
- * @param {string} email
- * @param {string} token
+ * @param {String} username
+ * @param {String} email
+ * @param {String} code
  * @returns {Promise}
  */
-const sendResetPasswordEmail = async (username, email, token) => {
+const sendResetPasswordEmail = async (username, email, code) => {
   const subject = 'Stackup reset password';
-  // replace this url with the link to the reset password page of your front-end app
-  const resetPasswordUrl = `https://stackup.sh/verify-email?token=${token}`;
-  await sendEmail(email, subject, resetPasswordEmail(username, resetPasswordUrl));
+  await sendEmail(email, subject, resetPasswordEmail(username, code));
 };
 
 /**
  * Send verification email
- * @param {string} username
- * @param {string} email
- * @param {string} token
+ * @param {String} username
+ * @param {String} email
+ * @param {String} code
  * @returns {Promise}
  */
-const sendVerificationEmail = async (username, email, token) => {
+const sendVerificationEmail = async (username, email, code) => {
   const subject = 'Stackup email verification';
-  // replace this url with the link to the email verification page of your front-end app
-  const verificationEmailUrl = `https://stackup.sh/verify-email?token=${token}`;
-  await sendEmail(email, subject, verifyEmail(username, verificationEmailUrl));
+  await sendEmail(email, subject, verifyEmail(username, code));
 };
 
 module.exports = {

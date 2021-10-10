@@ -1,6 +1,6 @@
 const httpStatus = require('http-status');
 const catchAsync = require('../utils/catchAsync');
-const { authService, userService, tokenService, emailService } = require('../services');
+const { authService, userService, tokenService, emailService, codeService } = require('../services');
 
 const register = catchAsync(async (req, res) => {
   const user = await userService.createUser(req.body);
@@ -26,24 +26,24 @@ const refreshTokens = catchAsync(async (req, res) => {
 });
 
 const forgotPassword = catchAsync(async (req, res) => {
-  const [email, resetPasswordToken] = await tokenService.generateResetPasswordToken(req.body.username);
-  await emailService.sendResetPasswordEmail(req.body.username, email, resetPasswordToken);
+  const [email, codeDoc] = await codeService.generateResetPasswordCode(req.body.username);
+  await emailService.sendResetPasswordEmail(req.body.username, email, codeDoc.code);
   res.status(httpStatus.NO_CONTENT).send();
 });
 
 const resetPassword = catchAsync(async (req, res) => {
-  await authService.resetPassword(req.query.token, req.body.password);
+  await authService.resetPassword(req.body.username, req.body.code, req.body.password);
   res.status(httpStatus.NO_CONTENT).send();
 });
 
 const sendVerificationEmail = catchAsync(async (req, res) => {
-  const verifyEmailToken = await tokenService.generateVerifyEmailToken(req.user);
-  await emailService.sendVerificationEmail(req.user.username, req.user.email, verifyEmailToken);
+  const codeDoc = await codeService.generateVerifyEmailCode(req.user);
+  await emailService.sendVerificationEmail(req.user.username, req.user.email, codeDoc.code);
   res.status(httpStatus.NO_CONTENT).send();
 });
 
 const verifyEmail = catchAsync(async (req, res) => {
-  await authService.verifyEmail(req.query.token);
+  await authService.verifyEmail(req.user.id, req.body.code);
   res.status(httpStatus.NO_CONTENT).send();
 });
 

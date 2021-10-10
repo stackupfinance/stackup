@@ -1,10 +1,10 @@
 /**
  * Generate reset password email template
- * @param {string} username
- * @param {string} link
+ * @param {String} username
+ * @param {String} code
  * @returns {String}
  */
-const resetPasswordEmail = (username, link) => {
+const resetPasswordEmail = (username, code) => {
   return `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
   <html xmlns="http://www.w3.org/1999/xhtml">
     <head>
@@ -445,7 +445,7 @@ const resetPasswordEmail = (username, link) => {
     <![endif]-->
     </head>
     <body>
-      <span class="preheader">Use this link to reset your password. The link is only valid for 24 hours.</span>
+      <span class="preheader">Use this code to reset your password. The code is only valid for 24 hours.</span>
       <table class="email-wrapper" width="100%" cellpadding="0" cellspacing="0" role="presentation">
         <tr>
           <td align="center">
@@ -466,35 +466,11 @@ const resetPasswordEmail = (username, link) => {
                       <td class="content-cell">
                         <div class="f-fallback">
                           <h1>Hi ${username},</h1>
-                          <p>You recently requested to reset your password for your Stackup account. Use the button below to reset it. <strong>This password reset is only valid for the next 10 minutes.</strong></p>
-                          <!-- Action -->
-                          <table class="body-action" align="center" width="100%" cellpadding="0" cellspacing="0" role="presentation">
-                            <tr>
-                              <td align="center">
-                                <!-- Border based button
-             https://litmus.com/blog/a-guide-to-bulletproof-buttons-in-email-design -->
-                                <table width="100%" border="0" cellspacing="0" cellpadding="0" role="presentation">
-                                  <tr>
-                                    <td align="center">
-                                      <a href="${link}" class="f-fallback button button--green" target="_blank">Reset your password</a>
-                                    </td>
-                                  </tr>
-                                </table>
-                              </td>
-                            </tr>
-                          </table>
+                          <p>You recently requested to reset your Stackup account password. Use the code below to verify you identity. <strong>This password reset is only valid for the next 10 minutes.</strong></p>
+                          <h1>${code}</h1>
                           <p>If you did not request a password reset, please ignore this email or <a href="mailto:support@stackup.sh">contact support</a> if you have questions.</p>
                           <p>Thanks,
                             <br>The Stackup Team</p>
-                          <!-- Sub copy -->
-                          <table class="body-sub" role="presentation">
-                            <tr>
-                              <td>
-                                <p class="f-fallback sub">If you’re having trouble with the button above, copy and paste the URL below into your mobile web browser.</p>
-                                <p class="f-fallback sub">${link}</p>
-                              </td>
-                            </tr>
-                          </table>
                         </div>
                       </td>
                     </tr>
@@ -525,11 +501,11 @@ const resetPasswordEmail = (username, link) => {
 
 /**
  * Generate verify email template
- * @param {string} username
- * @param {string} link
+ * @param {String} username
+ * @param {String} code
  * @returns {String}
  */
-const verifyEmail = (username, link) => {
+const verifyEmail = (username, code) => {
   return `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
   <html xmlns="http://www.w3.org/1999/xhtml">
     <head>
@@ -991,35 +967,11 @@ const verifyEmail = (username, link) => {
                       <td class="content-cell">
                         <div class="f-fallback">
                           <h1>Welcome, ${username}!</h1>
-                          <p>Thanks for verifying your Stackup account. We’re thrilled to have you on board. To complete the verification, click the following link:</p>
-                          <!-- Action -->
-                          <table class="body-action" align="center" width="100%" cellpadding="0" cellspacing="0" role="presentation">
-                            <tr>
-                              <td align="center">
-                                <!-- Border based button
-             https://litmus.com/blog/a-guide-to-bulletproof-buttons-in-email-design -->
-                                <table width="100%" border="0" cellspacing="0" cellpadding="0" role="presentation">
-                                  <tr>
-                                    <td align="center">
-                                      <a href="${link}" class="f-fallback button" target="_blank">Verify your email</a>
-                                    </td>
-                                  </tr>
-                                </table>
-                              </td>
-                            </tr>
-                          </table>
+                          <p>Thanks for verifying your Stackup account. We’re thrilled to have you on board. You can use the following code to complete verification:</p>
+                          <h1>${code}</h1>
                           <p>Thanks,
                             <br>The Stackup Team</p>
                           <p><strong>P.S.</strong> Need immediate help getting started? Just reply to this email, and the Stackup support team is always ready to help!</p>
-                          <!-- Sub copy -->
-                          <table class="body-sub" role="presentation">
-                            <tr>
-                              <td>
-                                <p class="f-fallback sub">If you’re having trouble with the button above, copy and paste the URL below into your mobile web browser.</p>
-                                <p class="f-fallback sub">${link}</p>
-                              </td>
-                            </tr>
-                          </table>
                         </div>
                       </td>
                     </tr>

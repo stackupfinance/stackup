@@ -22,7 +22,7 @@ api.auth(
 
 /**
  * Encrypts an internal wallet's mnemonic
- * @param {string} mnemonic
+ * @param {String} mnemonic
  * @returns {Promise<string>}
  */
 const encryptWalletMnemonic = async (mnemonic) => {
@@ -39,7 +39,7 @@ const encryptWalletMnemonic = async (mnemonic) => {
 
 /**
  * Decrypt an internal wallet's encrypted mnemonic
- * @param {string} mnemonic
+ * @param {String} mnemonic
  * @returns {Promise<string>}
  */
 const decryptWalletMnemonic = async (encryptedMnemonic) => {

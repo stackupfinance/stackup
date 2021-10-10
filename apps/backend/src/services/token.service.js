@@ -11,9 +11,9 @@ const { tokenTypes } = require('../config/tokens');
  * Generate token
  * @param {ObjectId} userId
  * @param {Moment} expires
- * @param {string} type
- * @param {string} [secret]
- * @returns {string}
+ * @param {String} type
+ * @param {String} [secret]
+ * @returns {String}
  */
 const generateToken = (userId, expires, type, secret = config.jwt.secret) => {
   const payload = {
@@ -27,10 +27,10 @@ const generateToken = (userId, expires, type, secret = config.jwt.secret) => {
 
 /**
  * Save a token
- * @param {string} token
+ * @param {String} token
  * @param {ObjectId} userId
  * @param {Moment} expires
- * @param {string} type
+ * @param {String} type
  * @param {boolean} [blacklisted]
  * @returns {Promise<Token>}
  */
@@ -47,8 +47,8 @@ const saveToken = async (token, userId, expires, type, blacklisted = false) => {
 
 /**
  * Verify token and return token doc (or throw an error if it is not valid)
- * @param {string} token
- * @param {string} type
+ * @param {String} token
+ * @param {String} type
  * @returns {Promise<Token>}
  */
 const verifyToken = async (token, type) => {
@@ -87,7 +87,7 @@ const generateAuthTokens = async (user) => {
 
 /**
  * Generate reset password token
- * @param {string} username
+ * @param {String} username
  * @returns {Promise<[string, string]>}
  */
 const generateResetPasswordToken = async (username) => {
