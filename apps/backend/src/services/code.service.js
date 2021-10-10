@@ -9,7 +9,7 @@ const { types } = require('../config/codes');
  * Save verify doc
  * @param {String} userId
  * @param {String} type
- * @returns {Promise<Verify>}
+ * @returns {Promise<Code>}
  */
 const saveCode = async (userId, type) => {
   return Code.create({
@@ -23,7 +23,7 @@ const saveCode = async (userId, type) => {
 /**
  * Generate reset password code
  * @param {String} username
- * @returns {Promise<Verify>}
+ * @returns {Promise<Code>}
  */
 const generateResetPasswordCode = async (username) => {
   const user = await userService.getUserByUsername(username);
@@ -40,7 +40,7 @@ const generateResetPasswordCode = async (username) => {
 /**
  * Generate verify email code
  * @param {User} user
- * @returns {Promise<Verify>}
+ * @returns {Promise<Code>}
  */
 const generateVerifyEmailCode = async (user) => {
   if (!user.email) {
@@ -54,7 +54,7 @@ const generateVerifyEmailCode = async (user) => {
  * @param {String} userId
  * @param {String} code
  * @param {String} type
- * @returns {Promise<Verify>}
+ * @returns {Promise<Code>}
  */
 const checkCode = async (userId, code, type) => {
   return Code.findOne({ userId, code, type, expires: { $gt: moment().toDate() } });
