@@ -4,11 +4,11 @@ on:
   push:
     branches: [master]
     paths:
-      - "apps/contracts/**"
+      - "./apps/contracts/**"
   pull_request:
     branches: [master]
     paths:
-      - "apps/contracts/**"
+      - "./apps/contracts/**"
 
 jobs:
   test:
@@ -33,6 +33,6 @@ jobs:
         uses: codecov/codecov-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          files: .apps/contracts/coverage/coverage-final.json
+          files: ./apps/contracts/coverage/coverage-final.json
           flags: contracts
           fail_ci_if_error: true
