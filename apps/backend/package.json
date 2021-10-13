@@ -56,7 +56,7 @@
   },
   "devDependencies": {
     "coveralls": "^3.0.7",
-    "eslint": "^7.0.0",
+    "eslint": "^8.0.0",
     "eslint-config-airbnb-base": "^14.0.0",
     "eslint-config-prettier": "^8.1.0",
     "eslint-plugin-import": "^2.18.2",
