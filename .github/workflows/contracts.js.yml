@@ -2,13 +2,13 @@ name: Contracts
 
 on:
   push:
-    branches: [master]
+    branches: [main]
     paths:
-      - "./apps/contracts/**"
+      - "apps/contracts/**"
   pull_request:
-    branches: [master]
+    branches: [main]
     paths:
-      - "./apps/contracts/**"
+      - "apps/contracts/**"
 
 jobs:
   test:
