@@ -15,7 +15,9 @@ $ yarn
 See the `README.md` files in the following directories for app specific setup guides.
 
 - [Backend](./apps/backend) - REST API for supporting frontend apps.
+- [Contracts](./apps/contracts) - Collection of solidity smart contracts.
 - [Mobile](./apps/mobile) - iOS and Android mobile frontend.
+- [Wallet](./apps/wallet) - A web frontend to demonstrate smart wallet functionality.
 
 ### Running locally
 

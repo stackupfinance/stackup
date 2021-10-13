@@ -1,0 +1,35 @@
+{
+  "name": "@stackupfinance/contracts",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "test": "hardhat coverage",
+    "test:watch": "hardhat watch test",
+    "lint": "solhint 'contracts/**/*.sol' && eslint .",
+    "lint:fix": "solhint 'contracts/**/*.sol' && eslint . --fix",
+    "prettier": "prettier --check --ignore-path ./.eslintignore '**'",
+    "prettier:fix": "prettier --write --ignore-path ./.eslintignore '**'",
+    "deploy:hardhat": "hardhat run --network hardhat scripts/deploy.js",
+    "deploy:matic": "hardhat run --network matic scripts/deploy.js"
+  },
+  "devDependencies": {
+    "@nomiclabs/hardhat-ethers": "^2.0.2",
+    "@nomiclabs/hardhat-waffle": "^2.0.1",
+    "chai": "^4.3.4",
+    "eslint": "^7.31.0",
+    "eslint-config-prettier": "^8.3.0",
+    "ethereum-waffle": "^3.4.0",
+    "ethers": "^5.4.4",
+    "hardhat": "^2.5.0",
+    "prettier": "2.3.2",
+    "prettier-plugin-solidity": "^1.0.0-beta.17",
+    "solhint": "^3.3.6",
+    "solhint-plugin-prettier": "^0.0.5",
+    "solidity-coverage": "^0.7.16"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.2.0",
+    "dotenv": "^10.0.0",
+    "hardhat-watcher": "^2.1.1"
+  }
+}

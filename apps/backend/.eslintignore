@@ -1,2 +1,10 @@
 node_modules
 bin
+coverage
+Dockerfile
+.dockerignore
+.editorconfig
+.gitattributes
+.gitignore
+.eslintignore
+*.env*

@@ -9,6 +9,8 @@
     "test": "lerna run test --stream",
     "lint": "lerna run lint --stream",
     "lint:fix": "lerna run lint:fix --stream",
+    "prettier": "lerna run prettier --stream",
+    "prettier:fix": "lerna run prettier:fix --stream",
     "dev:dependencies": "yarn workspace @stackupfinance/backend run docker:dev:dependencies",
     "dev:backend": "yarn workspace @stackupfinance/backend run dev"
   },

@@ -1,0 +1,16 @@
+node_modules
+
+# Coverage directory used by tools like istanbul
+coverage
+*.lcov
+coverage.json
+
+# macOS
+.DS_Store
+
+# Hardhat files
+cache
+artifacts
+
+# local env files
+.env
