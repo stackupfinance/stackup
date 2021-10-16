@@ -9,8 +9,8 @@ const {
 describe("EntryPoint", () => {
   let create2Factory;
   let entryPoint;
-  let initCode;
   let sender;
+  let initCode;
 
   beforeEach(async () => {
     const [SingletonFactory, EntryPoint, Wallet] = await Promise.all([
@@ -21,8 +21,8 @@ describe("EntryPoint", () => {
 
     create2Factory = await SingletonFactory.deploy();
     entryPoint = await EntryPoint.deploy(create2Factory.address);
-    initCode = Wallet.getDeployTransaction().data;
     sender = getWalletAddress(create2Factory.address, initCode);
+    initCode = Wallet.getDeployTransaction().data;
   });
 
   describe("handleOps", () => {
