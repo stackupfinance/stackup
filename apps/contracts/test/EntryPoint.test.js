@@ -1,27 +1,28 @@
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
 const {
-  NULL_CODE,
+  getUserOperation,
   getWalletAddress,
   isWalletDeployed,
 } = require("../utils/testHelpers");
 
 describe("EntryPoint", () => {
   let entryPoint;
-  let userOp = {
-    nonce: 0,
-  };
+  let initCode;
 
   beforeEach(async () => {
-    const EntryPoint = await ethers.getContractFactory("EntryPoint");
-    entryPoint = await EntryPoint.deploy();
+    const [EntryPoint, Wallet] = await Promise.all([
+      ethers.getContractFactory("EntryPoint"),
+      ethers.getContractFactory("Wallet"),
+    ]);
 
-    const Wallet = await ethers.getContractFactory("Wallet");
-    userOp.initCode = await Wallet.getDeployTransaction().data;
+    entryPoint = await EntryPoint.deploy();
+    initCode = await Wallet.getDeployTransaction().data;
   });
 
   describe("handleOps", () => {
     it("Uses CREATE2 to deploy wallet if it does not yet exist", async () => {
+      const userOp = getUserOperation({ initCode });
       const address = getWalletAddress(
         entryPoint.address,
         userOp.nonce,
@@ -34,7 +35,7 @@ describe("EntryPoint", () => {
     });
 
     it("Reverts if the wallet does not exist and the initcode is empty", async () => {
-      userOp.initCode = NULL_CODE;
+      const userOp = getUserOperation();
 
       await expect(
         entryPoint.handleOps([userOp], ethers.constants.AddressZero)

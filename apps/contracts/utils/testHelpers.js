@@ -2,6 +2,14 @@ const { ethers } = require("hardhat");
 
 const NULL_CODE = "0x";
 
+const getUserOperation = (override = {}) => {
+  return {
+    nonce: 0,
+    initCode: NULL_CODE,
+    ...override,
+  };
+};
+
 const getWalletAddress = (from, nonce, initCode) => {
   return ethers.utils.getCreate2Address(
     from,
@@ -19,6 +27,7 @@ const isWalletDeployed = async (address) => {
 
 module.exports = {
   NULL_CODE,
+  getUserOperation,
   getWalletAddress,
   isWalletDeployed,
 };
