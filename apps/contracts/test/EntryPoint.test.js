@@ -17,7 +17,7 @@ describe("EntryPoint", () => {
     ]);
 
     entryPoint = await EntryPoint.deploy();
-    initCode = await Wallet.getDeployTransaction().data;
+    initCode = Wallet.getDeployTransaction().data;
   });
 
   describe("handleOps", () => {
