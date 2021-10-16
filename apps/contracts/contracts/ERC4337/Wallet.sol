@@ -3,11 +3,17 @@
 // SPDX-License-Identifier: agpl-3.0
 pragma solidity ^0.8.0;
 
-import "./UserOperation.sol";
+import "./interface/IWallet.sol";
 
-interface IWallet {
+import "hardhat/console.sol";
+
+contract Wallet is IWallet {
   function validateUserOp(
     UserOperation calldata userOp,
     uint256 requiredPrefund
-  ) external;
+  ) external {
+    // TODO: implement wallet logic
+    userOp;
+    requiredPrefund;
+  }
 }

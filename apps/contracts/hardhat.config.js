@@ -11,7 +11,7 @@ module.exports = {
   watcher: {
     test: {
       tasks: ["test"],
-      files: ["./contracts", "./test", "./utils"],
+      files: ["./contracts", "./test", "./utils/testHelpers.js"],
     },
   },
   networks: {
