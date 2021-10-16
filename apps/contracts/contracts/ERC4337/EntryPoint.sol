@@ -4,27 +4,32 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/utils/Address.sol";
-import "@openzeppelin/contracts/utils/Create2.sol";
+import "../ERC2470/SingletonFactory.sol";
 import "./interface/IEntryPoint.sol";
 
 import "hardhat/console.sol";
 
 contract EntryPoint is IEntryPoint {
-  function _shouldCreateWallet(UserOperation calldata op)
+  address public immutable create2Factory;
+
+  constructor(address _create2Factory) {
+    create2Factory = _create2Factory;
+  }
+
+  function _shouldCreateWallet(address sender, bytes calldata initCode)
     internal
     view
     returns (bool)
   {
-    address wallet = Create2.computeAddress(
-      bytes32(op.nonce),
-      keccak256(op.initCode)
-    );
-
-    if (!Address.isContract(wallet) && op.initCode.length == 0) {
-      revert("ERC4337: Null wallet + initCode");
+    if (!Address.isContract(sender) && initCode.length == 0) {
+      revert("ERC4337: No wallet and initCode");
     }
 
-    return !Address.isContract(wallet) && op.initCode.length != 0;
+    return !Address.isContract(sender) && initCode.length != 0;
+  }
+
+  function _deployWallet(bytes calldata initCode, uint256 nonce) internal {
+    SingletonFactory(create2Factory).deploy(initCode, bytes32(nonce));
   }
 
   function handleOps(UserOperation[] calldata ops, address payable redeemer)
@@ -36,11 +41,11 @@ contract EntryPoint is IEntryPoint {
     uint256 opslen = ops.length;
 
     // Verification loop
-    // 1. Call validateUserOp on the wallet
-    // 2. Create the wallet if it does not yet exist
+    // 1. Create the wallet if it does not yet exist
+    // 2. Call validateUserOp on the wallet
     for (uint256 i = 0; i < opslen; i++) {
-      if (_shouldCreateWallet(ops[i])) {
-        Create2.deploy(0, bytes32(ops[i].nonce), ops[i].initCode);
+      if (_shouldCreateWallet(ops[i].sender, ops[i].initCode)) {
+        _deployWallet(ops[i].initCode, ops[i].nonce);
       }
     }
 

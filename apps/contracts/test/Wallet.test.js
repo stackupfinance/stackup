@@ -12,7 +12,7 @@ describe("Wallet", () => {
 
   describe("validateUserOp", () => {
     it("Placeholder test", async () => {
-      const userOp = getUserOperation();
+      const userOp = getUserOperation(ethers.constants.AddressZero);
       expect(await wallet.validateUserOp(userOp, 0)).to.not.throw;
     });
   });
