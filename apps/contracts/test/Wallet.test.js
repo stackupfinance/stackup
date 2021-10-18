@@ -80,7 +80,7 @@ describe("Wallet", () => {
       ).to.equal(entryPointFinalBalance);
     });
 
-    it("Does not pay fee to EntryPoint if requiredPrefund is zero", async () => {
+    it("Does not pay fee to the EntryPoint if requiredPrefund is zero", async () => {
       const balance = await sendEth(owner, wallet.address, "0.1").then(
         (res) => res.value
       );
