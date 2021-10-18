@@ -40,7 +40,7 @@ describe("Wallet", () => {
       );
     });
 
-    it("Increments nonce on a valid op", async () => {
+    it("Increments valid nonce", async () => {
       const validUserOp = await getUserOperation(owner, wallet.address);
 
       await expect(wallet.validateUserOp(validUserOp, 0)).to.not.be.reverted;
