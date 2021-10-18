@@ -7,12 +7,14 @@ const {
 } = require("../utils/testHelpers");
 
 describe("EntryPoint", () => {
+  let owner;
   let create2Factory;
   let entryPoint;
   let initCode;
   let sender;
 
   beforeEach(async () => {
+    [owner] = await ethers.getSigners();
     const [SingletonFactory, EntryPoint, Wallet] = await Promise.all([
       ethers.getContractFactory("SingletonFactory"),
       ethers.getContractFactory("EntryPoint"),
@@ -21,13 +23,16 @@ describe("EntryPoint", () => {
 
     create2Factory = await SingletonFactory.deploy();
     entryPoint = await EntryPoint.deploy(create2Factory.address);
-    initCode = Wallet.getDeployTransaction().data;
+    initCode = Wallet.getDeployTransaction(
+      entryPoint.address,
+      owner.address
+    ).data;
     sender = getWalletAddress(create2Factory.address, initCode);
   });
 
   describe("handleOps", () => {
     it("Uses CREATE2 to deploy wallet if it does not yet exist", async () => {
-      const userOp = getUserOperation(sender, { initCode });
+      const userOp = await getUserOperation(owner, sender, { initCode });
 
       expect(await isWalletDeployed(sender)).to.be.false;
       await entryPoint.handleOps([userOp], ethers.constants.AddressZero);
@@ -35,11 +40,11 @@ describe("EntryPoint", () => {
     });
 
     it("Reverts if the wallet does not exist and the initcode is empty", async () => {
-      const userOp = getUserOperation(sender);
+      const userOp = await getUserOperation(owner, sender);
 
       await expect(
         entryPoint.handleOps([userOp], ethers.constants.AddressZero)
-      ).to.be.revertedWith("ERC4337: No wallet and initCode");
+      ).to.be.revertedWith("EntryPoint: No wallet & initCode");
     });
   });
 });

@@ -22,7 +22,7 @@ contract EntryPoint is IEntryPoint {
     returns (bool)
   {
     if (!Address.isContract(sender) && initCode.length == 0) {
-      revert("ERC4337: No wallet and initCode");
+      revert("EntryPoint: No wallet & initCode");
     }
 
     return !Address.isContract(sender) && initCode.length != 0;

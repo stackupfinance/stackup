@@ -15,5 +15,5 @@ struct UserOperation {
   // uint256 maxPriorityFeePerGas;
   // address paymaster;
   // bytes paymasterData;
-  // bytes signature;
+  bytes signature;
 }
