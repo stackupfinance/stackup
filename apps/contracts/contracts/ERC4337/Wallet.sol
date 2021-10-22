@@ -5,7 +5,8 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
-import "./interface/IWallet.sol";
+import {IWallet} from "./interface/IWallet.sol";
+import {UserOperation} from "./UserOperation.sol";
 
 import "hardhat/console.sol";
 
@@ -24,12 +25,15 @@ contract Wallet is IWallet {
     owner = _owner;
   }
 
+  modifier onlyEntryPoint() {
+    require(msg.sender == entryPoint, "Wallet: Not from EntryPoint");
+    _;
+  }
+
   function validateUserOp(
     UserOperation calldata userOp,
     uint256 requiredPrefund
-  ) external {
-    require(msg.sender == entryPoint, "Wallet: Not from EntryPoint");
-
+  ) external onlyEntryPoint {
     require(
       keccak256(abi.encodePacked(userOp.nonce))
         .toEthSignedMessageHash()
@@ -46,6 +50,25 @@ contract Wallet is IWallet {
       // solhint-disable-next-line avoid-low-level-calls
       (bool success, ) = entryPoint.call{value: requiredPrefund}("");
       success;
+    }
+  }
+
+  function executeUserOp(
+    address to,
+    uint256 value,
+    bytes calldata data
+  ) external onlyEntryPoint {
+    // solhint-disable-next-line avoid-low-level-calls
+    (bool success, bytes memory result) = to.call{value: value}(data);
+
+    if (!success) {
+      // solhint-disable-next-line reason-string
+      if (result.length < 68) revert();
+      // solhint-disable-next-line no-inline-assembly
+      assembly {
+        result := add(result, 0x04)
+      }
+      revert(abi.decode(result, (string)));
     }
   }
 }

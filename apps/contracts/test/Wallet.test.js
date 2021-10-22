@@ -1,6 +1,9 @@
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
 const {
+  NULL_DATA,
+  encodeFailContractCall,
+  encodePassContractCall,
   getUserOperation,
   getWalletBalances,
   sendEth,
@@ -12,12 +15,19 @@ describe("Wallet", () => {
   let owner;
   let nonOwner;
   let wallet;
+  let test;
 
   beforeEach(async () => {
     [mockEntryPoint, owner, nonOwner] = await ethers.getSigners();
 
-    const Wallet = await ethers.getContractFactory("Wallet");
-    wallet = await Wallet.deploy(mockEntryPoint.address, owner.address);
+    const [Wallet, Test] = await Promise.all([
+      ethers.getContractFactory("Wallet"),
+      ethers.getContractFactory("Test"),
+    ]);
+    [wallet, test] = await Promise.all([
+      Wallet.deploy(mockEntryPoint.address, owner.address),
+      Test.deploy(),
+    ]);
   });
 
   describe("validateUserOp", () => {
@@ -91,6 +101,51 @@ describe("Wallet", () => {
       );
       const [walletBalance] = await getWalletBalances([wallet.address]);
       expect(walletBalance).to.equal(balance);
+    });
+  });
+
+  describe("executeUserOp", () => {
+    it("Required to be called from the Entry Point", async () => {
+      const value = ethers.utils.parseEther("0.1");
+
+      await expect(
+        wallet.connect(owner).executeUserOp(nonOwner.address, value, NULL_DATA)
+      ).to.be.revertedWith("Wallet: Not from EntryPoint");
+    });
+
+    it("Sends the correct amount of Eth", async () => {
+      const value = ethers.utils.parseEther("0.1");
+      await sendEth(owner, wallet.address, value);
+      const [initBalance] = await getWalletBalances([nonOwner.address]);
+
+      await expect(wallet.executeUserOp(nonOwner.address, value, NULL_DATA)).to
+        .not.be.reverted;
+      const [finalBalance] = await getWalletBalances([nonOwner.address]);
+
+      expect(finalBalance.sub(initBalance)).to.equal(value);
+    });
+
+    it("Reverts when not enough Eth", async () => {
+      const value = ethers.utils.parseEther("0.1");
+
+      await expect(
+        wallet.executeUserOp(nonOwner.address, value, NULL_DATA)
+      ).to.be.revertedWith("");
+    });
+
+    it("Can successfully make arbitrary contract calls", async () => {
+      const data = encodePassContractCall();
+
+      await expect(wallet.executeUserOp(test.address, 0, data)).to.not.be
+        .reverted;
+    });
+
+    it("Can revert gracefully from failed arbitrary contract calls", async () => {
+      const data = encodeFailContractCall();
+
+      await expect(
+        wallet.executeUserOp(test.address, 0, data)
+      ).to.be.revertedWith("Test: reverted");
     });
   });
 });
