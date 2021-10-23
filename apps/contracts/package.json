@@ -16,19 +16,19 @@
     "@nomiclabs/hardhat-ethers": "^2.0.2",
     "@nomiclabs/hardhat-waffle": "^2.0.1",
     "chai": "^4.3.4",
-    "eslint": "^8.0.0",
+    "eslint": "^8.0.1",
     "eslint-config-prettier": "^8.3.0",
     "ethereum-waffle": "^3.4.0",
-    "ethers": "^5.4.4",
-    "hardhat": "^2.5.0",
+    "ethers": "^5.4.7",
+    "hardhat": "^2.6.7",
     "prettier": "2.3.2",
-    "prettier-plugin-solidity": "^1.0.0-beta.17",
+    "prettier-plugin-solidity": "^1.0.0-beta.18",
     "solhint": "^3.3.6",
     "solhint-plugin-prettier": "^0.0.5",
-    "solidity-coverage": "^0.7.16"
+    "solidity-coverage": "^0.7.17"
   },
   "dependencies": {
-    "@openzeppelin/contracts": "^4.2.0",
+    "@openzeppelin/contracts": "^4.3.2",
     "dotenv": "^10.0.0",
     "hardhat-watcher": "^2.1.1"
   }
