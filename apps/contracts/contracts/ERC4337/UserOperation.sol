@@ -5,6 +5,7 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/utils/math/Math.sol";
+import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "../ERC2470/SingletonFactory.sol";
 import "./interface/IWallet.sol";
 
@@ -18,8 +19,8 @@ struct UserOperation {
   uint256 preVerificationGas;
   uint256 maxFeePerGas;
   uint256 maxPriorityFeePerGas;
-  // address paymaster;
-  // bytes paymasterData;
+  address paymaster;
+  bytes paymasterData;
   bytes signature;
 }
 
@@ -36,6 +37,29 @@ library UserOperationUtils {
     } else {
       return Math.min(op.maxFeePerGas, op.maxPriorityFeePerGas + block.basefee);
     }
+  }
+
+  function messageHash(UserOperation calldata op)
+    internal
+    pure
+    returns (bytes32)
+  {
+    return
+      keccak256(
+        abi.encodePacked(
+          op.sender,
+          op.nonce,
+          keccak256(op.initCode),
+          keccak256(op.callData),
+          op.callGas,
+          op.verificationGas,
+          op.preVerificationGas,
+          op.maxFeePerGas,
+          op.maxPriorityFeePerGas,
+          op.paymaster,
+          keccak256(op.paymasterData)
+        )
+      );
   }
 }
 
@@ -92,5 +116,14 @@ library EntryPointUserOperation {
       }
       revert(abi.decode(result, (string)));
     }
+  }
+}
+
+library WalletUserOperation {
+  using UserOperationUtils for UserOperation;
+  using ECDSA for bytes32;
+
+  function signer(UserOperation calldata op) internal pure returns (address) {
+    return op.messageHash().toEthSignedMessageHash().recover(op.signature);
   }
 }

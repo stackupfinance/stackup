@@ -4,14 +4,13 @@
 // SPDX-License-Identifier: agpl-3.0
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import {IWallet} from "./interface/IWallet.sol";
-import {UserOperation} from "./UserOperation.sol";
+import {UserOperation, WalletUserOperation} from "./UserOperation.sol";
 
 import "hardhat/console.sol";
 
 contract Wallet is IWallet {
-  using ECDSA for bytes32;
+  using WalletUserOperation for UserOperation;
 
   address public entryPoint;
   address public owner;
@@ -34,12 +33,7 @@ contract Wallet is IWallet {
     UserOperation calldata userOp,
     uint256 requiredPrefund
   ) external onlyEntryPoint {
-    require(
-      keccak256(abi.encodePacked(userOp.nonce))
-        .toEthSignedMessageHash()
-        .recover(userOp.signature) == owner,
-      "Wallet: Invalid signature"
-    );
+    require(userOp.signer() == owner, "Wallet: Invalid signature");
 
     if (userOp.initCode.length == 0) {
       require(nonce == userOp.nonce, "Wallet: Invalid nonce");

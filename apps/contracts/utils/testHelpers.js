@@ -50,15 +50,42 @@ const encodePassEntryPointCall = (testContract) => {
   ]);
 };
 
-const getUserOperationHash = (nonce) => {
+const getUserOperationHash = (op) => {
   const messageHash = ethers.utils.keccak256(
-    ethers.utils.defaultAbiCoder.encode(["uint256"], [nonce])
+    ethers.utils.solidityPack(
+      [
+        "address",
+        "uint256",
+        "bytes32",
+        "bytes32",
+        "uint256",
+        "uint256",
+        "uint256",
+        "uint256",
+        "uint256",
+        "address",
+        "bytes32",
+      ],
+      [
+        op.sender,
+        op.nonce,
+        ethers.utils.keccak256(op.initCode),
+        ethers.utils.keccak256(op.callData),
+        op.callGas,
+        op.verificationGas,
+        op.preVerificationGas,
+        op.maxFeePerGas,
+        op.maxPriorityFeePerGas,
+        op.paymaster,
+        ethers.utils.keccak256(op.paymasterData),
+      ]
+    )
   );
   return ethers.utils.arrayify(messageHash);
 };
 
 const getUserOperation = async (signer, sender, override = {}) => {
-  return {
+  const op = {
     sender,
     nonce: INITIAL_NONCE,
     initCode: NULL_DATA,
@@ -68,10 +95,14 @@ const getUserOperation = async (signer, sender, override = {}) => {
     preVerificationGas: DEFAULT_GAS,
     maxFeePerGas: DEFAULT_MAX_FEE,
     maxPriorityFeePerGas: DEFAULT_MAX_PRIORITY_FEE,
-    signature: await signer.signMessage(
-      getUserOperationHash(override.nonce ?? INITIAL_NONCE)
-    ),
+    paymaster: ethers.constants.AddressZero,
+    paymasterData: NULL_DATA,
     ...override,
+  };
+
+  return {
+    ...op,
+    signature: await signer.signMessage(getUserOperationHash(op)),
   };
 };
 
