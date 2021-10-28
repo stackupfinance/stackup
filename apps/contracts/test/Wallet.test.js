@@ -4,8 +4,8 @@ const {
   NULL_DATA,
   encodeFailContractCall,
   encodePassContractCall,
+  getAddressBalances,
   getUserOperation,
-  getWalletBalances,
   sendEth,
   transactionFee,
 } = require("../utils/testHelpers");
@@ -72,7 +72,7 @@ describe("Wallet", () => {
         (res) => res.value
       );
       const [entryPointInitBalance, walletInitBalance] =
-        await getWalletBalances([mockEntryPoint.address, wallet.address]);
+        await getAddressBalances([mockEntryPoint.address, wallet.address]);
       expect(walletInitBalance).to.equal(requiredPrefund);
 
       const tx = await wallet
@@ -83,7 +83,7 @@ describe("Wallet", () => {
         .then((res) => res.wait());
 
       const [entryPointFinalBalance, walletFinalBalance] =
-        await getWalletBalances([mockEntryPoint.address, wallet.address]);
+        await getAddressBalances([mockEntryPoint.address, wallet.address]);
       expect(walletFinalBalance).to.equal(0);
       expect(
         entryPointInitBalance.sub(transactionFee(tx)).add(requiredPrefund)
@@ -99,7 +99,7 @@ describe("Wallet", () => {
         await getUserOperation(owner, wallet.address),
         0
       );
-      const [walletBalance] = await getWalletBalances([wallet.address]);
+      const [walletBalance] = await getAddressBalances([wallet.address]);
       expect(walletBalance).to.equal(balance);
     });
   });
@@ -116,11 +116,11 @@ describe("Wallet", () => {
     it("Sends the correct amount of Eth", async () => {
       const value = ethers.utils.parseEther("0.1");
       await sendEth(owner, wallet.address, value);
-      const [initBalance] = await getWalletBalances([nonOwner.address]);
+      const [initBalance] = await getAddressBalances([nonOwner.address]);
 
       await expect(wallet.executeUserOp(nonOwner.address, value, NULL_DATA)).to
         .not.be.reverted;
-      const [finalBalance] = await getWalletBalances([nonOwner.address]);
+      const [finalBalance] = await getAddressBalances([nonOwner.address]);
 
       expect(finalBalance.sub(initBalance)).to.equal(value);
     });

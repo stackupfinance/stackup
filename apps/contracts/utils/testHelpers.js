@@ -1,4 +1,4 @@
-const { ethers } = require("hardhat");
+const { ethers, network } = require("hardhat");
 const TestContract = require("../artifacts/contracts/test/Test.sol/Test.json");
 const WalletContract = require("../artifacts/contracts/ERC4337/Wallet.sol/Wallet.json");
 
@@ -26,6 +26,8 @@ const WALLET_CONTRACT_INTERFACE = new ethers.utils.Interface(
   WalletContract.abi
 );
 
+const LOCK_EXPIRY_PERIOD = 172800; // 2 Days
+
 const encodeFailContractCall = () => {
   return TEST_CONTRACT_INTERFACE.encodeFunctionData("func", [false]);
 };
@@ -48,6 +50,10 @@ const encodePassEntryPointCall = (testContract) => {
     0,
     encodePassContractCall(),
   ]);
+};
+
+const getAddressBalances = async (addresses) => {
+  return Promise.all(addresses.map((addr) => ethers.provider.getBalance(addr)));
 };
 
 const getUserOperationHash = (op) => {
@@ -114,14 +120,23 @@ const getWalletAddress = (create2factory, initCode) => {
   );
 };
 
-const getWalletBalances = async (addresses) => {
-  const [signer] = await ethers.getSigners();
-  return Promise.all(addresses.map((addr) => signer.provider.getBalance(addr)));
+const getLastBlockTimestamp = async () => {
+  const prevBlock = await ethers.provider.getBlock(
+    await ethers.provider.getBlockNumber()
+  );
+
+  return prevBlock.timestamp;
+};
+
+const incrementBlockTimestamp = async (increment = 0) => {
+  await network.provider.request({
+    method: "evm_setNextBlockTimestamp",
+    params: [(await getLastBlockTimestamp()) + increment],
+  });
 };
 
 const isWalletDeployed = async (address) => {
-  const [signer] = await ethers.getSigners();
-  const code = await signer.provider.getCode(address);
+  const code = await ethers.provider.getCode(address);
 
   return code !== NULL_DATA;
 };
@@ -142,14 +157,17 @@ module.exports = {
   INITIAL_NONCE,
   DEFAULT_REQUIRED_PRE_FUND,
   TEST_CONTRACT_INTERFACE,
+  LOCK_EXPIRY_PERIOD,
   encodeFailContractCall,
   encodeFailEntryPointCall,
   encodePassContractCall,
   encodePassEntryPointCall,
+  getAddressBalances,
   getUserOperationHash,
   getUserOperation,
   getWalletAddress,
-  getWalletBalances,
+  getLastBlockTimestamp,
+  incrementBlockTimestamp,
   isWalletDeployed,
   sendEth,
   transactionFee,

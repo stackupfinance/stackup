@@ -19,12 +19,12 @@ interface IEntryPoint {
   // ) external view returns (bytes memory context, uint256 gasUsedByPayForOp);
 }
 
-interface IEntryPointStakeManager {
+interface IEntryPointStakeController {
   function addStake() external payable;
 
   function lockStake() external;
 
-  function unlockStake(address paymaster) external;
+  function unlockStake() external;
 
   function withdrawStake(address payable withdrawAddress) external;
 }

@@ -2,12 +2,17 @@ const { expect } = require("chai");
 const { ethers } = require("hardhat");
 const {
   DEFAULT_REQUIRED_PRE_FUND,
+  LOCK_EXPIRY_PERIOD,
   encodeFailEntryPointCall,
   encodePassEntryPointCall,
+  getAddressBalances,
   getUserOperation,
   getWalletAddress,
+  getLastBlockTimestamp,
+  incrementBlockTimestamp,
   isWalletDeployed,
   sendEth,
+  transactionFee,
 } = require("../utils/testHelpers");
 
 describe("EntryPoint", () => {
@@ -99,6 +104,119 @@ describe("EntryPoint", () => {
 
       await expect(entryPoint.handleOps([userOp], ethers.constants.AddressZero))
         .to.not.be.reverted;
+    });
+  });
+
+  describe("addStake", () => {
+    it("Should receive Eth stake from paymaster", async () => {
+      expect(...(await getAddressBalances([entryPoint.address]))).to.equal(0);
+      expect(await entryPoint.getStake(owner.address)).to.deep.equal([
+        ethers.constants.Zero,
+        ethers.constants.Zero,
+        false,
+      ]);
+
+      await entryPoint.addStake({ value: DEFAULT_REQUIRED_PRE_FUND });
+
+      expect(...(await getAddressBalances([entryPoint.address]))).to.equal(
+        DEFAULT_REQUIRED_PRE_FUND
+      );
+      expect(await entryPoint.getStake(owner.address)).to.deep.equal([
+        DEFAULT_REQUIRED_PRE_FUND,
+        ethers.constants.Zero,
+        false,
+      ]);
+    });
+  });
+
+  describe("lockStake", () => {
+    it("Should lock staked Eth from paymaster", async () => {
+      await entryPoint.addStake({ value: DEFAULT_REQUIRED_PRE_FUND });
+      expect(await entryPoint.getStake(owner.address)).to.deep.equal([
+        DEFAULT_REQUIRED_PRE_FUND,
+        ethers.constants.Zero,
+        false,
+      ]);
+
+      await entryPoint.lockStake();
+      expect(await entryPoint.getStake(owner.address)).to.deep.equal([
+        DEFAULT_REQUIRED_PRE_FUND,
+        ethers.BigNumber.from(
+          (await getLastBlockTimestamp()) + LOCK_EXPIRY_PERIOD
+        ),
+        true,
+      ]);
+    });
+  });
+
+  describe("unlockStake", () => {
+    it("Should unlock stake if past lock expiry time", async () => {
+      await entryPoint.addStake({ value: DEFAULT_REQUIRED_PRE_FUND });
+      await entryPoint.lockStake();
+      expect(await entryPoint.getStake(owner.address)).to.deep.equal([
+        DEFAULT_REQUIRED_PRE_FUND,
+        ethers.BigNumber.from(
+          (await getLastBlockTimestamp()) + LOCK_EXPIRY_PERIOD
+        ),
+        true,
+      ]);
+
+      await incrementBlockTimestamp(LOCK_EXPIRY_PERIOD);
+      await entryPoint.unlockStake();
+      expect(await entryPoint.getStake(owner.address)).to.deep.equal([
+        DEFAULT_REQUIRED_PRE_FUND,
+        ethers.constants.Zero,
+        false,
+      ]);
+    });
+
+    it("Should revert if not past lock expiry time", async () => {
+      await entryPoint.addStake({ value: DEFAULT_REQUIRED_PRE_FUND });
+      await entryPoint.lockStake();
+      const expectedStake = await entryPoint.getStake(owner.address);
+
+      await expect(entryPoint.unlockStake()).to.be.revertedWith(
+        "EntryPoint: Lock not expired"
+      );
+      expect(await entryPoint.getStake(owner.address)).to.deep.equal(
+        expectedStake
+      );
+    });
+  });
+
+  describe("withdrawStake", () => {
+    it("Should withdraw unlocked stake to the given address", async () => {
+      await entryPoint.addStake({ value: DEFAULT_REQUIRED_PRE_FUND });
+      await entryPoint.lockStake();
+      await incrementBlockTimestamp(LOCK_EXPIRY_PERIOD);
+      await entryPoint.unlockStake();
+
+      const [initBalance] = await getAddressBalances([owner.address]);
+      const tx = await entryPoint
+        .withdrawStake(owner.address)
+        .then((tx) => tx.wait());
+      const [finalBalance] = await getAddressBalances([owner.address]);
+      expect(
+        initBalance.sub(transactionFee(tx)).add(DEFAULT_REQUIRED_PRE_FUND)
+      ).to.equal(finalBalance);
+      expect(await entryPoint.getStake(owner.address)).to.deep.equal([
+        ethers.constants.Zero,
+        ethers.constants.Zero,
+        false,
+      ]);
+    });
+
+    it("Should revert if stake has not been unlocked", async () => {
+      await entryPoint.addStake({ value: DEFAULT_REQUIRED_PRE_FUND });
+      await entryPoint.lockStake();
+      const expectedStake = await entryPoint.getStake(owner.address);
+
+      await expect(entryPoint.withdrawStake(owner.address)).to.be.revertedWith(
+        "EntryPoint: Stake is locked"
+      );
+      expect(await entryPoint.getStake(owner.address)).to.deep.equal(
+        expectedStake
+      );
     });
   });
 });
