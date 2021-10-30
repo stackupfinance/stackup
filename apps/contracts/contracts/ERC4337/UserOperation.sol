@@ -26,6 +26,28 @@ struct UserOperation {
 }
 
 library UserOperationUtils {
+  function totalGas(UserOperation calldata op) internal pure returns (uint256) {
+    return op.callGas + op.verificationGas + op.preVerificationGas;
+  }
+
+  function gasPrice(UserOperation calldata op) internal view returns (uint256) {
+    if (op.maxFeePerGas == op.maxPriorityFeePerGas) {
+      // For blockchains that don't support EIP-1559 transactions.
+      // Avoids calling the BASEFEE opcode.
+      return op.maxFeePerGas;
+    } else {
+      return Math.min(op.maxFeePerGas, op.maxPriorityFeePerGas + block.basefee);
+    }
+  }
+
+  function requiredPrefund(UserOperation calldata op)
+    internal
+    view
+    returns (uint256)
+  {
+    return totalGas(op) * gasPrice(op);
+  }
+
   function messageHash(UserOperation calldata op)
     internal
     pure
@@ -51,19 +73,7 @@ library UserOperationUtils {
 }
 
 library EntryPointUserOperation {
-  function totalGas(UserOperation calldata op) internal pure returns (uint256) {
-    return op.callGas + op.verificationGas + op.preVerificationGas;
-  }
-
-  function gasPrice(UserOperation calldata op) internal view returns (uint256) {
-    if (op.maxFeePerGas == op.maxPriorityFeePerGas) {
-      // For blockchains that don't support EIP-1559 transactions.
-      // Avoids calling the BASEFEE opcode.
-      return op.maxFeePerGas;
-    } else {
-      return Math.min(op.maxFeePerGas, op.maxPriorityFeePerGas + block.basefee);
-    }
-  }
+  using UserOperationUtils for UserOperation;
 
   function shouldCreateWallet(UserOperation calldata op)
     internal
@@ -90,7 +100,7 @@ library EntryPointUserOperation {
     view
   {
     require(
-      stake.isLocked && stake.value >= totalGas(op) * gasPrice(op),
+      stake.isLocked && stake.value >= op.requiredPrefund(),
       "EntryPoint: Invalid stake"
     );
   }
@@ -101,9 +111,8 @@ library EntryPointUserOperation {
     SingletonFactory(create2Factory).deploy(op.initCode, bytes32(op.nonce));
   }
 
-  function validateUserOp(UserOperation calldata op, uint256 requiredPrefund)
-    internal
-  {
+  function validateUserOp(UserOperation calldata op) internal {
+    uint256 requiredPrefund = hasPaymaster(op) ? 0 : op.requiredPrefund();
     uint256 initBalance = address(this).balance;
 
     IWallet(op.sender).validateUserOp{gas: op.verificationGas}(
