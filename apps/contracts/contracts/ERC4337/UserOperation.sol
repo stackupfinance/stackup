@@ -99,9 +99,10 @@ library EntryPointUserOperation {
     internal
     view
   {
+    require(stake.isLocked, "EntryPoint: Stake not locked");
     require(
-      stake.isLocked && stake.value >= op.requiredPrefund(),
-      "EntryPoint: Invalid stake"
+      stake.value >= op.requiredPrefund(),
+      "EntryPoint: Insufficient stake"
     );
   }
 
