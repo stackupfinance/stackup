@@ -124,6 +124,25 @@ describe("EntryPoint", () => {
         .to.not.be.reverted;
     });
 
+    it("Reverts if paymaster stake is not locked", async () => {
+      await entryPoint
+        .connect(paymaster)
+        .addStake({ value: DEFAULT_REQUIRED_PRE_FUND });
+      const userOp = await signUserOperation(
+        owner,
+        await withPaymaster(
+          paymaster,
+          getUserOperation(sender, {
+            initCode,
+          })
+        )
+      );
+
+      await expect(
+        entryPoint.handleOps([userOp], ethers.constants.AddressZero)
+      ).to.be.revertedWith("EntryPoint: Stake not locked");
+    });
+
     it("Reverts if paymaster does not have enough Eth staked", async () => {
       await entryPoint
         .connect(paymaster)
@@ -142,25 +161,6 @@ describe("EntryPoint", () => {
       await expect(
         entryPoint.handleOps([userOp], ethers.constants.AddressZero)
       ).to.be.revertedWith("EntryPoint: Insufficient stake");
-    });
-
-    it("Reverts if paymaster stake is not locked", async () => {
-      await entryPoint
-        .connect(paymaster)
-        .addStake({ value: DEFAULT_REQUIRED_PRE_FUND });
-      const userOp = await signUserOperation(
-        owner,
-        await withPaymaster(
-          paymaster,
-          getUserOperation(sender, {
-            initCode,
-          })
-        )
-      );
-
-      await expect(
-        entryPoint.handleOps([userOp], ethers.constants.AddressZero)
-      ).to.be.revertedWith("EntryPoint: Stake not locked");
     });
 
     it("Does not revert if paymaster has enough Eth staked", async () => {
