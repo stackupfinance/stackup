@@ -56,6 +56,38 @@ const getAddressBalances = async (addresses) => {
   return Promise.all(addresses.map((addr) => ethers.provider.getBalance(addr)));
 };
 
+const getPaymasterDataHash = (op) => {
+  const messageHash = ethers.utils.keccak256(
+    ethers.utils.solidityPack(
+      [
+        "address",
+        "uint256",
+        "bytes32",
+        "bytes32",
+        "uint256",
+        "uint256",
+        "uint256",
+        "uint256",
+        "uint256",
+        "address",
+      ],
+      [
+        op.sender,
+        op.nonce,
+        ethers.utils.keccak256(op.initCode),
+        ethers.utils.keccak256(op.callData),
+        op.callGas,
+        op.verificationGas,
+        op.preVerificationGas,
+        op.maxFeePerGas,
+        op.maxPriorityFeePerGas,
+        op.paymaster,
+      ]
+    )
+  );
+  return ethers.utils.arrayify(messageHash);
+};
+
 const getUserOperationHash = (op) => {
   const messageHash = ethers.utils.keccak256(
     ethers.utils.solidityPack(
@@ -90,8 +122,8 @@ const getUserOperationHash = (op) => {
   return ethers.utils.arrayify(messageHash);
 };
 
-const getUserOperation = async (signer, sender, override = {}) => {
-  const op = {
+const getUserOperation = (sender, override = {}) => {
+  return {
     sender,
     nonce: INITIAL_NONCE,
     initCode: NULL_DATA,
@@ -103,12 +135,8 @@ const getUserOperation = async (signer, sender, override = {}) => {
     maxPriorityFeePerGas: DEFAULT_MAX_PRIORITY_FEE,
     paymaster: ethers.constants.AddressZero,
     paymasterData: NULL_DATA,
+    signature: NULL_DATA,
     ...override,
-  };
-
-  return {
-    ...op,
-    signature: await signer.signMessage(getUserOperationHash(op)),
   };
 };
 
@@ -148,8 +176,27 @@ const sendEth = async (from, to, value) => {
   });
 };
 
+const signUserOperation = async (signer, op) => {
+  return {
+    ...op,
+    signature: await signer.signMessage(getUserOperationHash(op)),
+  };
+};
+
 const transactionFee = (tx) => {
   return tx.effectiveGasPrice.mul(tx.gasUsed);
+};
+
+const withPaymaster = async (paymaster, op) => {
+  const userOp = {
+    ...op,
+    paymaster: paymaster.address,
+  };
+
+  return {
+    ...userOp,
+    paymasterData: await paymaster.signMessage(getPaymasterDataHash(userOp)),
+  };
 };
 
 module.exports = {
@@ -170,5 +217,7 @@ module.exports = {
   incrementBlockTimestamp,
   isWalletDeployed,
   sendEth,
+  signUserOperation,
   transactionFee,
+  withPaymaster,
 };

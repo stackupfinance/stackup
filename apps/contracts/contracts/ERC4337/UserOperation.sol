@@ -7,7 +7,8 @@ import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/utils/math/Math.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "../ERC2470/SingletonFactory.sol";
-import "./interface/IWallet.sol";
+import {IWallet} from "./interface/IWallet.sol";
+import {Stake} from "./Stake.sol";
 
 struct UserOperation {
   address sender;
@@ -25,20 +26,6 @@ struct UserOperation {
 }
 
 library UserOperationUtils {
-  function totalGas(UserOperation calldata op) internal pure returns (uint256) {
-    return op.callGas + op.verificationGas + op.preVerificationGas;
-  }
-
-  function gasPrice(UserOperation calldata op) internal view returns (uint256) {
-    if (op.maxFeePerGas == op.maxPriorityFeePerGas) {
-      // For blockchains that don't support EIP-1559 transactions.
-      // Avoids calling the BASEFEE opcode.
-      return op.maxFeePerGas;
-    } else {
-      return Math.min(op.maxFeePerGas, op.maxPriorityFeePerGas + block.basefee);
-    }
-  }
-
   function messageHash(UserOperation calldata op)
     internal
     pure
@@ -64,7 +51,19 @@ library UserOperationUtils {
 }
 
 library EntryPointUserOperation {
-  using UserOperationUtils for UserOperation;
+  function totalGas(UserOperation calldata op) internal pure returns (uint256) {
+    return op.callGas + op.verificationGas + op.preVerificationGas;
+  }
+
+  function gasPrice(UserOperation calldata op) internal view returns (uint256) {
+    if (op.maxFeePerGas == op.maxPriorityFeePerGas) {
+      // For blockchains that don't support EIP-1559 transactions.
+      // Avoids calling the BASEFEE opcode.
+      return op.maxFeePerGas;
+    } else {
+      return Math.min(op.maxFeePerGas, op.maxPriorityFeePerGas + block.basefee);
+    }
+  }
 
   function shouldCreateWallet(UserOperation calldata op)
     internal
@@ -78,16 +77,33 @@ library EntryPointUserOperation {
     return !Address.isContract(op.sender) && op.initCode.length != 0;
   }
 
+  function hasPaymaster(UserOperation calldata op)
+    internal
+    pure
+    returns (bool)
+  {
+    return op.paymaster != address(0);
+  }
+
+  function verifyPaymasterStake(UserOperation calldata op, Stake memory stake)
+    internal
+    view
+  {
+    require(
+      stake.isLocked && stake.value >= totalGas(op) * gasPrice(op),
+      "EntryPoint: Invalid stake"
+    );
+  }
+
   function deployWallet(UserOperation calldata op, address create2Factory)
     internal
   {
     SingletonFactory(create2Factory).deploy(op.initCode, bytes32(op.nonce));
   }
 
-  function validate(UserOperation calldata op) internal {
-    uint256 totalGas = op.totalGas();
-    uint256 gasPrice = op.gasPrice();
-    uint256 requiredPrefund = totalGas * gasPrice;
+  function validateUserOp(UserOperation calldata op, uint256 requiredPrefund)
+    internal
+  {
     uint256 initBalance = address(this).balance;
 
     IWallet(op.sender).validateUserOp{gas: op.verificationGas}(

@@ -12,11 +12,14 @@ const {
   incrementBlockTimestamp,
   isWalletDeployed,
   sendEth,
+  signUserOperation,
   transactionFee,
+  withPaymaster,
 } = require("../utils/testHelpers");
 
 describe("EntryPoint", () => {
   let owner;
+  let paymaster;
   let create2Factory;
   let entryPoint;
   let initCode;
@@ -24,7 +27,7 @@ describe("EntryPoint", () => {
   let test;
 
   beforeEach(async () => {
-    [owner] = await ethers.getSigners();
+    [owner, paymaster] = await ethers.getSigners();
     const [SingletonFactory, EntryPoint, Wallet, Test] = await Promise.all([
       ethers.getContractFactory("SingletonFactory"),
       ethers.getContractFactory("EntryPoint"),
@@ -47,7 +50,10 @@ describe("EntryPoint", () => {
   describe("handleOps", () => {
     it("Uses CREATE2 to deploy wallet if it does not yet exist", async () => {
       await sendEth(owner, sender, DEFAULT_REQUIRED_PRE_FUND);
-      const userOp = await getUserOperation(owner, sender, { initCode });
+      const userOp = await signUserOperation(
+        owner,
+        getUserOperation(sender, { initCode })
+      );
 
       expect(await isWalletDeployed(sender)).to.be.false;
       await entryPoint.handleOps([userOp], ethers.constants.AddressZero);
@@ -55,7 +61,7 @@ describe("EntryPoint", () => {
     });
 
     it("Reverts if the wallet does not exist and the initcode is empty", async () => {
-      const userOp = await getUserOperation(owner, sender);
+      const userOp = await signUserOperation(owner, getUserOperation(sender));
 
       await expect(
         entryPoint.handleOps([userOp], ethers.constants.AddressZero)
@@ -64,7 +70,10 @@ describe("EntryPoint", () => {
 
     it("Reverts if the wallet does not pay the correct prefund", async () => {
       await sendEth(owner, sender, "0.0015");
-      const userOp = await getUserOperation(owner, sender, { initCode });
+      const userOp = await signUserOperation(
+        owner,
+        getUserOperation(sender, { initCode })
+      );
 
       await expect(
         entryPoint.handleOps([userOp], ethers.constants.AddressZero)
@@ -73,10 +82,13 @@ describe("EntryPoint", () => {
 
     it("Does not revert if callData is good", async () => {
       await sendEth(owner, sender, DEFAULT_REQUIRED_PRE_FUND);
-      const userOp = await getUserOperation(owner, sender, {
-        initCode,
-        callData: encodePassEntryPointCall(test.address),
-      });
+      const userOp = await signUserOperation(
+        owner,
+        getUserOperation(sender, {
+          initCode,
+          callData: encodePassEntryPointCall(test.address),
+        })
+      );
 
       await expect(entryPoint.handleOps([userOp], ethers.constants.AddressZero))
         .to.not.be.reverted;
@@ -84,10 +96,13 @@ describe("EntryPoint", () => {
 
     it("Reverts if callData is bad", async () => {
       await sendEth(owner, sender, DEFAULT_REQUIRED_PRE_FUND);
-      const userOp = await getUserOperation(owner, sender, {
-        initCode,
-        callData: encodeFailEntryPointCall(test.address),
-      });
+      const userOp = await signUserOperation(
+        owner,
+        getUserOperation(sender, {
+          initCode,
+          callData: encodeFailEntryPointCall(test.address),
+        })
+      );
 
       await expect(
         entryPoint.handleOps([userOp], ethers.constants.AddressZero)
@@ -96,11 +111,49 @@ describe("EntryPoint", () => {
 
     it("Does not revert with EIP-1559 style transactions", async () => {
       await sendEth(owner, sender, DEFAULT_REQUIRED_PRE_FUND);
-      const userOp = await getUserOperation(owner, sender, {
-        initCode,
-        // use recommended default of 2 GWei for maxPriorityFee
-        maxPriorityFeePerGas: ethers.utils.parseEther("2", "gwei"),
-      });
+      const userOp = await signUserOperation(
+        owner,
+        getUserOperation(sender, {
+          initCode,
+          // use recommended default of 2 GWei for maxPriorityFee
+          maxPriorityFeePerGas: ethers.utils.parseEther("2", "gwei"),
+        })
+      );
+
+      await expect(entryPoint.handleOps([userOp], ethers.constants.AddressZero))
+        .to.not.be.reverted;
+    });
+
+    it("Reverts if paymaster does not have enough Eth staked", async () => {
+      const userOp = await signUserOperation(
+        owner,
+        await withPaymaster(
+          paymaster,
+          getUserOperation(sender, {
+            initCode,
+          })
+        )
+      );
+
+      await expect(
+        entryPoint.handleOps([userOp], ethers.constants.AddressZero)
+      ).to.be.revertedWith("EntryPoint: Invalid stake");
+    });
+
+    it("Does not revert if paymaster has enough Eth staked", async () => {
+      await entryPoint
+        .connect(paymaster)
+        .addStake({ value: DEFAULT_REQUIRED_PRE_FUND });
+      await entryPoint.connect(paymaster).lockStake();
+      const userOp = await signUserOperation(
+        owner,
+        await withPaymaster(
+          paymaster,
+          getUserOperation(sender, {
+            initCode,
+          })
+        )
+      );
 
       await expect(entryPoint.handleOps([userOp], ethers.constants.AddressZero))
         .to.not.be.reverted;

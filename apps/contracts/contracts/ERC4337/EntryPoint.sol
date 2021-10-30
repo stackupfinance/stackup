@@ -36,7 +36,13 @@ contract EntryPoint is IEntryPoint, IEntryPointStakeController {
         ops[i].deployWallet(create2Factory);
       }
 
-      ops[i].validate();
+      uint256 requiredPrefund = ops[i].totalGas() * ops[i].gasPrice();
+      if (ops[i].hasPaymaster()) {
+        ops[i].verifyPaymasterStake(_paymasterStakes[ops[i].paymaster]);
+        requiredPrefund = 0;
+      }
+
+      ops[i].validateUserOp(requiredPrefund);
     }
 
     // Execution loop

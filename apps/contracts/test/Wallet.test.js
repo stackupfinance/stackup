@@ -7,6 +7,7 @@ const {
   getAddressBalances,
   getUserOperation,
   sendEth,
+  signUserOperation,
   transactionFee,
 } = require("../utils/testHelpers");
 
@@ -32,7 +33,10 @@ describe("Wallet", () => {
 
   describe("validateUserOp", () => {
     it("Required to be called from the Entry Point", async () => {
-      const userOp = await getUserOperation(owner, wallet.address);
+      const userOp = await signUserOperation(
+        owner,
+        getUserOperation(wallet.address)
+      );
 
       await expect(wallet.validateUserOp(userOp, 0)).to.not.be.reverted;
       await expect(
@@ -41,8 +45,14 @@ describe("Wallet", () => {
     });
 
     it("Required to be signed by wallet owner", async () => {
-      const validUserOp = await getUserOperation(owner, wallet.address);
-      const invalidUserOp = await getUserOperation(nonOwner, wallet.address);
+      const validUserOp = await signUserOperation(
+        owner,
+        getUserOperation(wallet.address)
+      );
+      const invalidUserOp = await signUserOperation(
+        nonOwner,
+        getUserOperation(wallet.address)
+      );
 
       await expect(wallet.validateUserOp(validUserOp, 0)).to.not.be.reverted;
       await expect(wallet.validateUserOp(invalidUserOp, 0)).to.be.revertedWith(
@@ -51,16 +61,22 @@ describe("Wallet", () => {
     });
 
     it("Increments valid nonce", async () => {
-      const validUserOp = await getUserOperation(owner, wallet.address);
+      const validUserOp = await signUserOperation(
+        owner,
+        getUserOperation(wallet.address)
+      );
 
       await expect(wallet.validateUserOp(validUserOp, 0)).to.not.be.reverted;
       expect(await wallet.nonce()).to.equal(1);
     });
 
     it("Reverts on an invalid nonce", async () => {
-      const invalidUserOp = await getUserOperation(owner, wallet.address, {
-        nonce: 1,
-      });
+      const invalidUserOp = await signUserOperation(
+        owner,
+        getUserOperation(wallet.address, {
+          nonce: 1,
+        })
+      );
 
       await expect(wallet.validateUserOp(invalidUserOp, 0)).to.be.revertedWith(
         "Wallet: Invalid nonce"
@@ -77,7 +93,7 @@ describe("Wallet", () => {
 
       const tx = await wallet
         .validateUserOp(
-          await getUserOperation(owner, wallet.address),
+          await signUserOperation(owner, getUserOperation(wallet.address)),
           requiredPrefund
         )
         .then((res) => res.wait());
@@ -96,7 +112,7 @@ describe("Wallet", () => {
       );
 
       await wallet.validateUserOp(
-        await getUserOperation(owner, wallet.address),
+        await signUserOperation(owner, getUserOperation(wallet.address)),
         0
       );
       const [walletBalance] = await getAddressBalances([wallet.address]);
@@ -148,4 +164,6 @@ describe("Wallet", () => {
       ).to.be.revertedWith("Test: reverted");
     });
   });
+
+  describe("validatePaymasterUserOp", () => {});
 });
