@@ -12,7 +12,8 @@
     "prettier": "lerna run prettier --stream",
     "prettier:fix": "lerna run prettier:fix --stream",
     "dev:dependencies": "yarn workspace @stackupfinance/backend run docker:dev:dependencies",
-    "dev:backend": "yarn workspace @stackupfinance/backend run dev"
+    "dev:backend": "yarn workspace @stackupfinance/backend run dev",
+    "dev:frontend": "yarn workspace @stackupfinance/frontend run dev"
   },
   "workspaces": [
     "apps/*"
