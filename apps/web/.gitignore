@@ -5,6 +5,7 @@
 /.pnp
 .pnp.js
 .idea
+.DS_Store
 
 # testing
 /coverage

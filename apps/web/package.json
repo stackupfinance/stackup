@@ -1,5 +1,5 @@
 {
-  "name": "@stackupfinance/frontend",
+  "name": "@stackupfinance/web",
   "version": "0.1.0",
   "private": true,
   "repository": "git@github.com:stackupfinance/stackup.git",
@@ -17,7 +17,8 @@
     "framer-motion": "^4",
     "next": "12.0.1",
     "react": "17.0.2",
-    "react-dom": "17.0.2"
+    "react-dom": "17.0.2",
+    "react-hook-form": "^7.18.0"
   },
   "devDependencies": {
     "eslint": "7",
