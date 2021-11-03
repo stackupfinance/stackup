@@ -17,7 +17,7 @@ See the `README.md` files in the following directories for app specific setup gu
 - [Backend](./apps/backend) - REST API for supporting frontend apps.
 - [Contracts](./apps/contracts) - Collection of solidity smart contracts.
 - [Mobile](./apps/mobile) - iOS and Android mobile frontend.
-- [Wallet](./apps/wallet) - A web frontend to demonstrate smart wallet functionality.
+- [Web](./apps/web) - A responsive web frontend.
 
 ### Running locally
 
@@ -32,5 +32,5 @@ $ yarn dev:backend
 ```
 
 ```bash
-$ yarn dev:mobile
+$ yarn dev:web
 ```
