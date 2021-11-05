@@ -1,15 +1,17 @@
-// Stackup implementation of an ERC-4337 Wallet
+// Stackup implementation of an ERC-4337 Wallet with Paymaster
 // Based on https://eips.ethereum.org/EIPS/eip-4337
 
 // SPDX-License-Identifier: agpl-3.0
 pragma solidity ^0.8.0;
 
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {IWallet} from "./interface/IWallet.sol";
+import {IPaymaster} from "./interface/IPaymaster.sol";
 import {UserOperation, WalletUserOperation} from "./UserOperation.sol";
 
 import "hardhat/console.sol";
 
-contract Wallet is IWallet {
+contract Wallet is IWallet, IPaymaster {
   using WalletUserOperation for UserOperation;
 
   address public entryPoint;
@@ -64,5 +66,19 @@ contract Wallet is IWallet {
       }
       revert(abi.decode(result, (string)));
     }
+  }
+
+  function validatePaymasterUserOp(
+    UserOperation calldata userOp,
+    uint256 maxcost
+  ) external view returns (bytes memory context) {
+    require(userOp.paymasterSigner() == owner, "Paymaster: Invalid signature");
+    require(
+      (userOp.requiredTokenIsApproved(maxcost) &&
+        userOp.tokenAllowanceRemainsOK(maxcost)) ||
+        userOp.tokenAllowanceWillBeOK(maxcost),
+      "Paymaster: Not approved"
+    );
+    return "";
   }
 }

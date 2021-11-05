@@ -1,13 +1,15 @@
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
+const { SINGLETON_FACTORY_ADDRESS } = require("../utils/deployHelpers");
 const {
   DEFAULT_REQUIRED_PRE_FUND,
   LOCK_EXPIRY_PERIOD,
+  USDC_TOKEN,
   encodeFailEntryPointCall,
   encodePassEntryPointCall,
   getAddressBalances,
   getUserOperation,
-  getWalletAddress,
+  getContractAddress,
   getLastBlockTimestamp,
   incrementBlockTimestamp,
   isWalletDeployed,
@@ -15,12 +17,11 @@ const {
   signUserOperation,
   transactionFee,
   withPaymaster,
-} = require("../utils/testHelpers");
+} = require("../utils/contractHelpers");
 
 describe("EntryPoint", () => {
   let owner;
   let paymaster;
-  let create2Factory;
   let entryPoint;
   let initCode;
   let sender;
@@ -28,23 +29,21 @@ describe("EntryPoint", () => {
 
   beforeEach(async () => {
     [owner, paymaster] = await ethers.getSigners();
-    const [SingletonFactory, EntryPoint, Wallet, Test] = await Promise.all([
-      ethers.getContractFactory("SingletonFactory"),
+    const [EntryPoint, Wallet, Test] = await Promise.all([
       ethers.getContractFactory("EntryPoint"),
       ethers.getContractFactory("Wallet"),
       ethers.getContractFactory("Test"),
     ]);
 
-    create2Factory = await SingletonFactory.deploy();
     [entryPoint, test] = await Promise.all([
-      EntryPoint.deploy(create2Factory.address),
+      EntryPoint.deploy(SINGLETON_FACTORY_ADDRESS),
       Test.deploy(),
     ]);
     initCode = Wallet.getDeployTransaction(
       entryPoint.address,
       owner.address
     ).data;
-    sender = getWalletAddress(create2Factory.address, initCode);
+    sender = getContractAddress(SINGLETON_FACTORY_ADDRESS, initCode);
   });
 
   describe("handleOps", () => {

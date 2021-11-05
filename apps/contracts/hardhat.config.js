@@ -11,10 +11,16 @@ module.exports = {
   watcher: {
     test: {
       tasks: ["test"],
-      files: ["./contracts", "./test", "./utils/testHelpers.js"],
+      files: ["./contracts", "./test"],
     },
   },
   networks: {
+    hardhat: {
+      forking: {
+        url: process.env.ALCHEMY_NODE || "",
+        blockNumber: 20843638,
+      },
+    },
     matic: {
       url: "https://rpc-mainnet.matic.quiknode.pro",
       chainId: 137,
