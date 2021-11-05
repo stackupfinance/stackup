@@ -206,6 +206,7 @@ describe("Wallet", () => {
         regularUser,
         await withPaymaster(
           regularUser,
+          paymasterUserWallet.address,
           getUserOperation(regularUserWallet.address)
         )
       );
@@ -224,6 +225,7 @@ describe("Wallet", () => {
         regularUser,
         await withPaymaster(
           paymasterUser,
+          paymasterUserWallet.address,
           getUserOperation(regularUserWallet.address, {
             callData: encodePassEntryPointCall(test.address),
           })
@@ -243,6 +245,7 @@ describe("Wallet", () => {
         regularUser,
         await withPaymaster(
           paymasterUser,
+          paymasterUserWallet.address,
           getUserOperation(regularUserWallet.address, {
             callData: encodeERC20MaxApprove(paymasterUserWallet.address),
           })
@@ -262,6 +265,7 @@ describe("Wallet", () => {
         regularUser,
         await withPaymaster(
           paymasterUser,
+          paymasterUserWallet.address,
           getUserOperation(regularUserWallet.address, {
             callData: encodeERC20ZeroApprove(paymasterUserWallet.address),
           })
@@ -278,6 +282,7 @@ describe("Wallet", () => {
         regularUser,
         await withPaymaster(
           paymasterUser,
+          paymasterUserWallet.address,
           getUserOperation(regularUserWallet.address, {
             callData: encodeERC20MaxApprove(paymasterUserWallet.address),
           })
@@ -293,6 +298,7 @@ describe("Wallet", () => {
         regularUser,
         await withPaymaster(
           paymasterUser,
+          paymasterUserWallet.address,
           getUserOperation(regularUserWallet.address, {
             callData: encodeERC20ZeroApprove(paymasterUserWallet.address),
           })

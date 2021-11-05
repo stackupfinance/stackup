@@ -1,5 +1,6 @@
 const { ethers, network } = require("hardhat");
 const TestContract = require("../artifacts/contracts/test/Test.sol/Test.json");
+const EntryPointContract = require("../artifacts/contracts/ERC4337/EntryPoint.sol/EntryPoint.json");
 const WalletContract = require("../artifacts/contracts/ERC4337/Wallet.sol/Wallet.json");
 
 const NULL_DATA = "0x";
@@ -22,6 +23,9 @@ const DEFAULT_REQUIRED_PRE_FUND = ethers.BigNumber.from(DEFAULT_GAS * 3).mul(
 );
 
 const TEST_CONTRACT_INTERFACE = new ethers.utils.Interface(TestContract.abi);
+const ENTRY_POINT_CONTRACT_INTERFACE = new ethers.utils.Interface(
+  EntryPointContract.abi
+);
 const WALLET_CONTRACT_INTERFACE = new ethers.utils.Interface(
   WalletContract.abi
 );
@@ -34,6 +38,22 @@ const LOCK_EXPIRY_PERIOD = 172800; // 2 Days
 const PAYMASTER_FEE = ethers.BigNumber.from(10000000);
 const USDC_TOKEN = "0x2791bca1f2de4661ed88a30c99a7a9449aa84174";
 const MATIC_USD_DATA_FEED = "0xAB594600376Ec9fD91F8e885dADF0CE036862dE0";
+
+const encodeAddStakeUserOp = (entryPoint, value) => {
+  return WALLET_CONTRACT_INTERFACE.encodeFunctionData("executeUserOp", [
+    entryPoint,
+    value._isBigNumber ? value : ethers.utils.parseEther(value),
+    ENTRY_POINT_CONTRACT_INTERFACE.encodeFunctionData("addStake"),
+  ]);
+};
+
+const encodeLockStakeUserOp = (entryPoint) => {
+  return WALLET_CONTRACT_INTERFACE.encodeFunctionData("executeUserOp", [
+    entryPoint,
+    0,
+    ENTRY_POINT_CONTRACT_INTERFACE.encodeFunctionData("lockStake"),
+  ]);
+};
 
 const encodeERC20MaxApprove = (spender) => {
   return WALLET_CONTRACT_INTERFACE.encodeFunctionData("executeUserOp", [
@@ -224,10 +244,10 @@ const transactionFee = (tx) => {
   return tx.effectiveGasPrice.mul(tx.gasUsed);
 };
 
-const withPaymaster = async (paymaster, op) => {
+const withPaymaster = async (signer, paymaster, op) => {
   const userOp = {
     ...op,
-    paymaster: paymaster.address,
+    paymaster,
   };
 
   return {
@@ -238,7 +258,7 @@ const withPaymaster = async (paymaster, op) => {
         PAYMASTER_FEE,
         USDC_TOKEN,
         MATIC_USD_DATA_FEED,
-        await paymaster.signMessage(
+        await signer.signMessage(
           getPaymasterDataHash(
             userOp,
             PAYMASTER_FEE,
@@ -258,6 +278,8 @@ module.exports = {
   NULL_DATA,
   TEST_CONTRACT_INTERFACE,
   USDC_TOKEN,
+  encodeAddStakeUserOp,
+  encodeLockStakeUserOp,
   encodeERC20MaxApprove,
   encodeERC20ZeroApprove,
   encodeFailContractCall,
