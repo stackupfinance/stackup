@@ -224,11 +224,6 @@ const transactionFee = (tx) => {
   return tx.effectiveGasPrice.mul(tx.gasUsed);
 };
 
-/**
- * Stackup paymaster implementation allows wallets to pay for other
- * user transactions with any ERC20 token and specify an additional fee
- * for the convenience.
- */
 const withPaymaster = async (paymaster, op) => {
   const userOp = {
     ...op,

@@ -4,7 +4,6 @@
 // SPDX-License-Identifier: agpl-3.0
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {IWallet} from "./interface/IWallet.sol";
 import {IPaymaster} from "./interface/IPaymaster.sol";
 import {UserOperation, WalletUserOperation} from "./UserOperation.sol";
