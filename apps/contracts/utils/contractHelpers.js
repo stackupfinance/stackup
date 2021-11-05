@@ -25,8 +25,37 @@ const TEST_CONTRACT_INTERFACE = new ethers.utils.Interface(TestContract.abi);
 const WALLET_CONTRACT_INTERFACE = new ethers.utils.Interface(
   WalletContract.abi
 );
+const ERC20_INTERFACE = new ethers.utils.Interface([
+  "function approve(address _spender, uint256 _value) public returns (bool success)",
+]);
 
 const LOCK_EXPIRY_PERIOD = 172800; // 2 Days
+
+const PAYMASTER_FEE = ethers.BigNumber.from(10000000);
+const USDC_TOKEN = "0x2791bca1f2de4661ed88a30c99a7a9449aa84174";
+const MATIC_USD_DATA_FEED = "0xAB594600376Ec9fD91F8e885dADF0CE036862dE0";
+
+const encodeERC20MaxApprove = (spender) => {
+  return WALLET_CONTRACT_INTERFACE.encodeFunctionData("executeUserOp", [
+    USDC_TOKEN,
+    0,
+    ERC20_INTERFACE.encodeFunctionData("approve", [
+      spender,
+      ethers.constants.MaxUint256,
+    ]),
+  ]);
+};
+
+const encodeERC20ZeroApprove = (spender) => {
+  return WALLET_CONTRACT_INTERFACE.encodeFunctionData("executeUserOp", [
+    USDC_TOKEN,
+    0,
+    ERC20_INTERFACE.encodeFunctionData("approve", [
+      spender,
+      ethers.constants.Zero,
+    ]),
+  ]);
+};
 
 const encodeFailContractCall = () => {
   return TEST_CONTRACT_INTERFACE.encodeFunctionData("func", [false]);
@@ -56,7 +85,15 @@ const getAddressBalances = async (addresses) => {
   return Promise.all(addresses.map((addr) => ethers.provider.getBalance(addr)));
 };
 
-const getPaymasterDataHash = (op) => {
+const getContractAddress = (create2factory, initCode) => {
+  return ethers.utils.getCreate2Address(
+    create2factory,
+    ethers.utils.formatBytes32String(INITIAL_NONCE),
+    ethers.utils.keccak256(initCode)
+  );
+};
+
+const getPaymasterDataHash = (op, paymasterFee, erc20Token, dataFeed) => {
   const messageHash = ethers.utils.keccak256(
     ethers.utils.solidityPack(
       [
@@ -70,6 +107,7 @@ const getPaymasterDataHash = (op) => {
         "uint256",
         "uint256",
         "address",
+        "bytes32",
       ],
       [
         op.sender,
@@ -82,6 +120,13 @@ const getPaymasterDataHash = (op) => {
         op.maxFeePerGas,
         op.maxPriorityFeePerGas,
         op.paymaster,
+        // Hash all paymasterData together
+        ethers.utils.keccak256(
+          ethers.utils.solidityPack(
+            ["uint256", "address", "address"],
+            [paymasterFee, erc20Token, dataFeed]
+          )
+        ),
       ]
     )
   );
@@ -140,14 +185,6 @@ const getUserOperation = (sender, override = {}) => {
   };
 };
 
-const getWalletAddress = (create2factory, initCode) => {
-  return ethers.utils.getCreate2Address(
-    create2factory,
-    ethers.utils.formatBytes32String(INITIAL_NONCE),
-    ethers.utils.keccak256(initCode)
-  );
-};
-
 const getLastBlockTimestamp = async () => {
   const prevBlock = await ethers.provider.getBlock(
     await ethers.provider.getBlockNumber()
@@ -195,24 +232,42 @@ const withPaymaster = async (paymaster, op) => {
 
   return {
     ...userOp,
-    paymasterData: await paymaster.signMessage(getPaymasterDataHash(userOp)),
+    paymasterData: ethers.utils.defaultAbiCoder.encode(
+      ["uint256", "address", "address", "bytes"],
+      [
+        PAYMASTER_FEE,
+        USDC_TOKEN,
+        MATIC_USD_DATA_FEED,
+        await paymaster.signMessage(
+          getPaymasterDataHash(
+            userOp,
+            PAYMASTER_FEE,
+            USDC_TOKEN,
+            MATIC_USD_DATA_FEED
+          )
+        ),
+      ]
+    ),
   };
 };
 
 module.exports = {
-  NULL_DATA,
-  INITIAL_NONCE,
   DEFAULT_REQUIRED_PRE_FUND,
-  TEST_CONTRACT_INTERFACE,
+  INITIAL_NONCE,
   LOCK_EXPIRY_PERIOD,
+  NULL_DATA,
+  TEST_CONTRACT_INTERFACE,
+  USDC_TOKEN,
+  encodeERC20MaxApprove,
+  encodeERC20ZeroApprove,
   encodeFailContractCall,
   encodeFailEntryPointCall,
   encodePassContractCall,
   encodePassEntryPointCall,
   getAddressBalances,
+  getContractAddress,
   getUserOperationHash,
   getUserOperation,
-  getWalletAddress,
   getLastBlockTimestamp,
   incrementBlockTimestamp,
   isWalletDeployed,

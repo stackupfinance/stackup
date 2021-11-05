@@ -1,4 +1,3 @@
-/* solhint-disable no-inline-assembly */
 // Based on https://eips.ethereum.org/EIPS/eip-2470
 
 // SPDX-License-Identifier: agpl-3.0
@@ -9,7 +8,7 @@ pragma solidity ^0.8.0;
  * @notice Exposes CREATE2 (EIP-1014) to deploy bytecode on deterministic addresses based on initialization code and salt.
  * @author Ricardo Guilherme Schmidt (Status Research & Development GmbH)
  */
-contract SingletonFactory {
+interface ISingletonFactory {
   /**
    * @notice Deploys `_initCode` using `_salt` for defining the deterministic address.
    * @param _initCode Initialization code.
@@ -17,18 +16,6 @@ contract SingletonFactory {
    * @return createdContract Created contract address.
    */
   function deploy(bytes memory _initCode, bytes32 _salt)
-    public
-    returns (address payable createdContract)
-  {
-    assembly {
-      createdContract := create2(
-        0,
-        add(_initCode, 0x20),
-        mload(_initCode),
-        _salt
-      )
-    }
-  }
+    external
+    returns (address payable createdContract);
 }
-// IV is a value changed to generate the vanity address.
-// IV: 6583047
