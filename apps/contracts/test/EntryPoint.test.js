@@ -4,6 +4,10 @@ const { SINGLETON_FACTORY_ADDRESS } = require("../utils/deployHelpers");
 const {
   DEFAULT_REQUIRED_PRE_FUND,
   LOCK_EXPIRY_PERIOD,
+  encodeAddStake,
+  encodeLockStake,
+  encodeERC20MaxApprove,
+  encodeERC20ZeroApprove,
   encodeFailEntryPointCall,
   encodePassEntryPointCall,
   getAddressBalances,
@@ -23,7 +27,9 @@ describe("EntryPoint", () => {
   let paymaster;
   let entryPoint;
   let initCode;
+  let paymasterInitCode;
   let sender;
+  let paymasterWallet;
   let test;
 
   beforeEach(async () => {
@@ -42,7 +48,15 @@ describe("EntryPoint", () => {
       entryPoint.address,
       owner.address
     ).data;
+    paymasterInitCode = Wallet.getDeployTransaction(
+      entryPoint.address,
+      paymaster.address
+    ).data;
     sender = getContractAddress(SINGLETON_FACTORY_ADDRESS, initCode);
+    paymasterWallet = getContractAddress(
+      SINGLETON_FACTORY_ADDRESS,
+      paymasterInitCode
+    );
   });
 
   describe("handleOps", () => {
@@ -130,6 +144,7 @@ describe("EntryPoint", () => {
         owner,
         await withPaymaster(
           paymaster,
+          paymaster.address,
           getUserOperation(sender, {
             initCode,
           })
@@ -150,6 +165,7 @@ describe("EntryPoint", () => {
         owner,
         await withPaymaster(
           paymaster,
+          paymaster.address,
           getUserOperation(sender, {
             initCode,
           })
@@ -161,23 +177,83 @@ describe("EntryPoint", () => {
       ).to.be.revertedWith("EntryPoint: Insufficient stake");
     });
 
-    it("Does not revert if paymaster has enough Eth staked", async () => {
+    it("Does not revert if paymaster has enough Eth staked and successfully validates user operation", async () => {
+      await sendEth(paymaster, paymasterWallet, "10");
+      const userOps = await Promise.all([
+        signUserOperation(
+          paymaster,
+          getUserOperation(paymasterWallet, {
+            initCode: paymasterInitCode,
+            callData: encodeAddStake(
+              entryPoint.address,
+              DEFAULT_REQUIRED_PRE_FUND
+            ),
+          })
+        ),
+        signUserOperation(
+          paymaster,
+          getUserOperation(paymasterWallet, {
+            callData: encodeLockStake(entryPoint.address),
+          })
+        ),
+      ]);
       await entryPoint
         .connect(paymaster)
-        .addStake({ value: DEFAULT_REQUIRED_PRE_FUND });
-      await entryPoint.connect(paymaster).lockStake();
+        .handleOps(userOps, ethers.constants.AddressZero);
+
       const userOp = await signUserOperation(
         owner,
         await withPaymaster(
           paymaster,
+          paymasterWallet,
           getUserOperation(sender, {
             initCode,
+            callData: encodeERC20MaxApprove(paymasterWallet),
           })
         )
       );
-
       await expect(entryPoint.handleOps([userOp], ethers.constants.AddressZero))
         .to.not.be.reverted;
+    });
+
+    it("Reverts if paymaster fails to validate user operation", async () => {
+      await sendEth(paymaster, paymasterWallet, "10");
+      const userOps = await Promise.all([
+        signUserOperation(
+          paymaster,
+          getUserOperation(paymasterWallet, {
+            initCode: paymasterInitCode,
+            callData: encodeAddStake(
+              entryPoint.address,
+              DEFAULT_REQUIRED_PRE_FUND
+            ),
+          })
+        ),
+        signUserOperation(
+          paymaster,
+          getUserOperation(paymasterWallet, {
+            callData: encodeLockStake(entryPoint.address),
+          })
+        ),
+      ]);
+      await entryPoint
+        .connect(paymaster)
+        .handleOps(userOps, ethers.constants.AddressZero);
+
+      const userOp = await signUserOperation(
+        owner,
+        await withPaymaster(
+          paymaster,
+          paymasterWallet,
+          getUserOperation(sender, {
+            initCode,
+            callData: encodeERC20ZeroApprove(paymasterWallet),
+          })
+        )
+      );
+      await expect(
+        entryPoint.handleOps([userOp], ethers.constants.AddressZero)
+      ).to.be.revertedWith("Paymaster: Not approved");
     });
   });
 

@@ -11,6 +11,7 @@ import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 import "solidity-bytes-utils/contracts/BytesLib.sol";
 import "../ERC2470/ISingletonFactory.sol";
 import {IWallet} from "./interface/IWallet.sol";
+import {IPaymaster} from "./interface/IPaymaster.sol";
 import {Stake} from "./Stake.sol";
 
 import "hardhat/console.sol";
@@ -169,6 +170,10 @@ library EntryPointUserOperation {
       stake.value >= op.requiredPrefund(),
       "EntryPoint: Insufficient stake"
     );
+  }
+
+  function validatePaymasterUserOp(UserOperation calldata op) internal view {
+    IPaymaster(op.paymaster).validatePaymasterUserOp(op, op.requiredPrefund());
   }
 
   function deployWallet(UserOperation calldata op, address create2Factory)

@@ -38,6 +38,7 @@ contract EntryPoint is IEntryPoint, IEntryPointStakeController {
 
       if (ops[i].hasPaymaster()) {
         ops[i].verifyPaymasterStake(_paymasterStakes[ops[i].paymaster]);
+        ops[i].validatePaymasterUserOp();
       }
 
       ops[i].validateUserOp();
