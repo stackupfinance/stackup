@@ -4,7 +4,6 @@ const { SINGLETON_FACTORY_ADDRESS } = require("../utils/deployHelpers");
 const {
   DEFAULT_REQUIRED_PRE_FUND,
   LOCK_EXPIRY_PERIOD,
-  USDC_TOKEN,
   encodeFailEntryPointCall,
   encodePassEntryPointCall,
   getAddressBalances,

@@ -229,7 +229,7 @@ const transactionFee = (tx) => {
  * user transactions with any ERC20 token and specify an additional fee
  * for the convenience.
  */
-const withPaymaster = async (paymaster, op, permit) => {
+const withPaymaster = async (paymaster, op) => {
   const userOp = {
     ...op,
     paymaster: paymaster.address,
