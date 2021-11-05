@@ -39,7 +39,7 @@ const PAYMASTER_FEE = ethers.BigNumber.from(10000000);
 const USDC_TOKEN = "0x2791bca1f2de4661ed88a30c99a7a9449aa84174";
 const MATIC_USD_DATA_FEED = "0xAB594600376Ec9fD91F8e885dADF0CE036862dE0";
 
-const encodeAddStakeUserOp = (entryPoint, value) => {
+const encodeAddStake = (entryPoint, value) => {
   return WALLET_CONTRACT_INTERFACE.encodeFunctionData("executeUserOp", [
     entryPoint,
     value._isBigNumber ? value : ethers.utils.parseEther(value),
@@ -47,7 +47,7 @@ const encodeAddStakeUserOp = (entryPoint, value) => {
   ]);
 };
 
-const encodeLockStakeUserOp = (entryPoint) => {
+const encodeLockStake = (entryPoint) => {
   return WALLET_CONTRACT_INTERFACE.encodeFunctionData("executeUserOp", [
     entryPoint,
     0,
@@ -278,8 +278,8 @@ module.exports = {
   NULL_DATA,
   TEST_CONTRACT_INTERFACE,
   USDC_TOKEN,
-  encodeAddStakeUserOp,
-  encodeLockStakeUserOp,
+  encodeAddStake,
+  encodeLockStake,
   encodeERC20MaxApprove,
   encodeERC20ZeroApprove,
   encodeFailContractCall,

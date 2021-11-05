@@ -4,8 +4,8 @@ const { SINGLETON_FACTORY_ADDRESS } = require("../utils/deployHelpers");
 const {
   DEFAULT_REQUIRED_PRE_FUND,
   LOCK_EXPIRY_PERIOD,
-  encodeAddStakeUserOp,
-  encodeLockStakeUserOp,
+  encodeAddStake,
+  encodeLockStake,
   encodeERC20MaxApprove,
   encodeERC20ZeroApprove,
   encodeFailEntryPointCall,
@@ -184,7 +184,7 @@ describe("EntryPoint", () => {
           paymaster,
           getUserOperation(paymasterWallet, {
             initCode: paymasterInitCode,
-            callData: encodeAddStakeUserOp(
+            callData: encodeAddStake(
               entryPoint.address,
               DEFAULT_REQUIRED_PRE_FUND
             ),
@@ -193,7 +193,7 @@ describe("EntryPoint", () => {
         signUserOperation(
           paymaster,
           getUserOperation(paymasterWallet, {
-            callData: encodeLockStakeUserOp(entryPoint.address),
+            callData: encodeLockStake(entryPoint.address),
           })
         ),
       ]);
@@ -223,7 +223,7 @@ describe("EntryPoint", () => {
           paymaster,
           getUserOperation(paymasterWallet, {
             initCode: paymasterInitCode,
-            callData: encodeAddStakeUserOp(
+            callData: encodeAddStake(
               entryPoint.address,
               DEFAULT_REQUIRED_PRE_FUND
             ),
@@ -232,7 +232,7 @@ describe("EntryPoint", () => {
         signUserOperation(
           paymaster,
           getUserOperation(paymasterWallet, {
-            callData: encodeLockStakeUserOp(entryPoint.address),
+            callData: encodeLockStake(entryPoint.address),
           })
         ),
       ]);
