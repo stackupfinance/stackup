@@ -2,6 +2,7 @@ const { ethers, network } = require("hardhat");
 const TestContract = require("../artifacts/contracts/test/Test.sol/Test.json");
 const EntryPointContract = require("../artifacts/contracts/ERC4337/EntryPoint.sol/EntryPoint.json");
 const WalletContract = require("../artifacts/contracts/ERC4337/Wallet.sol/Wallet.json");
+const UniswapV2Router02 = require("../artifacts/contracts/uniswap/IUniswapV2Router02.sol/IUniswapV2Router02.json");
 
 const NULL_DATA = "0x";
 const INITIAL_NONCE = 0;
@@ -31,13 +32,26 @@ const WALLET_CONTRACT_INTERFACE = new ethers.utils.Interface(
 );
 const ERC20_INTERFACE = new ethers.utils.Interface([
   "function approve(address _spender, uint256 _value) public returns (bool success)",
+  "function balanceOf(address _owner) public view returns (uint256 balance)",
+  "function allowance(address _owner, address _spender) public view returns (uint256 remaining)",
 ]);
 
 const LOCK_EXPIRY_PERIOD = 172800; // 2 Days
 
-const PAYMASTER_FEE = ethers.BigNumber.from(10000000);
-const USDC_TOKEN = "0x2791bca1f2de4661ed88a30c99a7a9449aa84174";
+const PAYMASTER_FEE = ethers.BigNumber.from(100000);
+const USDC_TOKEN = "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174";
 const MATIC_USD_DATA_FEED = "0xAB594600376Ec9fD91F8e885dADF0CE036862dE0";
+
+const WETH = "0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270";
+const UNISWAP_V2 = "0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff";
+const UNISWAP_V2_ROUTER_O2 = new ethers.Contract(
+  UNISWAP_V2,
+  UniswapV2Router02.abi,
+  ethers.provider
+);
+
+const MOCK_POST_OP_ACTUAL_GAS = ethers.utils.parseEther("0.0005");
+const MOCK_POST_OP_EXCHANGE_RATE = ethers.BigNumber.from("1847619");
 
 const encodeAddStake = (entryPoint, value) => {
   return WALLET_CONTRACT_INTERFACE.encodeFunctionData("executeUserOp", [
@@ -153,6 +167,26 @@ const getPaymasterDataHash = (op, paymasterFee, erc20Token, dataFeed) => {
   return ethers.utils.arrayify(messageHash);
 };
 
+const getTokenAllowance = async (owner, spender, token) => {
+  const erc20Token = new ethers.Contract(
+    token,
+    ERC20_INTERFACE,
+    ethers.provider
+  );
+
+  return erc20Token.allowance(owner, spender);
+};
+
+const getTokenBalance = async (owner, token) => {
+  const erc20Token = new ethers.Contract(
+    token,
+    ERC20_INTERFACE,
+    ethers.provider
+  );
+
+  return erc20Token.balanceOf(owner);
+};
+
 const getUserOperationHash = (op) => {
   const messageHash = ethers.utils.keccak256(
     ethers.utils.solidityPack(
@@ -226,6 +260,17 @@ const isWalletDeployed = async (address) => {
   return code !== NULL_DATA;
 };
 
+const mockPostOpArgs = (sender) => {
+  return [
+    0,
+    ethers.utils.defaultAbiCoder.encode(
+      ["address", "address", "uint256", "uint256"],
+      [sender, USDC_TOKEN, MOCK_POST_OP_EXCHANGE_RATE, PAYMASTER_FEE]
+    ),
+    MOCK_POST_OP_ACTUAL_GAS,
+  ];
+};
+
 const sendEth = async (from, to, value) => {
   return from.sendTransaction({
     to,
@@ -238,6 +283,25 @@ const signUserOperation = async (signer, op) => {
     ...op,
     signature: await signer.signMessage(getUserOperationHash(op)),
   };
+};
+
+const swapEthForToken = async (signer, to, token, value) => {
+  const path = [WETH, token];
+  const amountsOut = await UNISWAP_V2_ROUTER_O2.connect(signer).getAmountsOut(
+    value,
+    path
+  );
+  const amountOutMin = amountsOut[1]
+    .mul(ethers.BigNumber.from("9950"))
+    .div(ethers.BigNumber.from("10000")); //0.5% slippage
+
+  return UNISWAP_V2_ROUTER_O2.connect(signer).swapExactETHForTokens(
+    amountOutMin,
+    path,
+    to,
+    (await getLastBlockTimestamp()) + 300,
+    { value }
+  );
 };
 
 const transactionFee = (tx) => {
@@ -275,7 +339,10 @@ module.exports = {
   DEFAULT_REQUIRED_PRE_FUND,
   INITIAL_NONCE,
   LOCK_EXPIRY_PERIOD,
+  MOCK_POST_OP_ACTUAL_GAS,
+  MOCK_POST_OP_EXCHANGE_RATE,
   NULL_DATA,
+  PAYMASTER_FEE,
   TEST_CONTRACT_INTERFACE,
   USDC_TOKEN,
   encodeAddStake,
@@ -288,13 +355,17 @@ module.exports = {
   encodePassEntryPointCall,
   getAddressBalances,
   getContractAddress,
+  getTokenAllowance,
+  getTokenBalance,
   getUserOperationHash,
   getUserOperation,
   getLastBlockTimestamp,
   incrementBlockTimestamp,
   isWalletDeployed,
+  mockPostOpArgs,
   sendEth,
   signUserOperation,
+  swapEthForToken,
   transactionFee,
   withPaymaster,
 };

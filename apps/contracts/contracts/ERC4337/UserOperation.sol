@@ -7,6 +7,7 @@ import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/utils/math/Math.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 import "solidity-bytes-utils/contracts/BytesLib.sol";
 import "../ERC2470/ISingletonFactory.sol";
@@ -97,7 +98,7 @@ library UserOperationUtils {
     return data;
   }
 
-  function requiredTokenFee(UserOperation calldata op, uint256 maxcost)
+  function requiredTokenExchangeRate(UserOperation calldata op)
     internal
     view
     returns (uint256)
@@ -106,7 +107,25 @@ library UserOperationUtils {
     (, int256 price, , , ) = AggregatorV3Interface(pd.dataFeed)
       .latestRoundData();
 
-    return (uint256(price) * maxcost) + pd.fee;
+    // Chainlink datafeeds return either 8 or 18 decimals
+    // However tokens like USDC only have 6 decimals
+    // We need to return a rate that matches the decimals of the ERC20 token
+    return
+      uint256(price) /
+      10 **
+        (AggregatorV3Interface(pd.dataFeed).decimals() -
+          IERC20Metadata(pd.erc20Token).decimals());
+  }
+
+  function requiredTokenFee(UserOperation calldata op, uint256 maxcost)
+    internal
+    view
+    returns (uint256)
+  {
+    PaymasterData memory pd = decodePaymasterData(op);
+    uint256 tokenFee = (requiredTokenExchangeRate(op) * maxcost) / 10**18;
+
+    return tokenFee + pd.fee;
   }
 
   function isCallingTokenApprove(UserOperation calldata op)
@@ -290,5 +309,21 @@ library WalletUserOperation {
   {
     // Is changing token allowance with an OK value.
     return op.isCallingTokenApprove() && op.hasOKTokenApproveValue(maxcost);
+  }
+
+  function paymasterContext(UserOperation calldata op)
+    internal
+    view
+    returns (bytes memory context)
+  {
+    PaymasterData memory pd = op.decodePaymasterData();
+
+    return
+      abi.encode(
+        op.sender,
+        pd.erc20Token,
+        op.requiredTokenExchangeRate(),
+        pd.fee
+      );
   }
 }
