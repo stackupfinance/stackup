@@ -8,7 +8,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "prettier": "prettier --check --ignore-path ./.eslintignore '**'",
+    "prettier:fix": "prettier --write --ignore-path ./.eslintignore '**'"
   },
   "dependencies": {
     "@chakra-ui/react": "^1.6.10",
@@ -22,6 +24,7 @@
   },
   "devDependencies": {
     "eslint": "7",
-    "eslint-config-next": "12.0.1"
+    "eslint-config-next": "12.0.1",
+    "prettier": "^2.4.1"
   }
 }
