@@ -1,16 +1,24 @@
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
 const {
+  DEFAULT_REQUIRED_PRE_FUND,
+  MOCK_POST_OP_ACTUAL_GAS,
+  MOCK_POST_OP_EXCHANGE_RATE,
   NULL_DATA,
+  PAYMASTER_FEE,
+  USDC_TOKEN,
   encodeERC20MaxApprove,
   encodeERC20ZeroApprove,
   encodeFailContractCall,
   encodePassContractCall,
   encodePassEntryPointCall,
   getAddressBalances,
+  getTokenBalance,
   getUserOperation,
+  mockPostOpArgs,
   sendEth,
   signUserOperation,
+  swapEthForToken,
   transactionFee,
   withPaymaster,
 } = require("../utils/contractHelpers");
@@ -308,6 +316,66 @@ describe("Wallet", () => {
       await expect(
         paymasterUserWallet.validatePaymasterUserOp(userOp, 0)
       ).to.be.revertedWith("Paymaster: Not approved");
+    });
+
+    it("Returns an ABI encoded sender, token, exchange rate, and fee", async () => {
+      const userOp = await signUserOperation(
+        regularUser,
+        await withPaymaster(
+          paymasterUser,
+          paymasterUserWallet.address,
+          getUserOperation(regularUserWallet.address, {
+            callData: encodeERC20MaxApprove(paymasterUserWallet.address),
+          })
+        )
+      );
+
+      const context = await paymasterUserWallet.validatePaymasterUserOp(
+        userOp,
+        DEFAULT_REQUIRED_PRE_FUND
+      );
+      const results = ethers.utils.defaultAbiCoder.decode(
+        ["address", "address", "uint256", "uint256"],
+        context
+      );
+      expect(results[0]).to.equal(regularUserWallet.address);
+      expect(results[1]).to.equal(USDC_TOKEN);
+      expect(results[2].toNumber()).to.greaterThan(0);
+      expect(results[3]).to.equal(PAYMASTER_FEE);
+    });
+  });
+
+  describe("postOp", () => {
+    it("Required to be called from the Entry Point", async () => {
+      await expect(
+        paymasterUserWallet
+          .connect(paymasterUser)
+          .postOp(...mockPostOpArgs(regularUserWallet.address))
+      ).to.be.revertedWith("Wallet: Not from EntryPoint");
+    });
+
+    it("Transfers the correct amount of tokens to the paymaster", async () => {
+      await swapEthForToken(
+        regularUser,
+        regularUserWallet.address,
+        USDC_TOKEN,
+        ethers.utils.parseEther("10")
+      );
+      await mockEntryPoint.sendTransaction({
+        to: regularUserWallet.address,
+        data: encodeERC20MaxApprove(paymasterUserWallet.address),
+      });
+
+      await paymasterUserWallet.postOp(
+        ...mockPostOpArgs(regularUserWallet.address)
+      );
+      expect(
+        await getTokenBalance(paymasterUserWallet.address, USDC_TOKEN)
+      ).to.equal(
+        MOCK_POST_OP_ACTUAL_GAS.mul(MOCK_POST_OP_EXCHANGE_RATE)
+          .div(ethers.constants.WeiPerEther)
+          .add(PAYMASTER_FEE)
+      );
     });
   });
 });

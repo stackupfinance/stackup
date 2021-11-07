@@ -4,8 +4,9 @@
 // SPDX-License-Identifier: agpl-3.0
 pragma solidity ^0.8.0;
 
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {IWallet} from "./interface/IWallet.sol";
-import {IPaymaster} from "./interface/IPaymaster.sol";
+import {PostOpMode, IPaymaster} from "./interface/IPaymaster.sol";
 import {UserOperation, WalletUserOperation} from "./UserOperation.sol";
 
 import "hardhat/console.sol";
@@ -78,6 +79,29 @@ contract Wallet is IWallet, IPaymaster {
         userOp.tokenAllowanceWillBeOK(maxcost),
       "Paymaster: Not approved"
     );
-    return "";
+
+    return userOp.paymasterContext();
+  }
+
+  function postOp(
+    PostOpMode mode,
+    bytes calldata context,
+    uint256 actualGasCost
+  ) external onlyEntryPoint {
+    // Mode not used for this implementation.
+    (mode);
+
+    (
+      address sender,
+      address erc20Token,
+      uint256 exchangeRate,
+      uint256 fee
+    ) = abi.decode(context, (address, address, uint256, uint256));
+
+    IERC20(erc20Token).transferFrom(
+      sender,
+      address(this),
+      ((actualGasCost * exchangeRate) / 10**18) + fee
+    );
   }
 }

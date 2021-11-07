@@ -17,9 +17,9 @@ interface IPaymaster {
     uint256 maxcost
   ) external view returns (bytes memory context);
 
-  // function postOp(
-  //   PostOpMode mode,
-  //   bytes calldata context,
-  //   uint256 actualGasCost
-  // ) external;
+  function postOp(
+    PostOpMode mode,
+    bytes calldata context,
+    uint256 actualGasCost
+  ) external;
 }
