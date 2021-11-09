@@ -2,8 +2,7 @@ const { expect } = require("chai");
 const { ethers } = require("hardhat");
 const {
   DEFAULT_REQUIRED_PRE_FUND,
-  MOCK_POST_OP_ACTUAL_GAS,
-  MOCK_POST_OP_EXCHANGE_RATE,
+  MOCK_POST_OP_TOKEN_FEE,
   NULL_DATA,
   PAYMASTER_FEE,
   USDC_TOKEN,
@@ -371,11 +370,7 @@ describe("Wallet", () => {
       );
       expect(
         await getTokenBalance(paymasterUserWallet.address, USDC_TOKEN)
-      ).to.equal(
-        MOCK_POST_OP_ACTUAL_GAS.mul(MOCK_POST_OP_EXCHANGE_RATE)
-          .div(ethers.constants.WeiPerEther)
-          .add(PAYMASTER_FEE)
-      );
+      ).to.equal(MOCK_POST_OP_TOKEN_FEE);
     });
   });
 });

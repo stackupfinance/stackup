@@ -4,6 +4,7 @@ const { SINGLETON_FACTORY_ADDRESS } = require("../utils/deployHelpers");
 const {
   DEFAULT_REQUIRED_PRE_FUND,
   LOCK_EXPIRY_PERIOD,
+  USDC_TOKEN,
   encodeAddStake,
   encodeLockStake,
   encodeERC20MaxApprove,
@@ -11,6 +12,7 @@ const {
   encodeFailEntryPointCall,
   encodePassEntryPointCall,
   getAddressBalances,
+  getTokenBalance,
   getUserOperation,
   getContractAddress,
   getLastBlockTimestamp,
@@ -18,6 +20,7 @@ const {
   isWalletDeployed,
   sendEth,
   signUserOperation,
+  swapEthForToken,
   transactionFee,
   withPaymaster,
 } = require("../utils/contractHelpers");
@@ -177,45 +180,6 @@ describe("EntryPoint", () => {
       ).to.be.revertedWith("EntryPoint: Insufficient stake");
     });
 
-    it("Does not revert if paymaster has enough Eth staked and successfully validates user operation", async () => {
-      await sendEth(paymaster, paymasterWallet, "10");
-      const userOps = await Promise.all([
-        signUserOperation(
-          paymaster,
-          getUserOperation(paymasterWallet, {
-            initCode: paymasterInitCode,
-            callData: encodeAddStake(
-              entryPoint.address,
-              DEFAULT_REQUIRED_PRE_FUND
-            ),
-          })
-        ),
-        signUserOperation(
-          paymaster,
-          getUserOperation(paymasterWallet, {
-            callData: encodeLockStake(entryPoint.address),
-          })
-        ),
-      ]);
-      await entryPoint
-        .connect(paymaster)
-        .handleOps(userOps, ethers.constants.AddressZero);
-
-      const userOp = await signUserOperation(
-        owner,
-        await withPaymaster(
-          paymaster,
-          paymasterWallet,
-          getUserOperation(sender, {
-            initCode,
-            callData: encodeERC20MaxApprove(paymasterWallet),
-          })
-        )
-      );
-      await expect(entryPoint.handleOps([userOp], ethers.constants.AddressZero))
-        .to.not.be.reverted;
-    });
-
     it("Reverts if paymaster fails to validate user operation", async () => {
       await sendEth(paymaster, paymasterWallet, "10");
       const userOps = await Promise.all([
@@ -254,6 +218,59 @@ describe("EntryPoint", () => {
       await expect(
         entryPoint.handleOps([userOp], ethers.constants.AddressZero)
       ).to.be.revertedWith("Paymaster: Not approved");
+    });
+
+    it("Does not revert if paymaster has enough Eth staked, successfully validates user operation, and gets paid", async () => {
+      await sendEth(paymaster, paymasterWallet, "10");
+      await swapEthForToken(
+        owner,
+        sender,
+        USDC_TOKEN,
+        ethers.utils.parseEther("10")
+      );
+
+      const paymasterSetupOps = await Promise.all([
+        signUserOperation(
+          paymaster,
+          getUserOperation(paymasterWallet, {
+            initCode: paymasterInitCode,
+            callData: encodeAddStake(
+              entryPoint.address,
+              DEFAULT_REQUIRED_PRE_FUND
+            ),
+          })
+        ),
+        signUserOperation(
+          paymaster,
+          getUserOperation(paymasterWallet, {
+            callData: encodeLockStake(entryPoint.address),
+          })
+        ),
+      ]);
+      await entryPoint
+        .connect(paymaster)
+        .handleOps(paymasterSetupOps, ethers.constants.AddressZero);
+
+      const userOp = await signUserOperation(
+        owner,
+        await withPaymaster(
+          paymaster,
+          paymasterWallet,
+          getUserOperation(sender, {
+            initCode,
+            callData: encodeERC20MaxApprove(paymasterWallet),
+          })
+        )
+      );
+
+      expect(await getTokenBalance(paymasterWallet, USDC_TOKEN)).to.equal(0);
+      await expect(entryPoint.handleOps([userOp], ethers.constants.AddressZero))
+        .to.not.be.reverted;
+      expect(
+        await getTokenBalance(paymasterWallet, USDC_TOKEN).then((val) =>
+          val.gt(0)
+        )
+      ).to.be.true;
     });
   });
 

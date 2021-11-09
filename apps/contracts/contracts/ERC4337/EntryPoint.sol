@@ -25,31 +25,50 @@ contract EntryPoint is IEntryPoint, IEntryPointStakeController {
   function handleOps(UserOperation[] calldata ops, address payable redeemer)
     external
   {
-    // TODO: What is this used for?
-    redeemer;
-
-    uint256 opslen = ops.length;
+    uint256 gasUsed;
+    uint256[] memory verificationGas = new uint256[](ops.length);
+    bytes[] memory contexts = new bytes[](ops.length);
 
     // Verification loop
-    for (uint256 i = 0; i < opslen; i++) {
+    for (uint256 i = 0; i < ops.length; i++) {
+      verificationGas[i] = gasleft();
+
       if (ops[i].shouldCreateWallet()) {
         ops[i].deployWallet(create2Factory);
       }
 
       if (ops[i].hasPaymaster()) {
         ops[i].verifyPaymasterStake(_paymasterStakes[ops[i].paymaster]);
-        ops[i].validatePaymasterUserOp();
+        contexts[i] = ops[i].validatePaymasterUserOp();
       }
 
       ops[i].validateUserOp();
+
+      verificationGas[i] = verificationGas[i] - gasleft();
     }
 
     // Execution loop
     // 1. Call the wallet with the UserOperation’s calldata
     // 2. Refund unused gas fees
-    for (uint256 i = 0; i < opslen; i++) {
+    for (uint256 i = 0; i < ops.length; i++) {
+      uint256 preExecutionGas = gasleft();
+
       ops[i].execute();
+
+      uint256 actualGasCost = verificationGas[i] +
+        (preExecutionGas - gasleft());
+      gasUsed += actualGasCost;
+
+      if (ops[i].hasPaymaster()) {
+        ops[i].paymasterPostOp(contexts[i], actualGasCost);
+      } else {
+        // TODO: refund unused gas to wallet
+        (ops[i].sender);
+      }
     }
+
+    // TODO: Transfer collected gas to redeemer
+    (redeemer);
   }
 
   function addStake() external payable {
