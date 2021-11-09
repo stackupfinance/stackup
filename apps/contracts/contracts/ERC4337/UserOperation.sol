@@ -12,7 +12,7 @@ import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 import "solidity-bytes-utils/contracts/BytesLib.sol";
 import "../ERC2470/ISingletonFactory.sol";
 import {IWallet} from "./interface/IWallet.sol";
-import {IPaymaster} from "./interface/IPaymaster.sol";
+import {PostOpMode, IPaymaster} from "./interface/IPaymaster.sol";
 import {Stake} from "./Stake.sol";
 
 import "hardhat/console.sol";
@@ -191,8 +191,28 @@ library EntryPointUserOperation {
     );
   }
 
-  function validatePaymasterUserOp(UserOperation calldata op) internal view {
-    IPaymaster(op.paymaster).validatePaymasterUserOp(op, op.requiredPrefund());
+  function validatePaymasterUserOp(UserOperation calldata op)
+    internal
+    view
+    returns (bytes memory)
+  {
+    return
+      IPaymaster(op.paymaster).validatePaymasterUserOp(
+        op,
+        op.requiredPrefund()
+      );
+  }
+
+  function paymasterPostOp(
+    UserOperation calldata op,
+    bytes memory context,
+    uint256 actualGasCost
+  ) internal {
+    IPaymaster(op.paymaster).postOp(
+      PostOpMode.opSucceeded,
+      context,
+      actualGasCost
+    );
   }
 
   function deployWallet(UserOperation calldata op, address create2Factory)

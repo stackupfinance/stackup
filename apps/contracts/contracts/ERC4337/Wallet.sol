@@ -5,6 +5,7 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 import {IWallet} from "./interface/IWallet.sol";
 import {PostOpMode, IPaymaster} from "./interface/IPaymaster.sol";
 import {UserOperation, WalletUserOperation} from "./UserOperation.sol";
@@ -97,11 +98,13 @@ contract Wallet is IWallet, IPaymaster {
       uint256 exchangeRate,
       uint256 fee
     ) = abi.decode(context, (address, address, uint256, uint256));
+    uint256 scaleFactor = 10**IERC20Metadata(erc20Token).decimals();
 
     IERC20(erc20Token).transferFrom(
       sender,
       address(this),
-      ((actualGasCost * exchangeRate) / 10**18) + fee
+      ((actualGasCost * exchangeRate * scaleFactor) / (10**18 * scaleFactor)) +
+        fee
     );
   }
 }
