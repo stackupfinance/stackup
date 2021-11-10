@@ -38,7 +38,9 @@ contract EntryPoint is IEntryPoint, IEntryPointStakeController {
       }
 
       if (ops[i].hasPaymaster()) {
-        ops[i].verifyPaymasterStake(_paymasterStakes[ops[i].paymaster]);
+        _paymasterStakes[ops[i].paymaster].value = ops[i].verifyPaymasterStake(
+          _paymasterStakes[ops[i].paymaster]
+        );
         contexts[i] = ops[i].validatePaymasterUserOp();
       }
 
@@ -48,8 +50,6 @@ contract EntryPoint is IEntryPoint, IEntryPointStakeController {
     }
 
     // Execution loop
-    // 1. Call the wallet with the UserOperation’s calldata
-    // 2. Refund unused gas fees
     for (uint256 i = 0; i < ops.length; i++) {
       uint256 preExecutionGas = gasleft();
 
@@ -61,14 +61,19 @@ contract EntryPoint is IEntryPoint, IEntryPointStakeController {
 
       if (ops[i].hasPaymaster()) {
         ops[i].paymasterPostOp(contexts[i], actualGasCost);
+        _paymasterStakes[ops[i].paymaster].value = ops[i]
+          .finalizePaymasterStake(
+            _paymasterStakes[ops[i].paymaster],
+            actualGasCost
+          );
       } else {
-        // TODO: refund unused gas to wallet
-        (ops[i].sender);
+        ops[i].refundUnusedGas(actualGasCost);
       }
     }
 
-    // TODO: Transfer collected gas to redeemer
-    (redeemer);
+    // solhint-disable-next-line avoid-low-level-calls
+    (bool success, ) = redeemer.call{value: gasUsed}("");
+    require(success, "EntryPoint: Failed to redeem");
   }
 
   function addStake() external payable {
