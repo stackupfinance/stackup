@@ -183,12 +183,23 @@ library EntryPointUserOperation {
   function verifyPaymasterStake(UserOperation calldata op, Stake memory stake)
     internal
     view
+    returns (uint256)
   {
     require(stake.isLocked, "EntryPoint: Stake not locked");
     require(
       stake.value >= op.requiredPrefund(),
       "EntryPoint: Insufficient stake"
     );
+
+    return stake.value - op.requiredPrefund();
+  }
+
+  function finalizePaymasterStake(
+    UserOperation calldata op,
+    Stake memory stake,
+    uint256 actualGasCost
+  ) internal view returns (uint256) {
+    return stake.value + op.requiredPrefund() - actualGasCost;
   }
 
   function validatePaymasterUserOp(UserOperation calldata op)
@@ -251,6 +262,16 @@ library EntryPointUserOperation {
       }
       revert(abi.decode(result, (string)));
     }
+  }
+
+  function refundUnusedGas(UserOperation calldata op, uint256 actualGasCost)
+    internal
+  {
+    // solhint-disable-next-line avoid-low-level-calls
+    (bool success, ) = op.sender.call{
+      value: op.requiredPrefund() - actualGasCost
+    }("");
+    require(success, "EntryPoint: Failed to refund");
   }
 }
 

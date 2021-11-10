@@ -105,8 +105,21 @@ describe("EntryPoint", () => {
         })
       );
 
+      const [preRedeemerBalance, preSenderBalance] = await getAddressBalances([
+        ethers.constants.AddressZero,
+        sender,
+      ]);
       await expect(entryPoint.handleOps([userOp], ethers.constants.AddressZero))
         .to.not.be.reverted;
+
+      const [postRedeemerBalance, postSenderBalance] = await getAddressBalances(
+        [ethers.constants.AddressZero, sender]
+      );
+      expect(postRedeemerBalance.gt(preRedeemerBalance)).to.be.true;
+      expect(postSenderBalance.lt(preSenderBalance)).to.be.true;
+      expect(postRedeemerBalance.sub(preRedeemerBalance)).to.equal(
+        preSenderBalance.sub(postSenderBalance)
+      );
     });
 
     it("Reverts if callData is bad", async () => {
@@ -262,15 +275,20 @@ describe("EntryPoint", () => {
           })
         )
       );
+      const [preStake, preTokenBalance] = await Promise.all([
+        entryPoint.getStake(paymasterWallet),
+        getTokenBalance(paymasterWallet, USDC_TOKEN),
+      ]);
 
-      expect(await getTokenBalance(paymasterWallet, USDC_TOKEN)).to.equal(0);
       await expect(entryPoint.handleOps([userOp], ethers.constants.AddressZero))
         .to.not.be.reverted;
-      expect(
-        await getTokenBalance(paymasterWallet, USDC_TOKEN).then((val) =>
-          val.gt(0)
-        )
-      ).to.be.true;
+
+      const [postStake, postTokenBalance] = await Promise.all([
+        entryPoint.getStake(paymasterWallet),
+        getTokenBalance(paymasterWallet, USDC_TOKEN),
+      ]);
+      expect(postStake[0].lt(preStake[0])).to.be.true;
+      expect(postTokenBalance.gt(preTokenBalance)).to.be.true;
     });
   });
 
