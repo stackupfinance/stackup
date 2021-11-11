@@ -52,7 +52,7 @@ const deleteUser = {
 const createUserWallet = {
   body: {
     walletAddress: Joi.string().required(),
-    seedSignerAddress: Joi.string().required(),
+    initSignerAddress: Joi.string().required(),
     encryptedSigner: Joi.string().base64().required(),
   },
 };

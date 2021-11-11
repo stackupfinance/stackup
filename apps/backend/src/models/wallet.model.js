@@ -21,7 +21,7 @@ const walletSchema = mongoose.Schema(
         }
       },
     },
-    seedSignerAddress: {
+    initSignerAddress: {
       type: String,
       required: true,
       trim: true,
@@ -52,6 +52,16 @@ const walletSchema = mongoose.Schema(
 // add plugin that converts mongoose to json
 walletSchema.plugin(toJSON);
 walletSchema.plugin(paginate);
+
+/**
+ * Check if user already has a wallet
+ * @param {ObjectId} userId
+ * @returns {Promise<boolean>}
+ */
+walletSchema.statics.alreadyCreated = async function (user) {
+  const wallet = await this.findOne({ user });
+  return !!wallet;
+};
 
 /**
  * @typedef Wallet

@@ -1,3 +1,5 @@
+const httpStatus = require('http-status');
+const ApiError = require('../utils/ApiError');
 const Wallet = require('../models/wallet.model');
 
 /**
@@ -6,6 +8,9 @@ const Wallet = require('../models/wallet.model');
  * @returns {Promise<Wallet>}
  */
 const createWallet = async (userId, walletBody) => {
+  if (await Wallet.alreadyCreated(userId)) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'User already has a wallet');
+  }
   return Wallet.create({
     user: userId,
     ...walletBody,
