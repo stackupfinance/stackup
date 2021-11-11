@@ -34,12 +34,17 @@ const deleteUser = catchAsync(async (req, res) => {
   res.status(httpStatus.NO_CONTENT).send();
 });
 
-const getUserWallets = catchAsync(async (req, res) => {
+const createUserWallet = catchAsync(async (req, res) => {
   const { userId } = req.params;
-  const wallets = req.query.withMnemonic
-    ? await walletService.getUserWalletsWithMnemonic(userId)
-    : await walletService.getUserWallets(userId);
-  res.send(wallets);
+  const wallet = await walletService.createWallet(userId, req.body);
+  await userService.updateUserById(userId, { wallet: wallet.id });
+  res.send(wallet);
+});
+
+const getUserWallet = catchAsync(async (req, res) => {
+  const { userId } = req.params;
+  const wallet = await walletService.getUserWallet(userId);
+  res.send(wallet);
 });
 
 module.exports = {
@@ -48,5 +53,6 @@ module.exports = {
   getUser,
   updateUser,
   deleteUser,
-  getUserWallets,
+  createUserWallet,
+  getUserWallet,
 };

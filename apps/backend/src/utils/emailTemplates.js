@@ -971,7 +971,7 @@ const verifyEmail = (username, code) => {
                           <h1>${code}</h1>
                           <p>Thanks,
                             <br>The Stackup Team</p>
-                          <p><strong>P.S.</strong> Need immediate help getting started? Just reply to this email, and the Stackup support team is always ready to help!</p>
+                          <p><strong>P.S.</strong> Need immediate help getting started? <a href="mailto:support@stackup.sh">Contact support</a>, and the Stackup team will get back to you as soon as possible!</p>
                         </div>
                       </td>
                     </tr>

@@ -49,10 +49,15 @@ const deleteUser = {
   }),
 };
 
-const getUserWallets = {
-  query: {
-    withMnemonic: Joi.boolean().default(false),
+const createUserWallet = {
+  body: {
+    walletAddress: Joi.string().required(),
+    seedSignerAddress: Joi.string().required(),
+    encryptedSigner: Joi.string().base64().required(),
   },
+};
+
+const getUserWallet = {
   params: Joi.object().keys({
     userId: Joi.string().custom(objectId),
   }),
@@ -64,5 +69,6 @@ module.exports = {
   getUser,
   updateUser,
   deleteUser,
-  getUserWallets,
+  createUserWallet,
+  getUserWallet,
 };

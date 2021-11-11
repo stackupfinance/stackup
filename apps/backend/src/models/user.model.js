@@ -60,7 +60,7 @@ const userSchema = mongoose.Schema(
       trim: true,
       maxLength: 150,
     },
-    defaultWallet: {
+    wallet: {
       type: mongoose.SchemaTypes.ObjectId,
       ref: 'Wallet',
     },
@@ -114,11 +114,6 @@ userSchema.pre('save', async function (next) {
 
   if (user.isModified('email')) {
     user.isEmailVerified = false;
-  }
-
-  if (user.isNew) {
-    const wallet = await walletService.createInternalWallet(user.id);
-    this.defaultWallet = wallet.id;
   }
 
   next();
