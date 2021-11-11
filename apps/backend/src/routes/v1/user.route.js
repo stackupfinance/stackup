@@ -18,7 +18,8 @@ router
   .delete(auth('manageUsers'), validate(userValidation.deleteUser), userController.deleteUser);
 
 router
-  .route('/:userId/wallets')
-  .get(auth('getUsers'), validate(userValidation.getUserWallets), userController.getUserWallets);
+  .route('/:userId/wallet')
+  .post(auth('manageUsers'), validate(userValidation.createUserWallet), userController.createUserWallet)
+  .get(auth('getUsers'), validate(userValidation.getUserWallet), userController.getUserWallet);
 
 module.exports = router;

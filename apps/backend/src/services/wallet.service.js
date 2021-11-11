@@ -1,21 +1,19 @@
+const httpStatus = require('http-status');
+const ApiError = require('../utils/ApiError');
 const Wallet = require('../models/wallet.model');
-const web3 = require('../utils/web3');
-const { types } = require('../config/wallets');
 
 /**
  * Create an internal wallet
  * @param {ObjectId} userId
  * @returns {Promise<Wallet>}
  */
-const createInternalWallet = async (userId) => {
-  const { address, publicKey, mnemonic } = web3.createWallet();
+const createWallet = async (userId, walletBody) => {
+  if (await Wallet.alreadyCreated(userId)) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'User already has a wallet');
+  }
   return Wallet.create({
     user: userId,
-    type: types.internal,
-    name: 'Stackup',
-    address,
-    publicKey,
-    mnemonic,
+    ...walletBody,
   });
 };
 
@@ -24,27 +22,8 @@ const createInternalWallet = async (userId) => {
  * @param {ObjectId} userId
  * @returns {Promise<Array<Wallet>>}
  */
-const getUserWallets = async (userId) => {
-  const userWallets = await Wallet.find({ user: userId });
-  return userWallets.map((doc) => {
-    Object.assign(doc, { mnemonic: undefined });
-    return doc;
-  });
-};
-
-/**
- * Get a users linked wallets with decrypted mnemonic
- * @param {ObjectId} userId
- * @returns {Promise<Array<Wallet>>}
- */
-const getUserWalletsWithMnemonic = async (userId) => {
-  const userWallets = await Wallet.find({ user: userId });
-  return Promise.all(
-    userWallets.map(async (doc) => {
-      Object.assign(doc, { mnemonic: await doc.getDecryptedMnemonic() });
-      return doc;
-    })
-  );
+const getUserWallet = async (userId) => {
+  return Wallet.findOne({ user: userId });
 };
 
 /**
@@ -57,8 +36,7 @@ const deleteUserWallets = async (userId) => {
 };
 
 module.exports = {
-  createInternalWallet,
-  getUserWallets,
-  getUserWalletsWithMnemonic,
+  createWallet,
+  getUserWallet,
   deleteUserWallets,
 };

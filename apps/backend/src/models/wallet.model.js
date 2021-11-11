@@ -1,8 +1,6 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
 const { toJSON, paginate } = require('./plugins');
-const { types } = require('../config/wallets');
-const secretService = require('../services/secret.service');
 
 const walletSchema = mongoose.Schema(
   {
@@ -10,18 +8,9 @@ const walletSchema = mongoose.Schema(
       type: mongoose.SchemaTypes.ObjectId,
       ref: 'User',
       required: true,
+      unique: true,
     },
-    type: {
-      type: String,
-      required: true,
-      enum: [types.internal],
-    },
-    name: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-    address: {
+    walletAddress: {
       type: String,
       required: true,
       trim: true,
@@ -32,23 +21,27 @@ const walletSchema = mongoose.Schema(
         }
       },
     },
-    publicKey: {
+    initSignerAddress: {
       type: String,
-      required: [
-        function () {
-          return this.type === types.internal;
-        },
-        'A public key is required for internal type wallets',
-      ],
+      required: true,
+      trim: true,
+      lowercase: true,
+      validate(value) {
+        if (!validator.isEthereumAddress(value)) {
+          throw new Error('Invalid wallet address');
+        }
+      },
     },
-    mnemonic: {
+    encryptedSigner: {
       type: String,
-      required: [
-        function () {
-          return this.type === types.internal;
-        },
-        'A mnemonic is required for internal type wallets',
-      ],
+      required: true,
+      trim: true,
+      lowercase: true,
+      validate(value) {
+        if (!validator.isBase64(value)) {
+          throw new Error('Invalid encrypted signer');
+        }
+      },
     },
   },
   {
@@ -61,21 +54,14 @@ walletSchema.plugin(toJSON);
 walletSchema.plugin(paginate);
 
 /**
- * Returns decrypted mnemonic for internal wallet
- * @returns {Promise<string | null>}
+ * Check if user already has a wallet
+ * @param {ObjectId} userId
+ * @returns {Promise<boolean>}
  */
-walletSchema.methods.getDecryptedMnemonic = async function () {
-  const wallet = this;
-  return secretService.decryptWalletMnemonic(wallet.mnemonic);
+walletSchema.statics.alreadyCreated = async function (user) {
+  const wallet = await this.findOne({ user });
+  return !!wallet;
 };
-
-walletSchema.pre('save', async function (next) {
-  const wallet = this;
-  if (wallet.isModified('mnemonic')) {
-    this.mnemonic = await secretService.encryptWalletMnemonic(wallet.mnemonic);
-  }
-  next();
-});
 
 /**
  * @typedef Wallet
