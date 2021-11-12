@@ -1,5 +1,5 @@
-import { useForm } from "react-hook-form";
-import React from "react";
+import { useForm } from 'react-hook-form';
+import React from 'react';
 import {
   FormErrorMessage,
   FormControl,
@@ -14,7 +14,7 @@ import {
   Grid,
   GridItem,
   Text,
-} from "@chakra-ui/react";
+} from '@chakra-ui/react';
 
 export const Register = (props) => {
   const {
@@ -39,12 +39,7 @@ export const Register = (props) => {
       <Center>
         <Wrap>
           <WrapItem>
-            <Avatar
-              size="2xl"
-              name="Dan Abrahmov"
-              src="https://bit.ly/dan-abramov"
-              top={250}
-            />
+            <Avatar size="2xl" name="Dan Abrahmov" src="https://bit.ly/dan-abramov" top={250} />
           </WrapItem>
         </Wrap>
       </Center>
@@ -65,38 +60,31 @@ export const Register = (props) => {
             <Input
               id="username"
               placeholder="Username"
-              {...register("user", {
-                required: "This is required",
-                minLength: { value: 4, message: "Minimum length should be 4" },
+              {...register('user', {
+                required: 'This is required',
+                minLength: { value: 4, message: 'Minimum length should be 4' },
               })}
             />
             <Input
               marginTop={4}
               id="password"
               placeholder="Password"
-              type={show ? "text" : "password"}
-              {...register("password", {
-                required: "This is required",
-                minLength: { value: 4, message: "Minimum length should be 4" },
+              type={show ? 'text' : 'password'}
+              {...register('password', {
+                required: 'This is required',
+                minLength: { value: 4, message: 'Minimum length should be 4' },
               })}
             />
-            <FormErrorMessage>
-              {errors.name && errors.name.message}
-            </FormErrorMessage>
-            <Progress
-              colorscheme={"green"}
-              value={64}
-              size="sm"
-              marginTop={1}
-            />
+            <FormErrorMessage>{errors.name && errors.name.message}</FormErrorMessage>
+            <Progress colorscheme={'green'} value={64} size="sm" marginTop={1} />
             <Grid templateColumns="repeat(5, 1fr)" gap={4}>
               <GridItem colSpan={2} h="10">
-                <Text fontSize="xs" color={"blackAlpha.500"}>
+                <Text fontSize="xs" color={'blackAlpha.500'}>
                   Weak
                 </Text>
               </GridItem>
               <GridItem colStart={5} colEnd={6} h="10">
-                <Text fontSize="xs" color={"blackAlpha.500"}>
+                <Text fontSize="xs" color={'blackAlpha.500'}>
                   Strong
                 </Text>
               </GridItem>
@@ -105,10 +93,10 @@ export const Register = (props) => {
               marginTop={2}
               id="confirmPassword"
               placeholder="Confirm Password"
-              type={show ? "text" : "confirmPassword"}
-              {...register("confirmPassword", {
-                required: "This is required",
-                minLength: { value: 4, message: "Minimum length should be 4" },
+              type={show ? 'text' : 'confirmPassword'}
+              {...register('confirmPassword', {
+                required: 'This is required',
+                minLength: { value: 4, message: 'Minimum length should be 4' },
               })}
             />
           </FormControl>
@@ -117,10 +105,10 @@ export const Register = (props) => {
               mt={4}
               colorScheme="teal"
               isLoading={isSubmitting}
-              size={"lg"}
+              size={'lg'}
               type="submit"
-              backgroundColor={"#1679EF"}
-              _hover={"#1679EF"}
+              backgroundColor={'#1679EF'}
+              _hover={'#1679EF'}
               w={279}
             >
               Next
