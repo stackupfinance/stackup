@@ -25,7 +25,7 @@ export default function Login() {
                 <form onSubmit={handleSubmit(onSubmit)}>
                   <VStack spacing="16px">
                     <Input placeholder="Username" {...register('username')} />
-                    <Input placeholder="Username" type="password" {...register('password')} />
+                    <Input placeholder="Password" type="password" {...register('password')} />
                     <Button isFullWidth colorScheme="blue" size="lg" type="submit">
                       Log in
                     </Button>
