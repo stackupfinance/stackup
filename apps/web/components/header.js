@@ -6,7 +6,6 @@ import {
   Image,
   Spacer,
   useBreakpointValue,
-  Heading,
   LinkBox,
   LinkOverlay,
 } from '@chakra-ui/react';
@@ -29,7 +28,7 @@ export const Header = ({ backLinkUrl }) => {
 
           <LinkBox>
             <LinkOverlay href="https://stackup.sh/" target="_blank">
-              <Image src="./logotype_blue_navy-32x142.png" alt="stackup logo" />
+              <Image src="./logotype_blue_navy-32x142.png" maxW="142px" maxH="32x" alt="stackup logo" />
             </LinkOverlay>
           </LinkBox>
         </HStack>
