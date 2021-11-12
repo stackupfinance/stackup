@@ -19,7 +19,7 @@ export default function Login() {
         <Container mt={['32px', '128px']} maxW="xl">
           <Center>
             <VStack spacing="32px" w="100%">
-              <Image src="./logo-light.png" maxW="128px" maxH="128px" alt="stackup logo" />
+              <Image src="./mark_blue.png" maxW="128px" maxH="128px" alt="stackup logo" />
 
               <Box borderWidth="1px" borderRadius="lg" p="16px" w="100%">
                 <form onSubmit={handleSubmit(onSubmit)}>
