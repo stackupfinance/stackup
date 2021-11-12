@@ -28,14 +28,9 @@ export const Header = ({ backLinkUrl }) => {
           {backLinkUrl && <Spacer />}
 
           <LinkBox>
-            <HStack spacing="8px">
-              <Image src="./logo-light.png" maxW="32px" maxH="32px" alt="stackup logo" />
-              <Heading as="h3" size="lg">
-                <LinkOverlay href="https://stackup.sh/" target="_blank">
-                  Stackup
-                </LinkOverlay>
-              </Heading>
-            </HStack>
+            <LinkOverlay href="https://stackup.sh/" target="_blank">
+              <Image src="./logotype_blue_navy-32x142.png" alt="stackup logo" />
+            </LinkOverlay>
           </LinkBox>
         </HStack>
       </Box>
