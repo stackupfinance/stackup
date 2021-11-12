@@ -11,7 +11,7 @@ import {
 } from '@chakra-ui/react';
 import { ChevronLeftIcon } from '@chakra-ui/icons';
 
-export const Header = ({ backLinkUrl }) => {
+export const Header = ({ backLinkUrl, backLinkLabel }) => {
   const buttonSize = useBreakpointValue({ base: 'md', sm: 'lg' });
 
   return (
@@ -20,7 +20,9 @@ export const Header = ({ backLinkUrl }) => {
         <HStack spacing={['8px', '16px']} py="16px" px="16px" maxW="xl" margin="0 auto">
           {backLinkUrl && (
             <NextLink href={backLinkUrl} passHref>
-              <Button as="a" variant="link" size={buttonSize} leftIcon={<ChevronLeftIcon />} />
+              <Button as="a" variant="link" size={buttonSize} leftIcon={<ChevronLeftIcon />}>
+                {backLinkLabel}
+              </Button>
             </NextLink>
           )}
 
@@ -29,7 +31,7 @@ export const Header = ({ backLinkUrl }) => {
           <LinkBox>
             <LinkOverlay href="https://stackup.sh/" target="_blank">
               <Image
-                src="./logotype_blue_navy-32x142.png"
+                src="./logotype-blue-navy-32x142.png"
                 maxW="142px"
                 maxH="32x"
                 alt="stackup logo"
