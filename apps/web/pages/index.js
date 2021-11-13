@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { AppContainer, Head, Header } from '../components';
 import { Routes } from '../src/config';
 
-export default function Login() {
+export default function Home() {
   const { register, handleSubmit } = useForm();
 
   const onSubmit = (data) => {
@@ -13,7 +13,7 @@ export default function Login() {
 
   return (
     <>
-      <Head title="Stackup | Login" />
+      <Head title="Stackup" />
 
       <div style={{ minHeight: '100vh' }}>
         <Header />
