@@ -19,7 +19,7 @@ export const useAccountStore = create(
         refreshToken: undefined,
 
         register: async (data) => {
-          set({ loading: true, error: undefined });
+          set({ loading: true });
 
           try {
             const res = await axios.post(`${App.stackup.backendUrl}/v1/auth/register`, data);
