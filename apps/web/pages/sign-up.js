@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Image, VStack, Box, Input, Button, Text } from '@chakra-ui/react';
+import { Image, VStack, Box, Input, Button } from '@chakra-ui/react';
 import { useForm } from 'react-hook-form';
 import { AppContainer, Head, Header, InlineError } from '../components';
 import { useAccountStore, accountSignUpPageSelector } from '../src/state';
