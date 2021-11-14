@@ -9,6 +9,10 @@ export const accountSignUpPageSelector = (state) => ({
   loading: state.loading,
 });
 
+export const accountWelcomePageSelector = (state) => ({
+  user: state.user,
+});
+
 export const useAccountStore = create(
   devtools(
     persist(
