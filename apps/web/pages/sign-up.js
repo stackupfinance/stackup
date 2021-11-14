@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useRouter } from 'next/router';
 import { Image, VStack, Box, Input, Button } from '@chakra-ui/react';
 import { useForm } from 'react-hook-form';
 import { AppContainer, Head, Header, InlineError } from '../components';
@@ -6,6 +7,7 @@ import { useAccountStore, accountSignUpPageSelector } from '../src/state';
 import { Routes } from '../src/config';
 
 export default function SignUp() {
+  const router = useRouter();
   const {
     register,
     handleSubmit,
@@ -21,6 +23,7 @@ export default function SignUp() {
 
     try {
       await account.register({ username, password });
+      router.push(Routes.WELCOME);
     } catch (error) {
       setRegisterError(error.response?.data?.message || 'Unknown error, try again later!');
     }
@@ -50,7 +53,7 @@ export default function SignUp() {
       <Head title="Stackup | Sign up" />
 
       <div style={{ minHeight: '100vh' }}>
-        <Header backLinkUrl={Routes.HOME} backLinkLabel="Login" />
+        <Header backLinkUrl={Routes.LOGIN} backLinkLabel="Login" />
 
         <AppContainer>
           <VStack spacing="32px" w="100%">

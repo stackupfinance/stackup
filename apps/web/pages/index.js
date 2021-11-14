@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { AppContainer, Head, Header } from '../components';
 import { Routes } from '../src/config';
 
-export default function Home() {
+export default function Login() {
   const { register, handleSubmit } = useForm();
 
   const onSubmit = (data) => {
