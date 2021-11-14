@@ -19,6 +19,7 @@ export default function Home() {
                 <p>Profile placeholder</p>
               </TabPanel>
             </TabPanels>
+
             <TabList
               borderWidth="1px"
               borderTopRadius="lg"
