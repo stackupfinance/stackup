@@ -1,17 +1,10 @@
-import { ethers } from 'ethers';
-import EntryPoint from './contracts/EntryPoint.json';
 import Wallet from './contracts/Wallet.json';
 
 const INITIAL_NONCE = 0;
-const SINGLETON_FACTORY_ADDRESS = '0xce0042B868300000d44A59004Da54A005ffdcf9f';
 
-const EntryPointFactory = new ethers.ContractFactory(EntryPoint.abi, EntryPoint.bytecode);
-const EntryPointInitCode = EntryPointFactory.getDeployTransaction(SINGLETON_FACTORY_ADDRESS).data;
-const ENTRY_POINT_ADDRESS = ethers.utils.getCreate2Address(
-  SINGLETON_FACTORY_ADDRESS,
-  ethers.utils.formatBytes32String(INITIAL_NONCE),
-  ethers.utils.keccak256(EntryPointInitCode),
-);
+// These contracts have the same address on any chain.
+const SINGLETON_FACTORY_ADDRESS = '0xce0042B868300000d44A59004Da54A005ffdcf9f';
+const ENTRY_POINT_ADDRESS = '0x863d65a1dfb497e5f703bCbBb4e4B254275D4623';
 
 export const Web3 = {
   INITIAL_NONCE,
