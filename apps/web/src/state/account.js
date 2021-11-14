@@ -1,7 +1,8 @@
 import create from 'zustand';
 import { persist, devtools } from 'zustand/middleware';
-import { App } from '../config';
 import axios from 'axios';
+import { App } from '../config';
+import { initWallet } from '../utils/wallets';
 
 export const accountSignUpPageSelector = (state) => ({
   register: state.register,
@@ -22,12 +23,22 @@ export const useAccountStore = create(
           set({ loading: true });
 
           try {
-            const res = await axios.post(`${App.stackup.backendUrl}/v1/auth/register`, data);
+            const register = await axios.post(`${App.stackup.backendUrl}/v1/auth/register`, data);
+            const user = register.data.user;
+            const accessToken = register.data.tokens.access;
+            const refreshToken = register.data.tokens.refresh;
+
+            const wallet = initWallet(data.password);
+            await axios.post(`${App.stackup.backendUrl}/v1/users/${user.id}/wallet`, wallet, {
+              headers: { Authorization: `Bearer ${accessToken.token}` },
+            });
+
             set({
               loading: false,
-              user: res.data.user,
-              accessToken: res.data.tokens.access,
-              refreshToken: res.data.tokens.refresh,
+              user,
+              wallet,
+              accessToken,
+              refreshToken,
             });
           } catch (error) {
             set({ loading: false });

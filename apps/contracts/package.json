@@ -5,6 +5,7 @@
   "scripts": {
     "test": "hardhat coverage",
     "test:watch": "hardhat watch test",
+    "compile": "hardhat compile",
     "lint": "solhint 'contracts/**/*.sol' && eslint .",
     "lint:fix": "solhint 'contracts/**/*.sol' && eslint . --fix",
     "prettier": "prettier --check --ignore-path ./.eslintignore '**'",
