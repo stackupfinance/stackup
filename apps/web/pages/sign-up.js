@@ -57,7 +57,7 @@ export default function SignUp() {
             <Image src="./user-blue.png" maxW="128px" maxH="128px" alt="stackup logo" />
 
             <Box borderWidth="1px" borderRadius="lg" p="16px" w="100%">
-              <form onSubmit={handleSubmit(onSubmit)}>
+              <form onSubmit={handleSubmit(onSubmit)} onChange={() => setRegisterError('')}>
                 <VStack spacing="16px">
                   <Input
                     placeholder="Username"
