@@ -11,7 +11,8 @@
     "prettier": "prettier --check --ignore-path ./.eslintignore '**'",
     "prettier:fix": "prettier --write --ignore-path ./.eslintignore '**'",
     "deploy:hardhat": "hardhat run --network hardhat scripts/deploy.js",
-    "deploy:matic": "hardhat run --network matic scripts/deploy.js"
+    "deploy:polygonTestnet": "hardhat run --network polygonTestnet scripts/deploy.js",
+    "deploy:polygonMainnet": "hardhat run --network polygonMainnet scripts/deploy.js"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.2",
