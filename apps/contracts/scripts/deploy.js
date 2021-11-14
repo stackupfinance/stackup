@@ -16,7 +16,7 @@ async function main() {
   const EntryPointInitCode = EntryPointFactory.getDeployTransaction(
     SINGLETON_FACTORY_ADDRESS
   ).data;
-  const EntryPointSalt = ethers.utils.formatBytes32String(INITIAL_NONCE);
+  const EntryPointSalt = hre.ethers.utils.formatBytes32String(INITIAL_NONCE);
 
   const tx = await SingletonFactory.deploy(EntryPointInitCode, EntryPointSalt, {
     gasLimit: 5000000,
