@@ -1,29 +1,30 @@
-// We require the Hardhat Runtime Environment explicitly here. This is optional
-// but useful for running the script in a standalone fashion through `node <script>`.
-//
-// When running the script with `npx hardhat run <script>` you'll find the Hardhat
-// Runtime Environment's members available in the global scope.
 const hre = require("hardhat");
+const {
+  SINGLETON_FACTORY_ABI,
+  SINGLETON_FACTORY_ADDRESS,
+} = require("../utils/deployHelpers");
+const { INITIAL_NONCE } = require("../utils/contractHelpers");
 
 async function main() {
-  // Hardhat always runs the compile task when running scripts with its command
-  // line interface.
-  //
-  // If this script is run directly using `node` you may want to call compile
-  // manually to make sure everything is compiled
-  // await hre.run('compile');
+  const [signer] = await hre.ethers.getSigners();
+  const SingletonFactory = new hre.ethers.Contract(
+    SINGLETON_FACTORY_ADDRESS,
+    SINGLETON_FACTORY_ABI,
+    signer
+  );
+  const EntryPointFactory = await hre.ethers.getContractFactory("EntryPoint");
+  const EntryPointInitCode = EntryPointFactory.getDeployTransaction(
+    SINGLETON_FACTORY_ADDRESS
+  ).data;
+  const EntryPointSalt = ethers.utils.formatBytes32String(INITIAL_NONCE);
 
-  // We get the contract to deploy
-  const Greeter = await hre.ethers.getContractFactory("Greeter");
-  const greeter = await Greeter.deploy("Hello, Hardhat!");
+  const tx = await SingletonFactory.deploy(EntryPointInitCode, EntryPointSalt, {
+    gasLimit: 5000000,
+  }).then((tx) => tx.wait());
 
-  await greeter.deployed();
-
-  console.log("Greeter deployed to:", greeter.address);
+  console.log("EntryPoint deployment transaction:", tx);
 }
 
-// We recommend this pattern to be able to use async/await everywhere
-// and properly handle errors.
 main()
   .then(() => process.exit(0))
   .catch((error) => {
