@@ -33,7 +33,7 @@ export const useAuth = () => {
     };
 
     authCheck().then(enableAccount);
-  }, []);
+  }, [refreshToken]);
 
   useEffect(() => {
     const interval = setInterval(() => {

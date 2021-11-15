@@ -26,6 +26,12 @@ export const accountWelcomePageSelector = (state) => ({
   user: state.user,
 });
 
+export const accountHomePageSelector = (state) => ({
+  isEnabled: state.isEnabled,
+  loading: state.loading,
+  logout: state.logout,
+});
+
 const defaultState = {
   isEnabled: false,
   loading: false,

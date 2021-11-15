@@ -1,12 +1,15 @@
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react';
-import { AppContainer, Head, Search } from '../components';
+import { PageContainer, AppContainer, Head, Search, AccountTab } from '../components';
+import { useAccountStore, accountHomePageSelector } from '../src/state';
 
 export default function Home() {
+  const { isEnabled, loading, logout } = useAccountStore(accountHomePageSelector);
+
   return (
     <>
       <Head title="Stackup | Home" />
 
-      <div style={{ minHeight: '100vh' }}>
+      <PageContainer>
         <Search />
 
         <AppContainer minMargin>
@@ -22,8 +25,8 @@ export default function Home() {
               <TabPanel>
                 <p>chats placeholder</p>
               </TabPanel>
-              <TabPanel>
-                <p>Profile placeholder</p>
+              <TabPanel px="0px">
+                <AccountTab isEnabled={isEnabled} isLoading={loading} onLogout={logout} />
               </TabPanel>
             </TabPanels>
 
@@ -35,15 +38,15 @@ export default function Home() {
               pos="absolute"
               bottom={['0px', '32px']}
               left={['0px', 'auto']}
-              maxW="xl"
+              maxW="544px"
               w="100%"
             >
               <Tab borderRadius="lg">Chats</Tab>
-              <Tab borderRadius="lg">Profile</Tab>
+              <Tab borderRadius="lg">Account</Tab>
             </TabList>
           </Tabs>
         </AppContainer>
-      </div>
+      </PageContainer>
     </>
   );
 }
