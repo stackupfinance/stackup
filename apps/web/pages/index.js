@@ -2,7 +2,7 @@ import { useState } from 'react';
 import NextLink from 'next/link';
 import { Image, VStack, Box, Input, Button, Divider } from '@chakra-ui/react';
 import { useForm } from 'react-hook-form';
-import { AppContainer, Head, Header, InlineError } from '../components';
+import { PageContainer, AppContainer, Head, Header, InlineError } from '../components';
 import { useAccountStore, accountLoginPageSelector } from '../src/state';
 import { Routes } from '../src/config';
 
@@ -43,7 +43,7 @@ export default function Login() {
     <>
       <Head title="Stackup" />
 
-      <div style={{ minHeight: '100vh' }}>
+      <PageContainer>
         <Header />
 
         <AppContainer>
@@ -94,7 +94,7 @@ export default function Login() {
             </Box>
           </VStack>
         </AppContainer>
-      </div>
+      </PageContainer>
     </>
   );
 }

@@ -1,6 +1,6 @@
 import NextLink from 'next/link';
 import { Image, VStack, Box, Button, Heading } from '@chakra-ui/react';
-import { AppContainer, Head, Header } from '../components';
+import { PageContainer, AppContainer, Head, Header } from '../components';
 import { useAccountStore, accountWelcomePageSelector } from '../src/state';
 import { Routes } from '../src/config';
 
@@ -11,7 +11,7 @@ export default function Welcome() {
     <>
       <Head title="Stackup | Welcome!" />
 
-      <div style={{ minHeight: '100vh' }}>
+      <PageContainer>
         <Header />
 
         <AppContainer>
@@ -32,7 +32,7 @@ export default function Welcome() {
             </Box>
           </VStack>
         </AppContainer>
-      </div>
+      </PageContainer>
     </>
   );
 }

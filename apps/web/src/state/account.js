@@ -26,8 +26,14 @@ export const accountWelcomePageSelector = (state) => ({
   user: state.user,
 });
 
+export const accountHomePageSelector = (state) => ({
+  enabled: state.enabled,
+  loading: state.loading,
+  logout: state.logout,
+});
+
 const defaultState = {
-  isEnabled: false,
+  enabled: false,
   loading: false,
   user: undefined,
   wallet: undefined,
@@ -130,13 +136,13 @@ export const useAccountStore = create(
         },
 
         enableAccount: () => {
-          set({ isEnabled: true });
+          set({ enabled: true });
         },
       }),
       {
         name: 'stackup-account-store',
         partialize: (state) => {
-          const { isEnabled, loading, ...persisted } = state;
+          const { enabled, loading, ...persisted } = state;
           return persisted;
         },
       },
