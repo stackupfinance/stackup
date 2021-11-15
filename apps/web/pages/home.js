@@ -3,7 +3,7 @@ import { PageContainer, AppContainer, Head, Search, AccountTab } from '../compon
 import { useAccountStore, accountHomePageSelector } from '../src/state';
 
 export default function Home() {
-  const { isEnabled, loading, logout } = useAccountStore(accountHomePageSelector);
+  const { enabled, loading, logout } = useAccountStore(accountHomePageSelector);
 
   return (
     <>
@@ -26,7 +26,7 @@ export default function Home() {
                 <p>chats placeholder</p>
               </TabPanel>
               <TabPanel px="0px">
-                <AccountTab isEnabled={isEnabled} isLoading={loading} onLogout={logout} />
+                <AccountTab isEnabled={enabled} isLoading={loading} onLogout={logout} />
               </TabPanel>
             </TabPanels>
 
