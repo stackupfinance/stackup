@@ -10,7 +10,14 @@ export default function Home() {
         <Search />
 
         <AppContainer minMargin>
-          <Tabs isFitted w="100%" variant="soft-rounded" colorScheme="blue" align="center">
+          <Tabs
+            id="home-tabs"
+            isFitted
+            w="100%"
+            variant="soft-rounded"
+            colorScheme="blue"
+            align="center"
+          >
             <TabPanels>
               <TabPanel>
                 <p>chats placeholder</p>
