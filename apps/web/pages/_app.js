@@ -1,4 +1,5 @@
 import { ChakraProvider, extendTheme } from '@chakra-ui/react';
+import { useAuth } from '../src/hooks';
 
 const theme = extendTheme({
   config: {
@@ -8,6 +9,8 @@ const theme = extendTheme({
 });
 
 function App({ Component, pageProps }) {
+  useAuth();
+
   return (
     <ChakraProvider theme={theme}>
       <Component {...pageProps} />

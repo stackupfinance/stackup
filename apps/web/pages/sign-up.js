@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/router';
 import { Image, VStack, Box, Input, Button } from '@chakra-ui/react';
 import { useForm } from 'react-hook-form';
-import { AppContainer, Head, Header, InlineError } from '../components';
+import { PageContainer, AppContainer, Head, Header, InlineError } from '../components';
 import { useAccountStore, accountSignUpPageSelector } from '../src/state';
 import { Routes } from '../src/config';
 
@@ -52,7 +52,7 @@ export default function SignUp() {
     <>
       <Head title="Stackup | Sign up" />
 
-      <div style={{ minHeight: '100vh' }}>
+      <PageContainer>
         <Header backLinkUrl={Routes.LOGIN} backLinkLabel="Login" />
 
         <AppContainer>
@@ -98,7 +98,7 @@ export default function SignUp() {
             </Box>
           </VStack>
         </AppContainer>
-      </div>
+      </PageContainer>
     </>
   );
 }

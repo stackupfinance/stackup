@@ -1,8 +1,8 @@
 import { Container, Center } from '@chakra-ui/react';
 
-export const AppContainer = ({ children }) => {
+export const AppContainer = ({ minMargin, children }) => {
   return (
-    <Container mt={['32px', '128px']} maxW="xl">
+    <Container mt={minMargin ? ['8px', '16px'] : ['32px', '128px']} maxW="xl">
       <Center>{children}</Center>
     </Container>
   );
