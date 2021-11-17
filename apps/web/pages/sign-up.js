@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/router';
 import { Image, VStack, Box, Input, Button } from '@chakra-ui/react';
 import { useForm } from 'react-hook-form';
-import { PageContainer, AppContainer, Head, Header, InlineError } from '../components';
+import { PageContainer, AppContainer, Head, Header, InlineError } from '../src/components';
 import { useAccountStore, accountSignUpPageSelector } from '../src/state';
 import { Routes } from '../src/config';
 

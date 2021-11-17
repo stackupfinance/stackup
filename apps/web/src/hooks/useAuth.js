@@ -16,7 +16,7 @@ export const useAuth = () => {
   const refreshTokenExpired = () => isExpired(refreshToken?.token);
   const accessTokenExpired = () => isExpired(accessToken?.token);
   const notOnLoginOrSignUpPage = () => !initAuthRoutes.has(location.pathname);
-  const onLoginOrSignUpPage = () => initAuthRoutes.has(location.pathname);
+  const onLoginPage = () => location.pathname === Routes.LOGIN;
   const shouldRefresh = () => accessToken && refreshToken && !isExpired(refreshToken.token);
 
   useEffect(() => {
@@ -28,7 +28,7 @@ export const useAuth = () => {
         notOnLoginOrSignUpPage() && router.push(Routes.LOGIN);
       } else {
         accessTokenExpired() && (await refresh());
-        onLoginOrSignUpPage() && router.push(Routes.HOME);
+        onLoginPage() && router.push(Routes.HOME);
       }
     };
 

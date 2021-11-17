@@ -22,4 +22,6 @@ router
   .post(auth('manageUsers'), validate(userValidation.createUserWallet), userController.createUserWallet)
   .get(auth('getUsers'), validate(userValidation.getUserWallet), userController.getUserWallet);
 
+router.route('/:userId/search').get(auth('getUsers'), validate(userValidation.getUserSearch), userController.getUserSearch);
+
 module.exports = router;
