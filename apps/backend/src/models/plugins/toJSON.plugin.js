@@ -28,7 +28,7 @@ const toJSON = (schema) => {
         }
       });
 
-      ret.id = ret._id.toString();
+      ret.id = typeof ret._id !== 'undefined' ? ret._id.toString() : undefined;
       delete ret._id;
       delete ret.__v;
       delete ret.createdAt;
