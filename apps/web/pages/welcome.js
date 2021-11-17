@@ -1,6 +1,6 @@
 import NextLink from 'next/link';
 import { Image, VStack, Box, Button, Heading } from '@chakra-ui/react';
-import { PageContainer, AppContainer, Head, Header } from '../components';
+import { PageContainer, AppContainer, Head, Header } from '../src/components';
 import { useAccountStore, accountWelcomePageSelector } from '../src/state';
 import { Routes } from '../src/config';
 

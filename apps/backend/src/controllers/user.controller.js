@@ -10,7 +10,7 @@ const createUser = catchAsync(async (req, res) => {
 });
 
 const getUsers = catchAsync(async (req, res) => {
-  const filter = pick(req.query, ['name', 'role']);
+  const filter = pick(req.query, ['username', 'role']);
   const options = pick(req.query, ['sortBy', 'limit', 'page']);
   const result = await userService.queryUsers(filter, options);
   res.send(result);
@@ -47,6 +47,21 @@ const getUserWallet = catchAsync(async (req, res) => {
   res.send(wallet);
 });
 
+const getUserSearch = catchAsync(async (req, res) => {
+  const { userId } = req.params;
+  const options = pick(req.query, ['sortBy', 'limit', 'page']);
+  const result = await userService.queryUsers(
+    { username: { $regex: req.query.username, $options: 'i' }, _id: { $ne: userId } },
+    {
+      ...options,
+      projection: 'username wallet _id',
+      populate: 'wallet',
+      populateProjection: 'walletAddress -_id',
+    }
+  );
+  res.send(result);
+});
+
 module.exports = {
   createUser,
   getUsers,
@@ -55,4 +70,5 @@ module.exports = {
   deleteUser,
   createUserWallet,
   getUserWallet,
+  getUserSearch,
 };

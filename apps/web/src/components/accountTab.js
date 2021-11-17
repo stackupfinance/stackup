@@ -10,7 +10,7 @@ import {
   Divider,
   useBreakpointValue,
 } from '@chakra-ui/react';
-import { Routes } from '../src/config';
+import { Routes } from '../config';
 import { ChevronRightIcon } from '@chakra-ui/icons';
 
 export const AccountTab = ({ isEnabled, isLoading, onLogout }) => {

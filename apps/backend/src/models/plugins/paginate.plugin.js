@@ -13,8 +13,10 @@ const paginate = (schema) => {
    * Query for documents with pagination
    * @param {Object} [filter] - Mongo filter
    * @param {Object} [options] - Query options
+   * @param {Object} [options.projection] - The projection parameter specifies which fields to return.
    * @param {String} [options.sortBy] - Sorting criteria using the format: sortField:(desc|asc). Multiple sorting criteria should be separated by commas (,)
    * @param {String} [options.populate] - Populate data fields. Hierarchy of fields should be separated by (.). Multiple populating criteria should be separated by commas (,)
+   * @param {String} [options.populateProjection] - The projection parameter specifies which fields to return for a populate.
    * @param {number} [options.limit] - Maximum number of results per page (default = 10)
    * @param {number} [options.page] - Current page (default = 1)
    * @returns {Promise<QueryResult>}
@@ -37,7 +39,7 @@ const paginate = (schema) => {
     const skip = (page - 1) * limit;
 
     const countPromise = this.countDocuments(filter).exec();
-    let docsPromise = this.find(filter).sort(sort).skip(skip).limit(limit);
+    let docsPromise = this.find(filter, options.projection).sort(sort).skip(skip).limit(limit);
 
     if (options.populate) {
       options.populate.split(',').forEach((populateOption) => {
@@ -45,7 +47,8 @@ const paginate = (schema) => {
           populateOption
             .split('.')
             .reverse()
-            .reduce((a, b) => ({ path: b, populate: a }))
+            .reduce((a, b) => ({ path: b, populate: a })),
+          options.populateProjection
         );
       });
     }
