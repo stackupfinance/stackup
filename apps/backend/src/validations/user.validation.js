@@ -13,7 +13,7 @@ const createUser = {
 
 const getUsers = {
   query: Joi.object().keys({
-    name: Joi.string(),
+    username: Joi.string(),
     role: Joi.string(),
     sortBy: Joi.string(),
     limit: Joi.number().integer(),
@@ -63,6 +63,15 @@ const getUserWallet = {
   }),
 };
 
+const getUserSearch = {
+  query: Joi.object().keys({
+    username: Joi.string().required(),
+    sortBy: Joi.string(),
+    limit: Joi.number().integer(),
+    page: Joi.number().integer(),
+  }),
+};
+
 module.exports = {
   createUser,
   getUsers,
@@ -71,4 +80,5 @@ module.exports = {
   deleteUser,
   createUserWallet,
   getUserWallet,
+  getUserSearch,
 };

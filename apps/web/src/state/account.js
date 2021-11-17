@@ -29,6 +29,8 @@ export const accountWelcomePageSelector = (state) => ({
 export const accountHomePageSelector = (state) => ({
   enabled: state.enabled,
   loading: state.loading,
+  user: state.user,
+  accessToken: state.accessToken,
   logout: state.logout,
 });
 
