@@ -15,6 +15,7 @@ import {
   useSearchStore,
   searchHomePageSelector,
 } from '../src/state';
+import { useActivityChannel } from '../src/hooks';
 
 const loadingList = [
   <UserCard
@@ -66,6 +67,10 @@ export default function Home() {
       // TODO: Get user activity
     }
   }, [enabled]);
+
+  useActivityChannel((_data) => {
+    // TODO: Update user activity
+  });
 
   const onSearch = async (query) => {
     if (!enabled) return;

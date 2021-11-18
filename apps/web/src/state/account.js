@@ -12,6 +12,12 @@ export const accountUseAuthSelector = (state) => ({
   enableAccount: state.enableAccount,
 });
 
+export const accountPusherSelector = (state) => ({
+  enabled: state.enabled,
+  accessToken: state.accessToken,
+  user: state.user,
+});
+
 export const accountLoginPageSelector = (state) => ({
   loading: state.loading,
   login: state.login,

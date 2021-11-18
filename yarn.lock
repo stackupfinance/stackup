@@ -10179,7 +10179,7 @@ is-arrayish@^0.3.1:
 
 is-base64@^1.1.0:
   version "1.1.0"
-  resolved "https://registry.npmjs.org/is-base64/-/is-base64-1.1.0.tgz"
+  resolved "https://registry.yarnpkg.com/is-base64/-/is-base64-1.1.0.tgz#8ce1d719895030a457c59a7dcaf39b66d99d56b4"
   integrity sha512-Nlhg7Z2dVC4/PTvIFkgVVNvPHSO2eR/Yd0XzhGiXCXEvWnptXlXa/clQ8aePPiMuxEGcWfzWbGw2Fe3d+Y3v1g==
 
 is-bigint@^1.0.1:
@@ -14328,9 +14328,16 @@ pupa@^2.1.1:
   dependencies:
     escape-goat "^2.0.0"
 
+pusher-js@^7.0.3:
+  version "7.0.3"
+  resolved "https://registry.yarnpkg.com/pusher-js/-/pusher-js-7.0.3.tgz#f81c78cdf2ad32f546caa7532ec7f9081ef00b8d"
+  integrity sha512-HIfCvt00CAqgO4W0BrdpPsDcAwy51rB6DN0VMC+JeVRRbo8mn3XTeUeIFjmmlRLZLX8rPhUtLRo7vPag6b8GCw==
+  dependencies:
+    tweetnacl "^1.0.3"
+
 pusher@^5.0.0:
   version "5.0.0"
-  resolved "https://registry.npmjs.org/pusher/-/pusher-5.0.0.tgz"
+  resolved "https://registry.yarnpkg.com/pusher/-/pusher-5.0.0.tgz#3dc39ff527637a4b4597652357b0ec562514c8e6"
   integrity sha512-YaSZHkukytHR9+lklJp4yefwfR4685kfS6pqrSDUxPj45Ga29lIgyN7Jcnsz+bN5WKwXaf2+4c/x/j3pzWIAkw==
   dependencies:
     abort-controller "^3.0.0"
