@@ -20,7 +20,6 @@ export default function Login() {
 
     try {
       await login(data);
-      router.push(Routes.HOME);
     } catch (error) {
       setLoginError(error.response?.data?.message || 'Unknown error, try again later!');
     }
