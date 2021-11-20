@@ -50,6 +50,9 @@ const deleteUser = {
 };
 
 const createUserWallet = {
+  params: Joi.object().keys({
+    userId: Joi.string().custom(objectId),
+  }),
   body: Joi.object().keys({
     walletAddress: Joi.string().required(),
     initSignerAddress: Joi.string().required(),
