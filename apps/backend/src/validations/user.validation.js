@@ -50,11 +50,14 @@ const deleteUser = {
 };
 
 const createUserWallet = {
-  body: {
+  params: Joi.object().keys({
+    userId: Joi.string().custom(objectId),
+  }),
+  body: Joi.object().keys({
     walletAddress: Joi.string().required(),
     initSignerAddress: Joi.string().required(),
     encryptedSigner: Joi.string().base64().required(),
-  },
+  }),
 };
 
 const getUserWallet = {
@@ -64,11 +67,59 @@ const getUserWallet = {
 };
 
 const getUserSearch = {
+  params: Joi.object().keys({
+    userId: Joi.string().custom(objectId),
+  }),
   query: Joi.object().keys({
     username: Joi.string().required(),
     sortBy: Joi.string(),
     limit: Joi.number().integer(),
     page: Joi.number().integer(),
+  }),
+};
+
+const findUserActivity = {
+  params: Joi.object().keys({
+    userId: Joi.string().custom(objectId),
+  }),
+  query: Joi.object().keys({
+    toUserId: Joi.string().custom(objectId).required(),
+  }),
+};
+
+const getUserActivities = {
+  params: Joi.object().keys({
+    userId: Joi.string().custom(objectId),
+  }),
+  query: Joi.object().keys({
+    limit: Joi.number().integer(),
+    page: Joi.number().integer(),
+  }),
+};
+
+const createUserActivity = {
+  params: Joi.object().keys({
+    userId: Joi.string().custom(objectId),
+  }),
+  body: Joi.object().keys({
+    toUserId: Joi.string().custom(objectId),
+  }),
+};
+
+const getUserActivityItems = {
+  params: Joi.object().keys({
+    userId: Joi.string().custom(objectId),
+    activityId: Joi.string().custom(objectId),
+  }),
+};
+
+const createUserActivityItem = {
+  params: Joi.object().keys({
+    userId: Joi.string().custom(objectId),
+    activityId: Joi.string().custom(objectId),
+  }),
+  body: Joi.object().keys({
+    userOperations: Joi.array().items(Joi.object().keys({})).required(),
   }),
 };
 
@@ -81,4 +132,9 @@ module.exports = {
   createUserWallet,
   getUserWallet,
   getUserSearch,
+  findUserActivity,
+  getUserActivities,
+  createUserActivity,
+  getUserActivityItems,
+  createUserActivityItem,
 };

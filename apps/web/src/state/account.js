@@ -119,7 +119,7 @@ export const useAccountStore = create(
 
             set({ ...defaultState });
           } catch (error) {
-            set({ loading: false });
+            set({ ...defaultState });
             throw error;
           }
         },

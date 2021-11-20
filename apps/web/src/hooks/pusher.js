@@ -20,8 +20,7 @@ export const useActivityChannel = (callback = () => {}) => {
     channel.bind(eventName, callback);
 
     return () => {
-      channel.unbind(eventName, callback);
-      pusher.unsubscribe(channelName);
+      pusher.disconnect();
     };
   }, [enabled, accessToken, user]);
 };
