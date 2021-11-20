@@ -2,7 +2,7 @@ const httpStatus = require('http-status');
 const pick = require('../utils/pick');
 const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
-const { userService, walletService } = require('../services');
+const { userService, walletService, transactionService, activityService } = require('../services');
 
 const createUser = catchAsync(async (req, res) => {
   const user = await userService.createUser(req.body);
@@ -62,6 +62,41 @@ const getUserSearch = catchAsync(async (req, res) => {
   res.send(result);
 });
 
+const getUserActivities = catchAsync(async (req, res) => {
+  const { userId } = req.params;
+  const options = pick(req.query, ['limit', 'page']);
+  const result = await activityService.queryActivity(
+    { users: userId, preview: { $ne: null } },
+    { ...options, sortBy: 'updatedAt', populate: 'users', populateProjection: 'username' }
+  );
+  res.send(result);
+});
+
+const createUserActivity = catchAsync(async (req, res) => {
+  const { userId } = req.params;
+  const { toUserId } = req.body;
+  const activity = await activityService.createActivity(userId, toUserId);
+  res.send({ activity });
+});
+
+const findUserActivity = catchAsync(async (req, res) => {
+  const { userId } = req.params;
+  const { toUserId } = req.query;
+  const activity = await activityService.findActivity(userId, toUserId);
+  res.send({ activity });
+});
+
+const getUserActivityItems = catchAsync(async (req, res) => {
+  // TODO: Implement logic
+  res.send({});
+});
+
+const createUserActivityItem = catchAsync(async (req, res) => {
+  // TODO: Implement logic
+  transactionService.monitorNewPaymentTransaction('activityId');
+  res.send({});
+});
+
 module.exports = {
   createUser,
   getUsers,
@@ -71,4 +106,9 @@ module.exports = {
   createUserWallet,
   getUserWallet,
   getUserSearch,
+  getUserActivities,
+  createUserActivity,
+  findUserActivity,
+  getUserActivityItems,
+  createUserActivityItem,
 };
