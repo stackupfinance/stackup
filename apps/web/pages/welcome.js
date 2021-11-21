@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import NextLink from 'next/link';
 import { Image, VStack, Box, Button, Heading } from '@chakra-ui/react';
 import { PageContainer, AppContainer, Head, Header } from '../src/components';
@@ -6,6 +7,11 @@ import { Routes } from '../src/config';
 
 export default function Welcome() {
   const { user } = useAccountStore(accountWelcomePageSelector);
+  const [username, setUsername] = useState('');
+
+  useEffect(() => {
+    user && setUsername(user.username);
+  }, [user]);
 
   return (
     <>
@@ -19,10 +25,7 @@ export default function Welcome() {
             <Image src="./user-blue.png" maxW="128px" maxH="128px" alt="stackup logo" />
 
             <Box p="16px" w="100%">
-              <Heading
-                suppressHydrationWarning
-                textAlign="center"
-              >{`Welcome, ${user?.username}! 🎉`}</Heading>
+              <Heading textAlign="center">{`Welcome, ${username}! 🎉`}</Heading>
 
               <NextLink href={Routes.HOME} passHref>
                 <Button isFullWidth as="a" colorScheme="blue" mt="64px" size="lg">

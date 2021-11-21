@@ -42,6 +42,7 @@ export const accountHomePageSelector = (state) => ({
 export const accountActivityPageSelector = (state) => ({
   enabled: state.enabled,
   user: state.user,
+  wallet: state.wallet,
   accessToken: state.accessToken,
 });
 

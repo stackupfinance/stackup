@@ -6,5 +6,6 @@ export * from './header';
 export * from './inlineError';
 export * from './list';
 export * from './pageContainer';
+export * from './pay';
 export * from './search';
 export * from './userCard';

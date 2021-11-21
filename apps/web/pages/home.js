@@ -172,7 +172,7 @@ export default function Home() {
             </TabPanels>
 
             <TabList
-              bg="white"
+              bg="gray.50"
               borderWidth="1px"
               borderTopRadius="lg"
               borderBottomRadius={['0', 'lg']}
