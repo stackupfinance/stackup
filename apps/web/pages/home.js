@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react';
 import {
   PageContainer,
@@ -15,7 +16,8 @@ import {
   useSearchStore,
   searchHomePageSelector,
 } from '../src/state';
-import { useActivityChannel } from '../src/hooks';
+import { useActivityChannel, useLogout } from '../src/hooks';
+import { Routes } from '../src/config';
 
 const loadingList = [
   <UserCard
@@ -49,7 +51,6 @@ export default function Home() {
     loading: accountLoading,
     user,
     accessToken,
-    logout,
   } = useAccountStore(accountHomePageSelector);
   const {
     loading: searchLoading,
@@ -57,10 +58,17 @@ export default function Home() {
     searchByUsername,
     fetchNextPage,
     hasMore,
-    clear,
+    selectResult,
+    clearSearchData,
   } = useSearchStore(searchHomePageSelector);
+  const logout = useLogout();
+  const router = useRouter();
   const [showSearch, setShowSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+
+  useEffect(() => {
+    router.prefetch(Routes.ACTIVITY);
+  }, [router]);
 
   useEffect(() => {
     if (enabled) {
@@ -83,7 +91,7 @@ export default function Home() {
   const onClear = async () => {
     setShowSearch(false);
     setSearchQuery('');
-    clear();
+    clearSearchData();
   };
 
   const searchResultsNextHandler = async () => {
@@ -98,6 +106,11 @@ export default function Home() {
     logout();
   };
 
+  const onSearchResultHandler = (result) => {
+    selectResult(result);
+    router.push(Routes.ACTIVITY);
+  };
+
   const renderSearchResults = (results = []) => {
     return results.map((result, i) => {
       return (
@@ -106,6 +119,7 @@ export default function Home() {
           isFirst={i === 0}
           isLast={i === results.length - 1}
           username={result.username}
+          onClick={() => onSearchResultHandler(result)}
         />
       );
     });

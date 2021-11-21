@@ -6,4 +6,5 @@ export const Routes = {
   EDIT_PROFILE: '/edit-profile',
   EDIT_PASSWORD: '/edit-password',
   EDIT_EMAIL: '/edit-email',
+  ACTIVITY: '/activity',
 };

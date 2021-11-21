@@ -4,7 +4,7 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 export const List = ({ items = [], hasMore, next, listHeading, emptyHeading }) => {
   return (
     <>
-      {items.length > 0 && (
+      {items.length > 0 && listHeading && (
         <Heading textAlign="left" size="sm">
           {listHeading}
         </Heading>

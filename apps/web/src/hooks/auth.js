@@ -1,16 +1,36 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { isExpired } from 'react-jwt';
-import { useAccountStore, accountUseAuthSelector } from '../state';
+import {
+  useAccountStore,
+  accountUseAuthSelector,
+  useSearchStore,
+  searchUseAuthSelector,
+  useActivityStore,
+  activityUseAuthSelector,
+} from '../state';
 import { Routes } from '../config';
 
 const REFRESH_INTERVAL_MS = 300000; // 5 minutes
 const initAuthRoutes = new Set([Routes.LOGIN, Routes.SIGN_UP]);
 
+export const useLogout = () => {
+  const { logout } = useAccountStore(accountUseAuthSelector);
+  const { clear: clearSearch } = useSearchStore(searchUseAuthSelector);
+  const { clear: clearActivity } = useActivityStore(activityUseAuthSelector);
+
+  return async () => {
+    clearSearch();
+    clearActivity();
+    await logout();
+  };
+};
+
 export const useAuth = () => {
   const router = useRouter();
-  const { accessToken, refreshToken, logout, refresh, enableAccount } =
+  const { accessToken, refreshToken, refresh, enableAccount } =
     useAccountStore(accountUseAuthSelector);
+  const logout = useLogout();
 
   const isLoggedOut = () => !refreshToken;
   const refreshTokenExpired = () => isExpired(refreshToken?.token);
