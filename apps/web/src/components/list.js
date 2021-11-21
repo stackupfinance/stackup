@@ -20,7 +20,7 @@ export const List = ({ items = [], hasMore, next, listHeading, emptyHeading }) =
             {items}
           </InfiniteScroll>
         )) || (
-          <Heading size="md" px="16px" py="128px" color="gray.500">
+          <Heading size="md" px="16px" py="128px" color="gray.500" textAlign="center">
             {emptyHeading}
           </Heading>
         )}

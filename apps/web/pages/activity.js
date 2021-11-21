@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Box, Button } from '@chakra-ui/react';
-import { PageContainer, AppContainer, Head, ActivityHeader, List } from '../src/components';
+import { Box } from '@chakra-ui/react';
+import { PageContainer, AppContainer, Head, ActivityHeader, List, Pay } from '../src/components';
 import {
   useSearchStore,
   searchActivityPageSelector,
@@ -9,23 +9,25 @@ import {
   useAccountStore,
   accountActivityPageSelector,
 } from '../src/state';
+import { getSigner } from '../src/utils/wallets';
 import { Routes } from '../src/config';
 
 export default function Activity() {
-  const { enabled, user, accessToken } = useAccountStore(accountActivityPageSelector);
+  const { enabled, user, wallet, accessToken } = useAccountStore(accountActivityPageSelector);
   const {
     // loading: activityLoading,
-    // savedActivity,
+    savedActivity,
     findOrCreateActivity,
+    clearSavedActivity,
   } = useActivityStore(activityActivityPageSelector);
   const { clear: clearSearch, selectedResult } = useSearchStore(searchActivityPageSelector);
   const [username, setUsername] = useState('');
+  const [payError, setPayError] = useState('');
 
   useEffect(() => {
     if (!enabled) return;
 
     if (selectedResult) {
-      setUsername(selectedResult.username);
       findOrCreateActivity(selectedResult.id, {
         userId: user.id,
         accessToken: accessToken.token,
@@ -33,6 +35,26 @@ export default function Activity() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [enabled]);
+
+  useEffect(() => {
+    if (!savedActivity) return '';
+
+    const toUser = savedActivity.users.find((curr) => curr.id !== user.id);
+    setUsername(toUser.username);
+
+    return clearSavedActivity;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [savedActivity]);
+
+  const onConfirmHandler = async (data) => {
+    setPayError('');
+    const signer = getSigner(data.password, wallet);
+    if (!signer) {
+      setPayError('Incorrect password');
+    }
+
+    // TODO: sign userOp
+  };
 
   return (
     <>
@@ -50,22 +72,7 @@ export default function Activity() {
               emptyHeading="No activity! Make a payment to get started 🤝"
             />
           </Box>
-          <Box
-            bg="gray.50"
-            borderWidth="1px"
-            borderTopRadius="lg"
-            borderBottomRadius={['0', 'lg']}
-            p="8px"
-            pos="fixed"
-            bottom={['0px', '32px']}
-            left={['0px', 'auto']}
-            maxW="544px"
-            w="100%"
-          >
-            <Button isFullWidth colorScheme="blue">
-              Pay
-            </Button>
-          </Box>
+          <Pay toUser={username} onConfirm={onConfirmHandler} error={payError} />
         </AppContainer>
       </PageContainer>
     </>

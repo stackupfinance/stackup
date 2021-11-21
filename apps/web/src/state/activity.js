@@ -11,6 +11,7 @@ export const activityActivityPageSelector = (state) => ({
   loading: state.loading,
   savedActivity: state.savedActivity,
   findOrCreateActivity: state.findOrCreateActivity,
+  clearSavedActivity: state.clearSavedActivity,
 });
 
 const defaultState = {
@@ -51,7 +52,9 @@ export const useActivityStore = create(
           }
         },
 
-        clear: () => ({ ...defaultState }),
+        clearSavedActivity: () => set({ savedActivity: undefined }),
+
+        clear: () => set({ ...defaultState }),
       }),
       {
         name: 'stackup-activity-store',

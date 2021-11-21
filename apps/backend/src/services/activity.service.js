@@ -11,7 +11,8 @@ const createActivity = async (...userIds) => {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Activity for these users have already been created');
   }
 
-  return Activity.create({ users });
+  const activity = await Activity.create({ users });
+  return activity.populate('users', 'username _id');
 };
 
 const queryActivity = async (filter, options) => {
@@ -21,7 +22,9 @@ const queryActivity = async (filter, options) => {
 
 const findActivity = async (...userIds) => {
   const users = [...new Set(userIds)];
-  const activity = await Activity.findOne({ $and: [{ users: { $all: users } }, { users: { $size: users.length } }] });
+  const activity = await Activity.findOne({
+    $and: [{ users: { $all: users } }, { users: { $size: users.length } }],
+  }).populate('users', 'username _id');
 
   return activity;
 };
