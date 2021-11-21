@@ -1,4 +1,5 @@
 export * from './accountTab';
+export * from './activityHeader';
 export * from './appContainer';
 export * from './head';
 export * from './header';

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { Image, VStack, Box, Input, Button } from '@chakra-ui/react';
 import { useForm } from 'react-hook-form';
@@ -16,6 +16,10 @@ export default function SignUp() {
   } = useForm();
   const account = useAccountStore(accountSignUpPageSelector);
   const [registerError, setRegisterError] = useState('');
+
+  useEffect(() => {
+    router.prefetch(Routes.WELCOME);
+  }, [router]);
 
   const onSubmit = async (data) => {
     setRegisterError('');

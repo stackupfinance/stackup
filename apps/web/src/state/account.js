@@ -37,7 +37,12 @@ export const accountHomePageSelector = (state) => ({
   loading: state.loading,
   user: state.user,
   accessToken: state.accessToken,
-  logout: state.logout,
+});
+
+export const accountActivityPageSelector = (state) => ({
+  enabled: state.enabled,
+  user: state.user,
+  accessToken: state.accessToken,
 });
 
 const defaultState = {
