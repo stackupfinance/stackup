@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react';
 import {
   PageContainer,
@@ -14,7 +15,11 @@ import {
   accountHomePageSelector,
   useSearchStore,
   searchHomePageSelector,
+  useWalletStore,
+  walletHomePageSelector,
 } from '../src/state';
+import { useActivityChannel, useLogout } from '../src/hooks';
+import { Routes } from '../src/config';
 
 const loadingList = [
   <UserCard
@@ -47,8 +52,8 @@ export default function Home() {
     enabled,
     loading: accountLoading,
     user,
+    wallet,
     accessToken,
-    logout,
   } = useAccountStore(accountHomePageSelector);
   const {
     loading: searchLoading,
@@ -56,16 +61,30 @@ export default function Home() {
     searchByUsername,
     fetchNextPage,
     hasMore,
-    clear,
+    selectResult,
+    clearSearchData,
   } = useSearchStore(searchHomePageSelector);
+  const { loading: walletLoading, balance, fetchBalance } = useWalletStore(walletHomePageSelector);
+  const logout = useLogout();
+  const router = useRouter();
   const [showSearch, setShowSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
+    router.prefetch(Routes.ACTIVITY);
+  }, [router]);
+
+  useEffect(() => {
     if (enabled) {
       // TODO: Get user activity
+      fetchBalance(wallet);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [enabled]);
+
+  useActivityChannel((_data) => {
+    // TODO: Update user activity
+  });
 
   const onSearch = async (query) => {
     if (!enabled) return;
@@ -78,7 +97,7 @@ export default function Home() {
   const onClear = async () => {
     setShowSearch(false);
     setSearchQuery('');
-    clear();
+    clearSearchData();
   };
 
   const searchResultsNextHandler = async () => {
@@ -93,6 +112,11 @@ export default function Home() {
     logout();
   };
 
+  const onSearchResultHandler = (result) => {
+    selectResult(result);
+    router.push(Routes.ACTIVITY);
+  };
+
   const renderSearchResults = (results = []) => {
     return results.map((result, i) => {
       return (
@@ -101,6 +125,7 @@ export default function Home() {
           isFirst={i === 0}
           isLast={i === results.length - 1}
           username={result.username}
+          onClick={() => onSearchResultHandler(result)}
         />
       );
     });
@@ -146,14 +171,17 @@ export default function Home() {
               <TabPanel px="0px">
                 <AccountTab
                   isEnabled={enabled}
-                  isLoading={accountLoading}
+                  isAccountLoading={accountLoading}
+                  isWalletLoading={walletLoading}
                   onLogout={logoutHandler}
+                  walletBalance={balance}
+                  walletAddress={wallet?.walletAddress}
                 />
               </TabPanel>
             </TabPanels>
 
             <TabList
-              bg="white"
+              bg="gray.50"
               borderWidth="1px"
               borderTopRadius="lg"
               borderBottomRadius={['0', 'lg']}

@@ -28,6 +28,7 @@
     "docker:test": "docker-compose -f docker-compose.yml -f docker-compose.test.yml up"
   },
   "dependencies": {
+    "agenda": "^4.2.1",
     "akeyless_vault_api": "akeylesslabs/akeyless-javascript-sdk",
     "bcryptjs": "^2.4.3",
     "compression": "^1.7.4",

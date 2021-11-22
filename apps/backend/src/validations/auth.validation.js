@@ -47,6 +47,13 @@ const verifyEmail = {
   }),
 };
 
+const authPusher = {
+  body: Joi.object().keys({
+    socket_id: Joi.string().required(),
+    channel_name: Joi.string().required(),
+  }),
+};
+
 module.exports = {
   register,
   login,
@@ -55,4 +62,5 @@ module.exports = {
   forgotPassword,
   resetPassword,
   verifyEmail,
+  authPusher,
 };

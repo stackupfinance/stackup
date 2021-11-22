@@ -24,4 +24,18 @@ router
 
 router.route('/:userId/search').get(auth('getUsers'), validate(userValidation.getUserSearch), userController.getUserSearch);
 
+router
+  .route('/:userId/activity')
+  .get(auth('getUsers'), validate(userValidation.getUserActivities), userController.getUserActivities)
+  .post(auth('manageUsers'), validate(userValidation.createUserActivity), userController.createUserActivity);
+
+router
+  .route('/:userId/activity/find')
+  .get(auth('getUsers'), validate(userValidation.findUserActivity), userController.findUserActivity);
+
+router
+  .route('/:userId/activity/:activityId')
+  .get(auth('getUsers'), validate(userValidation.getUserActivityItems), userController.getUserActivityItems)
+  .post(auth('manageUsers'), validate(userValidation.createUserActivityItem), userController.createUserActivityItem);
+
 module.exports = router;
