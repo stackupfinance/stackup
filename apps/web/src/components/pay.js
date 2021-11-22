@@ -24,11 +24,13 @@ import {
   ModalBody,
   ModalCloseButton,
   Text,
+  Skeleton,
 } from '@chakra-ui/react';
 import { CloseIcon } from '@chakra-ui/icons';
 import { InlineError } from '.';
+import { balanceToString, displayUSDC } from '../utils/wallets';
 
-export const Pay = ({ isLoading, toUser, onConfirm, error }) => {
+export const Pay = ({ isLoading, toUser, onConfirm, error, walletBalance }) => {
   const [showPay, setShowPay] = useState(false);
   const [amount, setAmount] = useState('');
   const [message, setMessage] = useState('');
@@ -61,18 +63,18 @@ export const Pay = ({ isLoading, toUser, onConfirm, error }) => {
               alignSelf="flex-end"
             />
 
-            <Box borderWidth="1px" borderRadius="lg" bg="white" w="100%" p="16px">
-              <Stat>
-                <StatLabel>Available balance</StatLabel>
-                <StatNumber>$1,000.00</StatNumber>
-              </Stat>
-            </Box>
+            <Stat borderWidth="1px" borderRadius="lg" bg="white" w="100%" p="16px">
+              <StatLabel>Available balance</StatLabel>
+              <Skeleton isLoaded={!isLoading}>
+                <StatNumber>{displayUSDC(walletBalance)}</StatNumber>
+              </Skeleton>
+            </Stat>
 
             <NumberInput
               onChange={(amount) => setAmount(parse(amount))}
               value={format(amount)}
               min={0}
-              max={1000}
+              max={balanceToString(walletBalance)}
               precision={2}
               step={0.2}
               w="100%"

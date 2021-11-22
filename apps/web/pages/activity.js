@@ -8,6 +8,8 @@ import {
   activityActivityPageSelector,
   useAccountStore,
   accountActivityPageSelector,
+  useWalletStore,
+  walletActivityPageSelector,
 } from '../src/state';
 import { getSigner } from '../src/utils/wallets';
 import { Routes } from '../src/config';
@@ -21,6 +23,11 @@ export default function Activity() {
     clearSavedActivity,
   } = useActivityStore(activityActivityPageSelector);
   const { clear: clearSearch, selectedResult } = useSearchStore(searchActivityPageSelector);
+  const {
+    loading: walletLoading,
+    balance,
+    fetchBalance,
+  } = useWalletStore(walletActivityPageSelector);
   const [username, setUsername] = useState('');
   const [payError, setPayError] = useState('');
 
@@ -33,6 +40,8 @@ export default function Activity() {
         accessToken: accessToken.token,
       }).then(() => clearSearch());
     }
+
+    fetchBalance(wallet);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [enabled]);
 
@@ -72,7 +81,13 @@ export default function Activity() {
               emptyHeading="No activity! Make a payment to get started 🤝"
             />
           </Box>
-          <Pay toUser={username} onConfirm={onConfirmHandler} error={payError} />
+          <Pay
+            isLoading={walletLoading}
+            toUser={username}
+            onConfirm={onConfirmHandler}
+            error={payError}
+            walletBalance={balance}
+          />
         </AppContainer>
       </PageContainer>
     </>

@@ -36,6 +36,7 @@ export const accountHomePageSelector = (state) => ({
   enabled: state.enabled,
   loading: state.loading,
   user: state.user,
+  wallet: state.wallet,
   accessToken: state.accessToken,
 });
 
@@ -150,7 +151,7 @@ export const useAccountStore = create(
         },
 
         enableAccount: () => {
-          set({ enabled: true });
+          set({ enabled: Boolean(get().refreshToken) });
         },
       }),
       {

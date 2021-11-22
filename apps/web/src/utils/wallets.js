@@ -4,6 +4,13 @@ import AES from 'crypto-js/aes';
 import Utf8 from 'crypto-js/enc-utf8';
 import { Web3 } from '../config';
 
+const formatter = new Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: 'USD',
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
+
 export const initWallet = (password) => {
   const signer = EthCrypto.createIdentity();
   const Wallet = new ethers.ContractFactory(Web3.WALLET_ABI, Web3.WALLET_BYTECODE);
@@ -29,4 +36,12 @@ export const getSigner = (password, wallet) => {
   } catch (error) {
     console.error(error);
   }
+};
+
+export const balanceToString = (balance) => {
+  return balance ? ethers.utils.formatUnits(balance, Web3.USDC_UNITS) : '0';
+};
+
+export const displayUSDC = (balance) => {
+  return formatter.format(balanceToString(balance));
 };

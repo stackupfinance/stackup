@@ -8,6 +8,8 @@ import {
   searchUseAuthSelector,
   useActivityStore,
   activityUseAuthSelector,
+  useWalletStore,
+  walletUseAuthSelector,
 } from '../state';
 import { Routes } from '../config';
 
@@ -18,10 +20,12 @@ export const useLogout = () => {
   const { logout } = useAccountStore(accountUseAuthSelector);
   const { clear: clearSearch } = useSearchStore(searchUseAuthSelector);
   const { clear: clearActivity } = useActivityStore(activityUseAuthSelector);
+  const { clear: clearWallet } = useWalletStore(walletUseAuthSelector);
 
   return async () => {
     clearSearch();
     clearActivity();
+    clearWallet();
     await logout();
   };
 };
