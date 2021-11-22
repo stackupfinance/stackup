@@ -48,8 +48,14 @@ export const Search = ({ onSearch, onClear }) => {
       <Box borderBottomWidth="1px">
         <HStack spacing={['8px', '16px']} py="16px" px="16px" maxW="xl" margin="0 auto">
           <LinkBox>
-            <LinkOverlay href="https://stackup.sh/" target="_blank">
-              <Image src="./mark-blue.png" maxW="32px" maxH="32x" alt="stackup logo" />
+            <LinkOverlay href="/home" target="_self">
+              <Image
+                src="./mark-blue.png"
+                maxW="32px"
+                maxH="32px"
+                alt="stackup logo"
+                borderRadius="full"
+              />
             </LinkOverlay>
           </LinkBox>
 
