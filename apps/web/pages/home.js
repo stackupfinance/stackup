@@ -15,6 +15,8 @@ import {
   accountHomePageSelector,
   useSearchStore,
   searchHomePageSelector,
+  useWalletStore,
+  walletHomePageSelector,
 } from '../src/state';
 import { useActivityChannel, useLogout } from '../src/hooks';
 import { Routes } from '../src/config';
@@ -50,6 +52,7 @@ export default function Home() {
     enabled,
     loading: accountLoading,
     user,
+    wallet,
     accessToken,
   } = useAccountStore(accountHomePageSelector);
   const {
@@ -61,6 +64,7 @@ export default function Home() {
     selectResult,
     clearSearchData,
   } = useSearchStore(searchHomePageSelector);
+  const { loading: walletLoading, balance, fetchBalance } = useWalletStore(walletHomePageSelector);
   const logout = useLogout();
   const router = useRouter();
   const [showSearch, setShowSearch] = useState(false);
@@ -73,7 +77,9 @@ export default function Home() {
   useEffect(() => {
     if (enabled) {
       // TODO: Get user activity
+      fetchBalance(wallet);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [enabled]);
 
   useActivityChannel((_data) => {
@@ -165,8 +171,11 @@ export default function Home() {
               <TabPanel px="0px">
                 <AccountTab
                   isEnabled={enabled}
-                  isLoading={accountLoading}
+                  isAccountLoading={accountLoading}
+                  isWalletLoading={walletLoading}
                   onLogout={logoutHandler}
+                  walletBalance={balance}
+                  walletAddress={wallet?.walletAddress}
                 />
               </TabPanel>
             </TabPanels>
