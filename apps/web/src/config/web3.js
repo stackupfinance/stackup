@@ -1,4 +1,5 @@
 import Wallet from './contracts/Wallet.json';
+import ERC20 from './contracts/ERC20.json';
 
 const INITIAL_NONCE = 0;
 
@@ -12,4 +13,9 @@ export const Web3 = {
   SINGLETON_FACTORY_ADDRESS,
   WALLET_ABI: Wallet.abi,
   WALLET_BYTECODE: Wallet.bytecode,
+  ERC20_ABI: ERC20.abi,
+  EXPLORER: process.env.NEXT_PUBLIC_WEB3_EXPLORER || '',
+  RPC: process.env.NEXT_PUBLIC_WEB3_RPC || '',
+  USDC: process.env.NEXT_PUBLIC_WEB3_USDC || '',
+  USDC_UNITS: 'mwei',
 };

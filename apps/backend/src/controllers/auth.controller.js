@@ -1,6 +1,6 @@
 const httpStatus = require('http-status');
 const catchAsync = require('../utils/catchAsync');
-const { authService, userService, tokenService, emailService, codeService } = require('../services');
+const { authService, userService, tokenService, emailService, codeService, pusherService } = require('../services');
 
 const register = catchAsync(async (req, res) => {
   const user = await userService.createUser(req.body);
@@ -47,6 +47,11 @@ const verifyEmail = catchAsync(async (req, res) => {
   res.status(httpStatus.NO_CONTENT).send();
 });
 
+const authPusher = catchAsync(async (req, res) => {
+  const auth = await pusherService.auth(req.body.socket_id, req.body.channel_name);
+  res.send(auth);
+});
+
 module.exports = {
   register,
   login,
@@ -56,4 +61,5 @@ module.exports = {
   resetPassword,
   sendVerificationEmail,
   verifyEmail,
+  authPusher,
 };

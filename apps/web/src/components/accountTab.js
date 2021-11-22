@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import NextLink from 'next/link';
 import {
   Tabs,
@@ -9,16 +10,38 @@ import {
   Button,
   Divider,
   useBreakpointValue,
+  Stat,
+  StatLabel,
+  StatNumber,
+  IconButton,
+  HStack,
+  Spacer,
+  Skeleton,
 } from '@chakra-ui/react';
-import { Routes } from '../config';
-import { ChevronRightIcon } from '@chakra-ui/icons';
+import { Routes, Web3 } from '../config';
+import { ChevronRightIcon, ExternalLinkIcon } from '@chakra-ui/icons';
+import { displayUSDC } from '../utils/wallets';
 
-export const AccountTab = ({ isEnabled, isLoading, onLogout }) => {
+export const AccountTab = ({
+  isEnabled,
+  isAccountLoading,
+  isWalletLoading,
+  onLogout,
+  walletBalance,
+  walletAddress,
+}) => {
   const buttonSize = useBreakpointValue({ base: 'md', sm: 'lg' });
+  const [exlorerLink, setExlorerLink] = useState(Web3.EXPLORER);
+
+  useEffect(() => {
+    if (walletAddress) {
+      setExlorerLink(`${Web3.EXPLORER}/address/${walletAddress}`);
+    }
+  }, [walletAddress]);
 
   return (
     <Tabs id="home-tabs" isFitted w="100%" variant="soft-rounded" colorScheme="blue" align="center">
-      <TabList borderWidth="1px" borderRadius="lg" p="8px">
+      <TabList borderWidth="1px" borderRadius="lg" p="8px" bg="gray.50">
         <Tab borderRadius="lg">Profile</Tab>
         <Tab borderRadius="lg">Wallet</Tab>
       </TabList>
@@ -29,7 +52,7 @@ export const AccountTab = ({ isEnabled, isLoading, onLogout }) => {
             <NextLink href={Routes.EDIT_PROFILE} passHref>
               <Button
                 isFullWidth
-                isLoading={isLoading}
+                isLoading={isAccountLoading}
                 as="a"
                 mt="16px"
                 variant="outline"
@@ -43,7 +66,7 @@ export const AccountTab = ({ isEnabled, isLoading, onLogout }) => {
             <NextLink href={Routes.EDIT_PASSWORD} passHref>
               <Button
                 isFullWidth
-                isLoading={isLoading}
+                isLoading={isAccountLoading}
                 as="a"
                 mt="16px"
                 variant="outline"
@@ -57,7 +80,7 @@ export const AccountTab = ({ isEnabled, isLoading, onLogout }) => {
             <NextLink href={Routes.EDIT_EMAIL} passHref>
               <Button
                 isFullWidth
-                isLoading={isLoading}
+                isLoading={isAccountLoading}
                 as="a"
                 mt="16px"
                 variant="outline"
@@ -73,7 +96,7 @@ export const AccountTab = ({ isEnabled, isLoading, onLogout }) => {
             <Button
               isFullWidth
               isDisabled={!isEnabled}
-              isLoading={isLoading}
+              isLoading={isAccountLoading}
               variant="outline"
               size={buttonSize}
               colorScheme="red"
@@ -84,7 +107,22 @@ export const AccountTab = ({ isEnabled, isLoading, onLogout }) => {
           </VStack>
         </TabPanel>
         <TabPanel px="0px">
-          <p>Wallet placeholder</p>
+          <Stat borderWidth="1px" borderRadius="lg" bg="white" w="100%" p="16px" textAlign="left">
+            <HStack>
+              <StatLabel>Total balance</StatLabel>
+              <Spacer />
+              <IconButton
+                as="a"
+                href={exlorerLink}
+                target="_blank"
+                size="xs"
+                icon={<ExternalLinkIcon />}
+              />
+            </HStack>
+            <Skeleton isLoaded={!isWalletLoading} mt={isWalletLoading && '8px'}>
+              <StatNumber>{displayUSDC(walletBalance)}</StatNumber>
+            </Skeleton>
+          </Stat>
         </TabPanel>
       </TabPanels>
     </Tabs>

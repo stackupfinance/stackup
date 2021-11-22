@@ -1,8 +1,20 @@
 import { Heading, HStack, VStack, Avatar, Text, Skeleton, Spacer } from '@chakra-ui/react';
 
-export const UserCard = ({ isLoading, isFirst, isLast, username, preview, timestamp }) => {
+export const UserCard = ({
+  isLoading,
+  isFirst,
+  isLast,
+  username,
+  preview,
+  timestamp,
+  onClick = () => {},
+}) => {
   return (
     <HStack
+      as="button"
+      _hover={{ bg: 'blue.100' }}
+      onClick={onClick}
+      w="100%"
       spacing="16px"
       p="16px"
       borderWidth="1px"

@@ -12,6 +12,12 @@ export const accountUseAuthSelector = (state) => ({
   enableAccount: state.enableAccount,
 });
 
+export const accountPusherSelector = (state) => ({
+  enabled: state.enabled,
+  accessToken: state.accessToken,
+  user: state.user,
+});
+
 export const accountLoginPageSelector = (state) => ({
   loading: state.loading,
   login: state.login,
@@ -30,8 +36,15 @@ export const accountHomePageSelector = (state) => ({
   enabled: state.enabled,
   loading: state.loading,
   user: state.user,
+  wallet: state.wallet,
   accessToken: state.accessToken,
-  logout: state.logout,
+});
+
+export const accountActivityPageSelector = (state) => ({
+  enabled: state.enabled,
+  user: state.user,
+  wallet: state.wallet,
+  accessToken: state.accessToken,
 });
 
 const defaultState = {
@@ -113,7 +126,7 @@ export const useAccountStore = create(
 
             set({ ...defaultState });
           } catch (error) {
-            set({ loading: false });
+            set({ ...defaultState });
             throw error;
           }
         },
@@ -138,7 +151,7 @@ export const useAccountStore = create(
         },
 
         enableAccount: () => {
-          set({ enabled: true });
+          set({ enabled: Boolean(get().refreshToken) });
         },
       }),
       {
