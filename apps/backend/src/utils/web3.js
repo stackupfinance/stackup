@@ -14,7 +14,6 @@ const PAYMASTER_FEE = ethers.BigNumber.from(100000);
 // ------------
 
 // These contracts have the same address on any chain.
-const ENTRY_POINT_ADDRESS = '0x863d65a1dfb497e5f703bCbBb4e4B254275D4623';
 const PAYMASTER_ADDRESS = '0xE156AaE544265f8B9498F5b9C686f170188A1529';
 
 const signer = ethers.Wallet.fromMnemonic(web3.mnemonic);
@@ -58,10 +57,10 @@ const getPaymasterDataHash = (op, paymasterFee, erc20Token, dataFeed) => {
 };
 
 // Overlap code (partial)
-const withPaymaster = async (paymaster, op) => {
+const withPaymaster = async (op) => {
   const userOp = {
     ...op,
-    paymaster,
+    paymaster: PAYMASTER_ADDRESS,
   };
 
   return {
@@ -79,8 +78,5 @@ const withPaymaster = async (paymaster, op) => {
 };
 
 module.exports = {
-  ENTRY_POINT_ADDRESS,
-  PAYMASTER_ADDRESS,
-  signer,
   withPaymaster,
 };
