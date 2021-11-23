@@ -50,6 +50,15 @@ const getUserByUsername = async (username) => {
 };
 
 /**
+ * Get user by username and populate wallet field
+ * @param {String} username
+ * @returns {Promise<User>}
+ */
+const getUserByUsernameWithWallet = async (username) => {
+  return User.findOne({ username }).populate('wallet', '-user');
+};
+
+/**
  * Update user by id
  * @param {ObjectId} userId
  * @param {Object} updateBody
@@ -91,6 +100,7 @@ module.exports = {
   queryUsers,
   getUserById,
   getUserByUsername,
+  getUserByUsernameWithWallet,
   updateUserById,
   deleteUserById,
 };

@@ -15,7 +15,7 @@ const { types } = require('../config/codes');
  * @returns {Promise<User>}
  */
 const loginUserWithUsernameAndPassword = async (username, password) => {
-  const user = await userService.getUserByUsername(username);
+  const user = await userService.getUserByUsernameWithWallet(username);
   if (!user || !(await user.isPasswordMatch(password))) {
     throw new ApiError(httpStatus.UNAUTHORIZED, 'Incorrect username or password');
   }

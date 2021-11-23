@@ -43,8 +43,17 @@ const findActivity = async (...userIds) => {
   return activity;
 };
 
+const getActivityByIdAndUsers = async (activityId, userIds) => {
+  const users = [...new Set(userIds)];
+  const activity = await Activity.findOne({
+    $and: [{ _id: activityId }, { users: { $all: users } }, { users: { $size: users.length } }],
+  });
+  return activity;
+};
+
 module.exports = {
   createActivity,
   queryActivity,
   findActivity,
+  getActivityByIdAndUsers,
 };

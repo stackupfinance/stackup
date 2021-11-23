@@ -80,7 +80,7 @@ export const displayUSDC = (balance) => {
 
 export const getWalletNonce = async (address) => {
   const wallet = new ethers.Contract(address, Web3.WALLET_ABI, provider);
-  return wallet.nonce().toNumber();
+  return wallet.nonce().then((nonce) => nonce.toNumber());
 };
 
 // Overlap code
@@ -161,7 +161,7 @@ export const encodeERC20Approve = (spender, value) => {
   ]);
 };
 
-// Overlap code (Partial)
+// Overlap code
 export const encodeERC20Transfer = (to, value) => {
   return WALLET_CONTRACT_INTERFACE.encodeFunctionData('executeUserOp', [
     Web3.USDC,

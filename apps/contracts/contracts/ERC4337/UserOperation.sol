@@ -123,7 +123,9 @@ library UserOperationUtils {
     returns (uint256)
   {
     PaymasterData memory pd = decodePaymasterData(op);
-    uint256 tokenFee = (requiredTokenExchangeRate(op) * maxcost) / 10**18;
+    uint256 scaleFactor = 10**IERC20Metadata(pd.erc20Token).decimals();
+    uint256 tokenFee = (maxcost * requiredTokenExchangeRate(op) * scaleFactor) /
+      (10**18 * scaleFactor);
 
     return tokenFee + pd.fee;
   }
@@ -350,6 +352,18 @@ library WalletUserOperation {
   {
     // Is changing token allowance with an OK value.
     return op.isCallingTokenApprove() && op.hasOKTokenApproveValue(maxcost);
+  }
+
+  function requiredTokenIsApprovedInPrevOps(UserOperation calldata op)
+    internal
+    pure
+    returns (bool)
+  {
+    // A paymaster fee of 0 means approval and fee collection has
+    // already occured within a previous op in the batch.
+    PaymasterData memory pd = op.decodePaymasterData();
+
+    return pd.fee == 0;
   }
 
   function paymasterContext(UserOperation calldata op)

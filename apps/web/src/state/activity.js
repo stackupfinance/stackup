@@ -12,6 +12,7 @@ export const activityActivityPageSelector = (state) => ({
   savedActivity: state.savedActivity,
   findOrCreateActivity: state.findOrCreateActivity,
   clearSavedActivity: state.clearSavedActivity,
+  createActivityItem: state.createActivityItem,
 });
 
 const defaultState = {
@@ -23,7 +24,7 @@ export const useActivityStore = create(
   devtools(
     persist(
       (set, get) => ({
-        findOrCreateActivity: async (toUserId, options) => {
+        findOrCreateActivity: async (toUserId, options = {}) => {
           set({ loading: true });
 
           try {
@@ -46,6 +47,24 @@ export const useActivityStore = create(
             } else {
               set({ loading: false, savedActivity: find.data.activity });
             }
+          } catch (error) {
+            set({ loading: false });
+            throw error;
+          }
+        },
+
+        createActivityItem: async (userOperations, options = {}) => {
+          set({ loading: true });
+          const savedActivity = get().savedActivity;
+          const toUser = savedActivity.users.find((curr) => curr.id !== options.userId);
+
+          try {
+            const res = await axios.post(
+              `${App.stackup.backendUrl}/v1/users/${options.userId}/activity/${savedActivity.id}`,
+              { toUserId: toUser.id, userOperations },
+              { headers: { Authorization: `Bearer ${options.accessToken}` } },
+            );
+            set({ loading: false });
           } catch (error) {
             set({ loading: false });
             throw error;
