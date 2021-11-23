@@ -1,5 +1,5 @@
 const Joi = require('joi');
-const { password, objectId } = require('./custom.validation');
+const { password, objectId, userOperation } = require('./custom.validation');
 const { status } = require('../config/users');
 
 const createUser = {
@@ -87,6 +87,15 @@ const findUserActivity = {
   }),
 };
 
+const approveUserActivity = {
+  params: Joi.object().keys({
+    userId: Joi.string().custom(objectId),
+  }),
+  body: Joi.object().keys({
+    userOperations: Joi.array().items(userOperation).required(),
+  }),
+};
+
 const getUserActivities = {
   params: Joi.object().keys({
     userId: Joi.string().custom(objectId),
@@ -119,7 +128,7 @@ const createUserActivityItem = {
     activityId: Joi.string().custom(objectId),
   }),
   body: Joi.object().keys({
-    userOperations: Joi.array().items(Joi.object().keys({})).required(),
+    userOperations: Joi.array().items(userOperation).required(),
   }),
 };
 
@@ -133,6 +142,7 @@ module.exports = {
   getUserWallet,
   getUserSearch,
   findUserActivity,
+  approveUserActivity,
   getUserActivities,
   createUserActivity,
   getUserActivityItems,

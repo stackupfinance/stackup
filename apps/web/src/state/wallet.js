@@ -1,7 +1,8 @@
 import create from 'zustand';
 import { persist, devtools } from 'zustand/middleware';
 import { ethers } from 'ethers';
-import { Web3 } from '../config';
+import axios from 'axios';
+import { App, Web3 } from '../config';
 import {
   usdcContract,
   getSigner,
@@ -30,12 +31,32 @@ export const walletActivityPageSelector = (state) => ({
   loading: state.loading,
   balance: state.balance,
   fetchBalance: state.fetchBalance,
-  signNewPaymentUserOp: state.signNewPaymentUserOp,
+  sendNewPayment: state.sendNewPayment,
 });
 
 const defaultState = {
   loading: false,
   balance: ethers.constants.Zero,
+};
+
+const paymasterApproval =
+  (options = {}) =>
+  async (userOperations) => {
+    try {
+      const res = await axios.post(
+        `${App.stackup.backendUrl}/v1/users/${options.userId}/activity/paymasterApproval`,
+        { userOperations },
+        { headers: { Authorization: `Bearer ${options.accessToken}` } },
+      );
+
+      return res.data.userOperations;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+const signUserOps = (signer) => async (ops) => {
+  return Promise.all(ops.map((op) => signUserOperation(signer, op)));
 };
 
 export const useWalletStore = create(
@@ -57,7 +78,7 @@ export const useWalletStore = create(
           }
         },
 
-        signNewPaymentUserOp: async (wallet, data) => {
+        sendNewPayment: async (wallet, data, options) => {
           const signer = getSigner(wallet, data.password);
           if (!signer) {
             throw new Error('Incorrect password');
@@ -70,32 +91,26 @@ export const useWalletStore = create(
               usdcContract.allowance(data.toWalletAddress, wallet.walletAddress),
             ]);
             const shouldApprove = allowance.lte(defaultPaymasterReapproval);
-            const nonce = isDeployed ? getWalletNonce(wallet.walletAddress) : 0;
+            const nonce = isDeployed ? await getWalletNonce(wallet.walletAddress) : 0;
             const newPaymentUserOps = await Promise.all([
-              !shouldApprove
-                ? signUserOperation(
-                    signer,
-                    getUserOperation(wallet.walletAddress, {
-                      ...(!isDeployed && { initCode: getInitCode(wallet.initSignerAddress) }),
-                      nonce,
-                      callData: encodeERC20Approve(
-                        Web3.PAYMASTER_ADDRESS,
-                        defaultPaymasterApproval,
-                      ),
-                    }),
-                  )
+              shouldApprove
+                ? getUserOperation(wallet.walletAddress, {
+                    ...(!isDeployed && { initCode: getInitCode(wallet.initSignerAddress) }),
+                    nonce,
+                    callData: encodeERC20Approve(Web3.PAYMASTER_ADDRESS, defaultPaymasterApproval),
+                  })
                 : undefined,
-              signUserOperation(
-                signer,
-                getUserOperation(wallet.walletAddress, {
-                  nonce,
-                  callData: encodeERC20Transfer(
-                    data.toWalletAddress,
-                    ethers.utils.parseUnits(data.amount, Web3.USDC_UNITS),
-                  ),
-                }),
-              ),
-            ]).then((ops) => ops.filter(Boolean));
+              getUserOperation(wallet.walletAddress, {
+                nonce,
+                callData: encodeERC20Transfer(
+                  data.toWalletAddress,
+                  ethers.utils.parseUnits(data.amount, Web3.USDC_UNITS),
+                ),
+              }),
+            ])
+              .then((ops) => ops.filter(Boolean))
+              .then(paymasterApproval(options))
+              .then(signUserOps(signer));
 
             console.log(newPaymentUserOps);
 
