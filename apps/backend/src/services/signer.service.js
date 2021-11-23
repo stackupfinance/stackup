@@ -1,9 +1,9 @@
 const { withPaymaster } = require('../utils/web3');
 
-const signPaymaster = async (userOperation) => {
+const signUserOpWithPaymaster = async (userOperation) => {
   return withPaymaster(userOperation);
 };
 
 module.exports = {
-  signPaymaster,
+  signUserOpWithPaymaster,
 };

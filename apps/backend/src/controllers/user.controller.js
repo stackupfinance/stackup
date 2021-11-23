@@ -88,7 +88,7 @@ const findUserActivity = catchAsync(async (req, res) => {
 
 const approveUserActivity = catchAsync(async (req, res) => {
   // TODO: Run additional verification before approving?
-  const userOperations = await Promise.all(req.body.userOperations.map(signerService.signPaymaster));
+  const userOperations = await Promise.all(req.body.userOperations.map(signerService.signUserOpWithPaymaster));
   res.send({ userOperations });
 });
 
