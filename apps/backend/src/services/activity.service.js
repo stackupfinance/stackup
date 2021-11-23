@@ -12,7 +12,14 @@ const createActivity = async (...userIds) => {
   }
 
   const activity = await Activity.create({ users });
-  return activity.populate('users', 'username _id');
+  return activity.populate({
+    path: 'users',
+    select: 'username wallet _id',
+    populate: {
+      path: 'wallet',
+      select: 'walletAddress -_id',
+    },
+  });
 };
 
 const queryActivity = async (filter, options) => {
@@ -24,7 +31,14 @@ const findActivity = async (...userIds) => {
   const users = [...new Set(userIds)];
   const activity = await Activity.findOne({
     $and: [{ users: { $all: users } }, { users: { $size: users.length } }],
-  }).populate('users', 'username _id');
+  }).populate({
+    path: 'users',
+    select: 'username wallet _id',
+    populate: {
+      path: 'wallet',
+      select: 'walletAddress -_id',
+    },
+  });
 
   return activity;
 };

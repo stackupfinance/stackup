@@ -2,6 +2,19 @@ import create from 'zustand';
 import { persist, devtools } from 'zustand/middleware';
 import { ethers } from 'ethers';
 import { Web3 } from '../config';
+import {
+  usdcContract,
+  getSigner,
+  isWalletDeployed,
+  getWalletNonce,
+  signUserOperation,
+  getUserOperation,
+  getInitCode,
+  encodeERC20Approve,
+  encodeERC20Transfer,
+  defaultPaymasterApproval,
+  defaultPaymasterReapproval,
+} from '../utils/wallets';
 
 export const walletUseAuthSelector = (state) => ({
   clear: state.clear,
@@ -17,6 +30,7 @@ export const walletActivityPageSelector = (state) => ({
   loading: state.loading,
   balance: state.balance,
   fetchBalance: state.fetchBalance,
+  signNewPaymentUserOp: state.signNewPaymentUserOp,
 });
 
 const defaultState = {
@@ -32,17 +46,60 @@ export const useWalletStore = create(
 
         fetchBalance: async (wallet) => {
           if (!wallet) return;
-
-          const usdc = new ethers.Contract(
-            Web3.USDC,
-            Web3.ERC20_ABI,
-            new ethers.providers.JsonRpcProvider(Web3.RPC),
-          );
           set({ loading: true });
 
           try {
-            const balance = await usdc.balanceOf(wallet.walletAddress);
+            const balance = await usdcContract.balanceOf(wallet.walletAddress);
             set({ loading: false, balance });
+          } catch (error) {
+            set({ loading: false });
+            throw error;
+          }
+        },
+
+        signNewPaymentUserOp: async (wallet, data) => {
+          const signer = getSigner(wallet, data.password);
+          if (!signer) {
+            throw new Error('Incorrect password');
+          }
+          set({ loading: true });
+
+          try {
+            const [isDeployed, allowance] = await Promise.all([
+              isWalletDeployed(wallet.walletAddress),
+              usdcContract.allowance(data.toWalletAddress, wallet.walletAddress),
+            ]);
+            const shouldApprove = allowance.lte(defaultPaymasterReapproval);
+            const nonce = isDeployed ? getWalletNonce(wallet.walletAddress) : 0;
+            const newPaymentUserOps = await Promise.all([
+              !shouldApprove
+                ? signUserOperation(
+                    signer,
+                    getUserOperation(wallet.walletAddress, {
+                      ...(!isDeployed && { initCode: getInitCode(wallet.initSignerAddress) }),
+                      nonce,
+                      callData: encodeERC20Approve(
+                        Web3.PAYMASTER_ADDRESS,
+                        defaultPaymasterApproval,
+                      ),
+                    }),
+                  )
+                : undefined,
+              signUserOperation(
+                signer,
+                getUserOperation(wallet.walletAddress, {
+                  nonce,
+                  callData: encodeERC20Transfer(
+                    data.toWalletAddress,
+                    ethers.utils.parseUnits(data.amount, Web3.USDC_UNITS),
+                  ),
+                }),
+              ),
+            ]).then((ops) => ops.filter(Boolean));
+
+            console.log(newPaymentUserOps);
+
+            set({ loading: false });
           } catch (error) {
             set({ loading: false });
             throw error;
