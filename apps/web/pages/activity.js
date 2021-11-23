@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
 import { Box } from '@chakra-ui/react';
 import { PageContainer, AppContainer, Head, ActivityHeader, List, Pay } from '../src/components';
 import {
@@ -16,18 +17,20 @@ import { Routes } from '../src/config';
 export default function Activity() {
   const { enabled, user, wallet, accessToken } = useAccountStore(accountActivityPageSelector);
   const {
-    // loading: activityLoading,
+    loading: activityLoading,
     savedActivity,
     findOrCreateActivity,
     clearSavedActivity,
+    createActivityItem,
   } = useActivityStore(activityActivityPageSelector);
   const { clear: clearSearch, selectedResult } = useSearchStore(searchActivityPageSelector);
   const {
     loading: walletLoading,
     balance,
     fetchBalance,
-    sendNewPayment,
+    signNewPaymentUserOps,
   } = useWalletStore(walletActivityPageSelector);
+  const router = useRouter();
   const [username, setUsername] = useState('');
   const [walletAddress, setWalletAddress] = useState('');
   const [payError, setPayError] = useState('');
@@ -40,6 +43,8 @@ export default function Activity() {
         userId: user.id,
         accessToken: accessToken.token,
       }).then(() => clearSearch());
+    } else if (!selectedResult && !savedActivity) {
+      router.push(Routes.HOME);
     }
 
     fetchBalance(wallet);
@@ -61,7 +66,11 @@ export default function Activity() {
     setPayError('');
 
     try {
-      await sendNewPayment(wallet, data, { userId: user.id, accessToken: accessToken.token });
+      const userOps = await signNewPaymentUserOps(wallet, data, {
+        userId: user.id,
+        accessToken: accessToken.token,
+      });
+      await createActivityItem(userOps, { userId: user.id, accessToken: accessToken.token });
     } catch (error) {
       setPayError(error.message);
     }
@@ -88,7 +97,7 @@ export default function Activity() {
             />
           </Box>
           <Pay
-            isLoading={walletLoading}
+            isLoading={walletLoading || activityLoading}
             toUser={username}
             toWalletAddress={walletAddress}
             onConfirm={onConfirmHandler}

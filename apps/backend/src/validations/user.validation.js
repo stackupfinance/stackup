@@ -92,7 +92,7 @@ const approveUserActivity = {
     userId: Joi.string().custom(objectId),
   }),
   body: Joi.object().keys({
-    userOperations: Joi.array().items(userOperation).required(),
+    userOperations: Joi.array().items(userOperation).required().min(1),
   }),
 };
 
@@ -128,7 +128,8 @@ const createUserActivityItem = {
     activityId: Joi.string().custom(objectId),
   }),
   body: Joi.object().keys({
-    userOperations: Joi.array().items(userOperation).required(),
+    toUserId: Joi.string().custom(objectId),
+    userOperations: Joi.array().items(userOperation).required().min(1),
   }),
 };
 

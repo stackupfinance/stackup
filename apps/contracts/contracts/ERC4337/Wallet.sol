@@ -77,7 +77,8 @@ contract Wallet is IWallet, IPaymaster {
     require(
       (userOp.requiredTokenIsApproved(maxcost) &&
         userOp.tokenAllowanceRemainsOK(maxcost)) ||
-        userOp.tokenAllowanceWillBeOK(maxcost),
+        userOp.tokenAllowanceWillBeOK(maxcost) ||
+        userOp.requiredTokenIsApprovedInPrevOps(),
       "Paymaster: Not approved"
     );
 

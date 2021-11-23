@@ -98,7 +98,16 @@ const getUserActivityItems = catchAsync(async (req, res) => {
 });
 
 const createUserActivityItem = catchAsync(async (req, res) => {
-  // TODO: Implement logic
+  const { userId, activityId } = req.params;
+  const { toUserId } = req.body;
+  const activity = await activityService.getActivityByIdAndUsers(activityId, [userId, toUserId]);
+  if (!activity) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Activity not found');
+  }
+
+  // TODO: Run additional verification before relaying?
+  await signerService.relayUserOpsToEntryPoint(req.body.userOperations);
+
   transactionService.monitorNewPaymentTransaction('activityId');
   res.send({});
 });

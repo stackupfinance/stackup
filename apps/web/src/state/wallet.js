@@ -31,7 +31,7 @@ export const walletActivityPageSelector = (state) => ({
   loading: state.loading,
   balance: state.balance,
   fetchBalance: state.fetchBalance,
-  sendNewPayment: state.sendNewPayment,
+  signNewPaymentUserOps: state.signNewPaymentUserOps,
 });
 
 const defaultState = {
@@ -78,7 +78,7 @@ export const useWalletStore = create(
           }
         },
 
-        sendNewPayment: async (wallet, data, options) => {
+        signNewPaymentUserOps: async (wallet, data, options) => {
           const signer = getSigner(wallet, data.password);
           if (!signer) {
             throw new Error('Incorrect password');
@@ -101,7 +101,7 @@ export const useWalletStore = create(
                   })
                 : undefined,
               getUserOperation(wallet.walletAddress, {
-                nonce,
+                nonce: isDeployed ? nonce + 1 : nonce,
                 callData: encodeERC20Transfer(
                   data.toWalletAddress,
                   ethers.utils.parseUnits(data.amount, Web3.USDC_UNITS),
@@ -112,9 +112,8 @@ export const useWalletStore = create(
               .then(paymasterApproval(options))
               .then(signUserOps(signer));
 
-            console.log(newPaymentUserOps);
-
             set({ loading: false });
+            return newPaymentUserOps;
           } catch (error) {
             set({ loading: false });
             throw error;
