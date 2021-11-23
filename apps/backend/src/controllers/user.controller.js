@@ -2,7 +2,7 @@ const httpStatus = require('http-status');
 const pick = require('../utils/pick');
 const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
-const { userService, walletService, transactionService, activityService } = require('../services');
+const { userService, walletService, transactionService, activityService, signerService } = require('../services');
 
 const createUser = catchAsync(async (req, res) => {
   const user = await userService.createUser(req.body);
@@ -86,6 +86,12 @@ const findUserActivity = catchAsync(async (req, res) => {
   res.send({ activity });
 });
 
+const approveUserActivity = catchAsync(async (req, res) => {
+  // TODO: Run additional verification before approving?
+  const userOperations = await Promise.all(req.body.userOperations.map(signerService.signUserOpWithPaymaster));
+  res.send({ userOperations });
+});
+
 const getUserActivityItems = catchAsync(async (req, res) => {
   // TODO: Implement logic
   res.send({});
@@ -109,6 +115,7 @@ module.exports = {
   getUserActivities,
   createUserActivity,
   findUserActivity,
+  approveUserActivity,
   getUserActivityItems,
   createUserActivityItem,
 };

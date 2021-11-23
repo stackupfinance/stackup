@@ -80,7 +80,7 @@ export const displayUSDC = (balance) => {
 
 export const getWalletNonce = async (address) => {
   const wallet = new ethers.Contract(address, Web3.WALLET_ABI, provider);
-  return wallet.nonce();
+  return wallet.nonce().toNumber();
 };
 
 // Overlap code

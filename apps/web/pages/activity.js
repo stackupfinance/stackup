@@ -26,7 +26,7 @@ export default function Activity() {
     loading: walletLoading,
     balance,
     fetchBalance,
-    signNewPaymentUserOp,
+    sendNewPayment,
   } = useWalletStore(walletActivityPageSelector);
   const [username, setUsername] = useState('');
   const [walletAddress, setWalletAddress] = useState('');
@@ -61,7 +61,7 @@ export default function Activity() {
     setPayError('');
 
     try {
-      await signNewPaymentUserOp(wallet, data);
+      await sendNewPayment(wallet, data, { userId: user.id, accessToken: accessToken.token });
     } catch (error) {
       setPayError(error.message);
     }
