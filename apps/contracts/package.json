@@ -12,7 +12,9 @@
     "prettier:fix": "prettier --write --ignore-path ./.eslintignore '**'",
     "deploy:hardhat": "hardhat run --network hardhat scripts/deploy.js",
     "deploy:polygonTestnet": "hardhat run --network polygonTestnet scripts/deploy.js",
-    "deploy:polygonMainnet": "hardhat run --network polygonMainnet scripts/deploy.js"
+    "deploy:polygonMainnet": "hardhat run --network polygonMainnet scripts/deploy.js",
+    "paymaster:addStake:polygonTestnet": "hardhat run --network polygonTestnet scripts/paymaster/addStake.js",
+    "paymaster:getStake:polygonTestnet": "hardhat run --network polygonTestnet scripts/paymaster/getStake.js"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.2",

@@ -11,7 +11,6 @@ import {
   useWalletStore,
   walletActivityPageSelector,
 } from '../src/state';
-import { getSigner } from '../src/utils/wallets';
 import { Routes } from '../src/config';
 
 export default function Activity() {
@@ -27,8 +26,10 @@ export default function Activity() {
     loading: walletLoading,
     balance,
     fetchBalance,
+    signNewPaymentUserOp,
   } = useWalletStore(walletActivityPageSelector);
   const [username, setUsername] = useState('');
+  const [walletAddress, setWalletAddress] = useState('');
   const [payError, setPayError] = useState('');
 
   useEffect(() => {
@@ -50,6 +51,7 @@ export default function Activity() {
 
     const toUser = savedActivity.users.find((curr) => curr.id !== user.id);
     setUsername(toUser.username);
+    setWalletAddress(toUser.wallet.walletAddress);
 
     return clearSavedActivity;
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -57,12 +59,16 @@ export default function Activity() {
 
   const onConfirmHandler = async (data) => {
     setPayError('');
-    const signer = getSigner(data.password, wallet);
-    if (!signer) {
-      setPayError('Incorrect password');
-    }
 
-    // TODO: sign userOp
+    try {
+      await signNewPaymentUserOp(wallet, data);
+    } catch (error) {
+      setPayError(error.message);
+    }
+  };
+
+  const onCancelHandler = () => {
+    setPayError('');
   };
 
   return (
@@ -84,7 +90,9 @@ export default function Activity() {
           <Pay
             isLoading={walletLoading}
             toUser={username}
+            toWalletAddress={walletAddress}
             onConfirm={onConfirmHandler}
+            onCancel={onCancelHandler}
             error={payError}
             walletBalance={balance}
           />
