@@ -10,7 +10,7 @@ const log = (msg) => logger.info(`JOB ${jobs.NEW_PAYMENT}: ${msg}`);
 
 const transactions = (queue) => {
   queue.define(jobs.NEW_PAYMENT, async (job) => {
-    const { paymentId, users, userOperations } = job.attrs.data;
+    const { paymentId, userOperations } = job.attrs.data;
     const payment = await paymentService.getPaymentById(paymentId);
 
     if (payment.status === status.pending && !payment.transactionHash) {
@@ -19,16 +19,16 @@ const transactions = (queue) => {
       await paymentService.updatePaymentDoc(payment, { transactionHash: tx.hash });
       log(`Forwarded user ops to EntryPoint in ${tx.hash}`);
 
-      queue.now(jobs.NEW_PAYMENT, { paymentId, users });
+      queue.now(jobs.NEW_PAYMENT, { paymentId });
     } else if (payment.status === status.pending && payment.transactionHash) {
       const txStatus = await getTransactionStatus(payment.transactionHash);
 
       if (txStatus === status.pending) {
         log(`Transaction ${payment.transactionHash} still pending. Requeuing job`);
-        queue.now(jobs.NEW_PAYMENT, { paymentId, users });
+        queue.now(jobs.NEW_PAYMENT, { paymentId });
       } else {
         const updatedPayment = await paymentService.updatePaymentDoc(payment, { status: txStatus });
-        pusherService.pushNewPaymentUpdate(updatedPayment, users);
+        pusherService.pushNewPaymentUpdate(updatedPayment);
         log(`Transaction ${payment.transactionHash} completed. Payment updated`);
       }
     }

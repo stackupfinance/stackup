@@ -4,7 +4,7 @@ const createNewPayment = async (newPayment) => {
   return Payment.create(newPayment);
 };
 
-const queryPayment = async (filter, options) => {
+const queryPayments = async (filter, options) => {
   const payments = await Payment.paginate(filter, options);
   return payments;
 };
@@ -20,7 +20,7 @@ const updatePaymentDoc = async (doc, updates) => {
 
 module.exports = {
   createNewPayment,
-  queryPayment,
+  queryPayments,
   getPaymentById,
   updatePaymentDoc,
 };

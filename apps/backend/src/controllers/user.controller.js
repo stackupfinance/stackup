@@ -102,11 +102,11 @@ const approveUserActivity = catchAsync(async (req, res) => {
 const getUserActivityItems = catchAsync(async (req, res) => {
   const { userId, activityId } = req.params;
   const options = pick(req.query, ['limit', 'page']);
-  const activity = await activityService.getActivityByIdAndParitalUser(activityId, userId);
+  const activity = await activityService.getActivityByIdAndPartialUser(activityId, userId);
   if (!activity) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Activity not found');
   }
-  const activityItems = await paymentService.queryPayment(
+  const activityItems = await paymentService.queryPayments(
     { activity: activity.id },
     { ...options, sortBy: 'updatedAt:desc' }
   );
@@ -128,12 +128,12 @@ const createUserActivityItem = catchAsync(async (req, res) => {
     amount,
     message,
   });
-  const activityItems = await paymentService.queryPayment(
+  const activityItems = await paymentService.queryPayments(
     { activity: activity.id },
     { limit: 20, page: 1, sortBy: 'updatedAt:desc' }
   );
 
-  transactionService.monitorNewPaymentTransaction({ paymentId: payment.id, users: [userId, toUser], userOperations });
+  transactionService.monitorNewPaymentTransaction({ paymentId: payment.id, userOperations });
   res.send({ activityItems });
 });
 
