@@ -1,7 +1,15 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { Box } from '@chakra-ui/react';
-import { PageContainer, AppContainer, Head, ActivityHeader, List, Pay } from '../src/components';
+import {
+  PageContainer,
+  AppContainer,
+  Head,
+  ActivityHeader,
+  List,
+  Pay,
+  NewPaymentCard,
+} from '../src/components';
 import {
   useSearchStore,
   searchActivityPageSelector,
@@ -12,7 +20,26 @@ import {
   useWalletStore,
   walletActivityPageSelector,
 } from '../src/state';
+import { useActivityChannel } from '../src/hooks';
 import { Routes } from '../src/config';
+
+const loadingList = [
+  <NewPaymentCard
+    key="loading-payment-1"
+    isFirst
+    isLoading
+    toUsername="username"
+    amount="$0.00"
+    message="message"
+  />,
+  <NewPaymentCard
+    key="loading-payment-2"
+    isLoading
+    fromUsername="username"
+    amount="$0.00"
+    message="message"
+  />,
+];
 
 export default function Activity() {
   const { enabled, user, wallet, accessToken } = useAccountStore(accountActivityPageSelector);
@@ -34,6 +61,8 @@ export default function Activity() {
   const [username, setUsername] = useState('');
   const [walletAddress, setWalletAddress] = useState('');
   const [payError, setPayError] = useState('');
+
+  useActivityChannel((_data) => {});
 
   useEffect(() => {
     if (!enabled) return;
@@ -88,9 +117,10 @@ export default function Activity() {
         <ActivityHeader backLinkUrl={Routes.HOME} username={username} />
 
         <AppContainer minMargin>
-          <Box px="0px" mb={['64px', '128px']}>
+          <Box px="0px" w="100%">
             <List
-              items={[]}
+              isInverse={activityLoading}
+              items={activityLoading ? loadingList : []}
               hasMore={false}
               next={() => {}}
               emptyHeading="No activity! Make a payment to get started 🤝"
