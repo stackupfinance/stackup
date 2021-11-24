@@ -8,21 +8,46 @@ import {
   Text,
   useBreakpointValue,
   Skeleton,
+  Spacer,
+  Spinner,
 } from '@chakra-ui/react';
 
+const STATUS_TYPES = {
+  pending: 'pending',
+  success: 'success',
+  failed: 'failed',
+};
+
 export const NewPaymentCard = ({
+  isReceiving,
   isFirst,
   isLoading,
   toUsername,
   fromUsername,
   message,
   amount,
+  status,
 }) => {
-  const isReceiving = Boolean(fromUsername);
-  const heading = isReceiving
-    ? `You received a payment from ${fromUsername}`
-    : `You sent a payment to ${toUsername}`;
   const avatarSize = useBreakpointValue({ base: 'sm', sm: 'md' });
+
+  let heading;
+  if (isReceiving) {
+    if (status === STATUS_TYPES.pending) {
+      heading = `A payment from ${fromUsername} is on its way`;
+    } else if (status === STATUS_TYPES.success) {
+      heading = `You received a payment from ${fromUsername}`;
+    } else {
+      heading = `A payment from ${fromUsername} failed to send`;
+    }
+  } else {
+    if (status === STATUS_TYPES.pending) {
+      heading = `Your payment to ${toUsername} is on its way`;
+    } else if (status === STATUS_TYPES.success) {
+      heading = `You sent a payment to ${toUsername}`;
+    } else {
+      heading = `Your payment to ${toUsername} failed to send`;
+    }
+  }
 
   const renderAvatar = () => {
     return (
@@ -30,6 +55,12 @@ export const NewPaymentCard = ({
         <Avatar size={avatarSize} />
       </Skeleton>
     );
+  };
+
+  const renderStatus = () => {
+    if (status === STATUS_TYPES.pending) return <Spinner size="sm" color="blue.500" />;
+    if (status === STATUS_TYPES.success) return <Text>✅</Text>;
+    if (status === STATUS_TYPES.failed) return <Text>❌</Text>;
   };
 
   return (
@@ -46,7 +77,11 @@ export const NewPaymentCard = ({
           textAlign="left"
         >
           <Skeleton isLoaded={!isLoading}>
-            <StatLabel>{heading}</StatLabel>
+            <HStack>
+              <StatLabel>{heading}</StatLabel>
+              <Spacer />
+              {renderStatus()}
+            </HStack>
           </Skeleton>
           <Skeleton isLoaded={!isLoading} mt={isLoading ? '8px' : undefined}>
             <StatNumber>{amount}</StatNumber>

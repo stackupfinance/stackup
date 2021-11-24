@@ -2,7 +2,14 @@ const httpStatus = require('http-status');
 const pick = require('../utils/pick');
 const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
-const { userService, walletService, transactionService, activityService, signerService } = require('../services');
+const {
+  userService,
+  walletService,
+  transactionService,
+  activityService,
+  signerService,
+  paymentService,
+} = require('../services');
 
 const createUser = catchAsync(async (req, res) => {
   const user = await userService.createUser(req.body);
@@ -93,23 +100,41 @@ const approveUserActivity = catchAsync(async (req, res) => {
 });
 
 const getUserActivityItems = catchAsync(async (req, res) => {
-  // TODO: Implement logic
-  res.send({});
+  const { userId, activityId } = req.params;
+  const options = pick(req.query, ['limit', 'page']);
+  const activity = await activityService.getActivityByIdAndParitalUser(activityId, userId);
+  if (!activity) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Activity not found');
+  }
+  const activityItems = await paymentService.queryPayment(
+    { activity: activity.id },
+    { ...options, sortBy: 'updatedAt:desc' }
+  );
+
+  res.send({ activityItems });
 });
 
 const createUserActivityItem = catchAsync(async (req, res) => {
   const { userId, activityId } = req.params;
-  const { toUserId } = req.body;
-  const activity = await activityService.getActivityByIdAndUsers(activityId, [userId, toUserId]);
+  const { toUser, amount, message, userOperations } = req.body;
+  const activity = await activityService.getActivityByIdAndUsers(activityId, [userId, toUser]);
   if (!activity) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Activity not found');
   }
+  const payment = await paymentService.createNewPayment({
+    activity: activity.id,
+    fromUser: userId,
+    toUser,
+    amount,
+    message,
+  });
+  const activityItems = await paymentService.queryPayment(
+    { activity: activity.id },
+    { limit: 20, page: 1, sortBy: 'updatedAt:desc' }
+  );
 
-  // TODO: Run additional verification before relaying?
-  await signerService.relayUserOpsToEntryPoint(req.body.userOperations);
-
-  transactionService.monitorNewPaymentTransaction('activityId');
-  res.send({});
+  transactionService.monitorNewPaymentTransaction({ paymentId: payment.id, users: [userId, toUser], userOperations });
+  res.send({ activityItems });
 });
 
 module.exports = {

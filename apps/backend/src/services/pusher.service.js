@@ -13,6 +13,11 @@ const auth = async (socketId, channelName) => {
   return pusher.authenticate(socketId, channelName);
 };
 
+const pushNewPaymentUpdate = async (activityItem, users = {}) => {
+  return Promise.all(users.map((user) => pusher.trigger(`private-${user}-activity`, 'newPayment', { activityItem })));
+};
+
 module.exports = {
   auth,
+  pushNewPaymentUpdate,
 };

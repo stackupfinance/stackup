@@ -8,6 +8,7 @@
  */
 const { ethers } = require('ethers');
 const { web3 } = require('../config/config');
+const { status } = require('../config/payments');
 const { abi: ENTRY_POINT_ABI } = require('../config/contracts/EntryPoint.json');
 
 // Overlap code
@@ -88,7 +89,19 @@ const entryPointHandleOps = async (userOps) => {
   });
 };
 
+const getTransactionStatus = async (transactionHash) => {
+  const txReceipt = await provider.getTransactionReceipt(transactionHash);
+  if (!txReceipt) {
+    return status.pending;
+  }
+  if (txReceipt.status === 1) {
+    return status.success;
+  }
+  return status.failed;
+};
+
 module.exports = {
   withPaymaster,
   entryPointHandleOps,
+  getTransactionStatus,
 };

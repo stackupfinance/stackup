@@ -120,6 +120,10 @@ const getUserActivityItems = {
     userId: Joi.string().custom(objectId),
     activityId: Joi.string().custom(objectId),
   }),
+  query: Joi.object().keys({
+    limit: Joi.number().integer(),
+    page: Joi.number().integer(),
+  }),
 };
 
 const createUserActivityItem = {
@@ -128,7 +132,9 @@ const createUserActivityItem = {
     activityId: Joi.string().custom(objectId),
   }),
   body: Joi.object().keys({
-    toUserId: Joi.string().custom(objectId),
+    toUser: Joi.string().custom(objectId).required(),
+    amount: Joi.number().required(),
+    message: Joi.string().required(),
     userOperations: Joi.array().items(userOperation).required().min(1),
   }),
 };

@@ -70,8 +70,10 @@ export const getSigner = (wallet, password) => {
   }
 };
 
-export const balanceToString = (balance) => {
-  return balance ? ethers.utils.formatUnits(balance, Web3.USDC_UNITS) : '0';
+export const balanceToString = (balance = ethers.constants.Zero) => {
+  return balance._isBigNumber
+    ? ethers.utils.formatUnits(balance, Web3.USDC_UNITS)
+    : ethers.utils.formatUnits(ethers.BigNumber.from(balance), Web3.USDC_UNITS);
 };
 
 export const displayUSDC = (balance) => {
