@@ -125,7 +125,7 @@ export const useWalletStore = create(
       {
         name: 'stackup-wallet-store',
         partialize: (state) => {
-          const { loading, ...persisted } = state;
+          const { loading, balance, ...persisted } = state;
           return persisted;
         },
       },

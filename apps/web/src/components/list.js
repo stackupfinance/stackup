@@ -24,6 +24,7 @@ export const List = ({ items = [], hasMore, next, listHeading, emptyHeading, isI
                 '&::-webkit-scrollbar': {
                   display: 'none',
                 },
+                scrollbarWidth: 'none',
               }
             : undefined
         }

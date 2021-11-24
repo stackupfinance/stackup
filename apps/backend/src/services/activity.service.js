@@ -51,9 +51,17 @@ const getActivityByIdAndUsers = async (activityId, userIds) => {
   return activity;
 };
 
+const getActivityByIdAndPartialUser = async (activityId, userId) => {
+  const activity = await Activity.findOne({
+    $and: [{ _id: activityId }, { users: { $all: [userId] } }],
+  });
+  return activity;
+};
+
 module.exports = {
   createActivity,
   queryActivity,
   findActivity,
   getActivityByIdAndUsers,
+  getActivityByIdAndPartialUser,
 };

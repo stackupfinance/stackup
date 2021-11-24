@@ -53,6 +53,16 @@ export const Pay = ({
     onCancel();
   };
 
+  const onSend = async () => {
+    try {
+      await onConfirm({ amount, message, password, toWalletAddress });
+      onClose();
+      setShowPay(false);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <>
       <Box
@@ -168,7 +178,7 @@ export const Pay = ({
                 isLoading={isLoading}
                 colorScheme="blue"
                 isDisabled={!password}
-                onClick={() => onConfirm({ amount, message, password, toWalletAddress })}
+                onClick={onSend}
               >
                 Confirm
               </Button>
