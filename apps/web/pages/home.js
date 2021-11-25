@@ -17,9 +17,13 @@ import {
   searchHomePageSelector,
   useWalletStore,
   walletHomePageSelector,
+  useActivityStore,
+  activityHomePageSelector,
 } from '../src/state';
 import { useActivityChannel, useLogout } from '../src/hooks';
+import { getToUserFromActivity } from '../src/utils/activity';
 import { Routes } from '../src/config';
+import { EVENTS, logEvent } from '../src/utils/analytics';
 
 const loadingList = [
   <UserCard
@@ -28,14 +32,14 @@ const loadingList = [
     isFirst
     username="username"
     preview="preview"
-    timestamp="timestamp"
+    timestamp={new Date()}
   />,
   <UserCard
     key="loading-card-2"
     isLoading
     username="username"
     preview="preview"
-    timestamp="timestamp"
+    timestamp={new Date()}
   />,
   <UserCard
     key="loading-card-3"
@@ -43,7 +47,7 @@ const loadingList = [
     isLast
     username="username"
     preview="preview"
-    timestamp="timestamp"
+    timestamp={new Date()}
   />,
 ];
 
@@ -65,6 +69,13 @@ export default function Home() {
     clearSearchData,
   } = useSearchStore(searchHomePageSelector);
   const { loading: walletLoading, balance, fetchBalance } = useWalletStore(walletHomePageSelector);
+  const {
+    loading: activityLoading,
+    activityList,
+    fetchActivities,
+    selectActivity,
+    updateActivityListFromChannel,
+  } = useActivityStore(activityHomePageSelector);
   const logout = useLogout();
   const router = useRouter();
   const [showSearch, setShowSearch] = useState(false);
@@ -76,14 +87,15 @@ export default function Home() {
 
   useEffect(() => {
     if (enabled) {
-      // TODO: Get user activity
+      fetchActivities({ userId: user.id, accessToken: accessToken.token });
       fetchBalance(wallet);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [enabled]);
 
-  useActivityChannel((_data) => {
-    // TODO: Update user activity
+  useActivityChannel((data) => {
+    updateActivityListFromChannel(data, { userId: user.id, accessToken: accessToken.token });
+    fetchBalance(wallet);
   });
 
   const onSearch = async (query) => {
@@ -92,12 +104,14 @@ export default function Home() {
     setShowSearch(true);
     setSearchQuery(query);
     searchByUsername(query, { userId: user.id, accessToken: accessToken.token });
+    logEvent(EVENTS.SEARCH_START);
   };
 
   const onClear = async () => {
     setShowSearch(false);
     setSearchQuery('');
     clearSearchData();
+    logEvent(EVENTS.SEARCH_CLEAR);
   };
 
   const searchResultsNextHandler = async () => {
@@ -110,10 +124,18 @@ export default function Home() {
 
   const logoutHandler = async () => {
     logout();
+    logEvent(EVENTS.LOGOUT);
   };
 
   const onSearchResultHandler = (result) => {
     selectResult(result);
+    logEvent(EVENTS.GO_TO_SEARCH_RESULT);
+    router.push(Routes.ACTIVITY);
+  };
+
+  const onActivityHandler = (activity) => {
+    selectActivity(activity);
+    logEvent(EVENTS.GOT_TO_ACTIVITY_ITEM);
     router.push(Routes.ACTIVITY);
   };
 
@@ -126,6 +148,23 @@ export default function Home() {
           isLast={i === results.length - 1}
           username={result.username}
           onClick={() => onSearchResultHandler(result)}
+        />
+      );
+    });
+  };
+
+  const renderActivityList = (results = []) => {
+    return results.map((result, i) => {
+      const toUser = getToUserFromActivity(result, user.id);
+      return (
+        <UserCard
+          key={`activity-list-item-${i}`}
+          isFirst={i === 0}
+          isLast={i === results.length - 1}
+          username={toUser.username}
+          onClick={() => onActivityHandler(result)}
+          preview={result.preview}
+          timestamp={result.updatedAt}
         />
       );
     });
@@ -159,8 +198,11 @@ export default function Home() {
                   />
                 ) : (
                   <List
-                    // TODO: if !enabled || activityLoading
-                    items={!enabled ? loadingList : []}
+                    items={
+                      !enabled || activityLoading
+                        ? loadingList
+                        : renderActivityList(activityList?.results)
+                    }
                     hasMore={false}
                     next={activityNextHandler}
                     listHeading="Latest activity"

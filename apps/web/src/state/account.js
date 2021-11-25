@@ -93,15 +93,11 @@ export const useAccountStore = create(
           set({ loading: true });
 
           try {
-            const register = await axios.post(`${App.stackup.backendUrl}/v1/auth/login`, data);
-            const user = register.data.user;
-            const accessToken = register.data.tokens.access;
-            const refreshToken = register.data.tokens.refresh;
-
-            const wallet = initWallet(data.password);
-            await axios.get(`${App.stackup.backendUrl}/v1/users/${user.id}/wallet`, {
-              headers: { Authorization: `Bearer ${accessToken.token}` },
-            });
+            const login = await axios.post(`${App.stackup.backendUrl}/v1/auth/login`, data);
+            const user = login.data.user;
+            const wallet = login.data.user.wallet;
+            const accessToken = login.data.tokens.access;
+            const refreshToken = login.data.tokens.refresh;
 
             set({
               loading: false,

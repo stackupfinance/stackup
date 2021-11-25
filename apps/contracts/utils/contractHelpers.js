@@ -34,6 +34,7 @@ const ERC20_INTERFACE = new ethers.utils.Interface([
   "function approve(address _spender, uint256 _value) public returns (bool success)",
   "function balanceOf(address _owner) public view returns (uint256 balance)",
   "function allowance(address _owner, address _spender) public view returns (uint256 remaining)",
+  "function transfer(address _to, uint256 _value) public returns (bool success)",
 ]);
 
 const LOCK_EXPIRY_PERIOD = 172800; // 2 Days
@@ -99,6 +100,14 @@ const encodeERC20ZeroApprove = (spender) => {
       spender,
       ethers.constants.Zero,
     ]),
+  ]);
+};
+
+const encodeERC20Transfer = (to, value) => {
+  return WALLET_CONTRACT_INTERFACE.encodeFunctionData("executeUserOp", [
+    USDC_TOKEN,
+    0,
+    ERC20_INTERFACE.encodeFunctionData("transfer", [to, value]),
   ]);
 };
 
@@ -319,27 +328,23 @@ const transactionFee = (tx) => {
   return tx.effectiveGasPrice.mul(tx.gasUsed);
 };
 
-const withPaymaster = async (signer, paymaster, op) => {
+const withPaymaster = async (signer, paymaster, op, opts = {}) => {
   const userOp = {
     ...op,
     paymaster,
   };
+  const fee = typeof opts.fee !== "undefined" ? opts.fee : PAYMASTER_FEE;
 
   return {
     ...userOp,
     paymasterData: ethers.utils.defaultAbiCoder.encode(
       ["uint256", "address", "address", "bytes"],
       [
-        PAYMASTER_FEE,
+        fee,
         USDC_TOKEN,
         MATIC_USD_DATA_FEED,
         await signer.signMessage(
-          getPaymasterDataHash(
-            userOp,
-            PAYMASTER_FEE,
-            USDC_TOKEN,
-            MATIC_USD_DATA_FEED
-          )
+          getPaymasterDataHash(userOp, fee, USDC_TOKEN, MATIC_USD_DATA_FEED)
         ),
       ]
     ),
@@ -362,6 +367,7 @@ module.exports = {
   encodeLockStake,
   encodeERC20MaxApprove,
   encodeERC20ZeroApprove,
+  encodeERC20Transfer,
   encodeFailContractCall,
   encodeFailEntryPointCall,
   encodePassContractCall,

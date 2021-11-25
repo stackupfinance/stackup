@@ -34,6 +34,10 @@ router
   .get(auth('getUsers'), validate(userValidation.findUserActivity), userController.findUserActivity);
 
 router
+  .route('/:userId/activity/paymasterApproval')
+  .post(auth('manageUsers'), validate(userValidation.approveUserActivity), userController.approveUserActivity);
+
+router
   .route('/:userId/activity/:activityId')
   .get(auth('getUsers'), validate(userValidation.getUserActivityItems), userController.getUserActivityItems)
   .post(auth('manageUsers'), validate(userValidation.createUserActivityItem), userController.createUserActivityItem);

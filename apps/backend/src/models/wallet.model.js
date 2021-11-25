@@ -14,7 +14,6 @@ const walletSchema = mongoose.Schema(
       type: String,
       required: true,
       trim: true,
-      lowercase: true,
       validate(value) {
         if (!validator.isEthereumAddress(value)) {
           throw new Error('Invalid wallet address');
@@ -25,7 +24,6 @@ const walletSchema = mongoose.Schema(
       type: String,
       required: true,
       trim: true,
-      lowercase: true,
       validate(value) {
         if (!validator.isEthereumAddress(value)) {
           throw new Error('Invalid wallet address');
@@ -36,7 +34,6 @@ const walletSchema = mongoose.Schema(
       type: String,
       required: true,
       trim: true,
-      lowercase: true,
       validate(value) {
         if (!validator.isBase64(value)) {
           throw new Error('Invalid encrypted signer');

@@ -27,6 +27,10 @@ const envVarsSchema = Joi.object()
     PUSHER_KEY: Joi.string().required().description('Key for Pusher channels'),
     PUSHER_SECRET: Joi.string().required().description('Secret for Pusher channels'),
     PUSHER_CLUSTER: Joi.string().required().description('Cluster for Pusher channels'),
+    WEB3_MNEMONIC: Joi.string().required().description('Mnemonic for paymaster signer and relayer'),
+    WEB3_RPC: Joi.string().required().description('RPC for the correct network'),
+    WEB3_USDC: Joi.string().required().description('ERC20 token address for USDC'),
+    WEB3_USDC_PRICE_FEED: Joi.string().required().description('Chainlink address for USDC price feed'),
   })
   .unknown();
 
@@ -68,5 +72,11 @@ module.exports = {
       secret: envVars.PUSHER_SECRET,
       cluster: envVars.PUSHER_CLUSTER,
     },
+  },
+  web3: {
+    mnemonic: envVars.WEB3_MNEMONIC,
+    rpc: envVars.WEB3_RPC,
+    usdc: envVars.WEB3_USDC,
+    usdcPriceFeed: envVars.WEB3_USDC_PRICE_FEED,
   },
 };

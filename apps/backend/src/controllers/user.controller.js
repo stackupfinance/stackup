@@ -2,7 +2,14 @@ const httpStatus = require('http-status');
 const pick = require('../utils/pick');
 const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
-const { userService, walletService, transactionService, activityService } = require('../services');
+const {
+  userService,
+  walletService,
+  transactionService,
+  activityService,
+  signerService,
+  paymentService,
+} = require('../services');
 
 const createUser = catchAsync(async (req, res) => {
   const user = await userService.createUser(req.body);
@@ -67,7 +74,7 @@ const getUserActivities = catchAsync(async (req, res) => {
   const options = pick(req.query, ['limit', 'page']);
   const result = await activityService.queryActivity(
     { users: userId, preview: { $ne: null } },
-    { ...options, sortBy: 'updatedAt', populate: 'users', populateProjection: 'username' }
+    { ...options, sortBy: 'updatedAt:desc' }
   );
   res.send(result);
 });
@@ -86,15 +93,48 @@ const findUserActivity = catchAsync(async (req, res) => {
   res.send({ activity });
 });
 
+const approveUserActivity = catchAsync(async (req, res) => {
+  // TODO: Run additional verification before approving?
+  const userOperations = await Promise.all(req.body.userOperations.map(signerService.signUserOpWithPaymaster));
+  res.send({ userOperations });
+});
+
 const getUserActivityItems = catchAsync(async (req, res) => {
-  // TODO: Implement logic
-  res.send({});
+  const { userId, activityId } = req.params;
+  const options = pick(req.query, ['limit', 'page']);
+  const activity = await activityService.getActivityByIdAndPartialUser(activityId, userId);
+  if (!activity) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Activity not found');
+  }
+  const activityItems = await paymentService.queryPayments(
+    { activity: activity.id },
+    { ...options, sortBy: 'updatedAt:desc' }
+  );
+
+  res.send({ activityItems });
 });
 
 const createUserActivityItem = catchAsync(async (req, res) => {
-  // TODO: Implement logic
-  transactionService.monitorNewPaymentTransaction('activityId');
-  res.send({});
+  const { userId, activityId } = req.params;
+  const { toUser, amount, message, userOperations } = req.body;
+  const activity = await activityService.getActivityByIdAndUsers(activityId, [userId, toUser]);
+  if (!activity) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Activity not found');
+  }
+  const payment = await paymentService.createNewPayment({
+    activity: activity.id,
+    fromUser: userId,
+    toUser,
+    amount,
+    message,
+  });
+  const activityItems = await paymentService.queryPayments(
+    { activity: activity.id },
+    { limit: 20, page: 1, sortBy: 'updatedAt:desc' }
+  );
+
+  transactionService.monitorNewPaymentTransaction({ paymentId: payment.id, userOperations });
+  res.send({ activityItems });
 });
 
 module.exports = {
@@ -109,6 +149,7 @@ module.exports = {
   getUserActivities,
   createUserActivity,
   findUserActivity,
+  approveUserActivity,
   getUserActivityItems,
   createUserActivityItem,
 };

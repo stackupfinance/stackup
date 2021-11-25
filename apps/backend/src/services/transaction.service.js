@@ -1,8 +1,8 @@
 const queue = require('../queue');
 const jobs = require('../config/jobs');
 
-const monitorNewPaymentTransaction = async (activityId) => {
-  queue.now(jobs.NEW_PAYMENT, { activityId });
+const monitorNewPaymentTransaction = async (data) => {
+  queue.now(jobs.NEW_PAYMENT, data);
 };
 
 module.exports = {

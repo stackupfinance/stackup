@@ -9,6 +9,7 @@ const {
   encodeLockStake,
   encodeERC20MaxApprove,
   encodeERC20ZeroApprove,
+  encodeERC20Transfer,
   encodeFailEntryPointCall,
   encodePassEntryPointCall,
   getAddressBalances,
@@ -249,7 +250,7 @@ describe("EntryPoint", () => {
             initCode: paymasterInitCode,
             callData: encodeAddStake(
               entryPoint.address,
-              DEFAULT_REQUIRED_PRE_FUND
+              ethers.utils.parseEther("1")
             ),
           })
         ),
@@ -264,23 +265,39 @@ describe("EntryPoint", () => {
         .connect(paymaster)
         .handleOps(paymasterSetupOps, ethers.constants.AddressZero);
 
-      const userOp = await signUserOperation(
-        owner,
-        await withPaymaster(
-          paymaster,
-          paymasterWallet,
-          getUserOperation(sender, {
-            initCode,
-            callData: encodeERC20MaxApprove(paymasterWallet),
-          })
-        )
-      );
+      const userOps = await Promise.all([
+        signUserOperation(
+          owner,
+          await withPaymaster(
+            paymaster,
+            paymasterWallet,
+            getUserOperation(sender, {
+              initCode,
+              callData: encodeERC20MaxApprove(paymasterWallet),
+            })
+          )
+        ),
+        signUserOperation(
+          owner,
+          await withPaymaster(
+            paymaster,
+            paymasterWallet,
+            getUserOperation(sender, {
+              callData: encodeERC20Transfer(
+                owner.address,
+                ethers.utils.parseUnits("1", "mwei")
+              ),
+            }),
+            { fee: 0 }
+          )
+        ),
+      ]);
       const [preStake, preTokenBalance] = await Promise.all([
         entryPoint.getStake(paymasterWallet),
         getTokenBalance(paymasterWallet, USDC_TOKEN),
       ]);
 
-      await expect(entryPoint.handleOps([userOp], ethers.constants.AddressZero))
+      await expect(entryPoint.handleOps(userOps, ethers.constants.AddressZero))
         .to.not.be.reverted;
 
       const [postStake, postTokenBalance] = await Promise.all([

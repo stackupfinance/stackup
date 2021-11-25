@@ -30,7 +30,17 @@ import { CloseIcon } from '@chakra-ui/icons';
 import { InlineError } from '.';
 import { balanceToString, displayUSDC } from '../utils/wallets';
 
-export const Pay = ({ isLoading, toUser, onConfirm, error, walletBalance }) => {
+export const Pay = ({
+  isLoading,
+  toUser,
+  toWalletAddress,
+  onPay,
+  onSend,
+  onConfirm,
+  onCancel,
+  error,
+  walletBalance,
+}) => {
   const [showPay, setShowPay] = useState(false);
   const [amount, setAmount] = useState('');
   const [message, setMessage] = useState('');
@@ -39,6 +49,31 @@ export const Pay = ({ isLoading, toUser, onConfirm, error, walletBalance }) => {
 
   const format = (val) => `$` + val.replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',');
   const parse = (val) => val.replace(/^\$|,/, '');
+
+  const onClose = () => {
+    setShowConfirmModal(false);
+    onCancel();
+  };
+
+  const onPayClick = () => {
+    onPay();
+    setShowPay(true);
+  };
+
+  const onSendClick = () => {
+    onSend();
+    setShowConfirmModal(true);
+  };
+
+  const onConfirmClick = async () => {
+    try {
+      await onConfirm({ amount, message, password, toWalletAddress });
+      onClose();
+      setShowPay(false);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <>
@@ -97,30 +132,20 @@ export const Pay = ({ isLoading, toUser, onConfirm, error, walletBalance }) => {
               />
 
               <InputRightElement width="64px">
-                <Button
-                  isLoading={isLoading}
-                  size="sm"
-                  colorScheme="blue"
-                  onClick={() => setShowConfirmModal(true)}
-                >
+                <Button isLoading={isLoading} size="sm" colorScheme="blue" onClick={onSendClick}>
                   Send
                 </Button>
               </InputRightElement>
             </InputGroup>
           </VStack>
         ) : (
-          <Button
-            isFullWidth
-            isLoading={isLoading}
-            colorScheme="blue"
-            onClick={() => setShowPay(true)}
-          >
+          <Button isFullWidth isLoading={isLoading} colorScheme="blue" onClick={onPayClick}>
             Pay
           </Button>
         )}
       </Box>
 
-      <Modal isOpen={showConfirmModal} onClose={() => setShowConfirmModal(false)}>
+      <Modal isOpen={showConfirmModal} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>Confirm transaction</ModalHeader>
@@ -155,15 +180,11 @@ export const Pay = ({ isLoading, toUser, onConfirm, error, walletBalance }) => {
                 isLoading={isLoading}
                 colorScheme="blue"
                 isDisabled={!password}
-                onClick={() => onConfirm({ amount, message, password })}
+                onClick={onConfirmClick}
               >
                 Confirm
               </Button>
-              <Button
-                isLoading={isLoading}
-                variant="outline"
-                onClick={() => setShowConfirmModal(false)}
-              >
+              <Button isLoading={isLoading} variant="outline" onClick={onClose}>
                 Cancel
               </Button>
             </HStack>
