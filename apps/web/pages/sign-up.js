@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { PageContainer, AppContainer, Head, Header, InlineError } from '../src/components';
 import { useAccountStore, accountSignUpPageSelector } from '../src/state';
 import { Routes } from '../src/config';
+import { EVENTS, logEvent } from '../src/utils/analytics';
 
 export default function SignUp() {
   const router = useRouter();
@@ -27,6 +28,7 @@ export default function SignUp() {
 
     try {
       await account.register({ username, password });
+      logEvent(EVENTS.SIGN_UP_FINISH);
       router.push(Routes.WELCOME);
     } catch (error) {
       setRegisterError(error.response?.data?.message || 'Unknown error, try again later!');

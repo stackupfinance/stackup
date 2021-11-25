@@ -24,6 +24,7 @@ import { useActivityChannel } from '../src/hooks';
 import { Routes } from '../src/config';
 import { getToUserFromActivity } from '../src/utils/activity';
 import { displayUSDC } from '../src/utils/wallets';
+import { EVENTS, logEvent } from '../src/utils/analytics';
 
 const loadingList = [
   <NewPaymentCard
@@ -105,6 +106,14 @@ export default function Activity() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [savedActivity]);
 
+  const onPayHandler = () => {
+    logEvent(EVENTS.OPEN_PAY);
+  };
+
+  const onSendHandler = () => {
+    logEvent(EVENTS.SEND_PAY);
+  };
+
   const onConfirmHandler = async (data) => {
     setPayError('');
 
@@ -118,6 +127,7 @@ export default function Activity() {
         accessToken: accessToken.token,
       });
       fetchBalance(wallet);
+      logEvent(EVENTS.CONFIRM_PAY);
     } catch (error) {
       setPayError(error.response?.data?.message || error.message);
       throw error;
@@ -172,6 +182,8 @@ export default function Activity() {
             isLoading={walletLoading || activityLoading}
             toUser={username}
             toWalletAddress={walletAddress}
+            onPay={onPayHandler}
+            onSend={onSendHandler}
             onConfirm={onConfirmHandler}
             onCancel={onCancelHandler}
             error={payError}

@@ -6,4 +6,7 @@ export const App = {
     appKey: process.env.NEXT_PUBLIC_PUSHER_APP_KEY || '',
     appCluster: process.env.NEXT_PUBLIC_PUSHER_APP_CLUSTER || '',
   },
+  amplitude: {
+    apiKey: process.env.NEXT_PUBLIC_AMPLITUDE_API_KEY || '',
+  },
 };

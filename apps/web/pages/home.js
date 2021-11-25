@@ -23,6 +23,7 @@ import {
 import { useActivityChannel, useLogout } from '../src/hooks';
 import { getToUserFromActivity } from '../src/utils/activity';
 import { Routes } from '../src/config';
+import { EVENTS, logEvent } from '../src/utils/analytics';
 
 const loadingList = [
   <UserCard
@@ -103,12 +104,14 @@ export default function Home() {
     setShowSearch(true);
     setSearchQuery(query);
     searchByUsername(query, { userId: user.id, accessToken: accessToken.token });
+    logEvent(EVENTS.SEARCH_START);
   };
 
   const onClear = async () => {
     setShowSearch(false);
     setSearchQuery('');
     clearSearchData();
+    logEvent(EVENTS.SEARCH_CLEAR);
   };
 
   const searchResultsNextHandler = async () => {
@@ -121,15 +124,18 @@ export default function Home() {
 
   const logoutHandler = async () => {
     logout();
+    logEvent(EVENTS.LOGOUT);
   };
 
   const onSearchResultHandler = (result) => {
     selectResult(result);
+    logEvent(EVENTS.GO_TO_SEARCH_RESULT);
     router.push(Routes.ACTIVITY);
   };
 
   const onActivityHandler = (activity) => {
     selectActivity(activity);
+    logEvent(EVENTS.GOT_TO_ACTIVITY_ITEM);
     router.push(Routes.ACTIVITY);
   };
 

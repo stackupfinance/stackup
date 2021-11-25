@@ -19,10 +19,12 @@ import { Routes } from '../config';
 
 export const Search = ({ onSearch, onClear }) => {
   const [value, setValue] = useState('');
+  const [debounce, setDebounce] = useState(false);
 
   useEffect(() => {
     if (!value) {
-      onClear?.();
+      debounce && onClear?.();
+      !debounce && setDebounce(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
