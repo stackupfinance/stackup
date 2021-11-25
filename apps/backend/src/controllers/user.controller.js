@@ -74,7 +74,7 @@ const getUserActivities = catchAsync(async (req, res) => {
   const options = pick(req.query, ['limit', 'page']);
   const result = await activityService.queryActivity(
     { users: userId, preview: { $ne: null } },
-    { ...options, sortBy: 'updatedAt', populate: 'users', populateProjection: 'username' }
+    { ...options, sortBy: 'updatedAt:desc' }
   );
   res.send(result);
 });

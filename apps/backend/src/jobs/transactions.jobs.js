@@ -1,5 +1,6 @@
 const jobs = require('../config/jobs');
 const logger = require('../config/logger');
+const activityService = require('../services/activity.service');
 const signerService = require('../services/signer.service');
 const paymentService = require('../services/payment.service');
 const pusherService = require('../services/pusher.service');
@@ -28,6 +29,7 @@ const transactions = (queue) => {
         queue.now(jobs.NEW_PAYMENT, { paymentId });
       } else {
         const updatedPayment = await paymentService.updatePaymentDoc(payment, { status: txStatus });
+        await activityService.updateActivityPreview(updatedPayment.activity, updatedPayment.message);
         pusherService.pushNewPaymentUpdate(updatedPayment);
         log(`Transaction ${payment.transactionHash} completed. Payment updated`);
       }

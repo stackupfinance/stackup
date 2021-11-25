@@ -9,6 +9,14 @@ export const activityUseAuthSelector = (state) => ({
   clear: state.clear,
 });
 
+export const activityHomePageSelector = (state) => ({
+  loading: state.loading,
+  activityList: state.activityList,
+  fetchActivities: state.fetchActivities,
+  selectActivity: state.selectActivity,
+  updateActivityListFromChannel: state.updateActivityListFromChannel,
+});
+
 export const activityActivityPageSelector = (state) => ({
   loading: state.loading,
   savedActivity: state.savedActivity,
@@ -22,6 +30,7 @@ export const activityActivityPageSelector = (state) => ({
 
 const defaultState = {
   loading: false,
+  activityList: undefined,
   savedActivity: undefined,
   activityItems: undefined,
 };
@@ -30,6 +39,58 @@ export const useActivityStore = create(
   devtools(
     persist(
       (set, get) => ({
+        fetchActivities: async (options) => {
+          set({ loading: true });
+
+          try {
+            const res = await axios.get(
+              `${App.stackup.backendUrl}/v1/users/${options.userId}/activity`,
+              {
+                params: { limit: 20, page: 1 },
+                headers: { Authorization: `Bearer ${options.accessToken}` },
+              },
+            );
+
+            set({
+              loading: false,
+              activityList: res.data,
+            });
+          } catch (error) {
+            set({ loading: false });
+            throw error;
+          }
+        },
+
+        updateActivityListFromChannel: async (data, options) => {
+          const activityList = get().activityList;
+          if (!activityList) return;
+
+          try {
+            const { activityItem } = data;
+            const toUserId =
+              activityItem.toUser === options.userId ? activityItem.fromUser : activityItem.toUser;
+            const res = await axios.get(
+              `${App.stackup.backendUrl}/v1/users/${options.userId}/activity/find`,
+              {
+                params: { toUserId },
+                headers: { Authorization: `Bearer ${options.accessToken}` },
+              },
+            );
+            const activity = res.data.activity;
+            set({
+              activityList: {
+                ...activityList,
+                results: [
+                  activity,
+                  ...activityList.results.filter((curr) => curr.id !== activity.id),
+                ],
+              },
+            });
+          } catch (error) {
+            throw error;
+          }
+        },
+
         findOrCreateActivity: async (toUserId, options = {}) => {
           set({ loading: true });
 
@@ -129,6 +190,8 @@ export const useActivityStore = create(
             throw error;
           }
         },
+
+        selectActivity: (savedActivity) => set({ savedActivity }),
 
         clearSavedActivity: () => set({ savedActivity: undefined, activityItems: undefined }),
 
