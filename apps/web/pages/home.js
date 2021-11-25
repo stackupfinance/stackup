@@ -21,7 +21,7 @@ import {
   activityHomePageSelector,
 } from '../src/state';
 import { useActivityChannel, useLogout } from '../src/hooks';
-import { getToUserFromSavedActivity } from '../src/utils/activity';
+import { getToUserFromActivity } from '../src/utils/activity';
 import { Routes } from '../src/config';
 
 const loadingList = [
@@ -149,7 +149,7 @@ export default function Home() {
 
   const renderActivityList = (results = []) => {
     return results.map((result, i) => {
-      const toUser = getToUserFromSavedActivity(result, user.id);
+      const toUser = getToUserFromActivity(result, user.id);
       return (
         <UserCard
           key={`activity-list-item-${i}`}

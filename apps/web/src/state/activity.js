@@ -3,7 +3,7 @@ import { persist, devtools } from 'zustand/middleware';
 import axios from 'axios';
 import { ethers } from 'ethers';
 import { App, Web3 } from '../config';
-import { getToUserFromSavedActivity } from '../utils/activity';
+import { getToUserFromActivity } from '../utils/activity';
 
 export const activityUseAuthSelector = (state) => ({
   clear: state.clear,
@@ -123,7 +123,7 @@ export const useActivityStore = create(
         createActivityItem: async (userOperations, amount, message, options = {}) => {
           set({ loading: true });
           const savedActivity = get().savedActivity;
-          const toUser = getToUserFromSavedActivity(savedActivity, options.userId);
+          const toUser = getToUserFromActivity(savedActivity, options.userId);
           const data = {
             toUser: toUser.id,
             amount: ethers.utils.parseUnits(amount, Web3.USDC_UNITS).toNumber(),
