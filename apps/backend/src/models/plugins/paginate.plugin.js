@@ -15,7 +15,7 @@ const paginate = (schema) => {
    * @param {Object} [options] - Query options
    * @param {Object} [options.projection] - The projection parameter specifies which fields to return.
    * @param {String} [options.sortBy] - Sorting criteria using the format: sortField:(desc|asc). Multiple sorting criteria should be separated by commas (,)
-   * @param {String} [options.populate] - Populate data fields. Hierarchy of fields should be separated by (.). Multiple populating criteria should be separated by commas (,)
+   * @param {String | Object} [options.populate] - Populate data fields. Hierarchy of fields should be separated by (.). Multiple populating criteria should be separated by commas (,)
    * @param {String} [options.populateProjection] - The projection parameter specifies which fields to return for a populate.
    * @param {number} [options.limit] - Maximum number of results per page (default = 10)
    * @param {number} [options.page] - Current page (default = 1)
@@ -41,7 +41,9 @@ const paginate = (schema) => {
     const countPromise = this.countDocuments(filter).exec();
     let docsPromise = this.find(filter, options.projection).sort(sort).skip(skip).limit(limit);
 
-    if (options.populate) {
+    if (typeof options.populate === 'object') {
+      docsPromise.populate(options.populate);
+    } else if (options.populate) {
       options.populate.split(',').forEach((populateOption) => {
         docsPromise = docsPromise.populate(
           populateOption

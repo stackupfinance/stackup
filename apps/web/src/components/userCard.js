@@ -1,3 +1,4 @@
+import formatDistance from 'date-fns/formatDistance';
 import { Heading, HStack, VStack, Avatar, Text, Skeleton, Spacer } from '@chakra-ui/react';
 
 export const UserCard = ({
@@ -35,8 +36,8 @@ export const UserCard = ({
 
           {timestamp && (
             <Skeleton isLoaded={!isLoading}>
-              <Text color="blue.500" fontSize="xs">
-                {timestamp}
+              <Text color="blue.500" fontSize="xs" fontWeight="bold">
+                {formatDistance(new Date(timestamp), new Date(), { addSuffix: true })}
               </Text>
             </Skeleton>
           )}

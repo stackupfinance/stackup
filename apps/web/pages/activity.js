@@ -22,7 +22,7 @@ import {
 } from '../src/state';
 import { useActivityChannel } from '../src/hooks';
 import { Routes } from '../src/config';
-import { getToUserFromSavedActivity } from '../src/utils/activity';
+import { getToUserFromActivity } from '../src/utils/activity';
 import { displayUSDC } from '../src/utils/wallets';
 
 const loadingList = [
@@ -93,7 +93,7 @@ export default function Activity() {
   useEffect(() => {
     if (!savedActivity) return '';
 
-    const toUser = getToUserFromSavedActivity(savedActivity, user.id);
+    const toUser = getToUserFromActivity(savedActivity, user.id);
     setUsername(toUser.username);
     setWalletAddress(toUser.wallet.walletAddress);
     fetchActivityItems({
@@ -130,7 +130,7 @@ export default function Activity() {
 
   const renderActivityItems = () => {
     if (!savedActivity) return [];
-    const toUser = getToUserFromSavedActivity(savedActivity, user.id);
+    const toUser = getToUserFromActivity(savedActivity, user.id);
 
     return (activityItems?.results || []).map((item, i) => {
       const isReceiving = item.toUser === user.id;
