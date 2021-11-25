@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { PageContainer, AppContainer, Head, Header, InlineError } from '../src/components';
 import { useAccountStore, accountLoginPageSelector } from '../src/state';
 import { Routes } from '../src/config';
+import { EVENTS, logEvent } from '../src/utils/analytics';
 
 export default function Login() {
   const {
@@ -20,9 +21,14 @@ export default function Login() {
 
     try {
       await login(data);
+      logEvent(EVENTS.LOGIN);
     } catch (error) {
       setLoginError(error.response?.data?.message || 'Unknown error, try again later!');
     }
+  };
+
+  const onCreateProfile = () => {
+    logEvent(EVENTS.SIGN_UP_START);
   };
 
   const renderError = () => {
@@ -72,7 +78,14 @@ export default function Login() {
 
               {renderError()}
 
-              <Button isFullWidth isLoading={loading} mt="16px" variant="outline" size="lg">
+              <Button
+                isDisabled
+                isFullWidth
+                isLoading={loading}
+                mt="16px"
+                variant="outline"
+                size="lg"
+              >
                 Recover account
               </Button>
 
@@ -86,6 +99,7 @@ export default function Login() {
                   mt="16px"
                   variant="outline"
                   size="lg"
+                  onClick={onCreateProfile}
                 >
                   Create profile
                 </Button>

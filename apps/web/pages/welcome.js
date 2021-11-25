@@ -4,6 +4,7 @@ import { Image, VStack, Box, Button, Heading } from '@chakra-ui/react';
 import { PageContainer, AppContainer, Head, Header } from '../src/components';
 import { useAccountStore, accountWelcomePageSelector } from '../src/state';
 import { Routes } from '../src/config';
+import { EVENTS, logEvent } from '../src/utils/analytics';
 
 export default function Welcome() {
   const { user } = useAccountStore(accountWelcomePageSelector);
@@ -12,6 +13,10 @@ export default function Welcome() {
   useEffect(() => {
     user && setUsername(user.username);
   }, [user]);
+
+  const onEnter = () => {
+    logEvent(EVENTS.ENTER_FROM_WELCOME);
+  };
 
   return (
     <>
@@ -28,7 +33,7 @@ export default function Welcome() {
               <Heading textAlign="center">{`Welcome, ${username}! 🎉`}</Heading>
 
               <NextLink href={Routes.HOME} passHref>
-                <Button isFullWidth as="a" colorScheme="blue" mt="64px" size="lg">
+                <Button isFullWidth as="a" colorScheme="blue" mt="64px" size="lg" onClick={onEnter}>
                   Enter Stackup
                 </Button>
               </NextLink>

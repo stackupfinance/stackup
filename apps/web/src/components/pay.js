@@ -34,6 +34,8 @@ export const Pay = ({
   isLoading,
   toUser,
   toWalletAddress,
+  onPay,
+  onSend,
   onConfirm,
   onCancel,
   error,
@@ -53,7 +55,17 @@ export const Pay = ({
     onCancel();
   };
 
-  const onSend = async () => {
+  const onPayClick = () => {
+    onPay();
+    setShowPay(true);
+  };
+
+  const onSendClick = () => {
+    onSend();
+    setShowConfirmModal(true);
+  };
+
+  const onConfirmClick = async () => {
     try {
       await onConfirm({ amount, message, password, toWalletAddress });
       onClose();
@@ -120,24 +132,14 @@ export const Pay = ({
               />
 
               <InputRightElement width="64px">
-                <Button
-                  isLoading={isLoading}
-                  size="sm"
-                  colorScheme="blue"
-                  onClick={() => setShowConfirmModal(true)}
-                >
+                <Button isLoading={isLoading} size="sm" colorScheme="blue" onClick={onSendClick}>
                   Send
                 </Button>
               </InputRightElement>
             </InputGroup>
           </VStack>
         ) : (
-          <Button
-            isFullWidth
-            isLoading={isLoading}
-            colorScheme="blue"
-            onClick={() => setShowPay(true)}
-          >
+          <Button isFullWidth isLoading={isLoading} colorScheme="blue" onClick={onPayClick}>
             Pay
           </Button>
         )}
@@ -178,7 +180,7 @@ export const Pay = ({
                 isLoading={isLoading}
                 colorScheme="blue"
                 isDisabled={!password}
-                onClick={onSend}
+                onClick={onConfirmClick}
               >
                 Confirm
               </Button>
