@@ -47,7 +47,11 @@ export const Pay = ({
   const [password, setPassword] = useState('');
   const [showConfirmModal, setShowConfirmModal] = useState(false);
 
-  const format = (val) => `$` + val.replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',');
+  const format = (val) => {
+    const parts = val.toString().split('.');
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return `$${parts.join('.')}`;
+  };
   const parse = (val) => val.replace(/^\$|,/, '');
 
   const onClose = () => {
