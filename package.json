@@ -5,6 +5,9 @@
   "author": "@stackupfinance",
   "license": "GPL-3.0",
   "private": true,
+  "engines": {
+    "node": ">=14.0.0"
+  },
   "scripts": {
     "test": "lerna run test --stream",
     "lint": "lerna run lint --stream",
