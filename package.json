@@ -19,6 +19,7 @@
     "dev:web": "yarn workspace @stackupfinance/web run dev",
     "build:web": "yarn workspace @stackupfinance/web run build",
     "build:backend": "yarn workspace @stackupfinance/backend run build:env",
+    "start:web": "yarn workspace @stackupfinance/web run start",
     "start:backend": "yarn workspace @stackupfinance/backend run start"
   },
   "workspaces": [
