@@ -12,6 +12,7 @@
     "node": ">=12.0.0"
   },
   "scripts": {
+    "build:env": "echo \"$MONGODB_CA_CERT\" > ./ca-certificate.crt",
     "start": "NODE_ENV=production node src/index.js",
     "dev": "cross-env NODE_ENV=development nodemon src/index.js",
     "test": "jest -i --colors --verbose --detectOpenHandles",
