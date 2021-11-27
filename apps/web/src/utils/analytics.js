@@ -2,7 +2,7 @@ import amplitude from 'amplitude-js';
 import { App } from '../config';
 import { isClient } from './environment';
 
-const analyticsURL = new URL(`${App.stackup.backendUrl}/analytics`);
+const analyticsURL = new URL(`${App.stackup.backendUrl}/proxy/analytics`);
 isClient() &&
   amplitude.getInstance().init(App.amplitude.apiKey, null, {
     apiEndpoint: `${analyticsURL.host}${analyticsURL.pathname}`,

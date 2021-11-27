@@ -25,8 +25,8 @@ if (config.env !== 'test') {
 // set security HTTP headers
 app.use(helmet());
 
-// Proxy analytics
-app.use('/analytics', proxy(config.analytics.url));
+// Proxies
+app.use('/proxy/analytics', proxy(config.analytics.url));
 
 // parse json request body
 app.use(express.json());
