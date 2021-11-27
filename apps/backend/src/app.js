@@ -6,6 +6,7 @@ const compression = require('compression');
 const cors = require('cors');
 const passport = require('passport');
 const httpStatus = require('http-status');
+const proxy = require('express-http-proxy');
 const config = require('./config/config');
 const morgan = require('./config/morgan');
 const { jwtStrategy } = require('./config/passport');
@@ -23,6 +24,9 @@ if (config.env !== 'test') {
 
 // set security HTTP headers
 app.use(helmet());
+
+// Proxy analytics
+app.use('/analytics', proxy(config.analytics.url));
 
 // parse json request body
 app.use(express.json());

@@ -31,6 +31,7 @@ const envVarsSchema = Joi.object()
     WEB3_RPC: Joi.string().required().description('RPC for the correct network'),
     WEB3_USDC: Joi.string().required().description('ERC20 token address for USDC'),
     WEB3_USDC_PRICE_FEED: Joi.string().required().description('Chainlink address for USDC price feed'),
+    ANALYTICS_URL: Joi.string().required().description('Analytics url for proxying events'),
   })
   .unknown();
 
@@ -78,5 +79,8 @@ module.exports = {
     rpc: envVars.WEB3_RPC,
     usdc: envVars.WEB3_USDC,
     usdcPriceFeed: envVars.WEB3_USDC_PRICE_FEED,
+  },
+  analytics: {
+    url: envVars.ANALYTICS_URL,
   },
 };
