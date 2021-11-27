@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import NextLink from 'next/link';
+// import NextLink from 'next/link';
 import {
   Tabs,
   TabList,
@@ -8,7 +8,7 @@ import {
   TabPanel,
   VStack,
   Button,
-  Divider,
+  // Divider,
   useBreakpointValue,
   Stat,
   StatLabel,
@@ -18,8 +18,8 @@ import {
   Spacer,
   Skeleton,
 } from '@chakra-ui/react';
-import { Routes, Web3 } from '../config';
-import { ChevronRightIcon, ExternalLinkIcon } from '@chakra-ui/icons';
+import { /*Routes,*/ Web3 } from '../config';
+import { /*ChevronRightIcon,*/ ExternalLinkIcon } from '@chakra-ui/icons';
 import { displayUSDC } from '../utils/wallets';
 
 export const AccountTab = ({
@@ -49,7 +49,7 @@ export const AccountTab = ({
       <TabPanels>
         <TabPanel px="0px">
           <VStack spacing="16px" borderWidth="1px" borderRadius="lg" p="16px" w="100%">
-            <NextLink href={Routes.EDIT_PROFILE} passHref>
+            {/* <NextLink href={Routes.EDIT_PROFILE} passHref>
               <Button
                 isFullWidth
                 isLoading={isAccountLoading}
@@ -91,7 +91,7 @@ export const AccountTab = ({
               </Button>
             </NextLink>
 
-            <Divider />
+            <Divider /> */}
 
             <Button
               isFullWidth
