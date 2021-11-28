@@ -126,7 +126,6 @@ export const Pay = ({
               max={balanceToString(walletBalance)}
               precision={2}
               step={0.2}
-              name="amount"
               w="100%"
               bg="white"
             >
@@ -143,9 +142,11 @@ export const Pay = ({
                   pr="72px"
                   placeholder="message..."
                   bg="white"
-                  name="message"
                   value={message}
                   onChange={(ev) => setMessage(ev.target.value)}
+                  autoComplete="off"
+                  data-lpignore="true"
+                  data-form-type="other"
                 />
 
                 <InputRightElement width="64px">
@@ -186,7 +187,6 @@ export const Pay = ({
                 <Input
                   placeholder="Password"
                   type="password"
-                  name="password"
                   onChange={(ev) => setPassword(ev.target.value)}
                 />
                 {error && <InlineError message={error} />}
