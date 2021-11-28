@@ -128,6 +128,7 @@ export const Pay = ({
               step={0.2}
               w="100%"
               bg="white"
+              disabled={showConfirmModal}
             >
               <NumberInputField />
               <NumberInputStepper>
@@ -147,6 +148,7 @@ export const Pay = ({
                   autoComplete="off"
                   data-lpignore="true"
                   data-form-type="other"
+                  disabled={showConfirmModal}
                 />
 
                 <InputRightElement width="64px">
