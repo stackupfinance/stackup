@@ -55,7 +55,12 @@ export const Pay = ({
   };
   const parse = (val) => val.replace(/^\$|,/, '');
 
-  const onClose = () => {
+  const onClosePay = () => {
+    setShowPay(false);
+    setSendError('');
+  };
+
+  const onCloseConfirm = () => {
     setShowConfirmModal(false);
     onCancel();
   };
@@ -66,7 +71,7 @@ export const Pay = ({
   };
 
   const onSendClick = () => {
-    if (!amount) {
+    if (!amount || parseFloat(amount) === 0) {
       setSendError('Amount must be more than 0.');
       return;
     } else if (!message) {
@@ -82,7 +87,7 @@ export const Pay = ({
   const onConfirmClick = async () => {
     try {
       await onConfirm({ amount, message, password, toWalletAddress });
-      onClose();
+      onCloseConfirm();
       setShowPay(false);
     } catch (error) {
       console.error(error);
@@ -105,12 +110,7 @@ export const Pay = ({
       >
         {showPay ? (
           <VStack spacing="8px">
-            <IconButton
-              icon={<CloseIcon />}
-              size="xs"
-              onClick={() => setShowPay(false)}
-              alignSelf="flex-end"
-            />
+            <IconButton icon={<CloseIcon />} size="xs" onClick={onClosePay} alignSelf="flex-end" />
 
             <Stat borderWidth="1px" borderRadius="lg" bg="white" w="100%" p="16px">
               <StatLabel>Available balance</StatLabel>
@@ -164,7 +164,7 @@ export const Pay = ({
         )}
       </Box>
 
-      <Modal isOpen={showConfirmModal} onClose={onClose}>
+      <Modal isOpen={showConfirmModal} onClose={onCloseConfirm}>
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>Confirm transaction</ModalHeader>
@@ -204,7 +204,7 @@ export const Pay = ({
               >
                 Confirm
               </Button>
-              <Button isLoading={isLoading} variant="outline" onClick={onClose}>
+              <Button isLoading={isLoading} variant="outline" onClick={onCloseConfirm}>
                 Cancel
               </Button>
             </HStack>
