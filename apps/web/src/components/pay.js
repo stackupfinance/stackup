@@ -46,6 +46,7 @@ export const Pay = ({
   const [message, setMessage] = useState('');
   const [password, setPassword] = useState('');
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [sendError, setSendError] = useState('');
 
   const format = (val) => {
     const parts = val.toString().split('.');
@@ -65,6 +66,15 @@ export const Pay = ({
   };
 
   const onSendClick = () => {
+    if (!amount) {
+      setSendError('Amount must be more than 0.');
+      return;
+    } else if (!message) {
+      setSendError('A message is required.');
+      return;
+    }
+
+    setSendError('');
     onSend();
     setShowConfirmModal(true);
   };
@@ -116,6 +126,7 @@ export const Pay = ({
               max={balanceToString(walletBalance)}
               precision={2}
               step={0.2}
+              name="amount"
               w="100%"
               bg="white"
             >
@@ -126,21 +137,25 @@ export const Pay = ({
               </NumberInputStepper>
             </NumberInput>
 
-            <InputGroup>
-              <Input
-                pr="72px"
-                placeholder="message..."
-                bg="white"
-                value={message}
-                onChange={(ev) => setMessage(ev.target.value)}
-              />
+            <Box w="100%">
+              <InputGroup>
+                <Input
+                  pr="72px"
+                  placeholder="message..."
+                  bg="white"
+                  name="message"
+                  value={message}
+                  onChange={(ev) => setMessage(ev.target.value)}
+                />
 
-              <InputRightElement width="64px">
-                <Button isLoading={isLoading} size="sm" colorScheme="blue" onClick={onSendClick}>
-                  Send
-                </Button>
-              </InputRightElement>
-            </InputGroup>
+                <InputRightElement width="64px">
+                  <Button isLoading={isLoading} size="sm" colorScheme="blue" onClick={onSendClick}>
+                    Send
+                  </Button>
+                </InputRightElement>
+              </InputGroup>
+              {sendError && <InlineError message={sendError} />}
+            </Box>
           </VStack>
         ) : (
           <Button isFullWidth isLoading={isLoading} colorScheme="blue" onClick={onPayClick}>
@@ -171,6 +186,7 @@ export const Pay = ({
                 <Input
                   placeholder="Password"
                   type="password"
+                  name="password"
                   onChange={(ev) => setPassword(ev.target.value)}
                 />
                 {error && <InlineError message={error} />}
