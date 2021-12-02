@@ -4,8 +4,9 @@
 pragma solidity ^0.8.0;
 
 import {IEntryPoint, IEntryPointStakeController} from "./interface/IEntryPoint.sol";
-import {UserOperation, EntryPointUserOperation} from "./UserOperation.sol";
-import {Stake} from "./Stake.sol";
+import {Stake} from "./library/Stake.sol";
+import {UserOperation} from "./library/UserOperation.sol";
+import {EntryPointUserOperation} from "./library/EntryPointUserOperation.sol";
 
 import "hardhat/console.sol";
 
