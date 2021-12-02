@@ -19,6 +19,10 @@ See the `README.md` files in the following directories for app specific setup gu
 - [Mobile](./apps/mobile) - iOS and Android mobile frontend.
 - [Web](./apps/web) - A responsive web frontend.
 
+#### Supporting packages
+
+- [Wallet](./packages/wallet) - A JS library for interacting with ERC-4337 accounts.
+
 ### Running locally
 
 Spin up an end to end instance locally by running the following commands in separate processes.
