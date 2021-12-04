@@ -15,13 +15,9 @@ $ yarn
 See the `README.md` files in the following directories for app specific setup guides.
 
 - [Backend](./apps/backend) - REST API for supporting frontend apps.
-- [Contracts](./apps/contracts) - Collection of solidity smart contracts.
+- [Contracts](./apps/contracts) - Collection of solidity smart contracts and JS library for interacting with ERC-4337 accounts.
 - [Mobile](./apps/mobile) - iOS and Android mobile frontend.
 - [Web](./apps/web) - A responsive web frontend.
-
-#### Supporting packages
-
-- [Wallet](./packages/wallet) - A JS library for interacting with ERC-4337 accounts.
 
 ### Running locally
 
