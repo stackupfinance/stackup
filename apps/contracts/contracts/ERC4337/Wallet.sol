@@ -30,9 +30,10 @@ contract Wallet is IWallet, IPaymaster, Initializable, UUPSUpgradeable {
     _;
   }
 
+  // solhint-disable-next-line no-empty-blocks
   function _authorizeUpgrade(address) internal override onlyEntryPoint {}
 
-  function Initialize(address _entryPoint, address _owner)
+  function initialize(address _entryPoint, address _owner)
     external
     initializer
   {

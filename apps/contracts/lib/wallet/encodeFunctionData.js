@@ -6,7 +6,7 @@ const WALLET_CONTRACT_INTERFACE = new ethers.utils.Interface(
 );
 
 module.exports.initialize = (entryPoint, owner) => {
-  return WALLET_CONTRACT_INTERFACE.encodeFunctionData("Initialize", [
+  return WALLET_CONTRACT_INTERFACE.encodeFunctionData("initialize", [
     entryPoint,
     owner,
   ]);
