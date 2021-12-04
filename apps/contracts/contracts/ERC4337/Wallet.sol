@@ -6,6 +6,7 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
+import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import {IWallet} from "./interface/IWallet.sol";
 import {PostOpMode, IPaymaster} from "./interface/IPaymaster.sol";
 import {UserOperation} from "./library/UserOperation.sol";
@@ -13,19 +14,31 @@ import {WalletUserOperation} from "./library/WalletUserOperation.sol";
 
 import "hardhat/console.sol";
 
+struct WalletSeed {
+  address entryPoint;
+  address owner;
+  address[] guardians;
+}
+
 contract Wallet is IWallet, IPaymaster {
   using WalletUserOperation for UserOperation;
+  using EnumerableSet for EnumerableSet.AddressSet;
 
   address public entryPoint;
   address public owner;
+  EnumerableSet.AddressSet private guardians;
   uint256 public nonce;
 
   // solhint-disable-next-line no-empty-blocks
   receive() external payable {}
 
-  constructor(address _entryPoint, address _owner) {
-    entryPoint = _entryPoint;
-    owner = _owner;
+  constructor(WalletSeed memory seed) {
+    entryPoint = seed.entryPoint;
+    owner = seed.owner;
+
+    for (uint256 i = 0; i < seed.guardians.length; i++) {
+      guardians.add(seed.guardians[i]);
+    }
   }
 
   modifier onlyEntryPoint() {
@@ -38,17 +51,14 @@ contract Wallet is IWallet, IPaymaster {
     uint256 requiredPrefund
   ) external onlyEntryPoint {
     require(userOp.signer() == owner, "Wallet: Invalid signature");
-
-    if (userOp.initCode.length == 0) {
-      require(nonce == userOp.nonce, "Wallet: Invalid nonce");
-      nonce++;
-    }
-
+    require(nonce == userOp.nonce, "Wallet: Invalid nonce");
     if (requiredPrefund != 0) {
       // solhint-disable-next-line avoid-low-level-calls
       (bool success, ) = entryPoint.call{value: requiredPrefund}("");
       success;
     }
+
+    nonce++;
   }
 
   function executeUserOp(
@@ -109,4 +119,22 @@ contract Wallet is IWallet, IPaymaster {
         fee
     );
   }
+
+  function getGuardians() external view returns (address[] memory) {
+    return guardians.values();
+  }
+
+  function addGuardian(address guardian) external onlyEntryPoint {
+    require(guardian != owner, "Wallet: Owner cannot be guardian");
+    guardians.add(guardian);
+  }
+
+  function removeGuardian(address guardian) external onlyEntryPoint {
+    guardians.remove(guardian);
+  }
+
+  function recoverOwner(address newOnwer, bytes32[] calldata guardianSignatures)
+    external
+    onlyEntryPoint
+  {}
 }

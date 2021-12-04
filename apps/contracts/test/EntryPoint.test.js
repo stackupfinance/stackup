@@ -37,7 +37,7 @@ describe("EntryPoint", () => {
   let test;
 
   beforeEach(async () => {
-    [owner, paymaster] = await ethers.getSigners();
+    [owner, paymaster, regularGuardian] = await ethers.getSigners();
     const [EntryPoint, Wallet, Test] = await Promise.all([
       ethers.getContractFactory("EntryPoint"),
       ethers.getContractFactory("Wallet"),
@@ -48,14 +48,16 @@ describe("EntryPoint", () => {
       EntryPoint.deploy(SINGLETON_FACTORY_ADDRESS),
       Test.deploy(),
     ]);
-    initCode = Wallet.getDeployTransaction(
-      entryPoint.address,
-      owner.address
-    ).data;
-    paymasterInitCode = Wallet.getDeployTransaction(
-      entryPoint.address,
-      paymaster.address
-    ).data;
+    initCode = Wallet.getDeployTransaction({
+      entryPoint: entryPoint.address,
+      owner: owner.address,
+      guardians: [regularGuardian.address],
+    }).data;
+    paymasterInitCode = Wallet.getDeployTransaction({
+      entryPoint: entryPoint.address,
+      owner: paymaster.address,
+      guardians: [regularGuardian.address],
+    }).data;
     sender = getContractAddress(SINGLETON_FACTORY_ADDRESS, initCode);
     paymasterWallet = getContractAddress(
       SINGLETON_FACTORY_ADDRESS,
@@ -211,6 +213,7 @@ describe("EntryPoint", () => {
           paymaster,
           getUserOperation(paymasterWallet, {
             callData: encodeLockStake(entryPoint.address),
+            nonce: 1,
           })
         ),
       ]);
@@ -258,6 +261,7 @@ describe("EntryPoint", () => {
           paymaster,
           getUserOperation(paymasterWallet, {
             callData: encodeLockStake(entryPoint.address),
+            nonce: 1,
           })
         ),
       ]);
@@ -287,6 +291,7 @@ describe("EntryPoint", () => {
                 owner.address,
                 ethers.utils.parseUnits("1", "mwei")
               ),
+              nonce: 1,
             }),
             { fee: 0 }
           )
