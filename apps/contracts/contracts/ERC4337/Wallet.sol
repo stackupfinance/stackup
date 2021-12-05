@@ -4,9 +4,10 @@
 // SPDX-License-Identifier: agpl-3.0
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
-import "@openzeppelin/contracts/proxy/utils/UUPSUpgradeable.sol";
-import "@openzeppelin/contracts/access/AccessControlEnumerable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/access/AccessControlEnumerableUpgradeable.sol";
+
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 import {IWallet} from "./interface/IWallet.sol";
@@ -21,7 +22,7 @@ contract Wallet is
   IPaymaster,
   Initializable,
   UUPSUpgradeable,
-  AccessControlEnumerable
+  AccessControlEnumerableUpgradeable
 {
   using WalletUserOperation for UserOperation;
   address public entryPoint;
@@ -29,22 +30,17 @@ contract Wallet is
   bytes32 public OWNER_ROLE;
   bytes32 public GUARDIAN_ROLE;
 
-  // solhint-disable-next-line no-empty-blocks
-  receive() external payable {}
-
-  modifier onlyEntryPoint() {
-    require(msg.sender == entryPoint, "Wallet: Not from EntryPoint");
-    _;
-  }
-
-  // solhint-disable-next-line no-empty-blocks
-  function _authorizeUpgrade(address) internal override onlyEntryPoint {}
+  /// @custom:oz-upgrades-unsafe-allow constructor
+  constructor() initializer {}
 
   function initialize(
     address _entryPoint,
     address _owner,
     address[] memory _guardians
   ) external initializer {
+    __UUPSUpgradeable_init();
+    __AccessControlEnumerable_init();
+
     entryPoint = _entryPoint;
 
     OWNER_ROLE = keccak256("OWNER_ROLE");
@@ -55,6 +51,17 @@ contract Wallet is
       _grantRole(GUARDIAN_ROLE, _guardians[i]);
     }
   }
+
+  // solhint-disable-next-line no-empty-blocks
+  receive() external payable {}
+
+  modifier onlyEntryPoint() {
+    require(msg.sender == entryPoint, "Wallet: Not from EntryPoint");
+    _;
+  }
+
+  // solhint-disable-next-line no-empty-blocks
+  function _authorizeUpgrade(address) internal view override onlyEntryPoint {}
 
   function getCurrentImplementation() public view returns (address) {
     return _getImplementation();
