@@ -6,6 +6,7 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts/proxy/utils/UUPSUpgradeable.sol";
+import "@openzeppelin/contracts/access/AccessControlEnumerable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 import {IWallet} from "./interface/IWallet.sol";
@@ -15,12 +16,18 @@ import {WalletUserOperation} from "./library/WalletUserOperation.sol";
 
 import "hardhat/console.sol";
 
-contract Wallet is IWallet, IPaymaster, Initializable, UUPSUpgradeable {
+contract Wallet is
+  IWallet,
+  IPaymaster,
+  Initializable,
+  UUPSUpgradeable,
+  AccessControlEnumerable
+{
   using WalletUserOperation for UserOperation;
-
   address public entryPoint;
-  address public owner;
   uint256 public nonce;
+  bytes32 public OWNER_ROLE;
+  bytes32 public GUARDIAN_ROLE;
 
   // solhint-disable-next-line no-empty-blocks
   receive() external payable {}
@@ -33,12 +40,20 @@ contract Wallet is IWallet, IPaymaster, Initializable, UUPSUpgradeable {
   // solhint-disable-next-line no-empty-blocks
   function _authorizeUpgrade(address) internal override onlyEntryPoint {}
 
-  function initialize(address _entryPoint, address _owner)
-    external
-    initializer
-  {
+  function initialize(
+    address _entryPoint,
+    address _owner,
+    address[] memory _guardians
+  ) external initializer {
     entryPoint = _entryPoint;
-    owner = _owner;
+
+    OWNER_ROLE = keccak256("OWNER_ROLE");
+    GUARDIAN_ROLE = keccak256("GUARDIAN_ROLE");
+    _setRoleAdmin(GUARDIAN_ROLE, OWNER_ROLE);
+    _grantRole(OWNER_ROLE, _owner);
+    for (uint256 i = 0; i < _guardians.length; i++) {
+      _grantRole(GUARDIAN_ROLE, _guardians[i]);
+    }
   }
 
   function getCurrentImplementation() public view returns (address) {
@@ -49,7 +64,7 @@ contract Wallet is IWallet, IPaymaster, Initializable, UUPSUpgradeable {
     UserOperation calldata userOp,
     uint256 requiredPrefund
   ) external onlyEntryPoint {
-    require(userOp.signer() == owner, "Wallet: Invalid signature");
+    require(hasRole(OWNER_ROLE, userOp.signer()), "Wallet: Invalid signature");
 
     if (userOp.initCode.length == 0) {
       require(nonce == userOp.nonce, "Wallet: Invalid nonce");
@@ -86,7 +101,10 @@ contract Wallet is IWallet, IPaymaster, Initializable, UUPSUpgradeable {
     UserOperation calldata userOp,
     uint256 maxcost
   ) external view returns (bytes memory context) {
-    require(userOp.paymasterSigner() == owner, "Paymaster: Invalid signature");
+    require(
+      hasRole(OWNER_ROLE, userOp.paymasterSigner()),
+      "Paymaster: Invalid signature"
+    );
     require(
       (userOp.requiredTokenIsApproved(maxcost) &&
         userOp.tokenAllowanceRemainsOK(maxcost)) ||
@@ -120,5 +138,22 @@ contract Wallet is IWallet, IPaymaster, Initializable, UUPSUpgradeable {
       ((actualGasCost * exchangeRate * scaleFactor) / (10**18 * scaleFactor)) +
         fee
     );
+  }
+
+  function getGuardianCount() external view returns (uint256) {
+    return getRoleMemberCount(GUARDIAN_ROLE);
+  }
+
+  function getGuardian(uint256 index) external view returns (address) {
+    return getRoleMember(GUARDIAN_ROLE, index);
+  }
+
+  function grantGuardian(address guardian) external onlyEntryPoint {
+    require(!hasRole(OWNER_ROLE, guardian), "Wallet: Owner cannot be guardian");
+    _grantRole(GUARDIAN_ROLE, guardian);
+  }
+
+  function revokeGuardian(address guardian) external onlyEntryPoint {
+    _revokeRole(GUARDIAN_ROLE, guardian);
   }
 }

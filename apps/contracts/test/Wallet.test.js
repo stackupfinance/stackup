@@ -27,6 +27,8 @@ describe("Wallet", () => {
   let mockEntryPoint;
   let paymasterUser;
   let regularUser;
+  let regularGuardian;
+  let anotherRegularGuardian;
 
   let walletImplementation;
   let test;
@@ -38,7 +40,13 @@ describe("Wallet", () => {
   let regularUserWallet;
 
   beforeEach(async () => {
-    [mockEntryPoint, paymasterUser, regularUser] = await ethers.getSigners();
+    [
+      mockEntryPoint,
+      paymasterUser,
+      regularUser,
+      regularGuardian,
+      anotherRegularGuardian,
+    ] = await ethers.getSigners();
     const [WalletProxy, Wallet, Test] = await Promise.all([
       ethers.getContractFactory("WalletProxy"),
       ethers.getContractFactory("Wallet"),
@@ -55,14 +63,16 @@ describe("Wallet", () => {
         walletImplementation.address,
         wallet.encodeFunctionData.initialize(
           mockEntryPoint.address,
-          paymasterUser.address
+          paymasterUser.address,
+          [regularGuardian.address]
         )
       ),
       WalletProxy.deploy(
         walletImplementation.address,
         wallet.encodeFunctionData.initialize(
           mockEntryPoint.address,
-          regularUser.address
+          regularUser.address,
+          [regularGuardian.address]
         )
       ),
     ]);
@@ -437,6 +447,72 @@ describe("Wallet", () => {
       expect(
         await getTokenBalance(paymasterUserWallet.address, USDC_TOKEN)
       ).to.equal(MOCK_POST_OP_TOKEN_FEE);
+    });
+  });
+
+  describe("getGuardianCount + getGuardian", () => {
+    it("Enables querying which accounts have guardian roles", async () => {
+      expect(
+        await wallet.access.getGuardians(regularUserWallet.connect(regularUser))
+      ).to.deep.equal([regularGuardian.address]);
+    });
+  });
+
+  describe("grantGuardian", () => {
+    it("Required to be called from the Entry Point", async () => {
+      await expect(
+        regularUserWallet
+          .connect(regularUser)
+          .grantGuardian(anotherRegularGuardian.address)
+      ).to.be.revertedWith("Wallet: Not from EntryPoint");
+    });
+
+    it("Reverts if adding owner", async () => {
+      await expect(
+        regularUserWallet.grantGuardian(regularUser.address)
+      ).to.be.revertedWith("Wallet: Owner cannot be guardian");
+    });
+
+    it("Adds account to the list of guardians", async () => {
+      await regularUserWallet.grantGuardian(anotherRegularGuardian.address);
+
+      expect(await wallet.access.getGuardians(regularUserWallet)).to.deep.equal(
+        [regularGuardian.address, anotherRegularGuardian.address]
+      );
+    });
+
+    it("List of guardians unchanged if account was already added", async () => {
+      await regularUserWallet.grantGuardian(regularGuardian.address);
+
+      expect(await wallet.access.getGuardians(regularUserWallet)).to.deep.equal(
+        [regularGuardian.address]
+      );
+    });
+  });
+
+  describe("revokeGuardian", () => {
+    it("Required to be called from the Entry Point", async () => {
+      await expect(
+        regularUserWallet
+          .connect(regularUser)
+          .revokeGuardian(regularGuardian.address)
+      ).to.be.revertedWith("Wallet: Not from EntryPoint");
+    });
+
+    it("Removes account from the list of guardians", async () => {
+      await regularUserWallet.revokeGuardian(regularGuardian.address);
+
+      expect(await wallet.access.getGuardians(regularUserWallet)).to.deep.equal(
+        []
+      );
+    });
+
+    it("List of guardians unchanged if account is not already a guardian", async () => {
+      await regularUserWallet.revokeGuardian(anotherRegularGuardian.address);
+
+      expect(await wallet.access.getGuardians(regularUserWallet)).to.deep.equal(
+        [regularGuardian.address]
+      );
     });
   });
 });

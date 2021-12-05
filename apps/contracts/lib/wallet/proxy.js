@@ -7,9 +7,9 @@ const WALLET_PROXY = new ethers.ContractFactory(
   WalletProxyContract.bytecode
 );
 
-module.exports.getInitCode = (implementation, entryPoint, owner) => {
+module.exports.getInitCode = (implementation, entryPoint, owner, guardians) => {
   return WALLET_PROXY.getDeployTransaction(
     implementation,
-    initialize(entryPoint, owner)
+    initialize(entryPoint, owner, guardians)
   ).data;
 };

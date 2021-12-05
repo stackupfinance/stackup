@@ -58,12 +58,14 @@ describe("EntryPoint", () => {
     initCode = wallet.proxy.getInitCode(
       walletImplementation.address,
       entryPoint.address,
-      owner.address
+      owner.address,
+      []
     );
     paymasterInitCode = wallet.proxy.getInitCode(
       walletImplementation.address,
       entryPoint.address,
-      paymaster.address
+      paymaster.address,
+      []
     );
 
     sender = getContractAddress(SINGLETON_FACTORY_ADDRESS, initCode);
