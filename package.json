@@ -9,6 +9,7 @@
     "node": "^14"
   },
   "scripts": {
+    "postinstall": "yarn workspace @stackupfinance/contracts run compile",
     "test": "lerna run test --stream",
     "lint": "lerna run lint --stream",
     "lint:fix": "lerna run lint:fix --stream",

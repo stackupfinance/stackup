@@ -4,6 +4,8 @@
 // SPDX-License-Identifier: agpl-3.0
 pragma solidity ^0.8.0;
 
+import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 import {IWallet} from "./interface/IWallet.sol";
@@ -13,7 +15,7 @@ import {WalletUserOperation} from "./library/WalletUserOperation.sol";
 
 import "hardhat/console.sol";
 
-contract Wallet is IWallet, IPaymaster {
+contract Wallet is IWallet, IPaymaster, Initializable, UUPSUpgradeable {
   using WalletUserOperation for UserOperation;
 
   address public entryPoint;
@@ -23,14 +25,24 @@ contract Wallet is IWallet, IPaymaster {
   // solhint-disable-next-line no-empty-blocks
   receive() external payable {}
 
-  constructor(address _entryPoint, address _owner) {
+  modifier onlyEntryPoint() {
+    require(msg.sender == entryPoint, "Wallet: Not from EntryPoint");
+    _;
+  }
+
+  // solhint-disable-next-line no-empty-blocks
+  function _authorizeUpgrade(address) internal override onlyEntryPoint {}
+
+  function initialize(address _entryPoint, address _owner)
+    external
+    initializer
+  {
     entryPoint = _entryPoint;
     owner = _owner;
   }
 
-  modifier onlyEntryPoint() {
-    require(msg.sender == entryPoint, "Wallet: Not from EntryPoint");
-    _;
+  function getCurrentImplementation() public view returns (address) {
+    return _getImplementation();
   }
 
   function validateUserOp(

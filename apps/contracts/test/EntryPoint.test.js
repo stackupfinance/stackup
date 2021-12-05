@@ -25,16 +25,21 @@ const {
   transactionFee,
   withPaymaster,
 } = require("../utils/contractHelpers");
+const { wallet } = require("../lib");
 
 describe("EntryPoint", () => {
   let owner;
   let paymaster;
+
   let entryPoint;
+  let walletImplementation;
+  let test;
+
   let initCode;
   let paymasterInitCode;
+
   let sender;
   let paymasterWallet;
-  let test;
 
   beforeEach(async () => {
     [owner, paymaster] = await ethers.getSigners();
@@ -44,18 +49,23 @@ describe("EntryPoint", () => {
       ethers.getContractFactory("Test"),
     ]);
 
-    [entryPoint, test] = await Promise.all([
+    [entryPoint, walletImplementation, test] = await Promise.all([
       EntryPoint.deploy(SINGLETON_FACTORY_ADDRESS),
+      Wallet.deploy(),
       Test.deploy(),
     ]);
-    initCode = Wallet.getDeployTransaction(
+
+    initCode = wallet.proxy.getInitCode(
+      walletImplementation.address,
       entryPoint.address,
       owner.address
-    ).data;
-    paymasterInitCode = Wallet.getDeployTransaction(
+    );
+    paymasterInitCode = wallet.proxy.getInitCode(
+      walletImplementation.address,
       entryPoint.address,
       paymaster.address
-    ).data;
+    );
+
     sender = getContractAddress(SINGLETON_FACTORY_ADDRESS, initCode);
     paymasterWallet = getContractAddress(
       SINGLETON_FACTORY_ADDRESS,

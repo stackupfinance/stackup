@@ -21,32 +21,98 @@ const {
   transactionFee,
   withPaymaster,
 } = require("../utils/contractHelpers");
+const { wallet } = require("../lib");
 
 describe("Wallet", () => {
   let mockEntryPoint;
   let paymasterUser;
   let regularUser;
+
+  let walletImplementation;
+  let test;
+
+  let paymasterUserWalletProxy;
+  let regularUserWalletProxy;
+
   let paymasterUserWallet;
   let regularUserWallet;
-  let test;
 
   beforeEach(async () => {
     [mockEntryPoint, paymasterUser, regularUser] = await ethers.getSigners();
-
-    const [Wallet, Test] = await Promise.all([
+    const [WalletProxy, Wallet, Test] = await Promise.all([
+      ethers.getContractFactory("WalletProxy"),
       ethers.getContractFactory("Wallet"),
       ethers.getContractFactory("Test"),
     ]);
 
-    [paymasterUserWallet, regularUserWallet, test] = await Promise.all([
-      Wallet.connect(paymasterUser)
-        .deploy(mockEntryPoint.address, paymasterUser.address)
-        .then((w) => w.connect(mockEntryPoint)),
-      Wallet.connect(regularUser)
-        .deploy(mockEntryPoint.address, regularUser.address)
-        .then((w) => w.connect(mockEntryPoint)),
+    [walletImplementation, test] = await Promise.all([
+      Wallet.deploy(),
       Test.deploy(),
     ]);
+
+    [paymasterUserWalletProxy, regularUserWalletProxy] = await Promise.all([
+      WalletProxy.deploy(
+        walletImplementation.address,
+        wallet.encodeFunctionData.initialize(
+          mockEntryPoint.address,
+          paymasterUser.address
+        )
+      ),
+      WalletProxy.deploy(
+        walletImplementation.address,
+        wallet.encodeFunctionData.initialize(
+          mockEntryPoint.address,
+          regularUser.address
+        )
+      ),
+    ]);
+
+    paymasterUserWallet = walletImplementation.attach(
+      paymasterUserWalletProxy.address
+    );
+    regularUserWallet = walletImplementation.attach(
+      regularUserWalletProxy.address
+    );
+  });
+
+  describe("upgradeTo", () => {
+    let newWalletImplementation;
+
+    beforeEach(async () => {
+      newWalletImplementation = await ethers
+        .getContractFactory("Wallet")
+        .then((w) => w.deploy());
+    });
+
+    it("Required to be called from the Entry Point", async () => {
+      await expect(regularUserWallet.upgradeTo(newWalletImplementation.address))
+        .to.not.be.reverted;
+      await expect(
+        regularUserWallet
+          .connect(regularUser)
+          .upgradeTo(newWalletImplementation.address)
+      ).to.be.revertedWith("Wallet: Not from EntryPoint");
+    });
+
+    it("Upgrades to the correct implementation", async () => {
+      const firstImplementation =
+        await regularUserWallet.getCurrentImplementation();
+      expect(firstImplementation).to.equal(walletImplementation.address);
+
+      await regularUserWallet.upgradeTo(newWalletImplementation.address);
+      const secondImplementation =
+        await regularUserWallet.getCurrentImplementation();
+      expect(secondImplementation).to.equal(newWalletImplementation.address);
+    });
+
+    it("Reverts if upgrading to a non UUPS compliant implementation", async () => {
+      await expect(
+        regularUserWallet.upgradeTo(test.address)
+      ).to.be.revertedWith("ERC1967Upgrade: upgrade breaks further upgrades");
+      expect(await regularUserWallet.getCurrentImplementation()).to.equal(
+        walletImplementation.address
+      );
+    });
   });
 
   describe("validateUserOp", () => {
