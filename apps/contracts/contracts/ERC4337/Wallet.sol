@@ -25,8 +25,14 @@ contract Wallet is
   AccessControlEnumerableUpgradeable
 {
   using WalletUserOperation for UserOperation;
-  address public entryPoint;
+
+  // This contract is an implementation for WalletProxy.sol.
+  // The following must be followed when updating contract variables:
+  // 1. Order and type of variables cannot change.
+  // 2. New variables must be added last.
+  // 3. Deprecated variables cannot be deleted and should be marked instead.
   uint256 public nonce;
+  address public entryPoint;
   bytes32 public OWNER_ROLE;
   bytes32 public GUARDIAN_ROLE;
 
