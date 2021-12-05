@@ -13,7 +13,7 @@
     "prettier:fix": "prettier --write --ignore-path ./.eslintignore '**'"
   },
   "dependencies": {
-    "@chakra-ui/icons": "^1.1.0",
+    "@chakra-ui/icons": "^1.1.1",
     "@chakra-ui/react": "^1.7.2",
     "@emotion/react": "^11",
     "@emotion/styled": "^11",
