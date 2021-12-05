@@ -33,11 +33,11 @@ contract Wallet is
   // 3. Deprecated variables cannot be deleted and should be marked instead.
   uint256 public nonce;
   address public entryPoint;
-  bytes32 public OWNER_ROLE;
-  bytes32 public GUARDIAN_ROLE;
+  bytes32 public OWNER_ROLE; // solhint-disable-line var-name-mixedcase
+  bytes32 public GUARDIAN_ROLE; // solhint-disable-line var-name-mixedcase
 
   /// @custom:oz-upgrades-unsafe-allow constructor
-  constructor() initializer {}
+  constructor() initializer {} // solhint-disable-line no-empty-blocks
 
   function initialize(
     address _entryPoint,
