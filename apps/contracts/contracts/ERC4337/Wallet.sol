@@ -30,8 +30,8 @@ contract Wallet is
   UUPSUpgradeable,
   AccessControlEnumerableUpgradeable
 {
-  using WalletUserOperation for UserOperation;
   using ECDSA for bytes32;
+  using WalletUserOperation for UserOperation;
   using WalletGuardianRecovery for GuardianRecovery;
 
   // This contract is an implementation for WalletProxy.sol.
