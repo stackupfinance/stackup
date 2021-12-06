@@ -126,6 +126,22 @@ library WalletUserOperation {
     return spender == address(this) && value >= _requiredTokenFee(op, maxcost);
   }
 
+  function isCallingRecoverAccount(UserOperation calldata op)
+    internal
+    pure
+    returns (bool)
+  {
+    if (op.callData.length == 0) return false;
+
+    return
+      bytes4(op.callData[:4]) ==
+      bytes4(
+        keccak256(
+          bytes("recoverAccount(address,(address,address,address,bytes)[])")
+        )
+      );
+  }
+
   function signer(UserOperation calldata op) internal pure returns (address) {
     return
       keccak256(

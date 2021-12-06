@@ -8,23 +8,31 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/AccessControlEnumerableUpgradeable.sol";
 
+import "@openzeppelin/contracts/interfaces/IERC1271.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
+import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import "@openzeppelin/contracts/utils/math/Math.sol";
 import {IWallet} from "./interface/IWallet.sol";
 import {PostOpMode, IPaymaster} from "./interface/IPaymaster.sol";
 import {UserOperation} from "./library/UserOperation.sol";
 import {WalletUserOperation} from "./library/WalletUserOperation.sol";
+import {GuardianRecovery} from "./library/GuardianRecovery.sol";
+import {WalletGuardianRecovery} from "./library/WalletGuardianRecovery.sol";
 
 import "hardhat/console.sol";
 
 contract Wallet is
   IWallet,
   IPaymaster,
+  IERC1271,
   Initializable,
   UUPSUpgradeable,
   AccessControlEnumerableUpgradeable
 {
   using WalletUserOperation for UserOperation;
+  using ECDSA for bytes32;
+  using WalletGuardianRecovery for GuardianRecovery;
 
   // This contract is an implementation for WalletProxy.sol.
   // The following must be followed when updating contract variables:
@@ -77,18 +85,21 @@ contract Wallet is
     UserOperation calldata userOp,
     uint256 requiredPrefund
   ) external onlyEntryPoint {
-    require(hasRole(OWNER_ROLE, userOp.signer()), "Wallet: Invalid signature");
-
-    if (userOp.initCode.length == 0) {
-      require(nonce == userOp.nonce, "Wallet: Invalid nonce");
-      nonce++;
+    if (!userOp.isCallingRecoverAccount()) {
+      require(
+        hasRole(OWNER_ROLE, userOp.signer()),
+        "Wallet: Invalid signature"
+      );
     }
+    require(nonce == userOp.nonce, "Wallet: Invalid nonce");
 
     if (requiredPrefund != 0) {
       // solhint-disable-next-line avoid-low-level-calls
       (bool success, ) = entryPoint.call{value: requiredPrefund}("");
       success;
     }
+
+    nonce++;
   }
 
   function executeUserOp(
@@ -153,6 +164,14 @@ contract Wallet is
     );
   }
 
+  function getOwnerCount() external view returns (uint256) {
+    return getRoleMemberCount(OWNER_ROLE);
+  }
+
+  function getOwner(uint256 index) external view returns (address) {
+    return getRoleMember(OWNER_ROLE, index);
+  }
+
   function getGuardianCount() external view returns (uint256) {
     return getRoleMemberCount(GUARDIAN_ROLE);
   }
@@ -168,5 +187,54 @@ contract Wallet is
 
   function revokeGuardian(address guardian) external onlyEntryPoint {
     _revokeRole(GUARDIAN_ROLE, guardian);
+  }
+
+  function isValidSignature(bytes32 hash, bytes memory signature)
+    public
+    view
+    returns (bytes4)
+  {
+    require(
+      hasRole(OWNER_ROLE, hash.recover(signature)),
+      "Wallet: Invalid signature"
+    );
+
+    return IERC1271.isValidSignature.selector;
+  }
+
+  function recoverAccount(
+    address newOwner,
+    GuardianRecovery[] calldata guardianRecoveryArray
+  ) external onlyEntryPoint {
+    for (uint256 i = 0; i < guardianRecoveryArray.length; i++) {
+      require(
+        guardianRecoveryArray[i].hasValidSignature(),
+        "Wallet: Invalid guardianRecovery"
+      );
+
+      require(
+        hasRole(GUARDIAN_ROLE, guardianRecoveryArray[i].guardian),
+        "Wallet: Not a guardian"
+      );
+
+      require(
+        address(this) == guardianRecoveryArray[i].wallet,
+        "Wallet: Wrong wallet"
+      );
+
+      require(
+        newOwner == guardianRecoveryArray[i].newOwner,
+        "Wallet: newOwner mismatch"
+      );
+    }
+
+    require(
+      guardianRecoveryArray.length >=
+        Math.ceilDiv(getRoleMemberCount(GUARDIAN_ROLE), 2),
+      "Wallet: Insufficient guardians"
+    );
+
+    _revokeRole(OWNER_ROLE, getRoleMember(OWNER_ROLE, 0));
+    _grantRole(OWNER_ROLE, newOwner);
   }
 }

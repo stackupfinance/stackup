@@ -223,6 +223,7 @@ describe("EntryPoint", () => {
           paymaster,
           getUserOperation(paymasterWallet, {
             callData: encodeLockStake(entryPoint.address),
+            nonce: 1,
           })
         ),
       ]);
@@ -270,6 +271,7 @@ describe("EntryPoint", () => {
           paymaster,
           getUserOperation(paymasterWallet, {
             callData: encodeLockStake(entryPoint.address),
+            nonce: 1,
           })
         ),
       ]);
@@ -299,6 +301,7 @@ describe("EntryPoint", () => {
                 owner.address,
                 ethers.utils.parseUnits("1", "mwei")
               ),
+              nonce: 1,
             }),
             { fee: 0 }
           )
