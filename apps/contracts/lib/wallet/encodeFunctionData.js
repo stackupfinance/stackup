@@ -12,3 +12,10 @@ module.exports.initialize = (entryPoint, owner, guardians) => {
     guardians,
   ]);
 };
+
+module.exports.recoverAccount = (newOwner, guardianRecoveryArray) => {
+  return WALLET_CONTRACT_INTERFACE.encodeFunctionData("recoverAccount", [
+    newOwner,
+    guardianRecoveryArray,
+  ]);
+};
