@@ -4,6 +4,7 @@ const { SINGLETON_FACTORY_ADDRESS } = require("../utils/deployHelpers");
 const {
   DEFAULT_REQUIRED_PRE_FUND,
   LOCK_EXPIRY_PERIOD,
+  PAYMASTER_FEE,
   USDC_TOKEN,
   encodeAddStake,
   encodeLockStake,
@@ -320,7 +321,8 @@ describe("EntryPoint", () => {
         getTokenBalance(paymasterWallet, USDC_TOKEN),
       ]);
       expect(postStake[0].lt(preStake[0])).to.be.true;
-      expect(postTokenBalance.gt(preTokenBalance)).to.be.true;
+      expect(postTokenBalance.gt(preTokenBalance.add(PAYMASTER_FEE))).to.be
+        .true;
     });
   });
 
