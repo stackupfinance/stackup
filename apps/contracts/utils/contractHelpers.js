@@ -6,7 +6,7 @@ const UniswapV2Router02 = require("../artifacts/contracts/uniswap/IUniswapV2Rout
 
 const NULL_DATA = "0x";
 const INITIAL_NONCE = 0;
-const DEFAULT_GAS = 200000;
+const DEFAULT_GAS = 210000;
 
 // For a standard EIP-1559 transaction:
 // maxPriorityFee is by default 2 GWei
