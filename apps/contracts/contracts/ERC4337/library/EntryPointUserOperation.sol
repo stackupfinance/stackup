@@ -14,19 +14,35 @@ import {Stake} from "./Stake.sol";
 import "hardhat/console.sol";
 
 library EntryPointUserOperation {
+  function _gasPrice(UserOperation calldata op)
+    internal
+    view
+    returns (uint256)
+  {
+    // For blockchains that don't support EIP-1559 transactions.
+    // Avoids calling the BASEFEE opcode.
+    return
+      op.maxFeePerGas == op.maxPriorityFeePerGas
+        ? op.maxFeePerGas
+        : Math.min(op.maxFeePerGas, op.maxPriorityFeePerGas + block.basefee);
+  }
+
   function _requiredPrefund(UserOperation calldata op)
     internal
     view
     returns (uint256)
   {
     uint256 totalGas = op.callGas + op.verificationGas + op.preVerificationGas;
-    // For blockchains that don't support EIP-1559 transactions.
-    // Avoids calling the BASEFEE opcode.
-    uint256 gasPrice = op.maxFeePerGas == op.maxPriorityFeePerGas
-      ? op.maxFeePerGas
-      : Math.min(op.maxFeePerGas, op.maxPriorityFeePerGas + block.basefee);
 
-    return totalGas * gasPrice;
+    return totalGas * _gasPrice(op);
+  }
+
+  function gasCost(UserOperation calldata op, uint256 gas)
+    internal
+    view
+    returns (uint256)
+  {
+    return gas * _gasPrice(op);
   }
 
   function shouldCreateWallet(UserOperation calldata op)
