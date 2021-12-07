@@ -12,11 +12,17 @@
     "prettier": "prettier --check --ignore-path ./.eslintignore '**'",
     "prettier:fix": "prettier --write --ignore-path ./.eslintignore '**'",
     "contracts:size": "hardhat clean && hardhat compile && hardhat size-contracts",
-    "deploy:hardhat": "hardhat run --network hardhat scripts/deploy.js",
-    "deploy:polygonTestnet": "hardhat run --network polygonTestnet scripts/deploy.js",
-    "deploy:polygonMainnet": "hardhat run --network polygonMainnet scripts/deploy.js",
-    "paymaster:addStake:polygonTestnet": "hardhat run --network polygonTestnet scripts/paymaster/addStake.js",
-    "paymaster:getStake:polygonTestnet": "hardhat run --network polygonTestnet scripts/paymaster/getStake.js"
+    "contracts:updateLib": "hardhat clean && hardhat run scripts/contracts/updateLib.js",
+    "deploy:hardhat:entryPoint": "hardhat run --network hardhat scripts/deploy/entryPoint.js",
+    "deploy:mumbai:entryPoint": "hardhat run --network mumbai scripts/deploy/entryPoint.js",
+    "deploy:hardhat:walletImplementation": "",
+    "deploy:mumbai:walletImplementation": "",
+    "deploy:hardhat:wallet": "",
+    "deploy:mumbai:wallet": "",
+    "paymaster:hardhat:addStake": "",
+    "paymaster:mumbai:addStake": "",
+    "paymaster:hardhat:getStake": "",
+    "paymaster:mumbai:getStake": ""
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.3",

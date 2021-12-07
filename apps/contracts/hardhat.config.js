@@ -31,14 +31,14 @@ module.exports = {
         blockNumber: 20843638,
       },
     },
-    polygonTestnet: {
+    mumbai: {
       url: "https://matic-mumbai.chainstacklabs.com",
       chainId: 80001,
       accounts: {
         mnemonic: process.env.MNEMONIC || "",
       },
     },
-    polygonMainnet: {
+    polygon: {
       url: "https://polygon-rpc.com/",
       chainId: 137,
       accounts: {
