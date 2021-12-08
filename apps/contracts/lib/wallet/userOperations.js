@@ -1,27 +1,21 @@
 const { ethers } = require("ethers");
-const {
-  initNonce,
-  nullCode,
-  defaultGas,
-  defaultMaxFee,
-  defaultMaxPriorityFee,
-} = require("../constants/userOperations");
+const userOperations = require("../constants/userOperations");
 const message = require("./message");
 
 module.exports.get = (sender, override = {}) => {
   return {
     sender,
-    nonce: initNonce,
-    initCode: nullCode,
-    callData: nullCode,
-    callGas: defaultGas,
-    verificationGas: defaultGas,
-    preVerificationGas: defaultGas,
-    maxFeePerGas: defaultMaxFee,
-    maxPriorityFeePerGas: defaultMaxPriorityFee,
+    nonce: userOperations.initNonce,
+    initCode: userOperations.nullCode,
+    callData: userOperations.nullCode,
+    callGas: userOperations.defaultGas,
+    verificationGas: userOperations.defaultGas,
+    preVerificationGas: userOperations.defaultGas,
+    maxFeePerGas: userOperations.defaultMaxFee,
+    maxPriorityFeePerGas: userOperations.defaultMaxPriorityFee,
     paymaster: ethers.constants.AddressZero,
-    paymasterData: nullCode,
-    signature: nullCode,
+    paymasterData: userOperations.nullCode,
+    signature: userOperations.nullCode,
     ...override,
   };
 };

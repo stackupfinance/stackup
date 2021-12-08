@@ -1,14 +1,14 @@
 const { ethers } = require("ethers");
 const SingletonFactory = require("../contracts/singletonFactory");
 const wallet = require("../contracts/wallet");
-const { factory } = require("../contracts/walletProxy");
-const { nullCode, initNonce } = require("../constants/userOperations");
-const { initialize } = require("./encodeFunctionData");
+const walletProxy = require("../contracts/walletProxy");
+const userOperation = require("../constants/userOperations");
+const encodeFunctionData = require("./encodeFunctionData");
 
 module.exports.isCodeDeployed = async (provider, walletAddress) => {
   const code = await provider.getCode(walletAddress);
 
-  return code !== nullCode;
+  return code !== userOperation.nullCode;
 };
 
 module.exports.getAddress = (
@@ -19,7 +19,7 @@ module.exports.getAddress = (
 ) => {
   return ethers.utils.getCreate2Address(
     SingletonFactory.address,
-    ethers.utils.formatBytes32String(initNonce),
+    ethers.utils.formatBytes32String(userOperation.initNonce),
     ethers.utils.keccak256(
       this.getInitCode(
         initImplementation,
@@ -37,9 +37,9 @@ module.exports.getInitCode = (
   initOwner,
   initGuardians
 ) => {
-  return factory.getDeployTransaction(
+  return walletProxy.factory.getDeployTransaction(
     initImplementation,
-    initialize(initEntryPoint, initOwner, initGuardians)
+    encodeFunctionData.initialize(initEntryPoint, initOwner, initGuardians)
   ).data;
 };
 
