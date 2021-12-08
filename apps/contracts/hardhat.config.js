@@ -1,7 +1,6 @@
 require("dotenv").config();
 require("@nomiclabs/hardhat-ethers");
 require("@nomiclabs/hardhat-waffle");
-require("hardhat-watcher");
 require("solidity-coverage");
 require("hardhat-contract-sizer");
 
@@ -16,12 +15,6 @@ module.exports = {
         enabled: true,
         runs: 100000,
       },
-    },
-  },
-  watcher: {
-    test: {
-      tasks: ["test"],
-      files: ["./contracts", "./test"],
     },
   },
   networks: {

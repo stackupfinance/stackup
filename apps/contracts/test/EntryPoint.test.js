@@ -248,81 +248,88 @@ describe("EntryPoint", () => {
       ).to.be.revertedWith("Paymaster: Not approved");
     });
 
-    it("Does not revert if paymaster has enough Eth staked, successfully validates user operation, and gets paid", async () => {
-      await sendEth(paymaster, paymasterWallet, "10");
-      await swapEthForToken(
-        owner,
-        sender,
-        USDC_TOKEN,
-        ethers.utils.parseEther("10")
-      );
+    describe("Successful transaction with paymaster", () => {
+      beforeEach(async () => {
+        await Promise.all([
+          sendEth(paymaster, paymasterWallet, "10"),
+          swapEthForToken(
+            owner,
+            sender,
+            USDC_TOKEN,
+            ethers.utils.parseEther("10")
+          ),
+        ]);
 
-      const paymasterSetupOps = await Promise.all([
-        signUserOperation(
-          paymaster,
-          getUserOperation(paymasterWallet, {
-            initCode: paymasterInitCode,
-            callData: encodeAddStake(
-              entryPoint.address,
-              ethers.utils.parseEther("1")
-            ),
-          })
-        ),
-        signUserOperation(
-          paymaster,
-          getUserOperation(paymasterWallet, {
-            callData: encodeLockStake(entryPoint.address),
-            nonce: 1,
-          })
-        ),
-      ]);
-      await entryPoint
-        .connect(paymaster)
-        .handleOps(paymasterSetupOps, ethers.constants.AddressZero);
-
-      const userOps = await Promise.all([
-        signUserOperation(
-          owner,
-          await withPaymaster(
+        const paymasterSetupOps = await Promise.all([
+          signUserOperation(
             paymaster,
-            paymasterWallet,
-            getUserOperation(sender, {
-              initCode,
-              callData: encodeERC20MaxApprove(paymasterWallet),
-            })
-          )
-        ),
-        signUserOperation(
-          owner,
-          await withPaymaster(
-            paymaster,
-            paymasterWallet,
-            getUserOperation(sender, {
-              callData: encodeERC20Transfer(
-                owner.address,
-                ethers.utils.parseUnits("1", "mwei")
+            getUserOperation(paymasterWallet, {
+              initCode: paymasterInitCode,
+              callData: encodeAddStake(
+                entryPoint.address,
+                ethers.utils.parseEther("1")
               ),
+            })
+          ),
+          signUserOperation(
+            paymaster,
+            getUserOperation(paymasterWallet, {
+              callData: encodeLockStake(entryPoint.address),
               nonce: 1,
-            }),
-            { fee: 0 }
-          )
-        ),
-      ]);
-      const [preStake, preTokenBalance] = await Promise.all([
-        entryPoint.getStake(paymasterWallet),
-        getTokenBalance(paymasterWallet, USDC_TOKEN),
-      ]);
+            })
+          ),
+        ]);
+        await entryPoint
+          .connect(paymaster)
+          .handleOps(paymasterSetupOps, ethers.constants.AddressZero);
+      });
 
-      await expect(entryPoint.handleOps(userOps, ethers.constants.AddressZero))
-        .to.not.be.reverted;
+      it("Does not revert if paymaster has enough Eth staked, validates user operation is OK, and gets paid", async () => {
+        const userOps = await Promise.all([
+          signUserOperation(
+            owner,
+            await withPaymaster(
+              paymaster,
+              paymasterWallet,
+              getUserOperation(sender, {
+                initCode,
+                callData: encodeERC20MaxApprove(paymasterWallet),
+              })
+            )
+          ),
+          signUserOperation(
+            owner,
+            await withPaymaster(
+              paymaster,
+              paymasterWallet,
+              getUserOperation(sender, {
+                callData: encodeERC20Transfer(
+                  owner.address,
+                  ethers.utils.parseUnits("1", "mwei")
+                ),
+                nonce: 1,
+              }),
+              { fee: 0 }
+            )
+          ),
+        ]);
+        const [preStake, preTokenBalance] = await Promise.all([
+          entryPoint.getStake(paymasterWallet),
+          getTokenBalance(paymasterWallet, USDC_TOKEN),
+        ]);
 
-      const [postStake, postTokenBalance] = await Promise.all([
-        entryPoint.getStake(paymasterWallet),
-        getTokenBalance(paymasterWallet, USDC_TOKEN),
-      ]);
-      expect(postStake[0].lt(preStake[0])).to.be.true;
-      expect(postTokenBalance.gt(preTokenBalance.add(PAYMASTER_FEE))).to.be
-        .true;
+        await expect(
+          entryPoint.handleOps(userOps, ethers.constants.AddressZero)
+        ).to.not.be.reverted;
+
+        const [postStake, postTokenBalance] = await Promise.all([
+          entryPoint.getStake(paymasterWallet),
+          getTokenBalance(paymasterWallet, USDC_TOKEN),
+        ]);
+        expect(postStake[0].lt(preStake[0])).to.be.true;
+        expect(postTokenBalance.gt(preTokenBalance.add(PAYMASTER_FEE))).to.be
+          .true;
+      });
     });
   });
 

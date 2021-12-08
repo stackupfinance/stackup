@@ -1,15 +1,38 @@
 const { ethers } = require("ethers");
+const SingletonFactory = require("../contracts/singletonFactory");
+const { factory } = require("../contracts/walletProxy");
 const { initialize } = require("./encodeFunctionData");
-const WalletProxyContract = require("../../artifacts/contracts/ERC4337/WalletProxy.sol/WalletProxy.json");
 
-const WALLET_PROXY = new ethers.ContractFactory(
-  WalletProxyContract.abi,
-  WalletProxyContract.bytecode
-);
+module.exports.initNonce = 0;
 
-module.exports.getInitCode = (implementation, entryPoint, owner, guardians) => {
-  return WALLET_PROXY.getDeployTransaction(
-    implementation,
-    initialize(entryPoint, owner, guardians)
+module.exports.getAddress = (
+  initImplementation,
+  initEntryPoint,
+  initOwner,
+  initGuardians
+) => {
+  return ethers.utils.getCreate2Address(
+    SingletonFactory.address,
+    ethers.utils.formatBytes32String(this.initNonce),
+    ethers.utils.keccak256(
+      this.getInitCode(
+        initImplementation,
+        initEntryPoint,
+        initOwner,
+        initGuardians
+      )
+    )
+  );
+};
+
+module.exports.getInitCode = (
+  initImplementation,
+  initEntryPoint,
+  initOwner,
+  initGuardians
+) => {
+  return factory.getDeployTransaction(
+    initImplementation,
+    initialize(initEntryPoint, initOwner, initGuardians)
   ).data;
 };

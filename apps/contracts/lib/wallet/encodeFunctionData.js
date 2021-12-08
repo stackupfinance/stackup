@@ -1,12 +1,7 @@
-const { ethers } = require("ethers");
-const WalletContract = require("../../artifacts/contracts/ERC4337/Wallet.sol/Wallet.json");
-
-const WALLET_CONTRACT_INTERFACE = new ethers.utils.Interface(
-  WalletContract.abi
-);
+const { interface } = require("../contracts/wallet");
 
 module.exports.initialize = (entryPoint, owner, guardians) => {
-  return WALLET_CONTRACT_INTERFACE.encodeFunctionData("initialize", [
+  return interface.encodeFunctionData("initialize", [
     entryPoint,
     owner,
     guardians,
@@ -14,7 +9,7 @@ module.exports.initialize = (entryPoint, owner, guardians) => {
 };
 
 module.exports.recoverAccount = (newOwner, guardianRecoveryArray) => {
-  return WALLET_CONTRACT_INTERFACE.encodeFunctionData("recoverAccount", [
+  return interface.encodeFunctionData("recoverAccount", [
     newOwner,
     guardianRecoveryArray,
   ]);
