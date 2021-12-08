@@ -31,7 +31,7 @@
     "react-hook-form": "^7.20.5",
     "react-infinite-scroll-component": "^6.1.0",
     "react-jwt": "^1.1.4",
-    "zustand": "^3.6.6"
+    "zustand": "^3.6.7"
   },
   "devDependencies": {
     "eslint": "^8",
