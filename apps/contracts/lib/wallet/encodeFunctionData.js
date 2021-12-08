@@ -1,7 +1,9 @@
-const { interface } = require("../contracts/wallet");
+const { ethers } = require("ethers");
+const EntryPoint = require("../contracts/entryPoint");
+const Wallet = require("../contracts/wallet");
 
 module.exports.initialize = (entryPoint, owner, guardians) => {
-  return interface.encodeFunctionData("initialize", [
+  return Wallet.interface.encodeFunctionData("initialize", [
     entryPoint,
     owner,
     guardians,
@@ -9,8 +11,24 @@ module.exports.initialize = (entryPoint, owner, guardians) => {
 };
 
 module.exports.recoverAccount = (newOwner, guardianRecoveryArray) => {
-  return interface.encodeFunctionData("recoverAccount", [
+  return Wallet.interface.encodeFunctionData("recoverAccount", [
     newOwner,
     guardianRecoveryArray,
+  ]);
+};
+
+module.exports.addEntryPointStake = (value) => {
+  return Wallet.interface.encodeFunctionData("executeUserOp", [
+    EntryPoint.address,
+    value._isBigNumber ? value : ethers.utils.parseEther(value),
+    EntryPoint.interface.encodeFunctionData("addStake"),
+  ]);
+};
+
+module.exports.lockEntryPointStake = () => {
+  return Wallet.interface.encodeFunctionData("executeUserOp", [
+    EntryPoint.address,
+    0,
+    EntryPoint.interface.encodeFunctionData("lockStake"),
   ]);
 };

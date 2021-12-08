@@ -19,3 +19,6 @@ module.exports.address = ethers.utils.getCreate2Address(
 );
 
 module.exports.interface = new ethers.utils.Interface(source.abi);
+
+module.exports.getInstance = (provider) =>
+  new ethers.Contract(this.address, source.abi, provider);
