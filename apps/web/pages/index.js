@@ -78,7 +78,7 @@ export default function Login() {
 
               {renderError()}
 
-              <Button
+              {/* <Button
                 isDisabled
                 isFullWidth
                 isLoading={loading}
@@ -87,7 +87,7 @@ export default function Login() {
                 size="lg"
               >
                 Recover account
-              </Button>
+              </Button> */}
 
               <Divider mt="16px" />
 

@@ -4,8 +4,9 @@
 pragma solidity ^0.8.0;
 
 import {IEntryPoint, IEntryPointStakeController} from "./interface/IEntryPoint.sol";
-import {UserOperation, EntryPointUserOperation} from "./UserOperation.sol";
-import {Stake} from "./Stake.sol";
+import {Stake} from "./library/Stake.sol";
+import {UserOperation} from "./library/UserOperation.sol";
+import {EntryPointUserOperation} from "./library/EntryPointUserOperation.sol";
 
 import "hardhat/console.sol";
 
@@ -25,7 +26,7 @@ contract EntryPoint is IEntryPoint, IEntryPointStakeController {
   function handleOps(UserOperation[] calldata ops, address payable redeemer)
     external
   {
-    uint256 gasUsed;
+    uint256 totalGasCost;
     uint256[] memory verificationGas = new uint256[](ops.length);
     bytes[] memory contexts = new bytes[](ops.length);
 
@@ -55,24 +56,23 @@ contract EntryPoint is IEntryPoint, IEntryPointStakeController {
 
       ops[i].execute();
 
-      uint256 actualGasCost = verificationGas[i] +
-        (preExecutionGas - gasleft());
-      gasUsed += actualGasCost;
+      uint256 actualGas = verificationGas[i] + (preExecutionGas - gasleft());
+      totalGasCost += ops[i].gasCost(actualGas);
 
       if (ops[i].hasPaymaster()) {
-        ops[i].paymasterPostOp(contexts[i], actualGasCost);
+        ops[i].paymasterPostOp(contexts[i], ops[i].gasCost(actualGas));
         _paymasterStakes[ops[i].paymaster].value = ops[i]
           .finalizePaymasterStake(
             _paymasterStakes[ops[i].paymaster],
-            actualGasCost
+            ops[i].gasCost(actualGas)
           );
       } else {
-        ops[i].refundUnusedGas(actualGasCost);
+        ops[i].refundUnusedGas(ops[i].gasCost(actualGas));
       }
     }
 
     // solhint-disable-next-line avoid-low-level-calls
-    (bool success, ) = redeemer.call{value: gasUsed}("");
+    (bool success, ) = redeemer.call{value: totalGasCost}("");
     require(success, "EntryPoint: Failed to redeem");
   }
 

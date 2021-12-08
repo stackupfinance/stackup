@@ -5,7 +5,11 @@
   "author": "@stackupfinance",
   "license": "GPL-3.0",
   "private": true,
+  "engines": {
+    "node": "^14"
+  },
   "scripts": {
+    "postinstall": "yarn workspace @stackupfinance/contracts run compile",
     "test": "lerna run test --stream",
     "lint": "lerna run lint --stream",
     "lint:fix": "lerna run lint:fix --stream",
@@ -13,10 +17,15 @@
     "prettier:fix": "lerna run prettier:fix --stream",
     "dev:dependencies": "yarn workspace @stackupfinance/backend run docker:dev:dependencies",
     "dev:backend": "yarn workspace @stackupfinance/backend run dev",
-    "dev:web": "yarn workspace @stackupfinance/web run dev"
+    "dev:web": "yarn workspace @stackupfinance/web run dev",
+    "build:web": "yarn workspace @stackupfinance/web run build",
+    "build:backend": "yarn workspace @stackupfinance/backend run build:env",
+    "start:web": "yarn workspace @stackupfinance/web run start",
+    "start:backend": "yarn workspace @stackupfinance/backend run start"
   },
   "workspaces": [
-    "apps/*"
+    "apps/*",
+    "packages/*"
   ],
   "devDependencies": {
     "lerna": "^4.0.0"

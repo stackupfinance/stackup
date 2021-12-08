@@ -2,7 +2,12 @@ import amplitude from 'amplitude-js';
 import { App } from '../config';
 import { isClient } from './environment';
 
-isClient() && amplitude.getInstance().init(App.amplitude.apiKey);
+const analyticsURL = new URL(`${App.stackup.backendUrl}/proxy/analytics`);
+isClient() &&
+  amplitude.getInstance().init(App.amplitude.apiKey, null, {
+    apiEndpoint: `${analyticsURL.host}${analyticsURL.pathname}`,
+    forceHttps: process.env.NODE_ENV === 'production',
+  });
 
 export const EVENTS = {
   LOGIN: 'LOGIN',

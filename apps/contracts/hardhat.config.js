@@ -1,17 +1,20 @@
 require("dotenv").config();
+require("@nomiclabs/hardhat-ethers");
 require("@nomiclabs/hardhat-waffle");
-require("hardhat-watcher");
 require("solidity-coverage");
+require("hardhat-contract-sizer");
 
 /**
  * @type import('hardhat/config').HardhatUserConfig
  */
 module.exports = {
-  solidity: "0.8.9",
-  watcher: {
-    test: {
-      tasks: ["test"],
-      files: ["./contracts", "./test"],
+  solidity: {
+    version: "0.8.9",
+    settings: {
+      optimizer: {
+        enabled: true,
+        runs: 100000,
+      },
     },
   },
   networks: {
@@ -21,14 +24,14 @@ module.exports = {
         blockNumber: 20843638,
       },
     },
-    polygonTestnet: {
+    mumbai: {
       url: "https://matic-mumbai.chainstacklabs.com",
       chainId: 80001,
       accounts: {
         mnemonic: process.env.MNEMONIC || "",
       },
     },
-    polygonMainnet: {
+    polygon: {
       url: "https://polygon-rpc.com/",
       chainId: 137,
       accounts: {

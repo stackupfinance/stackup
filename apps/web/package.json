@@ -4,39 +4,40 @@
   "private": true,
   "scripts": {
     "dev": "next dev -p 8080",
-    "build": "next build",
-    "start": "next start",
+    "build:env": "envsubst < ./.env.production.template > ./.env.production.local",
+    "build": "yarn build:env && next build",
+    "start": "next start -p 8080",
     "lint": "next lint",
     "lint:fix": "next lint --fix",
     "prettier": "prettier --check --ignore-path ./.eslintignore '**'",
     "prettier:fix": "prettier --write --ignore-path ./.eslintignore '**'"
   },
   "dependencies": {
-    "@chakra-ui/icons": "^1.1.0",
-    "@chakra-ui/react": "^1.6.10",
+    "@chakra-ui/icons": "^1.1.1",
+    "@chakra-ui/react": "^1.7.2",
     "@emotion/react": "^11",
     "@emotion/styled": "^11",
-    "amplitude-js": "^8.12.0",
+    "amplitude-js": "^8.13.1",
     "axios": "^0.24.0",
     "crypto-js": "^4.1.1",
-    "date-fns": "^2.26.0",
+    "date-fns": "^2.27.0",
     "eth-crypto": "^2.1.0",
-    "ethers": "^5.5.1",
-    "framer-motion": "^4",
-    "next": "12.0.1",
+    "ethers": "^5.5.2",
+    "framer-motion": "^5",
+    "next": "12.0.7",
     "pusher-js": "^7.0.3",
     "react": "17.0.2",
     "react-dom": "17.0.2",
-    "react-hook-form": "^7.18.0",
+    "react-hook-form": "^7.20.5",
     "react-infinite-scroll-component": "^6.1.0",
     "react-jwt": "^1.1.4",
-    "zustand": "^3.6.5"
+    "zustand": "^3.6.6"
   },
   "devDependencies": {
-    "eslint": "^7",
-    "eslint-config-next": "12.0.1",
+    "eslint": "^8",
+    "eslint-config-next": "12.0.7",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-unused-imports": "^2.0.0",
-    "prettier": "2.3.2"
+    "prettier": "2.5.1"
   }
 }

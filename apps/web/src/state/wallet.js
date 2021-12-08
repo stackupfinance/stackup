@@ -101,6 +101,7 @@ export const useWalletStore = create(
                   })
                 : undefined,
               getUserOperation(wallet.walletAddress, {
+                // TODO: Change this to always be `nonce + 1` for V0.2
                 nonce: isDeployed ? nonce + 1 : nonce,
                 callData: encodeERC20Transfer(
                   data.toWalletAddress,

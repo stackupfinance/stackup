@@ -46,11 +46,21 @@ export const Pay = ({
   const [message, setMessage] = useState('');
   const [password, setPassword] = useState('');
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [sendError, setSendError] = useState('');
 
-  const format = (val) => `$` + val.replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',');
+  const format = (val) => {
+    const parts = val.toString().split('.');
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return `$${parts.join('.')}`;
+  };
   const parse = (val) => val.replace(/^\$|,/, '');
 
-  const onClose = () => {
+  const onClosePay = () => {
+    setShowPay(false);
+    setSendError('');
+  };
+
+  const onCloseConfirm = () => {
     setShowConfirmModal(false);
     onCancel();
   };
@@ -61,6 +71,15 @@ export const Pay = ({
   };
 
   const onSendClick = () => {
+    if (!amount || parseFloat(amount) === 0) {
+      setSendError('Amount must be more than 0.');
+      return;
+    } else if (!message) {
+      setSendError('A message is required.');
+      return;
+    }
+
+    setSendError('');
     onSend();
     setShowConfirmModal(true);
   };
@@ -68,7 +87,7 @@ export const Pay = ({
   const onConfirmClick = async () => {
     try {
       await onConfirm({ amount, message, password, toWalletAddress });
-      onClose();
+      onCloseConfirm();
       setShowPay(false);
     } catch (error) {
       console.error(error);
@@ -91,12 +110,7 @@ export const Pay = ({
       >
         {showPay ? (
           <VStack spacing="8px">
-            <IconButton
-              icon={<CloseIcon />}
-              size="xs"
-              onClick={() => setShowPay(false)}
-              alignSelf="flex-end"
-            />
+            <IconButton icon={<CloseIcon />} size="xs" onClick={onClosePay} alignSelf="flex-end" />
 
             <Stat borderWidth="1px" borderRadius="lg" bg="white" w="100%" p="16px">
               <StatLabel>Available balance</StatLabel>
@@ -114,6 +128,7 @@ export const Pay = ({
               step={0.2}
               w="100%"
               bg="white"
+              disabled={showConfirmModal}
             >
               <NumberInputField />
               <NumberInputStepper>
@@ -122,21 +137,28 @@ export const Pay = ({
               </NumberInputStepper>
             </NumberInput>
 
-            <InputGroup>
-              <Input
-                pr="72px"
-                placeholder="message..."
-                bg="white"
-                value={message}
-                onChange={(ev) => setMessage(ev.target.value)}
-              />
+            <Box w="100%">
+              <InputGroup>
+                <Input
+                  pr="72px"
+                  placeholder="message..."
+                  bg="white"
+                  value={message}
+                  onChange={(ev) => setMessage(ev.target.value)}
+                  autoComplete="off"
+                  data-lpignore="true"
+                  data-form-type="other"
+                  disabled={showConfirmModal}
+                />
 
-              <InputRightElement width="64px">
-                <Button isLoading={isLoading} size="sm" colorScheme="blue" onClick={onSendClick}>
-                  Send
-                </Button>
-              </InputRightElement>
-            </InputGroup>
+                <InputRightElement width="64px">
+                  <Button isLoading={isLoading} size="sm" colorScheme="blue" onClick={onSendClick}>
+                    Send
+                  </Button>
+                </InputRightElement>
+              </InputGroup>
+              {sendError && <InlineError message={sendError} />}
+            </Box>
           </VStack>
         ) : (
           <Button isFullWidth isLoading={isLoading} colorScheme="blue" onClick={onPayClick}>
@@ -145,7 +167,7 @@ export const Pay = ({
         )}
       </Box>
 
-      <Modal isOpen={showConfirmModal} onClose={onClose}>
+      <Modal isOpen={showConfirmModal} onClose={onCloseConfirm}>
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>Confirm transaction</ModalHeader>
@@ -184,7 +206,7 @@ export const Pay = ({
               >
                 Confirm
               </Button>
-              <Button isLoading={isLoading} variant="outline" onClick={onClose}>
+              <Button isLoading={isLoading} variant="outline" onClick={onCloseConfirm}>
                 Cancel
               </Button>
             </HStack>
