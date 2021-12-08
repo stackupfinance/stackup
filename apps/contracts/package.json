@@ -18,12 +18,9 @@
     "deploy:mumbai:entryPoint": "hardhat run --network mumbai scripts/deploy/entryPoint.js",
     "deploy:hardhat:wallet": "hardhat run --network hardhat scripts/deploy/wallet.js",
     "deploy:mumbai:wallet": "hardhat run --network mumbai scripts/deploy/wallet.js",
-    "deploy:hardhat:walletProxy": "",
-    "deploy:mumbai:walletProxy": "",
-    "paymaster:hardhat:addStake": "",
-    "paymaster:mumbai:addStake": "",
-    "paymaster:hardhat:getStake": "",
-    "paymaster:mumbai:getStake": ""
+    "paymaster:mumbai:getAddress": "hardhat run --network mumbai scripts/paymaster/getAddress.js",
+    "paymaster:mumbai:addStake": "hardhat run --network mumbai scripts/paymaster/addStake.js",
+    "paymaster:mumbai:getStake": "hardhat run --network mumbai scripts/paymaster/getStake.js"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.3",
