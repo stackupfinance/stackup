@@ -1,6 +1,7 @@
 export * from './accountTab';
 export * from './activityHeader';
 export * from './appContainer';
+export * from './exploreTabMockup';
 export * from './head';
 export * from './header';
 export * from './inlineError';

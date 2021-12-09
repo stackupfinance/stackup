@@ -9,6 +9,7 @@ import {
   AccountTab,
   List,
   UserCard,
+  ExploreTabMockup,
 } from '../src/components';
 import {
   useAccountStore,
@@ -24,6 +25,11 @@ import { useActivityChannel, useLogout } from '../src/hooks';
 import { getToUserFromActivity } from '../src/utils/activity';
 import { Routes } from '../src/config';
 import { EVENTS, logEvent } from '../src/utils/analytics';
+
+const tabs = {
+  EXPLORE: 0,
+  PAY: 1,
+};
 
 const loadingList = [
   <UserCard
@@ -80,6 +86,7 @@ export default function Home() {
   const router = useRouter();
   const [showSearch, setShowSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [tabIndex, setTabIndex] = useState(tabs.EXPLORE);
 
   useEffect(() => {
     router.prefetch(Routes.ACTIVITY);
@@ -101,6 +108,7 @@ export default function Home() {
   const onSearch = async (query) => {
     if (!enabled) return;
 
+    setTabIndex(tabs.PAY);
     setShowSearch(true);
     setSearchQuery(query);
     searchByUsername(query, { userId: user.id, accessToken: accessToken.token });
@@ -170,6 +178,10 @@ export default function Home() {
     });
   };
 
+  const handleTabsChange = (index) => {
+    setTabIndex(index);
+  };
+
   return (
     <>
       <Head title="Stackup | Home" />
@@ -185,8 +197,13 @@ export default function Home() {
             variant="soft-rounded"
             colorScheme="blue"
             align="center"
+            index={tabIndex}
+            onChange={handleTabsChange}
           >
             <TabPanels>
+              <TabPanel px="0px" mb={['64px', '128px']}>
+                <ExploreTabMockup />
+              </TabPanel>
               <TabPanel px="0px" mb={['64px', '128px']}>
                 {showSearch ? (
                   <List
@@ -234,6 +251,7 @@ export default function Home() {
               maxW="544px"
               w="100%"
             >
+              <Tab borderRadius="lg">Explore</Tab>
               <Tab borderRadius="lg">Pay</Tab>
               <Tab borderRadius="lg">Account</Tab>
             </TabList>
