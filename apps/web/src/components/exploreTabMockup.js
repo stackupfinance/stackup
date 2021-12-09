@@ -1,6 +1,6 @@
 import { Box, HStack, VStack, Avatar, Text, Link, Image } from '@chakra-ui/react';
 
-const NFTTransactionMockup = ({ user, type, title, link, src }) => {
+const NFTTransaction = ({ user, type, title, link, src }) => {
   return (
     <Box borderWidth="1px" borderRadius="lg" p="16px" bg="gray.50" w="100%">
       <VStack spacing="16px">
@@ -136,7 +136,9 @@ const TweetMention = ({ user, context, twitterLink, contextLink }) => {
 export const ExploreTabMockup = () => {
   return (
     <VStack spacing="16px" textAlign="left">
-      <NFTTransactionMockup
+      <PaymentTransaction to="you" from="bob" amount="$25.50 USDC" />
+
+      <NFTTransaction
         user="johnrising"
         type="bought"
         title="Genesis #392"
@@ -153,7 +155,7 @@ export const ExploreTabMockup = () => {
         link="https://yearn.finance/#/home"
       />
 
-      <NFTTransactionMockup
+      <NFTTransaction
         user="mary"
         type="sold"
         title="Apparitions #1296"
@@ -190,7 +192,7 @@ export const ExploreTabMockup = () => {
         src="./mockups/discord-logo-color.png"
       />
 
-      <NFTTransactionMockup
+      <NFTTransaction
         user="hazim-j"
         type="bought"
         title="Cerulean Headless Catman"
