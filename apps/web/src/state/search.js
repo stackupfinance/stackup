@@ -22,6 +22,15 @@ export const searchActivityPageSelector = (state) => ({
   clear: state.clear,
 });
 
+export const searchOnboardRecoveryPageSelector = (state) => ({
+  loading: state.loading,
+  searchData: state.searchData,
+  searchByUsername: state.searchByUsername,
+  fetchNextPage: state.fetchNextPage,
+  hasMore: state.hasMore,
+  clearSearchData: state.clearSearchData,
+});
+
 const defaultState = {
   loading: false,
   searchData: undefined,

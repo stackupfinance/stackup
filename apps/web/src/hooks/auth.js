@@ -10,6 +10,8 @@ import {
   activityUseAuthSelector,
   useWalletStore,
   walletUseAuthSelector,
+  useOnboardStore,
+  onboardUseAuthSelector,
 } from '../state';
 import { Routes } from '../config';
 
@@ -21,11 +23,13 @@ export const useLogout = () => {
   const { clear: clearSearch } = useSearchStore(searchUseAuthSelector);
   const { clear: clearActivity } = useActivityStore(activityUseAuthSelector);
   const { clear: clearWallet } = useWalletStore(walletUseAuthSelector);
+  const { clear: clearOnboard } = useOnboardStore(onboardUseAuthSelector);
 
   return async () => {
     clearSearch();
     clearActivity();
     clearWallet();
+    clearOnboard();
     await logout();
   };
 };

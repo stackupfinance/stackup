@@ -2,6 +2,7 @@ import formatDistance from 'date-fns/formatDistance';
 import { Heading, HStack, VStack, Avatar, Text, Skeleton, Spacer } from '@chakra-ui/react';
 
 export const UserCard = ({
+  avatarSize,
   isLoading,
   isFirst,
   isLast,
@@ -24,7 +25,7 @@ export const UserCard = ({
       borderBottomRadius={isLast && 'lg'}
     >
       <Skeleton isLoaded={!isLoading} borderRadius="100%">
-        <Avatar />
+        <Avatar size={avatarSize} />
       </Skeleton>
       <VStack spacing="8px" w="100%" justifyContent="center" alignItems="left">
         <HStack>

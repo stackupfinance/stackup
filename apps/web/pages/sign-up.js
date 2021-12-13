@@ -3,7 +3,12 @@ import { useRouter } from 'next/router';
 import { Image, VStack, Box, Input, Button } from '@chakra-ui/react';
 import { useForm } from 'react-hook-form';
 import { PageContainer, AppContainer, Head, Header, InlineError } from '../src/components';
-import { useAccountStore, accountSignUpPageSelector } from '../src/state';
+import {
+  useAccountStore,
+  accountSignUpPageSelector,
+  useOnboardStore,
+  onboardSignUpPageSelector,
+} from '../src/state';
 import { Routes } from '../src/config';
 import { EVENTS, logEvent } from '../src/utils/analytics';
 
@@ -15,7 +20,8 @@ export default function SignUp() {
     watch,
     formState: { errors },
   } = useForm();
-  const account = useAccountStore(accountSignUpPageSelector);
+  const { loading, register: registerAccount } = useAccountStore(accountSignUpPageSelector);
+  const { createEphemeralWallet } = useOnboardStore(onboardSignUpPageSelector);
   const [registerError, setRegisterError] = useState('');
 
   useEffect(() => {
@@ -27,7 +33,8 @@ export default function SignUp() {
     const { username, password } = data;
 
     try {
-      await account.register({ username, password });
+      await registerAccount({ username, password });
+      createEphemeralWallet(password);
       logEvent(EVENTS.SIGN_UP_FINISH);
       router.push(Routes.WELCOME);
     } catch (error) {
@@ -90,7 +97,7 @@ export default function SignUp() {
                   />
                   <Button
                     isFullWidth
-                    isLoading={account.loading}
+                    isLoading={loading}
                     colorScheme="blue"
                     size="lg"
                     type="submit"

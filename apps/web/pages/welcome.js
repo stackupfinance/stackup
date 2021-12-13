@@ -32,7 +32,7 @@ export default function Welcome() {
             <Box p="16px" w="100%">
               <Heading textAlign="center">{`Welcome, ${username}! 🎉`}</Heading>
 
-              <NextLink href={Routes.HOME} passHref>
+              <NextLink href={Routes.ONBOARD_RECOVERY} passHref>
                 <Button isFullWidth as="a" colorScheme="blue" mt="64px" size="lg" onClick={onEnter}>
                   Enter Stackup
                 </Button>

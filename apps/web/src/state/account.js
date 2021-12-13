@@ -2,7 +2,6 @@ import create from 'zustand';
 import { persist, devtools } from 'zustand/middleware';
 import axios from 'axios';
 import { App } from '../config';
-import { initWallet } from '../utils/wallets';
 
 export const accountUseAuthSelector = (state) => ({
   accessToken: state.accessToken,
@@ -47,6 +46,13 @@ export const accountActivityPageSelector = (state) => ({
   accessToken: state.accessToken,
 });
 
+export const accountOnboardRecoveryPageSelector = (state) => ({
+  enabled: state.enabled,
+  user: state.user,
+  wallet: state.wallet,
+  accessToken: state.accessToken,
+});
+
 const defaultState = {
   enabled: false,
   loading: false,
@@ -71,15 +77,9 @@ export const useAccountStore = create(
             const accessToken = register.data.tokens.access;
             const refreshToken = register.data.tokens.refresh;
 
-            const wallet = initWallet(data.password);
-            await axios.post(`${App.stackup.backendUrl}/v1/users/${user.id}/wallet`, wallet, {
-              headers: { Authorization: `Bearer ${accessToken.token}` },
-            });
-
             set({
               loading: false,
               user,
-              wallet,
               accessToken,
               refreshToken,
             });
@@ -140,6 +140,25 @@ export const useAccountStore = create(
               accessToken: res.data.access,
               refreshToken: res.data.refresh,
             });
+          } catch (error) {
+            set({ loading: false });
+            throw error;
+          }
+        },
+
+        saveEncryptedWallet: async (wallet) => {
+          set({ loading: true });
+
+          try {
+            await axios.post(
+              `${App.stackup.backendUrl}/v1/users/${get().user?.id}/wallet`,
+              wallet,
+              {
+                headers: { Authorization: `Bearer ${get().accessToken?.token}` },
+              },
+            );
+
+            set({ loading: false, wallet });
           } catch (error) {
             set({ loading: false });
             throw error;

@@ -31,7 +31,7 @@ export const Header = ({ backLinkUrl, backLinkLabel }) => {
           <LinkBox>
             <LinkOverlay href="https://stackup.sh/" target="_blank">
               <Image
-                src="./logotype-blue-navy-32x142.png"
+                src="/logotype-blue-navy-32x142.png"
                 maxW="142px"
                 maxH="32px"
                 alt="stackup logo"
