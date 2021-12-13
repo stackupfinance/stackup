@@ -142,7 +142,7 @@ function OnboardRecovery() {
         <AppContainer>
           <SetupGuardians
             username={username}
-            defaultGuardianSelected={guardianMap.defaultGuardian}
+            isDefaultGuardianSelected={guardianMap.defaultGuardian}
             additionalGuardians={renderAdditionalGuardians()}
             onDefaultGuardian={onDefaultGuardian}
             onAddGuardian={onAddGuardian}

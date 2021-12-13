@@ -49,7 +49,7 @@ export const List = ({
             }
             inverse={isInverse}
             style={isInverse ? { display: 'flex', flexDirection: 'column-reverse' } : undefined}
-            scrollableTarget={isInverse ? 'infinite-scroll-wrapper' : scrollableTarget ?? undefined}
+            scrollableTarget={isInverse ? 'infinite-scroll-wrapper' : scrollableTarget}
           >
             {items}
           </InfiniteScroll>

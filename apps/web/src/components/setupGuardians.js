@@ -25,7 +25,7 @@ import { CheckIcon, AddIcon } from '@chakra-ui/icons';
 
 export const SetupGuardians = ({
   username,
-  defaultGuardianSelected,
+  isDefaultGuardianSelected,
   additionalGuardians,
   onDefaultGuardian,
   onAddGuardian,
@@ -100,10 +100,10 @@ export const SetupGuardians = ({
             <VStack mb="16px">
               <Button
                 isFullWidth
-                variant={defaultGuardianSelected ? 'solid' : 'outline'}
+                variant={isDefaultGuardianSelected ? 'solid' : 'outline'}
                 colorScheme="blue"
                 onClick={onDefaultGuardianClick}
-                leftIcon={defaultGuardianSelected ? <CheckIcon /> : <AddIcon />}
+                leftIcon={isDefaultGuardianSelected ? <CheckIcon /> : <AddIcon />}
               >
                 Stackup
               </Button>
