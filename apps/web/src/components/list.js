@@ -1,7 +1,15 @@
 import { Heading, Box, Spinner, useBreakpointValue } from '@chakra-ui/react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 
-export const List = ({ items = [], hasMore, next, listHeading, emptyHeading, isInverse }) => {
+export const List = ({
+  items = [],
+  hasMore,
+  next,
+  listHeading,
+  emptyHeading,
+  isInverse,
+  scrollableTarget,
+}) => {
   const heightOffset = useBreakpointValue({ base: '160px', sm: '200px' });
 
   return (
@@ -34,10 +42,14 @@ export const List = ({ items = [], hasMore, next, listHeading, emptyHeading, isI
             dataLength={items.length}
             next={next}
             hasMore={hasMore}
-            loader={<Spinner mt="16px" color="blue.500" />}
+            loader={
+              <Box mt="16px" display="flex" justifyContent="center" alignItems="center" minH="40px">
+                <Spinner color="blue.500" />
+              </Box>
+            }
             inverse={isInverse}
             style={isInverse ? { display: 'flex', flexDirection: 'column-reverse' } : undefined}
-            scrollableTarget={isInverse ? 'infinite-scroll-wrapper' : undefined}
+            scrollableTarget={isInverse ? 'infinite-scroll-wrapper' : scrollableTarget}
           >
             {items}
           </InfiniteScroll>

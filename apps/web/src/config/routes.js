@@ -7,4 +7,5 @@ export const Routes = {
   EDIT_PASSWORD: '/edit-password',
   EDIT_EMAIL: '/edit-email',
   ACTIVITY: '/activity',
+  ONBOARD_RECOVERY: '/onboard/recovery',
 };

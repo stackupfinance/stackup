@@ -9,4 +9,7 @@ export const App = {
   amplitude: {
     apiKey: process.env.NEXT_PUBLIC_AMPLITUDE_API_KEY || '',
   },
+  web3: {
+    paymaster: process.env.NEXT_PUBLIC_WEB3_PAYMASTER || '',
+  },
 };

@@ -20,6 +20,8 @@ import {
   walletHomePageSelector,
   useActivityStore,
   activityHomePageSelector,
+  useOnboardStore,
+  onboardHomePageSelector,
 } from '../src/state';
 import { useActivityChannel, useLogout } from '../src/hooks';
 import { getToUserFromActivity } from '../src/utils/activity';
@@ -82,6 +84,7 @@ export default function Home() {
     selectActivity,
     updateActivityListFromChannel,
   } = useActivityStore(activityHomePageSelector);
+  const { clear: clearOnboardData } = useOnboardStore(onboardHomePageSelector);
   const logout = useLogout();
   const router = useRouter();
   const [showSearch, setShowSearch] = useState(false);
@@ -93,10 +96,15 @@ export default function Home() {
   }, [router]);
 
   useEffect(() => {
-    if (enabled) {
-      fetchActivities({ userId: user.id, accessToken: accessToken.token });
-      fetchBalance(wallet);
+    if (!enabled) return;
+    if (!wallet) {
+      router.push(Routes.ONBOARD_RECOVERY);
+      return;
     }
+
+    clearOnboardData();
+    fetchActivities({ userId: user.id, accessToken: accessToken.token });
+    fetchBalance(wallet);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [enabled]);
 

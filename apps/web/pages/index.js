@@ -3,7 +3,12 @@ import NextLink from 'next/link';
 import { Image, VStack, Box, Input, Button, Divider } from '@chakra-ui/react';
 import { useForm } from 'react-hook-form';
 import { PageContainer, AppContainer, Head, Header, InlineError } from '../src/components';
-import { useAccountStore, accountLoginPageSelector } from '../src/state';
+import {
+  useAccountStore,
+  accountLoginPageSelector,
+  useOnboardStore,
+  onboardLoginPageSelector,
+} from '../src/state';
 import { Routes } from '../src/config';
 import { EVENTS, logEvent } from '../src/utils/analytics';
 
@@ -14,6 +19,7 @@ export default function Login() {
     formState: { errors },
   } = useForm();
   const { loading, login } = useAccountStore(accountLoginPageSelector);
+  const { createEphemeralWallet } = useOnboardStore(onboardLoginPageSelector);
   const [loginError, setLoginError] = useState('');
 
   const onSubmit = async (data) => {
@@ -21,6 +27,7 @@ export default function Login() {
 
     try {
       await login(data);
+      createEphemeralWallet(data.password);
       logEvent(EVENTS.LOGIN);
     } catch (error) {
       setLoginError(error.response?.data?.message || 'Unknown error, try again later!');
