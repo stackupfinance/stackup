@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { isExpired } from 'react-jwt';
 import {
@@ -39,6 +39,7 @@ export const useAuth = () => {
   const { accessToken, refreshToken, refresh, enableAccount } =
     useAccountStore(accountUseAuthSelector);
   const logout = useLogout();
+  const [isFirst, setIsFirst] = useState(true);
 
   const isLoggedOut = () => !refreshToken;
   const refreshTokenExpired = () => isExpired(refreshToken?.token);
@@ -49,14 +50,22 @@ export const useAuth = () => {
 
   useEffect(() => {
     const authCheck = async () => {
-      if (isLoggedOut()) {
-        notOnLoginOrSignUpPage() && router.push(Routes.LOGIN);
-      } else if (refreshTokenExpired()) {
-        await logout();
-        notOnLoginOrSignUpPage() && router.push(Routes.LOGIN);
-      } else {
-        accessTokenExpired() && (await refresh());
-        onLoginPage() && router.push(Routes.HOME);
+      try {
+        if (isLoggedOut()) {
+          notOnLoginOrSignUpPage() && router.push(Routes.LOGIN);
+        } else if (refreshTokenExpired()) {
+          await logout();
+          notOnLoginOrSignUpPage() && router.push(Routes.LOGIN);
+        } else if (isFirst) {
+          setIsFirst(false);
+          await refresh();
+        } else {
+          accessTokenExpired() && (await refresh());
+          onLoginPage() && router.push(Routes.HOME);
+        }
+      } catch (error) {
+        console.error(error);
+        await logout().catch(console.error);
       }
     };
 

@@ -16,20 +16,52 @@ const walletSchema = mongoose.Schema(
       trim: true,
       validate(value) {
         if (!validator.isEthereumAddress(value)) {
-          throw new Error('Invalid wallet address');
+          throw new Error('Invalid Ethereum address');
         }
       },
     },
-    initSignerAddress: {
+    initImplementation: {
       type: String,
       required: true,
       trim: true,
       validate(value) {
         if (!validator.isEthereumAddress(value)) {
-          throw new Error('Invalid wallet address');
+          throw new Error('Invalid Ethereum address');
         }
       },
     },
+    initEntryPoint: {
+      type: String,
+      required: true,
+      trim: true,
+      validate(value) {
+        if (!validator.isEthereumAddress(value)) {
+          throw new Error('Invalid Ethereum address');
+        }
+      },
+    },
+    initOwner: {
+      type: String,
+      required: true,
+      trim: true,
+      validate(value) {
+        if (!validator.isEthereumAddress(value)) {
+          throw new Error('Invalid Ethereum address');
+        }
+      },
+    },
+    initGuardians: [
+      {
+        type: String,
+        required: true,
+        trim: true,
+        validate(value) {
+          if (!validator.isEthereumAddress(value)) {
+            throw new Error('Invalid Ethereum address');
+          }
+        },
+      },
+    ],
     encryptedSigner: {
       type: String,
       required: true,

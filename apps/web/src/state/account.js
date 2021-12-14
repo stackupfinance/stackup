@@ -48,9 +48,11 @@ export const accountActivityPageSelector = (state) => ({
 
 export const accountOnboardRecoveryPageSelector = (state) => ({
   enabled: state.enabled,
+  loading: state.loading,
   user: state.user,
   wallet: state.wallet,
   accessToken: state.accessToken,
+  saveEncryptedWallet: state.saveEncryptedWallet,
 });
 
 const defaultState = {

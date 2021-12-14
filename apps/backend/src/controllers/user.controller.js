@@ -58,7 +58,7 @@ const getUserSearch = catchAsync(async (req, res) => {
   const { userId } = req.params;
   const options = pick(req.query, ['sortBy', 'limit', 'page']);
   const result = await userService.queryUsers(
-    { username: { $regex: req.query.username, $options: 'i' }, _id: { $ne: userId } },
+    { username: { $regex: req.query.username, $options: 'i' }, _id: { $ne: userId }, wallet: { $exists: true } },
     {
       ...options,
       projection: 'username wallet _id',

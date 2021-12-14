@@ -95,7 +95,7 @@ export const useWalletStore = create(
             const newPaymentUserOps = await Promise.all([
               shouldApprove
                 ? getUserOperation(wallet.walletAddress, {
-                    ...(!isDeployed && { initCode: getInitCode(wallet.initSignerAddress) }),
+                    ...(!isDeployed && { initCode: getInitCode(wallet.initOwner) }),
                     nonce,
                     callData: encodeERC20Approve(Web3.PAYMASTER_ADDRESS, defaultPaymasterApproval),
                   })
