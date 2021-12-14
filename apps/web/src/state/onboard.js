@@ -1,6 +1,6 @@
 import create from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
-import { initWallet } from '../utils/wallets';
+import { wallet } from '@stackupfinance/contracts';
 
 export const onboardUseAuthSelector = (state) => ({
   clear: state.clear,
@@ -18,6 +18,10 @@ export const onboardHomePageSelector = (state) => ({
   clear: state.clear,
 });
 
+export const onboardOnboardRecoveryPageSelector = (state) => ({
+  ephemeralWallet: state.ephemeralWallet,
+});
+
 const defaultState = {
   loading: false,
   ephemeralWallet: undefined,
@@ -29,7 +33,8 @@ export const useOnboardStore = create(
       (set, get) => ({
         ...defaultState,
 
-        createEphemeralWallet: (password) => set({ ephemeralWallet: initWallet(password) }),
+        createEphemeralWallet: (password) =>
+          set({ ephemeralWallet: wallet.proxy.initEncryptedIdentity(password) }),
 
         clear: () => set({ ...defaultState }),
       }),

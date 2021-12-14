@@ -25,6 +25,7 @@ import { CheckIcon, AddIcon } from '@chakra-ui/icons';
 
 export const SetupGuardians = ({
   username,
+  isLoading,
   isDefaultGuardianSelected,
   additionalGuardians,
   onDefaultGuardian,
@@ -123,11 +124,23 @@ export const SetupGuardians = ({
             <Divider />
 
             <VStack mt="16px">
-              <Button isFullWidth colorScheme="blue" size="lg" onClick={onNextClick}>
+              <Button
+                isFullWidth
+                isLoading={isLoading}
+                colorScheme="blue"
+                size="lg"
+                onClick={onNextClick}
+              >
                 Next
               </Button>
 
-              <Button isFullWidth variant="outline" size="lg" onClick={onSkipClick}>
+              <Button
+                isFullWidth
+                isLoading={isLoading}
+                variant="outline"
+                size="lg"
+                onClick={onSkipClick}
+              >
                 Skip
               </Button>
             </VStack>
@@ -146,10 +159,10 @@ export const SetupGuardians = ({
           </ModalBody>
 
           <ModalFooter>
-            <Button colorScheme="blue" onClick={onSkipCancelClick}>
+            <Button isLoading={isLoading} colorScheme="blue" onClick={onSkipCancelClick}>
               Do it now
             </Button>
-            <Button variant="outline" ml="8px" onClick={onSkipConfirmClick}>
+            <Button isLoading={isLoading} variant="outline" ml="8px" onClick={onSkipConfirmClick}>
               Skip
             </Button>
           </ModalFooter>

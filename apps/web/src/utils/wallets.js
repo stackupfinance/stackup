@@ -6,7 +6,6 @@
  *
  * TODO: Consider consolidating the two modules into a single package.
  */
-import EthCrypto from 'eth-crypto';
 import { ethers } from 'ethers';
 import AES from 'crypto-js/aes';
 import Utf8 from 'crypto-js/enc-utf8';
@@ -39,24 +38,9 @@ export const provider = new ethers.providers.JsonRpcProvider(Web3.RPC);
 
 export const usdcContract = new ethers.Contract(Web3.USDC, Web3.ERC20_ABI, provider);
 
-export const getInitCode = (initSignerAddress) => {
+export const getInitCode = (initOwner) => {
   const Wallet = new ethers.ContractFactory(Web3.WALLET_ABI, Web3.WALLET_BYTECODE);
-  return Wallet.getDeployTransaction(Web3.ENTRY_POINT_ADDRESS, initSignerAddress).data;
-};
-
-export const initWallet = (password) => {
-  const signer = EthCrypto.createIdentity();
-  const initCode = getInitCode(signer.address);
-
-  return {
-    walletAddress: ethers.utils.getCreate2Address(
-      Web3.SINGLETON_FACTORY_ADDRESS,
-      ethers.utils.formatBytes32String(Web3.INITIAL_NONCE),
-      ethers.utils.keccak256(initCode),
-    ),
-    initSignerAddress: signer.address,
-    encryptedSigner: AES.encrypt(signer.privateKey, password).toString(),
-  };
+  return Wallet.getDeployTransaction(Web3.ENTRY_POINT_ADDRESS, initOwner).data;
 };
 
 export const getSigner = (wallet, password) => {

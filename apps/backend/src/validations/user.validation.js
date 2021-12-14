@@ -55,7 +55,10 @@ const createUserWallet = {
   }),
   body: Joi.object().keys({
     walletAddress: Joi.string().required(),
-    initSignerAddress: Joi.string().required(),
+    initImplementation: Joi.string().required(),
+    initEntryPoint: Joi.string().required(),
+    initOwner: Joi.string().required(),
+    initGuardians: Joi.array().items(Joi.string()).required(),
     encryptedSigner: Joi.string().base64().required(),
   }),
 };

@@ -4,6 +4,8 @@ import { useMap } from 'react-use';
 import { Button, useToast } from '@chakra-ui/react';
 import { CheckIcon } from '@chakra-ui/icons';
 import {
+  useOnboardStore,
+  onboardOnboardRecoveryPageSelector,
   useSearchStore,
   searchOnboardRecoveryPageSelector,
   useAccountStore,
@@ -25,17 +27,33 @@ import { App } from '../../src/config';
 function OnboardRecovery() {
   const router = useRouter();
   const toast = useToast();
-  const { enabled, user, wallet, accessToken } = useAccountStore(
-    accountOnboardRecoveryPageSelector,
-  );
-  const { loading, searchData, searchByUsername, fetchNextPage, hasMore, clearSearchData } =
-    useSearchStore(searchOnboardRecoveryPageSelector);
+  const { ephemeralWallet } = useOnboardStore(onboardOnboardRecoveryPageSelector);
+  const {
+    loading: accountLoading,
+    enabled,
+    user,
+    wallet,
+    accessToken,
+    saveEncryptedWallet,
+  } = useAccountStore(accountOnboardRecoveryPageSelector);
+  const {
+    loading: searchLoading,
+    searchData,
+    searchByUsername,
+    fetchNextPage,
+    hasMore,
+    clearSearchData,
+  } = useSearchStore(searchOnboardRecoveryPageSelector);
   const [showSearch, setShowSearch] = useState(false);
   const [username, setUsername] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [guardianMap, { set: setGuardian, remove: removeGuardian }] = useMap({
     defaultGuardian: App.web3.paymaster,
   });
+
+  useEffect(() => {
+    router.prefetch(Routes.HOME);
+  }, [router]);
 
   useEffect(() => {
     if (!enabled) return;
@@ -78,7 +96,20 @@ function OnboardRecovery() {
 
   const onSkip = () => {};
 
-  const onSkipConfirm = () => {};
+  const onSkipConfirm = async () => {
+    try {
+      await saveEncryptedWallet(ephemeralWallet);
+      router.push(Routes.HOME);
+    } catch (error) {
+      toast({
+        title: 'Something went wrong...',
+        description: error.response?.data?.message || 'Unknown error, try again later!',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+  };
 
   const onSearch = (query) => {
     if (!enabled) return;
@@ -142,6 +173,7 @@ function OnboardRecovery() {
         <AppContainer>
           <SetupGuardians
             username={username}
+            isLoading={accountLoading}
             isDefaultGuardianSelected={guardianMap.defaultGuardian}
             additionalGuardians={renderAdditionalGuardians()}
             onDefaultGuardian={onDefaultGuardian}
@@ -153,7 +185,7 @@ function OnboardRecovery() {
           <SearchModal
             bodyRef="search-modal-body"
             isOpen={showSearch}
-            isLoading={loading}
+            isLoading={searchLoading}
             onSearch={onSearch}
             onClear={onSearchClear}
             onClose={onSearchClose}
