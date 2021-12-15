@@ -12,6 +12,9 @@ async function main() {
 
   const paymaster = wallet.proxy.getAddress(...init);
   console.log("Paymaster wallet address:", paymaster);
+
+  const w = contracts.Wallet.getInstance(signer).attach(paymaster);
+  console.log(await w.getOwner(0));
 }
 
 main()

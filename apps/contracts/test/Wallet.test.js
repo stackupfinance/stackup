@@ -4,6 +4,7 @@ const {
   DEFAULT_REQUIRED_PRE_FUND,
   MOCK_POST_OP_TOKEN_FEE,
   NULL_DATA,
+  MATIC_USD_DATA_FEED,
   PAYMASTER_FEE,
   USDC_TOKEN,
   encodeERC20MaxApprove,
@@ -318,10 +319,13 @@ describe("Wallet", () => {
     it("Reverts when paymasterData is not externally signed by paymasterUser", async () => {
       const userOp = await signUserOperation(
         regularUser,
-        await withPaymaster(
+        await wallet.userOperations.signPaymasterData(
           regularUser,
           paymasterUserWallet.address,
-          getUserOperation(regularUserWallet.address)
+          PAYMASTER_FEE,
+          USDC_TOKEN,
+          MATIC_USD_DATA_FEED,
+          wallet.userOperations.get(regularUserWallet.address)
         )
       );
 
@@ -333,14 +337,21 @@ describe("Wallet", () => {
     it("Does not revert if token approved", async () => {
       await mockEntryPoint.sendTransaction({
         to: regularUserWallet.address,
-        data: encodeERC20MaxApprove(paymasterUserWallet.address),
+        data: wallet.encodeFunctionData.ERC20Approve(
+          USDC_TOKEN,
+          paymasterUserWallet.address,
+          ethers.constants.MaxUint256
+        ),
       });
-      const userOp = await signUserOperation(
+      const userOp = await wallet.userOperations.sign(
         regularUser,
-        await withPaymaster(
+        await wallet.userOperations.signPaymasterData(
           paymasterUser,
           paymasterUserWallet.address,
-          getUserOperation(regularUserWallet.address, {
+          PAYMASTER_FEE,
+          USDC_TOKEN,
+          MATIC_USD_DATA_FEED,
+          wallet.userOperations.get(regularUserWallet.address, {
             callData: encodePassEntryPointCall(test.address),
           })
         )

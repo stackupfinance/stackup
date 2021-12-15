@@ -2,17 +2,11 @@ import create from 'zustand';
 import { persist, devtools } from 'zustand/middleware';
 import { ethers } from 'ethers';
 import axios from 'axios';
-import { App, Web3 } from '../config';
+import { wallet, constants } from '@stackupfinance/contracts';
+import { App } from '../config';
 import {
+  provider,
   usdcContract,
-  getSigner,
-  isWalletDeployed,
-  getWalletNonce,
-  signUserOperation,
-  getUserOperation,
-  getInitCode,
-  encodeERC20Approve,
-  encodeERC20Transfer,
   defaultPaymasterApproval,
   defaultPaymasterReapproval,
 } from '../utils/wallets';
@@ -56,7 +50,7 @@ const paymasterApproval =
   };
 
 const signUserOps = (signer) => async (ops) => {
-  return Promise.all(ops.map((op) => signUserOperation(signer, op)));
+  return Promise.all(ops.map((op) => wallet.userOperations.sign(signer, op)));
 };
 
 export const useWalletStore = create(
@@ -78,8 +72,8 @@ export const useWalletStore = create(
           }
         },
 
-        signNewPaymentUserOps: async (wallet, data, options) => {
-          const signer = getSigner(wallet, data.password);
+        signNewPaymentUserOps: async (userWallet, data, options) => {
+          const signer = wallet.proxy.decryptSigner(userWallet, data.password);
           if (!signer) {
             throw new Error('Incorrect password');
           }
@@ -87,25 +81,38 @@ export const useWalletStore = create(
 
           try {
             const [isDeployed, allowance] = await Promise.all([
-              isWalletDeployed(wallet.walletAddress),
-              usdcContract.allowance(data.toWalletAddress, wallet.walletAddress),
+              wallet.proxy.isCodeDeployed(provider, userWallet.walletAddress),
+              usdcContract.allowance(userWallet.walletAddress, App.web3.paymaster),
             ]);
             const shouldApprove = allowance.lte(defaultPaymasterReapproval);
-            const nonce = isDeployed ? await getWalletNonce(wallet.walletAddress) : 0;
+            const nonce = isDeployed
+              ? await wallet.proxy.getNonce(provider, userWallet.walletAddress)
+              : constants.userOperations.initNonce;
             const newPaymentUserOps = await Promise.all([
               shouldApprove
-                ? getUserOperation(wallet.walletAddress, {
-                    ...(!isDeployed && { initCode: getInitCode(wallet.initOwner) }),
+                ? wallet.userOperations.get(userWallet.walletAddress, {
                     nonce,
-                    callData: encodeERC20Approve(Web3.PAYMASTER_ADDRESS, defaultPaymasterApproval),
+                    initCode: isDeployed
+                      ? constants.userOperations.nullCode
+                      : wallet.proxy.getInitCode(
+                          userWallet.initImplementation,
+                          userWallet.initEntryPoint,
+                          userWallet.initOwner,
+                          userWallet.initGuardians,
+                        ),
+                    callData: wallet.encodeFunctionData.ERC20Approve(
+                      App.web3.usdc,
+                      App.web3.paymaster,
+                      defaultPaymasterApproval,
+                    ),
                   })
                 : undefined,
-              getUserOperation(wallet.walletAddress, {
-                // TODO: Change this to always be `nonce + 1` for V0.2
-                nonce: isDeployed ? nonce + 1 : nonce,
-                callData: encodeERC20Transfer(
+              wallet.userOperations.get(userWallet.walletAddress, {
+                nonce: shouldApprove ? nonce + 1 : nonce,
+                callData: wallet.encodeFunctionData.ERC20Transfer(
+                  App.web3.usdc,
                   data.toWalletAddress,
-                  ethers.utils.parseUnits(data.amount, Web3.USDC_UNITS),
+                  ethers.utils.parseUnits(data.amount, App.web3.usdcUnits),
                 ),
               }),
             ])
