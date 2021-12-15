@@ -20,7 +20,7 @@ import {
 } from '@chakra-ui/react';
 import { /*Routes,*/ App } from '../config';
 import { /*ChevronRightIcon,*/ ExternalLinkIcon } from '@chakra-ui/icons';
-import { displayUSDC } from '../utils/wallets';
+import { displayUSDC } from '../utils/web3';
 
 export const AccountTab = ({
   isEnabled,

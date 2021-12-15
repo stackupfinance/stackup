@@ -9,7 +9,7 @@ import {
   usdcContract,
   defaultPaymasterApproval,
   defaultPaymasterReapproval,
-} from '../utils/wallets';
+} from '../utils/web3';
 
 export const walletUseAuthSelector = (state) => ({
   clear: state.clear,
