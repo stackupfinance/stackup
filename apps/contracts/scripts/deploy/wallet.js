@@ -3,7 +3,7 @@ const { contracts } = require("../../lib");
 
 async function main() {
   const [signer] = await ethers.getSigners();
-  const SingletonFactory = contracts.SingletonFactory.getContract(signer);
+  const SingletonFactory = contracts.SingletonFactory.getInstance(signer);
 
   const tx = await SingletonFactory.deploy(
     contracts.Wallet.deployInitCode,

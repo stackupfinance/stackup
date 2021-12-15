@@ -34,17 +34,17 @@ module.exports.recoverAccount = (newOwner, guardianRecoveryArray) => {
   ]);
 };
 
-module.exports.addEntryPointStake = (value) => {
+module.exports.addEntryPointStake = (value, override = {}) => {
   return Wallet.interface.encodeFunctionData("executeUserOp", [
-    EntryPoint.address,
+    override.EntryPoint ?? EntryPoint.address,
     value._isBigNumber ? value : ethers.utils.parseEther(value),
     EntryPoint.interface.encodeFunctionData("addStake"),
   ]);
 };
 
-module.exports.lockEntryPointStake = () => {
+module.exports.lockEntryPointStake = (override = {}) => {
   return Wallet.interface.encodeFunctionData("executeUserOp", [
-    EntryPoint.address,
+    override.EntryPoint ?? EntryPoint.address,
     0,
     EntryPoint.interface.encodeFunctionData("lockStake"),
   ]);
