@@ -316,8 +316,8 @@ describe("Wallet", () => {
   });
 
   describe("validatePaymasterUserOp", () => {
-    it("Reverts when paymasterData is not externally signed by paymasterUser", async () => {
-      const userOp = await signUserOperation(
+    it.only("Reverts when paymasterData is not externally signed by paymasterUser", async () => {
+      const userOp = await wallet.userOperations.sign(
         regularUser,
         await wallet.userOperations.signPaymasterData(
           regularUser,
