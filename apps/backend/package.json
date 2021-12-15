@@ -26,6 +26,7 @@
     "docker:test": "docker-compose -f docker-compose.yml -f docker-compose.test.yml up"
   },
   "dependencies": {
+    "@stackupfinance/contracts": "^1.0.0",
     "agenda": "^4.2.1",
     "akeyless_vault_api": "akeylesslabs/akeyless-javascript-sdk",
     "bcryptjs": "^2.4.3",
@@ -43,7 +44,7 @@
     "joi": "^17.5.0",
     "jsonwebtoken": "^8.5.1",
     "moment": "^2.29.1",
-    "mongoose": "^6.0.14",
+    "mongoose": "^6.1.2",
     "morgan": "^1.10.0",
     "nodemailer": "^6.7.2",
     "passport": "^0.5.0",
