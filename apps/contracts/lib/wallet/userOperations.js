@@ -26,3 +26,29 @@ module.exports.sign = async (signer, op) => {
     signature: await signer.signMessage(message.userOperation(op)),
   };
 };
+
+module.exports.signPaymasterData = async (
+  signer,
+  paymaster,
+  fee,
+  token,
+  priceFeed,
+  op
+) => {
+  const userOp = { ...op, paymaster };
+
+  return {
+    ...userOp,
+    paymasterData: ethers.utils.defaultAbiCoder.encode(
+      ["uint256", "address", "address", "bytes"],
+      [
+        fee,
+        token,
+        priceFeed,
+        await signer.signMessage(
+          message.paymasterData(userOp, fee, token, priceFeed)
+        ),
+      ]
+    ),
+  };
+};

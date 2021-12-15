@@ -23,7 +23,7 @@ import {
 import { useActivityChannel } from '../src/hooks';
 import { Routes } from '../src/config';
 import { getToUserFromActivity } from '../src/utils/activity';
-import { displayUSDC } from '../src/utils/wallets';
+import { displayUSDC } from '../src/utils/web3';
 import { EVENTS, logEvent } from '../src/utils/analytics';
 
 const loadingList = [

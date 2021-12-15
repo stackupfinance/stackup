@@ -28,7 +28,7 @@ import {
 } from '@chakra-ui/react';
 import { CloseIcon } from '@chakra-ui/icons';
 import { InlineError } from '.';
-import { balanceToString, displayUSDC } from '../utils/wallets';
+import { balanceToString, displayUSDC } from '../utils/web3';
 
 export const Pay = ({
   isLoading,

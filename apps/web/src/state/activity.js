@@ -2,7 +2,7 @@ import create from 'zustand';
 import { persist, devtools } from 'zustand/middleware';
 import axios from 'axios';
 import { ethers } from 'ethers';
-import { App, Web3 } from '../config';
+import { App } from '../config';
 import { getToUserFromActivity } from '../utils/activity';
 
 export const activityUseAuthSelector = (state) => ({
@@ -126,7 +126,7 @@ export const useActivityStore = create(
           const toUser = getToUserFromActivity(savedActivity, options.userId);
           const data = {
             toUser: toUser.id,
-            amount: ethers.utils.parseUnits(amount, Web3.USDC_UNITS).toNumber(),
+            amount: ethers.utils.parseUnits(amount, App.web3.usdcUnits).toNumber(),
             message,
             userOperations,
           };

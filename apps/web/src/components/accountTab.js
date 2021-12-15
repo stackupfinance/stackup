@@ -18,9 +18,9 @@ import {
   Spacer,
   Skeleton,
 } from '@chakra-ui/react';
-import { /*Routes,*/ Web3 } from '../config';
+import { /*Routes,*/ App } from '../config';
 import { /*ChevronRightIcon,*/ ExternalLinkIcon } from '@chakra-ui/icons';
-import { displayUSDC } from '../utils/wallets';
+import { displayUSDC } from '../utils/web3';
 
 export const AccountTab = ({
   isEnabled,
@@ -31,11 +31,11 @@ export const AccountTab = ({
   walletAddress,
 }) => {
   const buttonSize = useBreakpointValue({ base: 'md', sm: 'lg' });
-  const [exlorerLink, setExlorerLink] = useState(Web3.EXPLORER);
+  const [exlorerLink, setExlorerLink] = useState(App.web3.explorer);
 
   useEffect(() => {
     if (walletAddress) {
-      setExlorerLink(`${Web3.EXPLORER}/address/${walletAddress}`);
+      setExlorerLink(`${App.web3.explorer}/address/${walletAddress}`);
     }
   }, [walletAddress]);
 
