@@ -17,7 +17,7 @@ export const defaultPaymasterReapproval = ethers.utils.parseUnits('5', App.web3.
 
 export const provider = new ethers.providers.JsonRpcProvider(App.web3.rpc);
 
-export const usdcContract = contracts.ERC20.getInstance(App.web3.usdc, provider);
+export const usdcContract = contracts.Erc20.getInstance(App.web3.usdc, provider);
 
 export const balanceToString = (balance = ethers.constants.Zero) => {
   return balance._isBigNumber
