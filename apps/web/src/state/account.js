@@ -55,6 +55,21 @@ export const accountOnboardRecoveryPageSelector = (state) => ({
   saveEncryptedWallet: state.saveEncryptedWallet,
 });
 
+export const accountOnboardAddEmailPageSelector = (state) => ({
+  enabled: state.enabled,
+  loading: state.loading,
+  wallet: state.wallet,
+  patchUser: state.patchUser,
+});
+
+export const accountOnboardVerifyEmailPageSelector = (state) => ({
+  enabled: state.enabled,
+  loading: state.loading,
+  wallet: state.wallet,
+  sendVerificationEmail: state.sendVerificationEmail,
+  verifyEmail: state.verifyEmail,
+});
+
 const defaultState = {
   enabled: false,
   loading: false,
@@ -142,6 +157,59 @@ export const useAccountStore = create(
               accessToken: res.data.access,
               refreshToken: res.data.refresh,
             });
+          } catch (error) {
+            set({ loading: false });
+            throw error;
+          }
+        },
+
+        patchUser: async (data) => {
+          set({ loading: true });
+
+          try {
+            await axios.patch(`${App.stackup.backendUrl}/v1/users/${get().user?.id}`, data, {
+              headers: { Authorization: `Bearer ${get().accessToken?.token}` },
+            });
+
+            set({ loading: false });
+          } catch (error) {
+            set({ loading: false });
+            throw error;
+          }
+        },
+
+        sendVerificationEmail: async () => {
+          set({ loading: true });
+
+          try {
+            await axios.post(
+              `${App.stackup.backendUrl}/v1/auth/send-verification-email`,
+              {},
+              {
+                headers: { Authorization: `Bearer ${get().accessToken?.token}` },
+              },
+            );
+
+            set({ loading: false });
+          } catch (error) {
+            set({ loading: false });
+            throw error;
+          }
+        },
+
+        verifyEmail: async (code) => {
+          set({ loading: true });
+
+          try {
+            await axios.post(
+              `${App.stackup.backendUrl}/v1/auth/verify-email`,
+              { code },
+              {
+                headers: { Authorization: `Bearer ${get().accessToken?.token}` },
+              },
+            );
+
+            set({ loading: false });
           } catch (error) {
             set({ loading: false });
             throw error;

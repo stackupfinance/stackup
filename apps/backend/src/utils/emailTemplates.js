@@ -946,7 +946,7 @@ const verifyEmail = (username, code) => {
     <![endif]-->
     </head>
     <body>
-      <span class="preheader">Thanks for trying out Stackup. We’ve pulled together some information and resources to help you get started.</span>
+      <span class="preheader">Use this code to verify your email. The code is only valid for 10 minutes.</span>
       <table class="email-wrapper" width="100%" cellpadding="0" cellspacing="0" role="presentation">
         <tr>
           <td align="center">

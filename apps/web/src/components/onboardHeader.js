@@ -1,10 +1,29 @@
-import { Box, HStack, Image, Spacer, LinkBox, LinkOverlay, Heading } from '@chakra-ui/react';
+import NextLink from 'next/link';
+import {
+  Box,
+  HStack,
+  Image,
+  Spacer,
+  LinkBox,
+  LinkOverlay,
+  Heading,
+  IconButton,
+} from '@chakra-ui/react';
+import { ChevronLeftIcon } from '@chakra-ui/icons';
 
-export const OnboardHeader = ({ title }) => {
+export const OnboardHeader = ({ title, backLinkUrl }) => {
   return (
     <header>
       <Box borderBottomWidth="1px">
         <HStack spacing={['8px', '16px']} py="16px" px="16px" maxW="xl" margin="0 auto">
+          {backLinkUrl && (
+            <NextLink href={backLinkUrl} passHref>
+              <IconButton as="a" aria-label="Back button" icon={<ChevronLeftIcon />} />
+            </NextLink>
+          )}
+
+          {backLinkUrl && <Spacer />}
+
           <Heading size="md">{title}</Heading>
 
           <Spacer />

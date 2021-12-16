@@ -8,4 +8,7 @@ export const Routes = {
   EDIT_EMAIL: '/edit-email',
   ACTIVITY: '/activity',
   ONBOARD_RECOVERY: '/onboard/recovery',
+  ONBOARD_ADD_EMAIL: '/onboard/add-email',
+  ONBOARD_VERIFY_EMAIL: '/onboard/verify-email',
+  ONBOARD_SUMMARY: '/onboard/summary',
 };
