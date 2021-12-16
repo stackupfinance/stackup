@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-import { useMap } from 'react-use';
 import { Button, useToast } from '@chakra-ui/react';
 import { CheckIcon } from '@chakra-ui/icons';
 import {
@@ -27,7 +26,12 @@ import { App } from '../../src/config';
 function OnboardRecovery() {
   const router = useRouter();
   const toast = useToast();
-  const { ephemeralWallet } = useOnboardStore(onboardOnboardRecoveryPageSelector);
+  const {
+    ephemeralWallet,
+    guardianMap: savedGuardianMap,
+    setGuardian,
+    removeGuardian,
+  } = useOnboardStore(onboardOnboardRecoveryPageSelector);
   const {
     loading: accountLoading,
     enabled,
@@ -47,12 +51,11 @@ function OnboardRecovery() {
   const [showSearch, setShowSearch] = useState(false);
   const [username, setUsername] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
-  const [guardianMap, { set: setGuardian, remove: removeGuardian }] = useMap({
-    defaultGuardian: App.web3.paymaster,
-  });
+  const [guardianMap, setGuardianMap] = useState({});
 
   useEffect(() => {
     router.prefetch(Routes.HOME);
+    router.prefetch(Routes.ONBOARD_ADD_EMAIL);
   }, [router]);
 
   useEffect(() => {
@@ -65,6 +68,10 @@ function OnboardRecovery() {
     setUsername(user.username);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [enabled]);
+
+  useEffect(() => {
+    setGuardianMap(savedGuardianMap);
+  }, [savedGuardianMap]);
 
   const onDefaultGuardian = () => {
     if (guardianMap.defaultGuardian) {
@@ -91,7 +98,11 @@ function OnboardRecovery() {
       return;
     }
 
-    console.log(Object.values(guardianMap));
+    if (guardianMap.defaultGuardian) {
+      router.push(Routes.ONBOARD_ADD_EMAIL);
+    } else {
+      // TODO: Implement skip to summary
+    }
   };
 
   const onSkip = () => {};
@@ -168,7 +179,7 @@ function OnboardRecovery() {
       <Head title="Stackup | Setup Recovery" />
 
       <PageContainer>
-        <OnboardHeader title="Account setup" />
+        <OnboardHeader title="Setup Recovery" />
 
         <AppContainer>
           <SetupGuardians

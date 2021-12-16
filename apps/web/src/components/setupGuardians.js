@@ -67,7 +67,7 @@ export const SetupGuardians = ({
         <Image src="/user-blue.png" maxW="128px" maxH="128px" alt="stackup logo" />
 
         <VStack spacing="16px" w="100%">
-          <Box>
+          <Box w="100%">
             <Heading size="md" mb="4px">
               Welcome to Stackup, {username}! 👋
             </Heading>

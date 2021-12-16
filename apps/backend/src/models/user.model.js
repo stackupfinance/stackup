@@ -3,7 +3,6 @@ const validator = require('validator');
 const bcrypt = require('bcryptjs');
 const { toJSON, paginate } = require('./plugins');
 const { roles } = require('../config/roles');
-const { status } = require('../config/users');
 const walletService = require('../services/wallet.service');
 
 const userSchema = mongoose.Schema(
@@ -63,11 +62,6 @@ const userSchema = mongoose.Schema(
     wallet: {
       type: mongoose.SchemaTypes.ObjectId,
       ref: 'Wallet',
-    },
-    status: {
-      type: String,
-      enum: [status.created, status.onboarded],
-      default: status.created,
     },
     role: {
       type: String,

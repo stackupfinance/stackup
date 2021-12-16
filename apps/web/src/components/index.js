@@ -1,5 +1,6 @@
 export * from './accountTab';
 export * from './activityHeader';
+export * from './addEmail';
 export * from './appContainer';
 export * from './exploreTabMockup';
 export * from './head';
@@ -14,3 +15,4 @@ export * from './search';
 export * from './searchModal';
 export * from './setupGuardians';
 export * from './userCard';
+export * from './verifyEmail';
