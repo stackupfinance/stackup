@@ -22,6 +22,7 @@ import {
 } from '../../src/components';
 import { Routes } from '../../src/config';
 import { App } from '../../src/config';
+import { logEvent, EVENTS } from '../../src/utils/analytics';
 
 function OnboardRecovery() {
   const router = useRouter();
@@ -106,11 +107,14 @@ function OnboardRecovery() {
     }
   };
 
-  const onSkip = () => {};
+  const onSkip = () => {
+    logEvent(EVENTS.ONBOARD_OPEN_SKIP);
+  };
 
   const onSkipConfirm = async () => {
     try {
       await saveEncryptedWallet(ephemeralWallet);
+      logEvent(EVENTS.ONBOARD_CONFIRM_SKIP);
       router.push(Routes.HOME);
     } catch (error) {
       toast({

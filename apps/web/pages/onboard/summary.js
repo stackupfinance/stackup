@@ -15,6 +15,7 @@ import {
   onboardOnboardSummaryPageSelector,
 } from '../../src/state';
 import { Routes } from '../../src/config';
+import { logEvent, EVENTS } from '../../src/utils/analytics';
 
 function OnboardSummary() {
   const router = useRouter();
@@ -66,6 +67,7 @@ function OnboardSummary() {
       ? [defaultGuardian, ...otherGuardians]
       : otherGuardians;
     await saveEncryptedWallet(walletLib.proxy.initEncryptedIdentity(data.password, { guardians }));
+    logEvent(EVENTS.ONBOARD_CONFIRM_SETUP);
     router.push(Routes.HOME);
   };
 

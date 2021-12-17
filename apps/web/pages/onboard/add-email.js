@@ -8,6 +8,7 @@ import {
   accountOnboardAddEmailPageSelector,
 } from '../../src/state';
 import { Routes } from '../../src/config';
+import { logEvent, EVENTS } from '../../src/utils/analytics';
 
 function OnboardAddEmail() {
   const router = useRouter();
@@ -44,6 +45,7 @@ function OnboardAddEmail() {
     try {
       await patchUser(data);
       setEmail(data.email);
+      logEvent(EVENTS.ONBOARD_ADD_EMAIL);
       router.push(Routes.ONBOARD_VERIFY_EMAIL);
     } catch (error) {
       throw error;

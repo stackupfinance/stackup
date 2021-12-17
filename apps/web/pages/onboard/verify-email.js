@@ -14,6 +14,7 @@ import {
   onboardOnboardVerifyEmailPageSelector,
 } from '../../src/state';
 import { Routes } from '../../src/config';
+import { logEvent, EVENTS } from '../../src/utils/analytics';
 
 function OnboardVerifyEmail() {
   const router = useRouter();
@@ -56,6 +57,7 @@ function OnboardVerifyEmail() {
 
     try {
       await sendVerificationEmail();
+      logEvent(EVENTS.ONBOARD_SEND_CODE);
       setIsDisabled(true);
       setTimeout(() => {
         setIsDisabled(false);
@@ -70,6 +72,7 @@ function OnboardVerifyEmail() {
 
     try {
       await verifyEmail(code);
+      logEvent(EVENTS.ONBOARD_VERIFY_EMAIL);
       router.push(Routes.ONBOARD_SUMMARY);
     } catch (error) {
       setError(error.response?.data?.message || 'Unknown error, try again later!');
