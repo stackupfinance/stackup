@@ -35,6 +35,11 @@ export const onboardOnboardVerifyEmailPageSelector = (state) => ({
   email: state.email,
 });
 
+export const onboardOnboardSummaryPageSelector = (state) => ({
+  ephemeralWallet: state.ephemeralWallet,
+  guardianMap: state.guardianMap,
+});
+
 const defaultState = {
   loading: false,
   ephemeralWallet: undefined,

@@ -37,7 +37,7 @@ const queryUsers = async (filter, options) => {
  * @returns {Promise<User>}
  */
 const getUserById = async (id) => {
-  return User.findById(id);
+  return User.findById(id).populate('wallet', '-_id -user -updatedAt');
 };
 
 /**
@@ -55,7 +55,7 @@ const getUserByUsername = async (username) => {
  * @returns {Promise<User>}
  */
 const getUserByUsernameWithWallet = async (username) => {
-  return User.findOne({ username }).populate('wallet', '-user');
+  return User.findOne({ username }).populate('wallet', '-_id -user -updatedAt');
 };
 
 /**
