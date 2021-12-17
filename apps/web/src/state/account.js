@@ -234,7 +234,6 @@ export const useAccountStore = create(
 
             await get().getUser();
           } catch (error) {
-            console.log(error);
             set({ loading: false });
             throw error;
           }
