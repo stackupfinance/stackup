@@ -35,10 +35,16 @@ export const onboardOnboardVerifyEmailPageSelector = (state) => ({
   email: state.email,
 });
 
+export const onboardOnboardSummaryPageSelector = (state) => ({
+  ephemeralWallet: state.ephemeralWallet,
+  guardianMap: state.guardianMap,
+});
+
+const defaultGuardianMap = { defaultGuardian: App.web3.paymaster };
 const defaultState = {
   loading: false,
   ephemeralWallet: undefined,
-  guardianMap: { defaultGuardian: App.web3.paymaster },
+  guardianMap: { ...defaultGuardianMap },
   email: undefined,
 };
 
@@ -64,7 +70,7 @@ export const useOnboardStore = create(
 
         setEmail: (email) => set({ email }),
 
-        clear: () => set({ ...defaultState }),
+        clear: () => set({ ...defaultState, guardianMap: { ...defaultGuardianMap } }),
       }),
       {
         name: 'stackup-onboard-store',

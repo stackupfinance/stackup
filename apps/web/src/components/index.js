@@ -2,6 +2,7 @@ export * from './accountTab';
 export * from './activityHeader';
 export * from './addEmail';
 export * from './appContainer';
+export * from './confirmGuardians';
 export * from './exploreTabMockup';
 export * from './head';
 export * from './header';

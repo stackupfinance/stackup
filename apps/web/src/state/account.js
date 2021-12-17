@@ -70,6 +70,14 @@ export const accountOnboardVerifyEmailPageSelector = (state) => ({
   verifyEmail: state.verifyEmail,
 });
 
+export const accountOnboardSummaryPageSelector = (state) => ({
+  enabled: state.enabled,
+  loading: state.loading,
+  user: state.user,
+  wallet: state.wallet,
+  saveEncryptedWallet: state.saveEncryptedWallet,
+});
+
 const defaultState = {
   enabled: false,
   loading: false,
@@ -111,8 +119,7 @@ export const useAccountStore = create(
 
           try {
             const login = await axios.post(`${App.stackup.backendUrl}/v1/auth/login`, data);
-            const user = login.data.user;
-            const wallet = login.data.user.wallet;
+            const { wallet, ...user } = login.data.user;
             const accessToken = login.data.tokens.access;
             const refreshToken = login.data.tokens.refresh;
 
@@ -157,6 +164,22 @@ export const useAccountStore = create(
               accessToken: res.data.access,
               refreshToken: res.data.refresh,
             });
+          } catch (error) {
+            set({ loading: false });
+            throw error;
+          }
+        },
+
+        getUser: async () => {
+          set({ loading: true });
+
+          try {
+            const res = await axios.get(`${App.stackup.backendUrl}/v1/users/${get().user?.id}`, {
+              headers: { Authorization: `Bearer ${get().accessToken?.token}` },
+            });
+
+            const { wallet, ...user } = res.data;
+            set({ loading: false, user, wallet });
           } catch (error) {
             set({ loading: false });
             throw error;
@@ -209,7 +232,7 @@ export const useAccountStore = create(
               },
             );
 
-            set({ loading: false });
+            await get().getUser();
           } catch (error) {
             set({ loading: false });
             throw error;
@@ -228,7 +251,7 @@ export const useAccountStore = create(
               },
             );
 
-            set({ loading: false, wallet });
+            await get().getUser();
           } catch (error) {
             set({ loading: false });
             throw error;

@@ -56,6 +56,7 @@ function OnboardRecovery() {
   useEffect(() => {
     router.prefetch(Routes.HOME);
     router.prefetch(Routes.ONBOARD_ADD_EMAIL);
+    router.prefetch(Routes.ONBOARD_SUMMARY);
   }, [router]);
 
   useEffect(() => {
@@ -101,7 +102,7 @@ function OnboardRecovery() {
     if (guardianMap.defaultGuardian) {
       router.push(Routes.ONBOARD_ADD_EMAIL);
     } else {
-      // TODO: Implement skip to summary
+      router.push(Routes.ONBOARD_SUMMARY);
     }
   };
 
