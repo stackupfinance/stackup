@@ -69,7 +69,7 @@ export const useOnboardStore = create(
 
         setEmail: (email) => set({ email }),
 
-        clear: () => set({ ...defaultState }),
+        clear: () => set({ ...defaultState, guardianMap: { defaultGuardian: App.web3.paymaster } }),
       }),
       {
         name: 'stackup-onboard-store',
