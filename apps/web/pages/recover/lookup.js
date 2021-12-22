@@ -32,7 +32,7 @@ function RecoverLookup() {
 
   return (
     <>
-      <Head title="Stackup | Recovery Account" />
+      <Head title="Stackup | Recover Account" />
 
       <PageContainer>
         <NavigationHeader title="Account lookup" backLinkUrl={Routes.LOGIN} />
