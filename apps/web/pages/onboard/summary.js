@@ -4,7 +4,7 @@ import { wallet as walletLib } from '@stackupfinance/contracts';
 import {
   Head,
   PageContainer,
-  OnboardHeader,
+  NavigationHeader,
   AppContainer,
   ConfirmGuardians,
 } from '../../src/components';
@@ -76,7 +76,7 @@ function OnboardSummary() {
       <Head title="Stackup | Setup Recovery" />
 
       <PageContainer>
-        <OnboardHeader title="Confirm Setup" backLinkUrl={Routes.ONBOARD_ADD_EMAIL} />
+        <NavigationHeader title="Confirm Setup" backLinkUrl={Routes.ONBOARD_ADD_EMAIL} />
 
         <AppContainer>
           <ConfirmGuardians

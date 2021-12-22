@@ -27,6 +27,12 @@ const refreshTokens = {
   }),
 };
 
+const recoverLookup = {
+  body: Joi.object().keys({
+    username: Joi.string().required().custom(username),
+  }),
+};
+
 const forgotPassword = {
   body: Joi.object().keys({
     username: Joi.string().required(),
@@ -59,6 +65,7 @@ module.exports = {
   login,
   logout,
   refreshTokens,
+  recoverLookup,
   forgotPassword,
   resetPassword,
   verifyEmail,

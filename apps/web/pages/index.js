@@ -34,6 +34,10 @@ export default function Login() {
     }
   };
 
+  const onRecoverAccount = () => {
+    logEvent(EVENTS.RECOVER_ACCOUNT_START);
+  };
+
   const onCreateProfile = () => {
     logEvent(EVENTS.SIGN_UP_START);
   };
@@ -85,16 +89,18 @@ export default function Login() {
 
               {renderError()}
 
-              {/* <Button
-                isDisabled
-                isFullWidth
-                isLoading={loading}
-                mt="16px"
-                variant="outline"
-                size="lg"
-              >
-                Recover account
-              </Button> */}
+              <NextLink href={Routes.RECOVER_LOOKUP} passHref>
+                <Button
+                  isFullWidth
+                  isLoading={loading}
+                  mt="16px"
+                  variant="outline"
+                  size="lg"
+                  onClick={onRecoverAccount}
+                >
+                  Recover account
+                </Button>
+              </NextLink>
 
               <Divider mt="16px" />
 

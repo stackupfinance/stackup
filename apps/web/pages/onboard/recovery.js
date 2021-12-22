@@ -13,7 +13,7 @@ import {
 import {
   Head,
   PageContainer,
-  OnboardHeader,
+  NavigationHeader,
   AppContainer,
   SetupGuardians,
   SearchModal,
@@ -184,7 +184,7 @@ function OnboardRecovery() {
       <Head title="Stackup | Setup Recovery" />
 
       <PageContainer>
-        <OnboardHeader title="Setup Recovery" />
+        <NavigationHeader title="Setup Recovery" />
 
         <AppContainer>
           <SetupGuardians

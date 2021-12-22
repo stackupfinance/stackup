@@ -1,4 +1,5 @@
 const httpStatus = require('http-status');
+const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
 const { authService, userService, tokenService, emailService, codeService, pusherService } = require('../services');
 
@@ -23,6 +24,15 @@ const logout = catchAsync(async (req, res) => {
 const refreshTokens = catchAsync(async (req, res) => {
   const tokens = await authService.refreshAuth(req.body.refreshToken);
   res.send({ ...tokens });
+});
+
+const recoverLookup = catchAsync(async (req, res) => {
+  const user = await userService.getWalletAddressByUsername(req.body.username);
+
+  if (!user) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
+  }
+  res.send({ user });
 });
 
 const forgotPassword = catchAsync(async (req, res) => {
@@ -57,6 +67,7 @@ module.exports = {
   login,
   logout,
   refreshTokens,
+  recoverLookup,
   forgotPassword,
   resetPassword,
   sendVerificationEmail,

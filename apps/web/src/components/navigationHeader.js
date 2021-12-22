@@ -11,7 +11,7 @@ import {
 } from '@chakra-ui/react';
 import { ChevronLeftIcon } from '@chakra-ui/icons';
 
-export const OnboardHeader = ({ title, backLinkUrl }) => {
+export const NavigationHeader = ({ title, backLinkUrl }) => {
   return (
     <header>
       <Box borderBottomWidth="1px">
