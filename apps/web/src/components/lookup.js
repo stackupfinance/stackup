@@ -51,7 +51,7 @@ export const Lookup = ({ isLoading, onNext }) => {
               Find your account 🔍
             </Heading>
             <Text>
-              {`Let's start by searching for your account to see what recovery options you have available.`}
+              {`Let's start by searching for your account to see what recovery options are available.`}
             </Text>
           </Box>
 

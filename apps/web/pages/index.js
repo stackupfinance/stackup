@@ -93,6 +93,7 @@ export default function Login() {
                 <Button
                   isFullWidth
                   isLoading={loading}
+                  as="a"
                   mt="16px"
                   variant="outline"
                   size="lg"
