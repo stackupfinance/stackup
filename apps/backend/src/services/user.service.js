@@ -59,11 +59,11 @@ const getUserByUsernameWithWallet = async (username) => {
 };
 
 /**
- * Get user by username and populate wallet address only
+ * Get user by username and populate wallet address and init guardians only
  * @param {String} username
  * @returns {Promise<User>}
  */
-const getWalletAddressByUsername = async (username) => {
+const getWalletForRecovery = async (username) => {
   return User.findOne({ username }, 'username wallet -_id').populate('wallet', 'walletAddress initGuardians -_id');
 };
 
@@ -110,7 +110,7 @@ module.exports = {
   getUserById,
   getUserByUsername,
   getUserByUsernameWithWallet,
-  getWalletAddressByUsername,
+  getWalletForRecovery,
   updateUserById,
   deleteUserById,
 };

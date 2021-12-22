@@ -27,7 +27,7 @@ const refreshTokens = catchAsync(async (req, res) => {
 });
 
 const recoverLookup = catchAsync(async (req, res) => {
-  const user = await userService.getWalletAddressByUsername(req.body.username);
+  const user = await userService.getWalletForRecovery(req.body.username);
 
   if (!user) {
     throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
