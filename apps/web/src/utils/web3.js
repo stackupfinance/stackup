@@ -19,6 +19,9 @@ export const provider = new ethers.providers.JsonRpcProvider(App.web3.rpc);
 
 export const usdcContract = contracts.Erc20.getInstance(App.web3.usdc, provider);
 
+export const walletContract = (walletAddress) =>
+  contracts.Wallet.getInstance(provider).attach(walletAddress);
+
 export const balanceToString = (balance = ethers.constants.Zero) => {
   return balance._isBigNumber
     ? ethers.utils.formatUnits(balance, App.web3.usdcUnits)

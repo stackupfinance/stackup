@@ -12,11 +12,20 @@ import {
   walletUseAuthSelector,
   useOnboardStore,
   onboardUseAuthSelector,
+  useRecoverStore,
+  recoverUseAuthSelector,
 } from '../state';
 import { Routes } from '../config';
 
 const REFRESH_INTERVAL_MS = 300000; // 5 minutes
-const initAuthRoutes = new Set([Routes.LOGIN, Routes.SIGN_UP]);
+const initAuthRoutes = new Set([
+  Routes.LOGIN,
+  Routes.SIGN_UP,
+  Routes.RECOVER_LOOKUP,
+  Routes.RECOVER_NOT_POSSIBLE,
+  Routes.RECOVER_VERIFY_EMAIL,
+  Routes.RECOVER_STATUS,
+]);
 
 export const useLogout = () => {
   const { logout } = useAccountStore(accountUseAuthSelector);
@@ -24,12 +33,14 @@ export const useLogout = () => {
   const { clear: clearActivity } = useActivityStore(activityUseAuthSelector);
   const { clear: clearWallet } = useWalletStore(walletUseAuthSelector);
   const { clear: clearOnboard } = useOnboardStore(onboardUseAuthSelector);
+  const { clear: clearRecover } = useRecoverStore(recoverUseAuthSelector);
 
   return async () => {
     clearSearch();
     clearActivity();
     clearWallet();
     clearOnboard();
+    clearRecover();
     await logout();
   };
 };
@@ -44,7 +55,7 @@ export const useAuth = () => {
   const isLoggedOut = () => !refreshToken;
   const refreshTokenExpired = () => isExpired(refreshToken?.token);
   const accessTokenExpired = () => isExpired(accessToken?.token);
-  const notOnLoginOrSignUpPage = () => !initAuthRoutes.has(location.pathname);
+  const notOnAuthPage = () => !initAuthRoutes.has(location.pathname);
   const onLoginPage = () => location.pathname === Routes.LOGIN;
   const shouldRefresh = () => accessToken && refreshToken && !isExpired(refreshToken.token);
 
@@ -52,10 +63,10 @@ export const useAuth = () => {
     const authCheck = async () => {
       try {
         if (isLoggedOut()) {
-          notOnLoginOrSignUpPage() && router.push(Routes.LOGIN);
+          notOnAuthPage() && router.push(Routes.LOGIN);
         } else if (refreshTokenExpired()) {
           await logout();
-          notOnLoginOrSignUpPage() && router.push(Routes.LOGIN);
+          notOnAuthPage() && router.push(Routes.LOGIN);
         } else if (isFirst) {
           setIsFirst(false);
           await refresh();

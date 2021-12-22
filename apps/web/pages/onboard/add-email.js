@@ -1,6 +1,12 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { Head, PageContainer, OnboardHeader, AppContainer, AddEmail } from '../../src/components';
+import {
+  Head,
+  PageContainer,
+  NavigationHeader,
+  AppContainer,
+  AddEmail,
+} from '../../src/components';
 import {
   useOnboardStore,
   onboardOnboardAddEmailPageSelector,
@@ -57,7 +63,7 @@ function OnboardAddEmail() {
       <Head title="Stackup | Setup Recovery" />
 
       <PageContainer>
-        <OnboardHeader title="Add E-mail" backLinkUrl={Routes.ONBOARD_RECOVERY} />
+        <NavigationHeader title="Add E-mail" backLinkUrl={Routes.ONBOARD_RECOVERY} />
 
         <AppContainer>
           <AddEmail isLoading={accountLoading} onNext={onNext} />

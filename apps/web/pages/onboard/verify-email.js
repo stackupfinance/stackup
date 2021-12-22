@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import {
   Head,
   PageContainer,
-  OnboardHeader,
+  NavigationHeader,
   AppContainer,
   VerifyEmail,
 } from '../../src/components';
@@ -84,7 +84,7 @@ function OnboardVerifyEmail() {
       <Head title="Stackup | Setup Recovery" />
 
       <PageContainer>
-        <OnboardHeader title="Verify E-mail" backLinkUrl={Routes.ONBOARD_ADD_EMAIL} />
+        <NavigationHeader title="Verify E-mail" backLinkUrl={Routes.ONBOARD_ADD_EMAIL} />
 
         <AppContainer>
           <VerifyEmail

@@ -22,6 +22,8 @@ import {
   activityHomePageSelector,
   useOnboardStore,
   onboardHomePageSelector,
+  useRecoverStore,
+  recoverHomePageSelector,
 } from '../src/state';
 import { useActivityChannel, useLogout } from '../src/hooks';
 import { getToUserFromActivity } from '../src/utils/activity';
@@ -85,6 +87,7 @@ export default function Home() {
     updateActivityListFromChannel,
   } = useActivityStore(activityHomePageSelector);
   const { clear: clearOnboardData } = useOnboardStore(onboardHomePageSelector);
+  const { clear: clearRecover } = useRecoverStore(recoverHomePageSelector);
   const logout = useLogout();
   const router = useRouter();
   const [showSearch, setShowSearch] = useState(false);
@@ -103,6 +106,7 @@ export default function Home() {
     }
 
     clearOnboardData();
+    clearRecover();
     fetchActivities({ userId: user.id, accessToken: accessToken.token });
     fetchBalance(wallet);
     // eslint-disable-next-line react-hooks/exhaustive-deps
