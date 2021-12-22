@@ -4207,10 +4207,10 @@ amp@0.3.1, amp@~0.3.1:
   resolved "https://registry.npmjs.org/amp/-/amp-0.3.1.tgz"
   integrity sha1-at+NWKdPNh6CwfqNOJwHnhOfxH0=
 
-amplitude-js@^8.13.1:
-  version "8.13.1"
-  resolved "https://registry.yarnpkg.com/amplitude-js/-/amplitude-js-8.13.1.tgz#0ae654a5bdfb434e17e55aa40a34775a902e97dd"
-  integrity sha512-cjKtq+t51jyN5XrnXtZW05jSGRDZKtHVqx/BIuP+b1baBgWqFZ2P5GKEH2DqCWhZqwwkaBkAw+E7tanohYqLMw==
+amplitude-js@^8.14.0:
+  version "8.14.0"
+  resolved "https://registry.yarnpkg.com/amplitude-js/-/amplitude-js-8.14.0.tgz#920f9d75709c742cb4d094708d275c268040e46e"
+  integrity sha512-ykMLQn+C4n26ayApaB3p1paNuMY6yBsVALRQRTFdY01xnbAumJTfxjW7Wl12CaKxwuNfyIUjKPUcoch0nEagXw==
   dependencies:
     "@amplitude/ua-parser-js" "0.7.26"
     "@amplitude/utils" "^1.0.5"

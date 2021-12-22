@@ -18,7 +18,7 @@
     "@emotion/react": "^11",
     "@emotion/styled": "^11",
     "@stackupfinance/contracts": "^1.0.0",
-    "amplitude-js": "^8.13.1",
+    "amplitude-js": "^8.14.0",
     "axios": "^0.24.0",
     "date-fns": "^2.27.0",
     "ethers": "^5.5.2",
