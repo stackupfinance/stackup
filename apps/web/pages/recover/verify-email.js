@@ -9,6 +9,7 @@ import {
 } from '../../src/components';
 import { useRecoverStore, recoverRecoverVerifyEmailPageSelector } from '../../src/state';
 import { Routes } from '../../src/config';
+import { logEvent, EVENTS } from '../../src/utils/analytics';
 
 function RecoverVerifyEmail() {
   const router = useRouter();
@@ -38,7 +39,7 @@ function RecoverVerifyEmail() {
       return;
     }
 
-    // onSendCode();
+    onSendCode();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [newOwner]);
 
@@ -47,6 +48,7 @@ function RecoverVerifyEmail() {
 
     try {
       await sendVerificationEmail();
+      logEvent(EVENTS.RECOVER_ACCOUNT_SEND_CODE);
       setIsDisabled(true);
       setTimeout(() => {
         setIsDisabled(false);
@@ -61,6 +63,7 @@ function RecoverVerifyEmail() {
 
     try {
       await verifyEmail(code);
+      logEvent(EVENTS.RECOVER_ACCOUNT_VERIFY_EMAIL);
 
       if (guardians.length > 1) {
         router.push(Routes.RECOVER_STATUS);

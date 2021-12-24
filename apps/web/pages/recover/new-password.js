@@ -9,6 +9,7 @@ import {
 } from '../../src/components';
 import { useRecoverStore, recoverRecoverNewPasswordPageSelector } from '../../src/state';
 import { App, Routes } from '../../src/config';
+import { logEvent, EVENTS } from '../../src/utils/analytics';
 
 function RecoverNewPassword() {
   const router = useRouter();
@@ -34,6 +35,7 @@ function RecoverNewPassword() {
   }, [user]);
 
   const onNextHandler = (data) => {
+    logEvent(EVENTS.RECOVER_ACCOUNT_CREATE_NEW_PASSWORD);
     createEphemeralSigner(data.password);
 
     if (guardians.find((curr) => curr === App.web3.paymaster)) {
