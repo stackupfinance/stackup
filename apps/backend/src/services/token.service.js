@@ -1,10 +1,7 @@
 const jwt = require('jsonwebtoken');
 const moment = require('moment');
-const httpStatus = require('http-status');
 const config = require('../config/config');
-const userService = require('./user.service');
 const { Token } = require('../models');
-const ApiError = require('../utils/ApiError');
 const { tokenTypes } = require('../config/tokens');
 
 /**
@@ -85,45 +82,9 @@ const generateAuthTokens = async (user) => {
   };
 };
 
-/**
- * Generate reset password token
- * @param {String} username
- * @returns {Promise<[string, string]>}
- */
-const generateResetPasswordToken = async (username) => {
-  const user = await userService.getUserByUsername(username);
-  if (!user) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'No account found with this username');
-  }
-  if (!user.email || !user.isEmailVerified) {
-    throw new ApiError(httpStatus.BAD_REQUEST, 'No verified e-mail for this account');
-  }
-  const expires = moment().add(config.jwt.resetPasswordExpirationMinutes, 'minutes');
-  const resetPasswordToken = generateToken(user.id, expires, tokenTypes.RESET_PASSWORD);
-  await saveToken(resetPasswordToken, user.id, expires, tokenTypes.RESET_PASSWORD);
-  return [user.email, resetPasswordToken];
-};
-
-/**
- * Generate verify email token
- * @param {User} user
- * @returns {Promise<string>}
- */
-const generateVerifyEmailToken = async (user) => {
-  if (!user.email) {
-    throw new ApiError(httpStatus.BAD_REQUEST, 'No e-mail linked to this account');
-  }
-  const expires = moment().add(config.jwt.verifyEmailExpirationMinutes, 'minutes');
-  const verifyEmailToken = generateToken(user.id, expires, tokenTypes.VERIFY_EMAIL);
-  await saveToken(verifyEmailToken, user.id, expires, tokenTypes.VERIFY_EMAIL);
-  return verifyEmailToken;
-};
-
 module.exports = {
   generateToken,
   saveToken,
   verifyToken,
   generateAuthTokens,
-  generateResetPasswordToken,
-  generateVerifyEmailToken,
 };

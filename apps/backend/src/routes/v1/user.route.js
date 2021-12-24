@@ -7,11 +7,6 @@ const userController = require('../../controllers/user.controller');
 const router = express.Router();
 
 router
-  .route('/')
-  .post(auth('manageUsers'), validate(userValidation.createUser), userController.createUser)
-  .get(auth('getUsers'), validate(userValidation.getUsers), userController.getUsers);
-
-router
   .route('/:userId')
   .get(auth('getUsers'), validate(userValidation.getUser), userController.getUser)
   .patch(auth('manageUsers'), validate(userValidation.updateUser), userController.updateUser)
@@ -19,7 +14,7 @@ router
 
 router
   .route('/:userId/wallet')
-  .post(auth('manageUsers'), validate(userValidation.createUserWallet), userController.createUserWallet)
+  .patch(auth('manageUsers'), validate(userValidation.updateUserWallet), userController.updateUserWallet)
   .get(auth('getUsers'), validate(userValidation.getUserWallet), userController.getUserWallet);
 
 router.route('/:userId/search').get(auth('getUsers'), validate(userValidation.getUserSearch), userController.getUserSearch);

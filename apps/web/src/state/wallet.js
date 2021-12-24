@@ -60,7 +60,6 @@ export const useWalletStore = create(
         ...defaultState,
 
         fetchBalance: async (wallet) => {
-          if (!wallet) return;
           set({ loading: true });
 
           try {

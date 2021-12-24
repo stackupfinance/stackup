@@ -37,7 +37,6 @@ function OnboardRecovery() {
     loading: accountLoading,
     enabled,
     user,
-    wallet,
     accessToken,
     saveEncryptedWallet,
   } = useAccountStore(accountOnboardRecoveryPageSelector);
@@ -62,7 +61,7 @@ function OnboardRecovery() {
 
   useEffect(() => {
     if (!enabled) return;
-    if (wallet) {
+    if (user.isOnboarded) {
       router.push(Routes.HOME);
       return;
     }

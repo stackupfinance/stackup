@@ -21,7 +21,7 @@ function OnboardVerifyEmail() {
   const {
     enabled,
     loading: accountLoading,
-    wallet,
+    user,
     sendVerificationEmail,
     verifyEmail,
   } = useAccountStore(accountOnboardVerifyEmailPageSelector);
@@ -38,7 +38,7 @@ function OnboardVerifyEmail() {
 
   useEffect(() => {
     if (!enabled) return;
-    if (wallet) {
+    if (user.isOnboarded) {
       router.push(Routes.HOME);
       return;
     }

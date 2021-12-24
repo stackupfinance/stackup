@@ -11,18 +11,6 @@ const {
   paymentService,
 } = require('../services');
 
-const createUser = catchAsync(async (req, res) => {
-  const user = await userService.createUser(req.body);
-  res.status(httpStatus.CREATED).send(user);
-});
-
-const getUsers = catchAsync(async (req, res) => {
-  const filter = pick(req.query, ['username', 'role']);
-  const options = pick(req.query, ['sortBy', 'limit', 'page']);
-  const result = await userService.queryUsers(filter, options);
-  res.send(result);
-});
-
 const getUser = catchAsync(async (req, res) => {
   const user = await userService.getUserById(req.params.userId);
   if (!user) {
@@ -41,10 +29,9 @@ const deleteUser = catchAsync(async (req, res) => {
   res.status(httpStatus.NO_CONTENT).send();
 });
 
-const createUserWallet = catchAsync(async (req, res) => {
+const updateUserWallet = catchAsync(async (req, res) => {
   const { userId } = req.params;
-  const wallet = await walletService.createWallet(userId, req.body);
-  await userService.updateUserById(userId, { wallet: wallet.id });
+  const wallet = await walletService.updateUserWallet(userId, req.body);
   res.send(wallet);
 });
 
@@ -58,7 +45,7 @@ const getUserSearch = catchAsync(async (req, res) => {
   const { userId } = req.params;
   const options = pick(req.query, ['sortBy', 'limit', 'page']);
   const result = await userService.queryUsers(
-    { username: { $regex: req.query.username, $options: 'i' }, _id: { $ne: userId }, wallet: { $exists: true } },
+    { username: { $regex: req.query.username, $options: 'i' }, _id: { $ne: userId }, isOnboarded: { $eq: true } },
     {
       ...options,
       projection: 'username wallet _id',
@@ -138,12 +125,10 @@ const createUserActivityItem = catchAsync(async (req, res) => {
 });
 
 module.exports = {
-  createUser,
-  getUsers,
   getUser,
   updateUser,
   deleteUser,
-  createUserWallet,
+  updateUserWallet,
   getUserWallet,
   getUserSearch,
   getUserActivities,

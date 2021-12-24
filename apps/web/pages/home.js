@@ -100,7 +100,7 @@ export default function Home() {
 
   useEffect(() => {
     if (!enabled) return;
-    if (!wallet) {
+    if (!user.isOnboarded) {
       router.push(Routes.ONBOARD_RECOVERY);
       return;
     }

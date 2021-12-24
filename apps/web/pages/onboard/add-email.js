@@ -22,7 +22,7 @@ function OnboardAddEmail() {
   const {
     enabled,
     loading: accountLoading,
-    wallet,
+    user,
     patchUser,
   } = useAccountStore(accountOnboardAddEmailPageSelector);
 
@@ -34,7 +34,7 @@ function OnboardAddEmail() {
 
   useEffect(() => {
     if (!enabled) return;
-    if (wallet) {
+    if (user.isOnboarded) {
       router.push(Routes.HOME);
       return;
     }

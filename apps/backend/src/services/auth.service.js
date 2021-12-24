@@ -8,16 +8,23 @@ const Code = require('../models/code.model');
 const ApiError = require('../utils/ApiError');
 const { tokenTypes } = require('../config/tokens');
 const { types } = require('../config/codes');
+const { isWalletDeployed, recoverAddressFromLoginSignature, walletContract } = require('../utils/web3');
 
 /**
- * Login with username and password
+ * Login with username and signature
  * @param {String} email
- * @param {String} password
+ * @param {String} signature
  * @returns {Promise<User>}
  */
-const loginUserWithUsernameAndPassword = async (username, password) => {
+const loginUserWithUsernameAndSignature = async (username, signature) => {
   const user = await userService.getUserByUsernameWithWallet(username);
-  if (!user || !(await user.isPasswordMatch(password))) {
+  const {
+    wallet: { walletAddress, initOwner },
+  } = user;
+  const recoveredAddress = recoverAddressFromLoginSignature(signature);
+  const owner = (await isWalletDeployed(walletAddress)) ? await walletContract(walletAddress).getOwner(0) : initOwner;
+
+  if (!user || recoveredAddress !== owner) {
     throw new ApiError(httpStatus.UNAUTHORIZED, 'Incorrect username or password');
   }
   return user;
@@ -59,7 +66,7 @@ const refreshAuth = async (refreshToken) => {
  * Verify email for account recovery
  * @param {String} username
  * @param {String} code
- * @param {String} newPassword
+ * @param {String} newOwner
  * @returns {Promise}
  */
 const recoverVerifyEmail = async (username, code, newOwner) => {
@@ -101,7 +108,7 @@ const verifyEmail = async (userId, code) => {
 };
 
 module.exports = {
-  loginUserWithUsernameAndPassword,
+  loginUserWithUsernameAndSignature,
   logout,
   refreshAuth,
   recoverVerifyEmail,

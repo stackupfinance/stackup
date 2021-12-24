@@ -59,6 +59,20 @@ const getUserByUsernameWithWallet = async (username) => {
 };
 
 /**
+ * Get user by username and populate encrypted signer only
+ * @param {String} username
+ * @returns {Promise<User>}
+ */
+const getWalletForLogin = async (username) => {
+  const user = await User.findOne({ username }, 'username wallet -_id').populate('wallet', 'encryptedSigner -_id');
+  if (!user) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
+  }
+
+  return user;
+};
+
+/**
  * Get user by username and populate wallet address and init guardians only
  * @param {String} username
  * @returns {Promise<User>}
@@ -110,6 +124,7 @@ module.exports = {
   getUserById,
   getUserByUsername,
   getUserByUsernameWithWallet,
+  getWalletForLogin,
   getWalletForRecovery,
   updateUserById,
   deleteUserById,

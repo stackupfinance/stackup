@@ -1,6 +1,8 @@
 import create from 'zustand';
 import { persist, devtools } from 'zustand/middleware';
 import axios from 'axios';
+import { wallet as walletLib } from '@stackupfinance/contracts';
+import { loginMessage } from '../utils/web3';
 import { App } from '../config';
 
 export const accountUseAuthSelector = (state) => ({
@@ -50,7 +52,6 @@ export const accountOnboardRecoveryPageSelector = (state) => ({
   enabled: state.enabled,
   loading: state.loading,
   user: state.user,
-  wallet: state.wallet,
   accessToken: state.accessToken,
   saveEncryptedWallet: state.saveEncryptedWallet,
 });
@@ -58,14 +59,14 @@ export const accountOnboardRecoveryPageSelector = (state) => ({
 export const accountOnboardAddEmailPageSelector = (state) => ({
   enabled: state.enabled,
   loading: state.loading,
-  wallet: state.wallet,
+  user: state.user,
   patchUser: state.patchUser,
 });
 
 export const accountOnboardVerifyEmailPageSelector = (state) => ({
   enabled: state.enabled,
   loading: state.loading,
-  wallet: state.wallet,
+  user: state.user,
   sendVerificationEmail: state.sendVerificationEmail,
   verifyEmail: state.verifyEmail,
 });
@@ -74,7 +75,6 @@ export const accountOnboardSummaryPageSelector = (state) => ({
   enabled: state.enabled,
   loading: state.loading,
   user: state.user,
-  wallet: state.wallet,
   saveEncryptedWallet: state.saveEncryptedWallet,
 });
 
@@ -97,14 +97,18 @@ export const useAccountStore = create(
           set({ loading: true });
 
           try {
-            const register = await axios.post(`${App.stackup.backendUrl}/v1/auth/register`, data);
-            const user = register.data.user;
+            const register = await axios.post(`${App.stackup.backendUrl}/v1/auth/register`, {
+              username: data.username,
+              wallet: walletLib.proxy.initEncryptedIdentity(data.password),
+            });
+            const { wallet, ...user } = register.data.user;
             const accessToken = register.data.tokens.access;
             const refreshToken = register.data.tokens.refresh;
 
             set({
               loading: false,
               user,
+              wallet,
               accessToken,
               refreshToken,
             });
@@ -118,7 +122,16 @@ export const useAccountStore = create(
           set({ loading: true });
 
           try {
-            const login = await axios.post(`${App.stackup.backendUrl}/v1/auth/login`, data);
+            const lookup = await axios.post(`${App.stackup.backendUrl}/v1/auth/lookup`, {
+              username: data.username,
+            });
+            const signer = walletLib.proxy.decryptSigner(lookup.data.user.wallet, data.password);
+            if (!signer) throw new Error('Incorrect password');
+
+            const login = await axios.post(`${App.stackup.backendUrl}/v1/auth/login`, {
+              username: data.username,
+              signature: await signer.signMessage(loginMessage),
+            });
             const { wallet, ...user } = login.data.user;
             const accessToken = login.data.tokens.access;
             const refreshToken = login.data.tokens.refresh;
@@ -243,13 +256,14 @@ export const useAccountStore = create(
           set({ loading: true });
 
           try {
-            await axios.post(
+            await axios.patch(
               `${App.stackup.backendUrl}/v1/users/${get().user?.id}/wallet`,
               wallet,
               {
                 headers: { Authorization: `Bearer ${get().accessToken?.token}` },
               },
             );
+            await get().patchUser({ isOnboarded: true });
 
             await get().getUser();
           } catch (error) {

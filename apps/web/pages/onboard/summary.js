@@ -23,7 +23,6 @@ function OnboardSummary() {
     enabled,
     loading: accountLoading,
     user,
-    wallet,
     saveEncryptedWallet,
   } = useAccountStore(accountOnboardSummaryPageSelector);
   const { ephemeralWallet, guardianMap: savedGuardianMap } = useOnboardStore(
@@ -39,7 +38,7 @@ function OnboardSummary() {
 
   useEffect(() => {
     if (!enabled) return;
-    if (wallet) {
+    if (user.isOnboarded) {
       router.push(Routes.HOME);
       return;
     }

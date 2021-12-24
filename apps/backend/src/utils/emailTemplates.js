@@ -1,5 +1,5 @@
 /**
- * Generate reset password email template
+ * Generate recover account email template
  * @param {String} username
  * @param {String} code
  * @returns {String}

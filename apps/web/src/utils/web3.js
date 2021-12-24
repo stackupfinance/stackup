@@ -9,6 +9,8 @@ const formatter = new Intl.NumberFormat('en-US', {
   maximumFractionDigits: 2,
 });
 
+export const loginMessage = 'Welcome to Stackup!';
+
 // TODO: Make this more precise.
 // Approving the paymaster for $10 should be more than enough to cover tx fees.
 // If approval drops below $5 we approve again.
