@@ -22,9 +22,11 @@ const initAuthRoutes = new Set([
   Routes.LOGIN,
   Routes.SIGN_UP,
   Routes.RECOVER_LOOKUP,
+  Routes.RECOVER_NEW_PASSWORD,
   Routes.RECOVER_NOT_POSSIBLE,
   Routes.RECOVER_VERIFY_EMAIL,
   Routes.RECOVER_STATUS,
+  Routes.RECOVER_SUBMIT,
 ]);
 
 export const useLogout = () => {

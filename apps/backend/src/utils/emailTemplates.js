@@ -4,7 +4,7 @@
  * @param {String} code
  * @returns {String}
  */
-const resetPasswordEmail = (username, code) => {
+const recoverAccountEmail = (username, code) => {
   return `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
   <html xmlns="http://www.w3.org/1999/xhtml">
     <head>
@@ -445,7 +445,7 @@ const resetPasswordEmail = (username, code) => {
     <![endif]-->
     </head>
     <body>
-      <span class="preheader">Use this code to reset your password. The code is only valid for 10 minutes.</span>
+      <span class="preheader">Use this code to recover your account. The code is only valid for 10 minutes.</span>
       <table class="email-wrapper" width="100%" cellpadding="0" cellspacing="0" role="presentation">
         <tr>
           <td align="center">
@@ -466,9 +466,9 @@ const resetPasswordEmail = (username, code) => {
                       <td class="content-cell">
                         <div class="f-fallback">
                           <h1>Hi ${username},</h1>
-                          <p>You recently requested to reset your Stackup account password. Use the code below to verify you identity. <strong>This password reset is only valid for the next 10 minutes.</strong></p>
+                          <p>You recently requested to recover your Stackup account and have selected us to be one of your guardians. You can use the following code to complete verification:</p>
                           <h1>${code}</h1>
-                          <p>If you did not request a password reset, please ignore this email or <a href="mailto:support@stackup.sh">contact support</a> if you have questions.</p>
+                          <p><strong>This will only be valid for the next 10 minutes.</strong> If you did not request to recover your account, please ignore this email or <a href="mailto:support@stackup.sh">contact support</a> if you have any questions.</p>
                           <p>Thanks,
                             <br>The Stackup Team</p>
                         </div>
@@ -1001,6 +1001,6 @@ const verifyEmail = (username, code) => {
 };
 
 module.exports = {
-  resetPasswordEmail,
+  recoverAccountEmail,
   verifyEmail,
 };

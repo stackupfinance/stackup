@@ -12,6 +12,21 @@ import {
 import { InlineError } from '.';
 
 export const VerifyEmail = ({ isLoading, isDisabled, onComplete, onSendCode, email, error }) => {
+  const renderDescription = () => {
+    if (email)
+      return (
+        <Text>
+          Enter the 6 digit code we sent to your inbox at{' '}
+          <Text as="span" fontWeight="bold">
+            {email}
+          </Text>
+          .
+        </Text>
+      );
+
+    return <Text>Enter the 6 digit code we sent to your recovery e-mail address.</Text>;
+  };
+
   return (
     <>
       <VStack spacing="32px" w="100%">
@@ -22,17 +37,13 @@ export const VerifyEmail = ({ isLoading, isDisabled, onComplete, onSendCode, ema
             <Heading size="md" mb="4px">
               Verify your e-mail 🔑
             </Heading>
-            <Text>
-              Enter the 6 digit code we sent to your inbox at{' '}
-              <Text as="span" fontWeight="bold">
-                {email}
-              </Text>
-            </Text>
+
+            {renderDescription()}
           </Box>
 
           <Box p="16px" borderWidth="1px" borderRadius="lg" w="100%">
             <HStack mb="16px" justifyContent="center">
-              <PinInput size="lg" onComplete={onComplete}>
+              <PinInput id="pin-input-1" size="lg" onComplete={onComplete}>
                 <PinInputField />
                 <PinInputField />
                 <PinInputField />

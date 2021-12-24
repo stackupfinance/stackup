@@ -33,17 +33,17 @@ const recoverLookup = {
   }),
 };
 
-const forgotPassword = {
+const recoverSendVerificationEmail = {
   body: Joi.object().keys({
     username: Joi.string().required(),
   }),
 };
 
-const resetPassword = {
+const recoverVerifyEmail = {
   body: Joi.object().keys({
     code: Joi.number().required(),
     username: Joi.string().required(),
-    password: Joi.string().required().custom(password),
+    newOwner: Joi.string().required(),
   }),
 };
 
@@ -66,8 +66,8 @@ module.exports = {
   logout,
   refreshTokens,
   recoverLookup,
-  forgotPassword,
-  resetPassword,
+  recoverSendVerificationEmail,
+  recoverVerifyEmail,
   verifyEmail,
   authPusher,
 };
