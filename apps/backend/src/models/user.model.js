@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
-const bcrypt = require('bcryptjs');
 const { toJSON, paginate } = require('./plugins');
 const { roles } = require('../config/roles');
 const walletService = require('../services/wallet.service');
@@ -19,17 +18,9 @@ const userSchema = mongoose.Schema(
         }
       },
     },
-    password: {
-      type: String,
-      required: true,
-      trim: true,
-      minLength: 8,
-      validate(value) {
-        if (!value.match(/\d/) || !value.match(/[a-zA-Z]/)) {
-          throw new Error('Password must contain at least one letter and one number');
-        }
-      },
-      private: true, // used by the toJSON plugin
+    isOnboarded: {
+      type: Boolean,
+      default: false,
     },
     email: {
       type: String,
@@ -89,22 +80,8 @@ userSchema.statics.isUsernameTaken = async function (username, excludeUserId) {
   return !!user;
 };
 
-/**
- * Check if password matches the user's password
- * @param {String} password
- * @returns {Promise<boolean>}
- */
-userSchema.methods.isPasswordMatch = async function (password) {
-  const user = this;
-  return bcrypt.compare(password, user.password);
-};
-
 userSchema.pre('save', async function (next) {
   const user = this;
-
-  if (user.isModified('password')) {
-    user.password = await bcrypt.hash(user.password, 8);
-  }
 
   if (user.isModified('email')) {
     user.isEmailVerified = false;

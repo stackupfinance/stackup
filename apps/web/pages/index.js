@@ -30,7 +30,9 @@ export default function Login() {
       createEphemeralWallet(data.password);
       logEvent(EVENTS.LOGIN);
     } catch (error) {
-      setLoginError(error.response?.data?.message || 'Unknown error, try again later!');
+      setLoginError(
+        error.response?.data?.message || error.message || 'Unknown error, try again later!',
+      );
     }
   };
 

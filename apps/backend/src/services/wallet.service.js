@@ -18,12 +18,29 @@ const createWallet = async (userId, walletBody) => {
 };
 
 /**
- * Get a users linked wallets
+ * Get a user's linked wallet
  * @param {ObjectId} userId
- * @returns {Promise<Array<Wallet>>}
+ * @returns {Promise<Wallet>}
  */
 const getUserWallet = async (userId) => {
   return Wallet.findOne({ user: userId });
+};
+
+/**
+ * Update user's linked wallet
+ * @param {ObjectId} userId
+ * @param {Object} updateBody
+ * @returns {Promise<Wallet>}
+ */
+const updateUserWallet = async (userId, updateBody) => {
+  const wallet = await getUserWallet(userId);
+  if (!wallet) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Wallet not found');
+  }
+  Object.assign(wallet, updateBody);
+
+  await wallet.save();
+  return wallet;
 };
 
 /**
@@ -38,5 +55,6 @@ const deleteUserWallets = async (userId) => {
 module.exports = {
   createWallet,
   getUserWallet,
+  updateUserWallet,
   deleteUserWallets,
 };

@@ -1,17 +1,30 @@
 const Joi = require('joi');
-const { username, password } = require('./custom.validation');
+const { username } = require('./custom.validation');
 
 const register = {
   body: Joi.object().keys({
     username: Joi.string().required().custom(username),
-    password: Joi.string().required().custom(password),
+    wallet: Joi.object().keys({
+      walletAddress: Joi.string().required(),
+      initImplementation: Joi.string().required(),
+      initEntryPoint: Joi.string().required(),
+      initOwner: Joi.string().required(),
+      initGuardians: Joi.array().items(Joi.string()).required(),
+      encryptedSigner: Joi.string().base64().required(),
+    }),
+  }),
+};
+
+const lookup = {
+  body: Joi.object().keys({
+    username: Joi.string().required(),
   }),
 };
 
 const login = {
   body: Joi.object().keys({
     username: Joi.string().required(),
-    password: Joi.string().required(),
+    signature: Joi.string().required(),
   }),
 };
 
@@ -62,6 +75,7 @@ const authPusher = {
 
 module.exports = {
   register,
+  lookup,
   login,
   logout,
   refreshTokens,

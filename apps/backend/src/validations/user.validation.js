@@ -1,24 +1,5 @@
 const Joi = require('joi');
-const { password, objectId, userOperation } = require('./custom.validation');
-
-const createUser = {
-  body: Joi.object().keys({
-    email: Joi.string().required().email(),
-    password: Joi.string().required().custom(password),
-    name: Joi.string().required(),
-    role: Joi.string().required().valid('user', 'admin'),
-  }),
-};
-
-const getUsers = {
-  query: Joi.object().keys({
-    username: Joi.string(),
-    role: Joi.string(),
-    sortBy: Joi.string(),
-    limit: Joi.number().integer(),
-    page: Joi.number().integer(),
-  }),
-};
+const { objectId, userOperation } = require('./custom.validation');
 
 const getUser = {
   params: Joi.object().keys({
@@ -32,8 +13,8 @@ const updateUser = {
   }),
   body: Joi.object()
     .keys({
+      isOnboarded: Joi.boolean(),
       email: Joi.string().email(),
-      password: Joi.string().custom(password),
       avatar: Joi.string().uri(),
       bio: Joi.string().max(150),
       unset: Joi.array().items(Joi.string().valid('email', 'avatar', 'bio')).default([]),
@@ -47,18 +28,20 @@ const deleteUser = {
   }),
 };
 
-const createUserWallet = {
+const updateUserWallet = {
   params: Joi.object().keys({
     userId: Joi.string().custom(objectId),
   }),
-  body: Joi.object().keys({
-    walletAddress: Joi.string().required(),
-    initImplementation: Joi.string().required(),
-    initEntryPoint: Joi.string().required(),
-    initOwner: Joi.string().required(),
-    initGuardians: Joi.array().items(Joi.string()).required(),
-    encryptedSigner: Joi.string().base64().required(),
-  }),
+  body: Joi.object()
+    .keys({
+      walletAddress: Joi.string(),
+      initImplementation: Joi.string(),
+      initEntryPoint: Joi.string(),
+      initOwner: Joi.string(),
+      initGuardians: Joi.array().items(Joi.string()),
+      encryptedSigner: Joi.string().base64(),
+    })
+    .min(1),
 };
 
 const getUserWallet = {
@@ -141,12 +124,10 @@ const createUserActivityItem = {
 };
 
 module.exports = {
-  createUser,
-  getUsers,
   getUser,
   updateUser,
   deleteUser,
-  createUserWallet,
+  updateUserWallet,
   getUserWallet,
   getUserSearch,
   findUserActivity,

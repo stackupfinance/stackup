@@ -1,6 +1,9 @@
 const { ethers } = require('ethers');
+const { wallet, contracts } = require('@stackupfinance/contracts');
 const { web3 } = require('../config/config');
 const { status } = require('../config/payments');
+
+const loginMessage = 'Welcome to Stackup!';
 
 const provider = new ethers.providers.JsonRpcProvider(web3.rpc);
 
@@ -18,3 +21,9 @@ module.exports.getTransactionStatus = async (transactionHash) => {
   }
   return status.failed;
 };
+
+module.exports.isWalletDeployed = async (walletAddress) => wallet.proxy.isCodeDeployed(provider, walletAddress);
+
+module.exports.recoverAddressFromLoginSignature = (signature) => ethers.utils.verifyMessage(loginMessage, signature);
+
+module.exports.walletContract = (walletAddress) => contracts.Wallet.getInstance(provider).attach(walletAddress);
