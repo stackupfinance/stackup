@@ -66,7 +66,7 @@ const refreshAuth = async (refreshToken) => {
  * Verify email for account recovery
  * @param {String} username
  * @param {String} code
- * @param {String} newPassword
+ * @param {String} newOwner
  * @returns {Promise}
  */
 const recoverVerifyEmail = async (username, code, newOwner) => {
