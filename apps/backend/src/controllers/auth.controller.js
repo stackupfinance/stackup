@@ -42,8 +42,8 @@ const recoverSendVerificationEmail = catchAsync(async (req, res) => {
 });
 
 const recoverVerifyEmail = catchAsync(async (req, res) => {
-  const signature = await authService.recoverVerifyEmail(req.body.username, req.body.code, req.body.newOwner);
-  res.send({ signature });
+  const guardianRecovery = await authService.recoverVerifyEmail(req.body.username, req.body.code, req.body.newOwner);
+  res.send({ guardianRecovery });
 });
 
 const sendVerificationEmail = catchAsync(async (req, res) => {

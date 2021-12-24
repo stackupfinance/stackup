@@ -106,7 +106,7 @@ export const useRecoverStore = create(
               newOwner: get().newOwner,
             });
 
-            set({ loading: false, guardianRecoveryArray: [res.data.signature] });
+            set({ loading: false, guardianRecoveryArray: [res.data.guardianRecovery] });
           } catch (error) {
             set({ loading: false });
             throw error;
