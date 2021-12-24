@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { Head, PageContainer, NavigationHeader, AppContainer, Lookup } from '../../src/components';
 import { useRecoverStore, recoverRecoverLookupPageSelector } from '../../src/state';
-import { App, Routes } from '../../src/config';
+import { Routes } from '../../src/config';
 import { logEvent, EVENTS } from '../../src/utils/analytics';
 
 function RecoverLookup() {
@@ -11,8 +11,7 @@ function RecoverLookup() {
 
   useEffect(() => {
     router.prefetch(Routes.RECOVER_NOT_POSSIBLE);
-    router.prefetch(Routes.RECOVER_VERIFY_EMAIL);
-    router.prefetch(Routes.RECOVER_STATUS);
+    router.prefetch(Routes.RECOVER_NEW_PASSWORD);
   }, [router]);
 
   const onNextHandler = async (data) => {
@@ -23,10 +22,8 @@ function RecoverLookup() {
     if (guardians.length === 0) {
       logEvent(EVENTS.RECOVER_ACCOUNT_NOT_POSSIBLE);
       router.push(Routes.RECOVER_NOT_POSSIBLE);
-    } else if (guardians.find((curr) => curr === App.web3.paymaster)) {
-      router.push(Routes.RECOVER_VERIFY_EMAIL);
     } else {
-      router.push(Routes.RECOVER_STATUS);
+      router.push(Routes.RECOVER_NEW_PASSWORD);
     }
   };
 

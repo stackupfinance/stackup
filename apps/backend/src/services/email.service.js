@@ -1,7 +1,7 @@
 const nodemailer = require('nodemailer');
 const config = require('../config/config');
 const logger = require('../config/logger');
-const { resetPasswordEmail, verifyEmail } = require('../utils/emailTemplates');
+const { recoverAccountEmail, verifyEmail } = require('../utils/emailTemplates');
 
 const transport = nodemailer.createTransport(config.email.smtp);
 /* istanbul ignore next */
@@ -25,15 +25,15 @@ const sendEmail = async (to, subject, html) => {
 };
 
 /**
- * Send reset password email
+ * Send verification email for account recovery
  * @param {String} username
  * @param {String} email
  * @param {String} code
  * @returns {Promise}
  */
-const sendResetPasswordEmail = async (username, email, code) => {
-  const subject = 'Stackup reset password';
-  await sendEmail(email, subject, resetPasswordEmail(username, code));
+const sendRecoverAccountEmail = async (username, email, code) => {
+  const subject = 'Stackup recover account';
+  await sendEmail(email, subject, recoverAccountEmail(username, code));
 };
 
 /**
@@ -51,6 +51,6 @@ const sendVerificationEmail = async (username, email, code) => {
 module.exports = {
   transport,
   sendEmail,
-  sendResetPasswordEmail,
+  sendRecoverAccountEmail,
   sendVerificationEmail,
 };

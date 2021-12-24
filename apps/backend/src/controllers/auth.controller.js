@@ -35,15 +35,15 @@ const recoverLookup = catchAsync(async (req, res) => {
   res.send({ user });
 });
 
-const forgotPassword = catchAsync(async (req, res) => {
-  const [email, codeDoc] = await codeService.generateResetPasswordCode(req.body.username);
-  await emailService.sendResetPasswordEmail(req.body.username, email, codeDoc.code);
+const recoverSendVerificationEmail = catchAsync(async (req, res) => {
+  const [email, codeDoc] = await codeService.generateRecoverAccountCode(req.body.username);
+  await emailService.sendRecoverAccountEmail(req.body.username, email, codeDoc.code);
   res.status(httpStatus.NO_CONTENT).send();
 });
 
-const resetPassword = catchAsync(async (req, res) => {
-  await authService.resetPassword(req.body.username, req.body.code, req.body.password);
-  res.status(httpStatus.NO_CONTENT).send();
+const recoverVerifyEmail = catchAsync(async (req, res) => {
+  const signature = await authService.recoverVerifyEmail(req.body.username, req.body.code, req.body.newOwner);
+  res.send({ signature });
 });
 
 const sendVerificationEmail = catchAsync(async (req, res) => {
@@ -68,8 +68,8 @@ module.exports = {
   logout,
   refreshTokens,
   recoverLookup,
-  forgotPassword,
-  resetPassword,
+  recoverSendVerificationEmail,
+  recoverVerifyEmail,
   sendVerificationEmail,
   verifyEmail,
   authPusher,

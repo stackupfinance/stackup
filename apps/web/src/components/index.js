@@ -10,6 +10,7 @@ export * from './inlineError';
 export * from './list';
 export * from './lookup';
 export * from './navigationHeader';
+export * from './newPassword';
 export * from './newPaymentCard';
 export * from './pageContainer';
 export * from './pay';

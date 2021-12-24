@@ -25,7 +25,7 @@ const codeSchema = mongoose.Schema(
     },
     type: {
       type: String,
-      enum: [types.resetPassword, types.verifyEmail],
+      enum: [types.recoverAccount, types.verifyEmail],
       required: true,
     },
     expires: {

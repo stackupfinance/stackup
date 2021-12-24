@@ -12,7 +12,9 @@ export const Routes = {
   ONBOARD_VERIFY_EMAIL: '/onboard/verify-email',
   ONBOARD_SUMMARY: '/onboard/summary',
   RECOVER_LOOKUP: '/recover/lookup',
+  RECOVER_NEW_PASSWORD: '/recover/new-password',
   RECOVER_NOT_POSSIBLE: '/recover/not-possible',
   RECOVER_VERIFY_EMAIL: '/recover/verify-email',
   RECOVER_STATUS: '/recover/status',
+  RECOVER_SUBMIT: '/recover/submit',
 };
