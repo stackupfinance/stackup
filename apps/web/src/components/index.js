@@ -14,6 +14,7 @@ export * from './newPassword';
 export * from './newPaymentCard';
 export * from './pageContainer';
 export * from './pay';
+export * from './recoverAccount';
 export * from './search';
 export * from './searchModal';
 export * from './setupGuardians';

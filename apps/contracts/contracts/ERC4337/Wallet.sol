@@ -17,8 +17,7 @@ import {IWallet} from "./interface/IWallet.sol";
 import {PostOpMode, IPaymaster} from "./interface/IPaymaster.sol";
 import {UserOperation} from "./library/UserOperation.sol";
 import {WalletUserOperation} from "./library/WalletUserOperation.sol";
-import {GuardianRecovery} from "./library/GuardianRecovery.sol";
-import {WalletGuardianRecovery} from "./library/WalletGuardianRecovery.sol";
+import {WalletSignature, WalletSignatureMode} from "./library/WalletSignature.sol";
 
 import "hardhat/console.sol";
 
@@ -32,7 +31,6 @@ contract Wallet is
 {
   using ECDSA for bytes32;
   using WalletUserOperation for UserOperation;
-  using WalletGuardianRecovery for GuardianRecovery;
 
   // This contract is an implementation for WalletProxy.sol.
   // The following must be followed when updating contract variables:
@@ -85,11 +83,38 @@ contract Wallet is
     UserOperation calldata userOp,
     uint256 requiredPrefund
   ) external onlyEntryPoint {
-    if (!userOp.isCallingRecoverAccount()) {
+    WalletSignature memory ws = userOp.decodeWalletSignature();
+
+    if (ws.mode == WalletSignatureMode.owner) {
       require(
-        hasRole(OWNER_ROLE, userOp.signer()),
-        "Wallet: Invalid signature"
+        hasRole(OWNER_ROLE, userOp.recoverSigner(ws.values[0].signature)),
+        "Wallet: Invalid owner sig"
       );
+    } else {
+      require(
+        userOp.isGuardianCallDataOK(requiredPrefund),
+        "Wallet: Invalid guardian action"
+      );
+
+      require(
+        ws.values.length >= Math.ceilDiv(getRoleMemberCount(GUARDIAN_ROLE), 2),
+        "Wallet: Insufficient guardians"
+      );
+
+      for (uint256 i = 0; i < ws.values.length; i++) {
+        require(
+          userOp.isValidGuardianSignature(
+            ws.values[i].signer,
+            ws.values[i].signature
+          ),
+          "Wallet: Invalid guardian sig"
+        );
+
+        require(
+          hasRole(GUARDIAN_ROLE, ws.values[i].signer),
+          "Wallet: Not a guardian"
+        );
+      }
     }
     require(nonce == userOp.nonce, "Wallet: Invalid nonce");
 
@@ -189,6 +214,11 @@ contract Wallet is
     _revokeRole(GUARDIAN_ROLE, guardian);
   }
 
+  function transferOwner(address newOwner) external onlyEntryPoint {
+    _revokeRole(OWNER_ROLE, getRoleMember(OWNER_ROLE, 0));
+    _grantRole(OWNER_ROLE, newOwner);
+  }
+
   function isValidSignature(bytes32 hash, bytes memory signature)
     public
     view
@@ -200,41 +230,5 @@ contract Wallet is
     );
 
     return IERC1271.isValidSignature.selector;
-  }
-
-  function recoverAccount(
-    address newOwner,
-    GuardianRecovery[] calldata guardianRecoveryArray
-  ) external onlyEntryPoint {
-    for (uint256 i = 0; i < guardianRecoveryArray.length; i++) {
-      require(
-        guardianRecoveryArray[i].hasValidSignature(),
-        "Wallet: Invalid guardianRecovery"
-      );
-
-      require(
-        hasRole(GUARDIAN_ROLE, guardianRecoveryArray[i].guardian),
-        "Wallet: Not a guardian"
-      );
-
-      require(
-        address(this) == guardianRecoveryArray[i].wallet,
-        "Wallet: Wrong wallet"
-      );
-
-      require(
-        newOwner == guardianRecoveryArray[i].newOwner,
-        "Wallet: newOwner mismatch"
-      );
-    }
-
-    require(
-      guardianRecoveryArray.length >=
-        Math.ceilDiv(getRoleMemberCount(GUARDIAN_ROLE), 2),
-      "Wallet: Insufficient guardians"
-    );
-
-    _revokeRole(OWNER_ROLE, getRoleMember(OWNER_ROLE, 0));
-    _grantRole(OWNER_ROLE, newOwner);
   }
 }

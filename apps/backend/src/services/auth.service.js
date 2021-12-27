@@ -82,7 +82,8 @@ const recoverVerifyEmail = async (username, code, newOwner) => {
     }
 
     await Code.deleteMany({ user: user.id, type: types.recoverAccount });
-    return signerService.signGuardianRecovery(user.wallet.walletAddress, newOwner);
+    // TODO: Requires refactor
+    return signerService.signUserOpAsGuardian(user.wallet.walletAddress, newOwner);
   } catch (error) {
     throw new ApiError(httpStatus.UNAUTHORIZED, 'Recover account verification failed');
   }

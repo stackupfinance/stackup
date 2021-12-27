@@ -6,9 +6,11 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import "@openzeppelin/contracts/utils/cryptography/SignatureChecker.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 import "solidity-bytes-utils/contracts/BytesLib.sol";
 import {UserOperation} from "./UserOperation.sol";
+import {WalletSignature, WalletSignatureMode, WalletSignatureValue} from "./WalletSignature.sol";
 
 import "hardhat/console.sol";
 
@@ -123,26 +125,10 @@ library WalletUserOperation {
       (address, uint256)
     );
 
-    return spender == address(this) && value >= _requiredTokenFee(op, maxcost);
+    return spender == op.paymaster && value >= _requiredTokenFee(op, maxcost);
   }
 
-  function isCallingRecoverAccount(UserOperation calldata op)
-    internal
-    pure
-    returns (bool)
-  {
-    if (op.callData.length == 0) return false;
-
-    return
-      bytes4(op.callData[:4]) ==
-      bytes4(
-        keccak256(
-          bytes("recoverAccount(address,(address,address,address,bytes)[])")
-        )
-      );
-  }
-
-  function signer(UserOperation calldata op) internal pure returns (address) {
+  function _hash(UserOperation calldata op) internal pure returns (bytes32) {
     return
       keccak256(
         abi.encodePacked(
@@ -158,7 +144,53 @@ library WalletUserOperation {
           op.paymaster,
           keccak256(op.paymasterData)
         )
-      ).toEthSignedMessageHash().recover(op.signature);
+      ).toEthSignedMessageHash();
+  }
+
+  function decodeWalletSignature(UserOperation calldata op)
+    internal
+    pure
+    returns (WalletSignature memory)
+  {
+    (WalletSignatureMode mode, WalletSignatureValue[] memory values) = abi
+      .decode(op.signature, (WalletSignatureMode, WalletSignatureValue[]));
+
+    WalletSignature memory data;
+    data.mode = mode;
+    data.values = values;
+    return data;
+  }
+
+  function recoverSigner(UserOperation calldata op, bytes memory signature)
+    internal
+    pure
+    returns (address)
+  {
+    return _hash(op).recover(signature);
+  }
+
+  function isValidGuardianSignature(
+    UserOperation calldata op,
+    address guardian,
+    bytes memory signature
+  ) internal view returns (bool) {
+    return SignatureChecker.isValidSignatureNow(guardian, _hash(op), signature);
+  }
+
+  function isGuardianCallDataOK(UserOperation calldata op, uint256 maxcost)
+    internal
+    view
+    returns (bool)
+  {
+    if (op.callData.length == 0) return false;
+
+    // Guardians can only do the following action:
+    // 1. Approve token allowance for paymaster
+    // 2. Transfer owner for social recovery
+    return
+      (op.paymasterData.length != 0 && tokenAllowanceWillBeOK(op, maxcost)) ||
+      (bytes4(op.callData[:4]) ==
+        bytes4(keccak256(bytes("transferOwner(address)"))));
   }
 
   function paymasterSigner(UserOperation calldata op)

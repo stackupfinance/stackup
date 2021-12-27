@@ -20,7 +20,8 @@
     "deploy:mumbai:wallet": "hardhat run --network mumbai scripts/deploy/wallet.js",
     "paymaster:mumbai:getAddress": "hardhat run --network mumbai scripts/paymaster/getAddress.js",
     "paymaster:mumbai:addStake": "hardhat run --network mumbai scripts/paymaster/addStake.js",
-    "paymaster:mumbai:getStake": "hardhat run --network mumbai scripts/paymaster/getStake.js"
+    "paymaster:mumbai:getStake": "hardhat run --network mumbai scripts/paymaster/getStake.js",
+    "paymaster:mumbai:updateImplementation": "hardhat run --network mumbai scripts/paymaster/updateImplementation.js"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.3",

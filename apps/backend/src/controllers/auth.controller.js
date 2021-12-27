@@ -1,5 +1,4 @@
 const httpStatus = require('http-status');
-const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
 const {
   authService,
@@ -46,10 +45,6 @@ const refreshTokens = catchAsync(async (req, res) => {
 
 const recoverLookup = catchAsync(async (req, res) => {
   const user = await userService.getWalletForRecovery(req.body.username);
-
-  if (!user) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
-  }
   res.send({ user });
 });
 

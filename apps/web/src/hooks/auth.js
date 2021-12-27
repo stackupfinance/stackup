@@ -26,7 +26,7 @@ const initAuthRoutes = new Set([
   Routes.RECOVER_NOT_POSSIBLE,
   Routes.RECOVER_VERIFY_EMAIL,
   Routes.RECOVER_STATUS,
-  Routes.RECOVER_SUBMIT,
+  Routes.RECOVER_CONFIRM,
 ]);
 
 export const useLogout = () => {

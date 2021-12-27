@@ -2,8 +2,15 @@ const { wallet, contracts } = require('@stackupfinance/contracts');
 const { web3 } = require('../config/config');
 const { signer, defaultPaymasterFee } = require('../utils/web3');
 
-const signGuardianRecovery = async (walletAddress, newOwner) => {
-  return wallet.access.signGuardianRecovery(signer, { guardian: web3.paymaster, wallet: walletAddress, newOwner });
+const signUserOpAsGuardian = async (walletAddress, newOwner) => {
+  // TODO: Requires refactor
+  return wallet.userOperations.signAsGuardian(
+    signer,
+    web3.paymaster,
+    wallet.userOperations.get(walletAddress, {
+      callData: wallet.encodeFunctionData.transferOwner(newOwner),
+    })
+  );
 };
 
 const signUserOpWithPaymaster = async (userOperation, index) => {
@@ -24,7 +31,7 @@ const relayUserOpsToEntryPoint = async (userOperations) => {
 };
 
 module.exports = {
-  signGuardianRecovery,
+  signUserOpAsGuardian,
   signUserOpWithPaymaster,
   relayUserOpsToEntryPoint,
 };

@@ -149,7 +149,7 @@ describe("Wallet", () => {
       ).to.be.revertedWith("Wallet: Not from EntryPoint");
     });
 
-    it("Required to be signed by the wallet's owner", async () => {
+    it("Does not revert when signed by the wallet's owner", async () => {
       const validUserOp = await wallet.userOperations.sign(
         paymasterUser,
         wallet.userOperations.get(paymasterUserWallet.address)
@@ -163,22 +163,7 @@ describe("Wallet", () => {
         .reverted;
       await expect(
         paymasterUserWallet.validateUserOp(invalidUserOp, 0)
-      ).to.be.revertedWith("Wallet: Invalid signature");
-    });
-
-    it("Required to be a call to recoverAccount if not signed by wallet's owner", async () => {
-      const validUserOp = await wallet.userOperations.sign(
-        newOwner,
-        wallet.userOperations.get(regularUserWallet.address, {
-          callData: wallet.encodeFunctionData.recoverAccount(
-            newOwner.address,
-            []
-          ),
-        })
-      );
-
-      await expect(regularUserWallet.validateUserOp(validUserOp, 0)).to.not.be
-        .reverted;
+      ).to.be.revertedWith("Wallet: Invalid owner sig");
     });
 
     it("Increments valid nonce", async () => {
@@ -257,6 +242,138 @@ describe("Wallet", () => {
         paymasterUserWallet.address,
       ]);
       expect(walletBalance).to.equal(balance);
+    });
+
+    describe("When signed by the wallet's guardians", () => {
+      it("Reverts on actions not required for recovery", async () => {
+        const validUserOp = await wallet.userOperations.signAsGuardian(
+          regularGuardian,
+          regularGuardian.address,
+          wallet.userOperations.get(regularUserWallet.address, {
+            callData: wallet.encodeFunctionData.ERC20Transfer(
+              USDC_TOKEN,
+              regularGuardian.address,
+              ethers.utils.parseUnits("1", "mwei")
+            ),
+          })
+        );
+
+        await expect(
+          regularUserWallet.validateUserOp(validUserOp, 0)
+        ).to.be.revertedWith("Wallet: Invalid guardian action");
+      });
+
+      it("Reverts without a majority of verified guardians", async () => {
+        await Promise.all([
+          regularUserWallet.grantGuardian(anotherRegularGuardian.address),
+          regularUserWallet.grantGuardian(regularGuardianWallet.address),
+        ]);
+        const invalidUserOp = await wallet.userOperations.signAsGuardian(
+          regularGuardian,
+          regularGuardianWallet.address,
+          wallet.userOperations.get(regularUserWallet.address, {
+            callData: wallet.encodeFunctionData.transferOwner(newOwner.address),
+          })
+        );
+
+        await expect(
+          regularUserWallet.validateUserOp(invalidUserOp, 0)
+        ).to.be.revertedWith("Wallet: Insufficient guardians");
+      });
+
+      it("Reverts on invalid guardian signature", async () => {
+        const invalidUserOp = await wallet.userOperations
+          .signAsGuardian(
+            regularGuardian,
+            regularGuardian.address,
+            wallet.userOperations.get(regularUserWallet.address, {
+              callData: wallet.encodeFunctionData.transferOwner(
+                regularGuardian.address
+              ),
+            })
+          )
+          .then((op) => {
+            op.callData = wallet.encodeFunctionData.transferOwner(
+              newOwner.address
+            );
+
+            return op;
+          });
+
+        await expect(
+          regularUserWallet.validateUserOp(invalidUserOp, 0)
+        ).to.be.revertedWith("Wallet: Invalid guardian sig");
+      });
+
+      it("Reverts if guardian does not have the correct role", async () => {
+        const invalidUserOp = await wallet.userOperations.signAsGuardian(
+          anotherRegularGuardian,
+          anotherRegularGuardian.address,
+          wallet.userOperations.get(regularUserWallet.address, {
+            callData: wallet.encodeFunctionData.transferOwner(newOwner.address),
+          })
+        );
+
+        await expect(
+          regularUserWallet.validateUserOp(invalidUserOp, 0)
+        ).to.be.revertedWith("Wallet: Not a guardian");
+      });
+
+      it("Does not revert with a majority of verified guardians and approved actions", async () => {
+        await Promise.all([
+          regularUserWallet.grantGuardian(anotherRegularGuardian.address),
+          regularUserWallet.grantGuardian(regularGuardianWallet.address),
+        ]);
+        const [approveUserOp, recoverUserOp] = await Promise.all([
+          wallet.userOperations
+            .signAsGuardian(
+              regularGuardian,
+              regularGuardianWallet.address,
+              await wallet.userOperations.signPaymasterData(
+                paymasterUser,
+                paymasterUserWallet.address,
+                ...PAYMASTER_OPTS,
+                wallet.userOperations.get(regularUserWallet.address, {
+                  callData: wallet.encodeFunctionData.ERC20Approve(
+                    USDC_TOKEN,
+                    paymasterUserWallet.address,
+                    ethers.constants.MaxUint256
+                  ),
+                })
+              )
+            )
+            .then((op) =>
+              wallet.userOperations.signAsGuardian(
+                anotherRegularGuardian,
+                anotherRegularGuardian.address,
+                op
+              )
+            ),
+          wallet.userOperations
+            .signAsGuardian(
+              regularGuardian,
+              regularGuardianWallet.address,
+              wallet.userOperations.get(regularUserWallet.address, {
+                nonce: 1,
+                callData: wallet.encodeFunctionData.transferOwner(
+                  newOwner.address
+                ),
+              })
+            )
+            .then((op) =>
+              wallet.userOperations.signAsGuardian(
+                anotherRegularGuardian,
+                anotherRegularGuardian.address,
+                op
+              )
+            ),
+        ]);
+
+        await expect(regularUserWallet.validateUserOp(approveUserOp, 0)).to.not
+          .be.reverted;
+        await expect(regularUserWallet.validateUserOp(recoverUserOp, 0)).to.not
+          .be.reverted;
+      });
     });
   });
 
@@ -601,13 +718,8 @@ describe("Wallet", () => {
 
   describe("isValidSignature", () => {
     it("Reverts if signature is invalid", async () => {
-      const guardianRecovery = wallet.message.guardianRecovery({
-        guardian: regularGuardianWallet.address,
-        wallet: regularUserWallet.address,
-        newOwner: newOwner.address,
-      });
-      const hash = ethers.utils.hashMessage(guardianRecovery);
-      const signature = newOwner.signMessage(guardianRecovery);
+      const hash = ethers.utils.hashMessage("Test message!");
+      const signature = newOwner.signMessage("Test message!");
 
       await expect(
         regularGuardianWallet.isValidSignature(hash, signature)
@@ -615,13 +727,8 @@ describe("Wallet", () => {
     });
 
     it("Returns correct value if signature is valid", async () => {
-      const guardianRecovery = wallet.message.guardianRecovery({
-        guardian: regularGuardianWallet.address,
-        wallet: regularUserWallet.address,
-        newOwner: newOwner.address,
-      });
-      const hash = ethers.utils.hashMessage(guardianRecovery);
-      const signature = regularGuardian.signMessage(guardianRecovery);
+      const hash = ethers.utils.hashMessage("Test message!");
+      const signature = regularGuardian.signMessage("Test message!");
 
       expect(
         await regularGuardianWallet.isValidSignature(hash, signature)
@@ -629,118 +736,16 @@ describe("Wallet", () => {
     });
   });
 
-  describe("recoverAccount", () => {
+  describe("transferOwner", () => {
     it("Required to be called from the Entry Point", async () => {
       await expect(
-        regularUserWallet
-          .connect(regularUser)
-          .recoverAccount(newOwner.address, [])
+        regularUserWallet.connect(regularUser).transferOwner(newOwner.address)
       ).to.be.revertedWith("Wallet: Not from EntryPoint");
     });
 
-    it("Reverts on invalid guardianRecovery", async () => {
-      const guardianRecovery = await wallet.access.signGuardianRecovery(
-        newOwner,
-        {
-          guardian: regularGuardian.address,
-          wallet: regularUserWallet.address,
-          newOwner: newOwner.address,
-        }
-      );
-
-      await expect(
-        regularUserWallet.recoverAccount(newOwner.address, [guardianRecovery])
-      ).to.be.revertedWith("Wallet: Invalid guardianRecovery");
-    });
-
-    it("Reverts if guardian does not have the correct role", async () => {
-      const guardianRecovery = await wallet.access.signGuardianRecovery(
-        anotherRegularGuardian,
-        {
-          guardian: anotherRegularGuardian.address,
-          wallet: regularUserWallet.address,
-          newOwner: newOwner.address,
-        }
-      );
-
-      await expect(
-        regularUserWallet.recoverAccount(newOwner.address, [guardianRecovery])
-      ).to.be.revertedWith("Wallet: Not a guardian");
-    });
-
-    it("Reverts if not the correct wallet", async () => {
-      const guardianRecovery = await wallet.access.signGuardianRecovery(
-        regularGuardian,
-        {
-          guardian: regularGuardian.address,
-          wallet: regularGuardianWallet.address,
-          newOwner: newOwner.address,
-        }
-      );
-
-      await expect(
-        regularUserWallet.recoverAccount(newOwner.address, [guardianRecovery])
-      ).to.be.revertedWith("Wallet: Wrong wallet");
-    });
-
-    it("Reverts if newOwner doesn't match", async () => {
-      const guardianRecovery = await wallet.access.signGuardianRecovery(
-        regularGuardian,
-        {
-          guardian: regularGuardian.address,
-          wallet: regularUserWallet.address,
-          newOwner: regularGuardian.address,
-        }
-      );
-
-      await expect(
-        regularUserWallet.recoverAccount(newOwner.address, [guardianRecovery])
-      ).to.be.revertedWith("Wallet: newOwner mismatch");
-    });
-
-    it("Requires a majority of verified guardians", async () => {
-      await Promise.all([
-        regularUserWallet.grantGuardian(anotherRegularGuardian.address),
-        regularUserWallet.grantGuardian(regularGuardianWallet.address),
-      ]);
-      const guardianRecovery = await wallet.access.signGuardianRecovery(
-        regularGuardian,
-        {
-          guardian: regularGuardian.address,
-          wallet: regularUserWallet.address,
-          newOwner: newOwner.address,
-        }
-      );
-
-      await expect(
-        regularUserWallet.recoverAccount(newOwner.address, [guardianRecovery])
-      ).to.be.revertedWith("Wallet: Insufficient guardians");
-    });
-
     it("Assigns a new owner and revokes old one", async () => {
-      await Promise.all([
-        regularUserWallet.grantGuardian(anotherRegularGuardian.address),
-        regularUserWallet.grantGuardian(regularGuardianWallet.address),
-      ]);
-      const guardianRecoveryArray = await Promise.all([
-        wallet.access.signGuardianRecovery(regularGuardian, {
-          guardian: regularGuardian.address,
-          wallet: regularUserWallet.address,
-          newOwner: newOwner.address,
-        }),
-        wallet.access.signGuardianRecovery(regularGuardian, {
-          guardian: regularGuardianWallet.address,
-          wallet: regularUserWallet.address,
-          newOwner: newOwner.address,
-        }),
-      ]);
-
-      await expect(
-        regularUserWallet.recoverAccount(
-          newOwner.address,
-          guardianRecoveryArray
-        )
-      ).to.not.be.reverted;
+      await expect(regularUserWallet.transferOwner(newOwner.address)).to.not.be
+        .reverted;
       expect(await regularUserWallet.getOwnerCount()).to.equal(1);
       expect(await regularUserWallet.getOwner(0)).to.equal(newOwner.address);
     });
