@@ -12,6 +12,7 @@ import {
 import { useRecoverStore, recoverRecoverConfirmPageSelector } from '../../src/state';
 import { useRecoverAccountChannel } from '../../src/hooks';
 import { App, Routes } from '../../src/config';
+import { logEvent, EVENTS } from '../../src/utils/analytics';
 
 const txStatus = {
   success: 'success',
@@ -56,6 +57,7 @@ function RecoverConfirm() {
       onCloseComplete:
         data.status === txStatus.success ? () => router.push(Routes.LOGIN) : undefined,
     });
+    data.status === txStatus.success && logEvent(EVENTS.RECOVER_ACCOUNT_CONFIRM_SUCCESS);
     onComplete();
   });
 
@@ -75,6 +77,7 @@ function RecoverConfirm() {
 
   const onConfirmTrasaction = async (data) => {
     await confirm(channelId, data.password);
+    logEvent(EVENTS.RECOVER_ACCOUNT_CONFIRM);
     toast({
       title: 'Recovery initiated',
       description: 'This might take a minute. Stay on this page for updates...',
