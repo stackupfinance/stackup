@@ -8,6 +8,8 @@ const {
   emailService,
   codeService,
   pusherService,
+  signerService,
+  transactionService,
 } = require('../services');
 
 const register = catchAsync(async (req, res) => {
@@ -48,6 +50,12 @@ const recoverLookup = catchAsync(async (req, res) => {
   res.send({ user });
 });
 
+const recoverPaymasterApproval = catchAsync(async (req, res) => {
+  // TODO: Run additional verification before approving?
+  const userOperations = await Promise.all(req.body.userOperations.map(signerService.signUserOpWithPaymaster));
+  res.send({ userOperations });
+});
+
 const recoverSendVerificationEmail = catchAsync(async (req, res) => {
   const [email, codeDoc] = await codeService.generateRecoverAccountCode(req.body.username);
   await emailService.sendRecoverAccountEmail(req.body.username, email, codeDoc.code);
@@ -55,8 +63,15 @@ const recoverSendVerificationEmail = catchAsync(async (req, res) => {
 });
 
 const recoverVerifyEmail = catchAsync(async (req, res) => {
-  const guardianRecovery = await authService.recoverVerifyEmail(req.body.username, req.body.code, req.body.newOwner);
-  res.send({ guardianRecovery });
+  const userOperations = await authService.recoverVerifyEmail(req.body.username, req.body.code, req.body.userOperations);
+  res.send({ userOperations });
+});
+
+const recoverConfirm = catchAsync(async (req, res) => {
+  const { signature, ...data } = req.body;
+  await transactionService.verifyRecoverAccountUserOps(signature, data.userOperations);
+  await transactionService.monitorRecoverAccountTransaction(data);
+  res.status(httpStatus.NO_CONTENT).send();
 });
 
 const sendVerificationEmail = catchAsync(async (req, res) => {
@@ -82,8 +97,10 @@ module.exports = {
   logout,
   refreshTokens,
   recoverLookup,
+  recoverPaymasterApproval,
   recoverSendVerificationEmail,
   recoverVerifyEmail,
+  recoverConfirm,
   sendVerificationEmail,
   verifyEmail,
   authPusher,

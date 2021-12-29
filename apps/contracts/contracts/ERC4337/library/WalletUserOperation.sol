@@ -100,11 +100,23 @@ library WalletUserOperation {
     return tokenFee + pd.fee;
   }
 
+  function _isCallingExternalContract(UserOperation calldata op)
+    internal
+    pure
+    returns (bool)
+  {
+    return
+      bytes4(op.callData[:4]) ==
+      bytes4(keccak256(bytes("executeUserOp(address,uint256,bytes)")));
+  }
+
   function _isCallingTokenApprove(UserOperation calldata op)
     internal
     pure
     returns (bool)
   {
+    if (!_isCallingExternalContract(op)) return false;
+
     WalletCallData memory wcd = _decodeWalletCallData(op);
     PaymasterData memory pd = _decodePaymasterData(op);
 
@@ -119,6 +131,8 @@ library WalletUserOperation {
     view
     returns (bool)
   {
+    if (!_isCallingExternalContract(op)) return false;
+
     WalletCallData memory wcd = _decodeWalletCallData(op);
     (address spender, uint256 value) = abi.decode(
       BytesLib.slice(wcd.data, 4, wcd.data.length - 4),

@@ -15,12 +15,13 @@ function RecoverVerifyEmail() {
   const router = useRouter();
   const {
     loading: recoverLoading,
-    userOps,
+    userOperations,
     guardians,
     sendVerificationEmail,
     verifyEmail,
   } = useRecoverStore(recoverRecoverVerifyEmailPageSelector);
   const [isDisabled, setIsDisabled] = useState(false);
+  const [debounce, setDebounce] = useState(true);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -34,14 +35,17 @@ function RecoverVerifyEmail() {
       router.push(Routes.RECOVER_LOOKUP);
       return;
     }
-    if (!userOps) {
+    if (!userOperations) {
       router.push(Routes.RECOVER_NEW_PASSWORD);
       return;
     }
 
-    onSendCode();
+    if (debounce) {
+      onSendCode();
+      setDebounce(false);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userOps]);
+  }, [userOperations]);
 
   const onSendCode = async () => {
     setError('');

@@ -26,7 +26,7 @@ export const RecoverAccount = ({ isLoading, onConfirmTrasaction }) => {
     try {
       await onConfirmTrasaction(data);
     } catch (error) {
-      setError(error.response?.data?.message || 'Unknown error, try again later!');
+      setError(error.response?.data?.message || error.message || 'Unknown error, try again later!');
     }
   };
 

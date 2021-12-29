@@ -24,3 +24,21 @@ export const useActivityChannel = (callback = () => {}) => {
     };
   }, [enabled, accessToken, user]);
 };
+
+export const useRecoverAccountChannel = (channelId, callback = () => {}) => {
+  useEffect(() => {
+    const pusher = new Pusher(App.pusher.appKey, {
+      cluster: App.pusher.appCluster,
+      authEndpoint: `${App.stackup.backendUrl}/v1/auth/pusher`,
+    });
+
+    const channelName = `recover-account-${channelId}`;
+    const eventName = 'recoverAccount';
+    const channel = pusher.subscribe(channelName);
+    channel.bind(eventName, callback);
+
+    return () => {
+      pusher.disconnect();
+    };
+  }, []);
+};

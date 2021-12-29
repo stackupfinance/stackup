@@ -8,10 +8,15 @@ import {
   usdcContract,
   defaultPaymasterApproval,
   defaultPaymasterReapproval,
+  loginMessage,
 } from '../../src/utils/web3';
 import { App } from '../config';
 
 export const recoverUseAuthSelector = (state) => ({
+  clear: state.clear,
+});
+
+export const recoverLoginPageSelector = (state) => ({
   clear: state.clear,
 });
 
@@ -33,7 +38,7 @@ export const recoverRecoverNewPasswordPageSelector = (state) => ({
 
 export const recoverRecoverVerifyEmailPageSelector = (state) => ({
   loading: state.loading,
-  userOps: state.userOps,
+  userOperations: state.userOperations,
   guardians: state.guardians,
   sendVerificationEmail: state.sendVerificationEmail,
   verifyEmail: state.verifyEmail,
@@ -41,14 +46,29 @@ export const recoverRecoverVerifyEmailPageSelector = (state) => ({
 
 export const recoverRecoverConfirmPageSelector = (state) => ({
   loading: state.loading,
+  userOperations: state.userOperations,
+  confirm: state.confirm,
+  onComplete: state.onComplete,
 });
 
 const defaultState = {
   loading: false,
   user: undefined,
   encryptedSigner: undefined,
-  userOps: undefined,
+  userOperations: undefined,
   guardians: undefined,
+};
+
+const paymasterApproval = async (userOperations) => {
+  try {
+    const res = await axios.post(`${App.stackup.backendUrl}/v1/auth/recover/paymasterApproval`, {
+      userOperations,
+    });
+
+    return res.data.userOperations;
+  } catch (error) {
+    throw error;
+  }
 };
 
 export const useRecoverStore = create(
@@ -73,7 +93,7 @@ export const useRecoverStore = create(
             const nonce = isDeployed
               ? await wallet.proxy.getNonce(provider, user.wallet.walletAddress)
               : constants.userOperations.initNonce;
-            const userOps = [
+            const userOperations = await Promise.all([
               shouldApprove
                 ? wallet.userOperations.get(user.wallet.walletAddress, {
                     nonce,
@@ -96,9 +116,11 @@ export const useRecoverStore = create(
                 nonce: shouldApprove ? nonce + 1 : nonce,
                 callData: wallet.encodeFunctionData.transferOwner(newOwner),
               }),
-            ].filter(Boolean);
+            ])
+              .then((ops) => ops.filter(Boolean))
+              .then(paymasterApproval);
 
-            set({ loading: false, encryptedSigner, userOps });
+            set({ loading: false, encryptedSigner, userOperations });
           } catch (error) {
             set({ loading: false });
             throw error;
@@ -146,22 +168,48 @@ export const useRecoverStore = create(
         },
 
         verifyEmail: async (code) => {
-          if (!get().user || !get().newOwner) return;
+          if (!get().user || !get().userOperations) return;
           set({ loading: true });
 
           try {
             const res = await axios.post(`${App.stackup.backendUrl}/v1/auth/recover/verify-email`, {
               username: get().user.username,
               code,
-              newOwner: get().newOwner,
+              userOperations: get().userOperations,
             });
 
-            set({ loading: false });
+            set({ loading: false, userOperations: res.data.userOperations });
           } catch (error) {
             set({ loading: false });
             throw error;
           }
         },
+
+        confirm: async (channelId, password) => {
+          const { user, encryptedSigner, userOperations } = get();
+          if (!user || !encryptedSigner || !userOperations) return;
+          set({ loading: true });
+
+          try {
+            const signer = wallet.proxy.decryptSigner({ encryptedSigner }, password);
+            if (!signer) {
+              throw new Error('Incorrect password');
+            }
+
+            await axios.post(`${App.stackup.backendUrl}/v1/auth/recover/confirm`, {
+              channelId,
+              username: user.username,
+              signature: await signer.signMessage(loginMessage),
+              encryptedSigner,
+              userOperations,
+            });
+          } catch (error) {
+            set({ loading: false });
+            throw error;
+          }
+        },
+
+        onComplete: async () => set({ loading: false }),
 
         clear: () => set({ ...defaultState }),
       }),
