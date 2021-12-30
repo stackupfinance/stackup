@@ -1177,7 +1177,7 @@
     patch-package "^6.2.2"
     postinstall-postinstall "^2.1.0"
 
-"@ethereumjs/block@^3.4.0", "@ethereumjs/block@^3.5.0", "@ethereumjs/block@^3.6.0":
+"@ethereumjs/block@^3.5.0", "@ethereumjs/block@^3.6.0":
   version "3.6.0"
   resolved "https://registry.npmjs.org/@ethereumjs/block/-/block-3.6.0.tgz"
   integrity sha512-dqLo1LtsLG+Oelu5S5tWUDG0pah3QUwV5TJZy2cm19BXDr4ka/S9XBSgao0i09gTcuPlovlHgcs6d7EZ37urjQ==
@@ -1187,7 +1187,7 @@
     ethereumjs-util "^7.1.3"
     merkle-patricia-tree "^4.2.2"
 
-"@ethereumjs/blockchain@^5.4.0", "@ethereumjs/blockchain@^5.5.0":
+"@ethereumjs/blockchain@^5.5.0":
   version "5.5.0"
   resolved "https://registry.npmjs.org/@ethereumjs/blockchain/-/blockchain-5.5.0.tgz"
   integrity sha512-879YVmWbM8OUKLVj+OuEZ+sZFkQOnXYGeak5oi7O1hOjaRv//je+fK2axGP04cbttu7sPCp41zy7O6xw4cut8A==
@@ -1236,9 +1236,9 @@
     "@ethereumjs/common" "^2.6.0"
     ethereumjs-util "^7.1.3"
 
-"@ethereumjs/vm@^5.5.2":
+"@ethereumjs/vm@^5.6.0":
   version "5.6.0"
-  resolved "https://registry.npmjs.org/@ethereumjs/vm/-/vm-5.6.0.tgz"
+  resolved "https://registry.yarnpkg.com/@ethereumjs/vm/-/vm-5.6.0.tgz#e0ca62af07de820143674c30b776b86c1983a464"
   integrity sha512-J2m/OgjjiGdWF2P9bj/4LnZQ1zRoZhY8mRNVw/N3tXliGI8ai1sI1mlDPkLpeUUM4vq54gH6n0ZlSpz8U/qlYQ==
   dependencies:
     "@ethereumjs/block" "^3.6.0"
@@ -9616,16 +9616,16 @@ hardhat-contract-sizer@^2.2.0:
     cli-table3 "^0.6.0"
     colors "^1.4.0"
 
-hardhat@^2.7.0:
-  version "2.7.0"
-  resolved "https://registry.yarnpkg.com/hardhat/-/hardhat-2.7.0.tgz#d8f01bc07bdd88ccaa00719ddb18618bc59a73b5"
-  integrity sha512-DqweY3KH5gwExoZ8EtsAfioj0Hk0NBXWXT3fMXWkiQNfyYBoZLrqdPNkbJ/E2LD4mZ+BKF7v/1chYR9ZCn2Z+g==
+hardhat@^2.8.0:
+  version "2.8.0"
+  resolved "https://registry.yarnpkg.com/hardhat/-/hardhat-2.8.0.tgz#4701fafe2de4fe88bed328561e554df85455385b"
+  integrity sha512-A2L5F+B7HgdvfcuEWBXyokzP3biSlu4UeIvNR/lgSC0Og/2kbP9cjMMkIH42V1W8nQEZk70VuryhVKX2uHwSYw==
   dependencies:
-    "@ethereumjs/block" "^3.4.0"
-    "@ethereumjs/blockchain" "^5.4.0"
-    "@ethereumjs/common" "^2.4.0"
-    "@ethereumjs/tx" "^3.3.0"
-    "@ethereumjs/vm" "^5.5.2"
+    "@ethereumjs/block" "^3.6.0"
+    "@ethereumjs/blockchain" "^5.5.0"
+    "@ethereumjs/common" "^2.6.0"
+    "@ethereumjs/tx" "^3.4.0"
+    "@ethereumjs/vm" "^5.6.0"
     "@ethersproject/abi" "^5.1.2"
     "@sentry/node" "^5.18.1"
     "@solidity-parser/parser" "^0.14.0"
@@ -9643,7 +9643,7 @@ hardhat@^2.7.0:
     eth-sig-util "^2.5.2"
     ethereum-cryptography "^0.1.2"
     ethereumjs-abi "^0.6.8"
-    ethereumjs-util "^7.1.0"
+    ethereumjs-util "^7.1.3"
     find-up "^2.1.0"
     fp-ts "1.19.3"
     fs-extra "^7.0.1"
