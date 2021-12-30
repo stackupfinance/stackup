@@ -127,30 +127,6 @@ export const useWalletStore = create(
           }
         },
 
-        getRecoverAccountUserOp: async (userWallet) => {
-          const signer = wallet.proxy.decryptSigner(userWallet, data.password);
-          if (!signer) {
-            throw new Error('Incorrect password');
-          }
-          set({ loading: true });
-
-          try {
-            const isDeployed = wallet.proxy.isCodeDeployed(provider, userWallet.walletAddress);
-            const nonce = isDeployed
-              ? await wallet.proxy.getNonce(provider, userWallet.walletAddress)
-              : constants.userOperations.initNonce;
-
-            // TODO:
-            // 1. Generate recover account userOps
-            // 2. Get paymaster to verify and sign userOps
-            // 3. Get guardians to verify and sign userOps
-            // 3. Relay to Entry Point
-          } catch (error) {
-            set({ loading: false });
-            throw error;
-          }
-        },
-
         clear: () => set({ ...defaultState }),
       }),
       {

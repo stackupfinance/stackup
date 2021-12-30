@@ -62,8 +62,6 @@ function RecoverConfirm() {
   });
 
   useEffect(() => {
-    router.prefetch(Routes.RECOVER_NOT_POSSIBLE);
-    router.prefetch(Routes.RECOVER_NEW_PASSWORD);
     router.prefetch(Routes.LOGIN);
   }, [router]);
 
