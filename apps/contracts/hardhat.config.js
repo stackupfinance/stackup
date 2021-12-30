@@ -1,5 +1,6 @@
 require("dotenv").config();
 require("@nomiclabs/hardhat-ethers");
+require("@nomiclabs/hardhat-etherscan");
 require("@nomiclabs/hardhat-waffle");
 require("solidity-coverage");
 require("hardhat-contract-sizer");
@@ -38,5 +39,8 @@ module.exports = {
         mnemonic: process.env.MNEMONIC || "",
       },
     },
+  },
+  etherscan: {
+    apiKey: process.env.POLYGONSCAN_API_KEY,
   },
 };

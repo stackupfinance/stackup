@@ -27,11 +27,8 @@ module.exports.initialize = (entryPoint, owner, guardians) => {
   ]);
 };
 
-module.exports.recoverAccount = (newOwner, guardianRecoveryArray) => {
-  return Wallet.interface.encodeFunctionData("recoverAccount", [
-    newOwner,
-    guardianRecoveryArray,
-  ]);
+module.exports.transferOwner = (newOwner) => {
+  return Wallet.interface.encodeFunctionData("transferOwner", [newOwner]);
 };
 
 module.exports.addEntryPointStake = (value, override = {}) => {
@@ -48,4 +45,8 @@ module.exports.lockEntryPointStake = (override = {}) => {
     0,
     EntryPoint.interface.encodeFunctionData("lockStake"),
   ]);
+};
+
+module.exports.upgradeTo = (newImplementation) => {
+  return Wallet.interface.encodeFunctionData("upgradeTo", [newImplementation]);
 };

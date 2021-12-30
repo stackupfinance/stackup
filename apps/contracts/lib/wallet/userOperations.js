@@ -21,9 +21,45 @@ module.exports.get = (sender, override = {}) => {
 };
 
 module.exports.sign = async (signer, op) => {
+  const walletSignatureValues = [
+    {
+      signer: signer.address,
+      signature: await signer.signMessage(message.userOperation(op)),
+    },
+  ];
+
   return {
     ...op,
-    signature: await signer.signMessage(message.userOperation(op)),
+    signature: ethers.utils.defaultAbiCoder.encode(
+      ["uint8", "(address signer, bytes signature)[]"],
+      [0, walletSignatureValues]
+    ),
+  };
+};
+
+module.exports.signAsGuardian = async (signer, guardian, op) => {
+  const ws =
+    op.signature !== userOperations.nullCode
+      ? ethers.utils.defaultAbiCoder.decode(
+          ["uint8", "(address signer, bytes signature)[]"],
+          op.signature
+        )
+      : [undefined, []];
+
+  const walletSignatureValues = [
+    ...ws[1].map((v) => ({ signer: v.signer, signature: v.signature })),
+    {
+      signer: guardian,
+      signature: await signer.signMessage(message.userOperation(op)),
+    },
+  ];
+
+  return {
+    ...op,
+    signature: ethers.utils.defaultAbiCoder.encode(
+      ["uint8", "(address signer, bytes signature)[]"],
+      [1, walletSignatureValues]
+    ),
   };
 };
 

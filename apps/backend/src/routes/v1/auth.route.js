@@ -13,11 +13,17 @@ router.post('/logout', validate(authValidation.logout), authController.logout);
 router.post('/refresh-tokens', validate(authValidation.refreshTokens), authController.refreshTokens);
 router.post('/recover/lookup', validate(authValidation.recoverLookup), authController.recoverLookup);
 router.post(
+  '/recover/paymasterApproval',
+  validate(authValidation.recoverPaymasterApproval),
+  authController.recoverPaymasterApproval
+);
+router.post(
   '/recover/send-verification-email',
   validate(authValidation.recoverSendVerificationEmail),
   authController.recoverSendVerificationEmail
 );
 router.post('/recover/verify-email', validate(authValidation.recoverVerifyEmail), authController.recoverVerifyEmail);
+router.post('/recover/confirm', validate(authValidation.recoverConfirm), authController.recoverConfirm);
 router.post('/send-verification-email', auth(), authController.sendVerificationEmail);
 router.post('/verify-email', auth(), validate(authValidation.verifyEmail), authController.verifyEmail);
 router.post('/pusher', auth(), validate(authValidation.authPusher), authController.authPusher);

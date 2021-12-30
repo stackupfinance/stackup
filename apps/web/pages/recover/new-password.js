@@ -17,7 +17,7 @@ function RecoverNewPassword() {
     loading: recoverLoading,
     user,
     guardians,
-    createEphemeralSigner,
+    createSignerAndUserOps,
   } = useRecoverStore(recoverRecoverNewPasswordPageSelector);
 
   useEffect(() => {
@@ -34,9 +34,9 @@ function RecoverNewPassword() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
-  const onNextHandler = (data) => {
+  const onNextHandler = async (data) => {
     logEvent(EVENTS.RECOVER_ACCOUNT_CREATE_NEW_PASSWORD);
-    createEphemeralSigner(data.password);
+    await createSignerAndUserOps(data.password);
 
     if (guardians.find((curr) => curr === App.web3.paymaster)) {
       router.push(Routes.RECOVER_VERIFY_EMAIL);

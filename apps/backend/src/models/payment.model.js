@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const { toJSON, paginate } = require('./plugins');
-const { status } = require('../config/payments');
+const { status } = require('../config/transaction');
 
 const paymentSchema = mongoose.Schema(
   {

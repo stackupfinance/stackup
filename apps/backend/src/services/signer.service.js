@@ -1,9 +1,10 @@
-const { wallet, contracts } = require('@stackupfinance/contracts');
+const { ethers } = require('ethers');
+const { wallet, contracts, constants } = require('@stackupfinance/contracts');
 const { web3 } = require('../config/config');
 const { signer, defaultPaymasterFee } = require('../utils/web3');
 
-const signGuardianRecovery = async (walletAddress, newOwner) => {
-  return wallet.access.signGuardianRecovery(signer, { guardian: web3.paymaster, wallet: walletAddress, newOwner });
+const signUserOpAsGuardian = async (userOperations) => {
+  return Promise.all(userOperations.map((op) => wallet.userOperations.signAsGuardian(signer, web3.paymaster, op)));
 };
 
 const signUserOpWithPaymaster = async (userOperation, index) => {
@@ -19,12 +20,16 @@ const signUserOpWithPaymaster = async (userOperation, index) => {
 
 const relayUserOpsToEntryPoint = async (userOperations) => {
   return contracts.EntryPoint.getInstance(signer).handleOps(userOperations, signer.address, {
-    gasLimit: 5000000,
+    gasLimit: userOperations.reduce((prev, op) => {
+      return prev.add(ethers.BigNumber.from(op.callGas + op.verificationGas + op.preVerificationGas));
+    }, ethers.constants.Zero),
+    maxFeePerGas: constants.userOperations.defaultMaxFee,
+    maxPriorityFeePerGas: constants.userOperations.defaultMaxPriorityFee,
   });
 };
 
 module.exports = {
-  signGuardianRecovery,
+  signUserOpAsGuardian,
   signUserOpWithPaymaster,
   relayUserOpsToEntryPoint,
 };

@@ -15,17 +15,18 @@ function RecoverVerifyEmail() {
   const router = useRouter();
   const {
     loading: recoverLoading,
-    newOwner,
+    userOperations,
     guardians,
     sendVerificationEmail,
     verifyEmail,
   } = useRecoverStore(recoverRecoverVerifyEmailPageSelector);
   const [isDisabled, setIsDisabled] = useState(false);
+  const [debounce, setDebounce] = useState(true);
   const [error, setError] = useState('');
 
   useEffect(() => {
     router.prefetch(Routes.RECOVER_LOOKUP);
-    router.prefetch(Routes.RECOVER_SUBMIT);
+    router.prefetch(Routes.RECOVER_CONFIRM);
     router.prefetch(Routes.RECOVER_STATUS);
   }, [router]);
 
@@ -34,14 +35,17 @@ function RecoverVerifyEmail() {
       router.push(Routes.RECOVER_LOOKUP);
       return;
     }
-    if (!newOwner) {
+    if (!userOperations) {
       router.push(Routes.RECOVER_NEW_PASSWORD);
       return;
     }
 
-    onSendCode();
+    if (debounce) {
+      onSendCode();
+      setDebounce(false);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [newOwner]);
+  }, [userOperations]);
 
   const onSendCode = async () => {
     setError('');
@@ -68,7 +72,7 @@ function RecoverVerifyEmail() {
       if (guardians.length > 1) {
         router.push(Routes.RECOVER_STATUS);
       } else {
-        router.push(Routes.RECOVER_SUBMIT);
+        router.push(Routes.RECOVER_CONFIRM);
       }
     } catch (error) {
       setError(error.response?.data?.message || 'Unknown error, try again later!');

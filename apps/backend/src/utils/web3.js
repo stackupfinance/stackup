@@ -1,7 +1,7 @@
 const { ethers } = require('ethers');
 const { wallet, contracts } = require('@stackupfinance/contracts');
 const { web3 } = require('../config/config');
-const { status } = require('../config/payments');
+const { status } = require('../config/transaction');
 
 const loginMessage = 'Welcome to Stackup!';
 

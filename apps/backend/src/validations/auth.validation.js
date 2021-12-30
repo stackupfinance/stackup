@@ -1,5 +1,5 @@
 const Joi = require('joi');
-const { username } = require('./custom.validation');
+const { username, userOperation } = require('./custom.validation');
 
 const register = {
   body: Joi.object().keys({
@@ -46,6 +46,12 @@ const recoverLookup = {
   }),
 };
 
+const recoverPaymasterApproval = {
+  body: Joi.object().keys({
+    userOperations: Joi.array().items(userOperation).required().min(1),
+  }),
+};
+
 const recoverSendVerificationEmail = {
   body: Joi.object().keys({
     username: Joi.string().required(),
@@ -56,7 +62,17 @@ const recoverVerifyEmail = {
   body: Joi.object().keys({
     code: Joi.number().required(),
     username: Joi.string().required(),
-    newOwner: Joi.string().required(),
+    userOperations: Joi.array().items(userOperation).required().min(1),
+  }),
+};
+
+const recoverConfirm = {
+  body: Joi.object().keys({
+    channelId: Joi.string().required(),
+    username: Joi.string().required(),
+    signature: Joi.string().required(),
+    encryptedSigner: Joi.string().required(),
+    userOperations: Joi.array().items(userOperation).required().min(1),
   }),
 };
 
@@ -80,8 +96,10 @@ module.exports = {
   logout,
   refreshTokens,
   recoverLookup,
+  recoverPaymasterApproval,
   recoverSendVerificationEmail,
   recoverVerifyEmail,
+  recoverConfirm,
   verifyEmail,
   authPusher,
 };

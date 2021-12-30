@@ -50,7 +50,7 @@ const getUserByUsername = async (username) => {
 };
 
 /**
- * Get user by username and populate wallet field
+ * Get user by username and populate wallet
  * @param {String} username
  * @returns {Promise<User>}
  */
@@ -59,7 +59,7 @@ const getUserByUsernameWithWallet = async (username) => {
 };
 
 /**
- * Get user by username and populate encrypted signer only
+ * Get username only and populate encrypted signer
  * @param {String} username
  * @returns {Promise<User>}
  */
@@ -73,12 +73,20 @@ const getWalletForLogin = async (username) => {
 };
 
 /**
- * Get user by username and populate wallet address and init guardians only
+ * Get username only and populate wallet
  * @param {String} username
  * @returns {Promise<User>}
  */
 const getWalletForRecovery = async (username) => {
-  return User.findOne({ username }, 'username wallet -_id').populate('wallet', 'walletAddress initGuardians -_id');
+  const user = await User.findOne({ username }, 'username wallet -_id').populate(
+    'wallet',
+    '-_id -user -encryptedSigner -updatedAt'
+  );
+  if (!user) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
+  }
+
+  return user;
 };
 
 /**

@@ -1,11 +1,22 @@
 import create from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import axios from 'axios';
-import { wallet } from '@stackupfinance/contracts';
-import { provider, walletContract } from '../../src/utils/web3';
+import { wallet, constants } from '@stackupfinance/contracts';
+import {
+  provider,
+  walletContract,
+  usdcContract,
+  defaultPaymasterApproval,
+  defaultPaymasterReapproval,
+  loginMessage,
+} from '../../src/utils/web3';
 import { App } from '../config';
 
 export const recoverUseAuthSelector = (state) => ({
+  clear: state.clear,
+});
+
+export const recoverLoginPageSelector = (state) => ({
   clear: state.clear,
 });
 
@@ -22,24 +33,42 @@ export const recoverRecoverNewPasswordPageSelector = (state) => ({
   loading: state.loading,
   user: state.user,
   guardians: state.guardians,
-  createEphemeralSigner: state.createEphemeralSigner,
+  createSignerAndUserOps: state.createSignerAndUserOps,
 });
 
 export const recoverRecoverVerifyEmailPageSelector = (state) => ({
   loading: state.loading,
-  newOwner: state.newOwner,
+  userOperations: state.userOperations,
   guardians: state.guardians,
   sendVerificationEmail: state.sendVerificationEmail,
   verifyEmail: state.verifyEmail,
+});
+
+export const recoverRecoverConfirmPageSelector = (state) => ({
+  loading: state.loading,
+  userOperations: state.userOperations,
+  confirm: state.confirm,
+  onComplete: state.onComplete,
 });
 
 const defaultState = {
   loading: false,
   user: undefined,
   encryptedSigner: undefined,
-  newOwner: undefined,
+  userOperations: undefined,
   guardians: undefined,
-  guardianRecoveryArray: undefined,
+};
+
+const paymasterApproval = async (userOperations) => {
+  try {
+    const res = await axios.post(`${App.stackup.backendUrl}/v1/auth/recover/paymasterApproval`, {
+      userOperations,
+    });
+
+    return res.data.userOperations;
+  } catch (error) {
+    throw error;
+  }
 };
 
 export const useRecoverStore = create(
@@ -48,11 +77,54 @@ export const useRecoverStore = create(
       (set, get) => ({
         ...defaultState,
 
-        createEphemeralSigner: (password) => {
-          const { encryptedSigner } = wallet.proxy.initEncryptedIdentity(password);
-          const newOwner = wallet.proxy.decryptSigner({ encryptedSigner }, password).address;
+        createSignerAndUserOps: async (password) => {
+          const user = get().user;
+          if (!user) return;
+          set({ loading: true });
 
-          set({ encryptedSigner, newOwner });
+          try {
+            const { encryptedSigner } = wallet.proxy.initEncryptedIdentity(password);
+            const newOwner = wallet.proxy.decryptSigner({ encryptedSigner }, password).address;
+            const [isDeployed, allowance] = await Promise.all([
+              wallet.proxy.isCodeDeployed(provider, user.wallet.walletAddress),
+              usdcContract.allowance(user.wallet.walletAddress, App.web3.paymaster),
+            ]);
+            const shouldApprove = allowance.lte(defaultPaymasterReapproval);
+            const nonce = isDeployed
+              ? await wallet.proxy.getNonce(provider, user.wallet.walletAddress)
+              : constants.userOperations.initNonce;
+            const userOperations = await Promise.all([
+              shouldApprove
+                ? wallet.userOperations.get(user.wallet.walletAddress, {
+                    nonce,
+                    initCode: isDeployed
+                      ? constants.userOperations.nullCode
+                      : wallet.proxy.getInitCode(
+                          user.wallet.initImplementation,
+                          user.wallet.initEntryPoint,
+                          user.wallet.initOwner,
+                          user.wallet.initGuardians,
+                        ),
+                    callData: wallet.encodeFunctionData.ERC20Approve(
+                      App.web3.usdc,
+                      App.web3.paymaster,
+                      defaultPaymasterApproval,
+                    ),
+                  })
+                : undefined,
+              wallet.userOperations.get(user.wallet.walletAddress, {
+                nonce: shouldApprove ? nonce + 1 : nonce,
+                callData: wallet.encodeFunctionData.transferOwner(newOwner),
+              }),
+            ])
+              .then((ops) => ops.filter(Boolean))
+              .then(paymasterApproval);
+
+            set({ loading: false, encryptedSigner, userOperations });
+          } catch (error) {
+            set({ loading: false });
+            throw error;
+          }
         },
 
         lookup: async (data) => {
@@ -96,22 +168,48 @@ export const useRecoverStore = create(
         },
 
         verifyEmail: async (code) => {
-          if (!get().user || !get().newOwner) return;
+          if (!get().user || !get().userOperations) return;
           set({ loading: true });
 
           try {
             const res = await axios.post(`${App.stackup.backendUrl}/v1/auth/recover/verify-email`, {
               username: get().user.username,
               code,
-              newOwner: get().newOwner,
+              userOperations: get().userOperations,
             });
 
-            set({ loading: false, guardianRecoveryArray: [res.data.guardianRecovery] });
+            set({ loading: false, userOperations: res.data.userOperations });
           } catch (error) {
             set({ loading: false });
             throw error;
           }
         },
+
+        confirm: async (channelId, password) => {
+          const { user, encryptedSigner, userOperations } = get();
+          if (!user || !encryptedSigner || !userOperations) return;
+          set({ loading: true });
+
+          try {
+            const signer = wallet.proxy.decryptSigner({ encryptedSigner }, password);
+            if (!signer) {
+              throw new Error('Incorrect password');
+            }
+
+            await axios.post(`${App.stackup.backendUrl}/v1/auth/recover/confirm`, {
+              channelId,
+              username: user.username,
+              signature: await signer.signMessage(loginMessage),
+              encryptedSigner,
+              userOperations,
+            });
+          } catch (error) {
+            set({ loading: false });
+            throw error;
+          }
+        },
+
+        onComplete: async () => set({ loading: false }),
 
         clear: () => set({ ...defaultState }),
       }),

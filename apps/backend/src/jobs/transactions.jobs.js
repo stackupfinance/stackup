@@ -5,7 +5,7 @@ const signerService = require('../services/signer.service');
 const paymentService = require('../services/payment.service');
 const pusherService = require('../services/pusher.service');
 const { getTransactionStatus } = require('../utils/web3');
-const { status } = require('../config/payments');
+const { status } = require('../config/transaction');
 
 const log = (msg) => logger.info(`JOB ${jobs.NEW_PAYMENT}: ${msg}`);
 

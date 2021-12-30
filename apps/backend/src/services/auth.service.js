@@ -66,12 +66,12 @@ const refreshAuth = async (refreshToken) => {
  * Verify email for account recovery
  * @param {String} username
  * @param {String} code
- * @param {String} newOwner
+ * @param {String} userOperations
  * @returns {Promise}
  */
-const recoverVerifyEmail = async (username, code, newOwner) => {
+const recoverVerifyEmail = async (username, code, userOperations) => {
   try {
-    const user = await userService.getUserByUsernameWithWallet(username);
+    const user = await userService.getUserByUsername(username);
     if (!user || !user.wallet) {
       throw new Error();
     }
@@ -82,7 +82,7 @@ const recoverVerifyEmail = async (username, code, newOwner) => {
     }
 
     await Code.deleteMany({ user: user.id, type: types.recoverAccount });
-    return signerService.signGuardianRecovery(user.wallet.walletAddress, newOwner);
+    return signerService.signUserOpAsGuardian(userOperations);
   } catch (error) {
     throw new ApiError(httpStatus.UNAUTHORIZED, 'Recover account verification failed');
   }

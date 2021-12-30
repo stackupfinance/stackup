@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import NextLink from 'next/link';
 import { Image, VStack, Box, Input, Button, Divider } from '@chakra-ui/react';
 import { useForm } from 'react-hook-form';
@@ -8,6 +8,8 @@ import {
   accountLoginPageSelector,
   useOnboardStore,
   onboardLoginPageSelector,
+  useRecoverStore,
+  recoverLoginPageSelector,
 } from '../src/state';
 import { Routes } from '../src/config';
 import { EVENTS, logEvent } from '../src/utils/analytics';
@@ -20,7 +22,13 @@ export default function Login() {
   } = useForm();
   const { loading, login } = useAccountStore(accountLoginPageSelector);
   const { createEphemeralWallet } = useOnboardStore(onboardLoginPageSelector);
+  const { clear: clearRecover } = useRecoverStore(recoverLoginPageSelector);
   const [loginError, setLoginError] = useState('');
+
+  useEffect(() => {
+    clearRecover();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const onSubmit = async (data) => {
     setLoginError('');
