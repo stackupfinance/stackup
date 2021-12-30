@@ -10,7 +10,7 @@ async function main() {
     [],
   ];
 
-  const paymaster = wallet.proxy.getAddress(...init);
+  const paymaster = process.env.PAYMASTER ?? wallet.proxy.getAddress(...init);
   const [value, lockExpiryTime, isLocked] =
     await contracts.EntryPoint.getInstance(ethers.provider).getStake(paymaster);
   console.log("Paymaster stake:", {

@@ -10,7 +10,7 @@ async function main() {
     [],
   ];
 
-  const paymaster = wallet.proxy.getAddress(...init);
+  const paymaster = process.env.PAYMASTER ?? wallet.proxy.getAddress(...init);
   const isDeployed = await wallet.proxy.isCodeDeployed(
     ethers.provider,
     paymaster
