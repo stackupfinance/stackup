@@ -2,8 +2,9 @@ import { useEffect } from 'react';
 import Pusher from 'pusher-js';
 import { useAccountStore, accountPusherSelector } from '../state';
 import { App } from '../config';
+import { types } from '../utils/events';
 
-export const useActivityChannel = (callback = () => {}) => {
+export const useAuthChannel = (callback = () => {}) => {
   const { enabled, accessToken, user } = useAccountStore(accountPusherSelector);
 
   useEffect(() => {
@@ -15,9 +16,9 @@ export const useActivityChannel = (callback = () => {}) => {
       auth: { headers: { Authorization: `Bearer ${accessToken?.token}` } },
     });
     const channelName = `private-${user.id}-activity`;
-    const eventName = 'newPayment';
     const channel = pusher.subscribe(channelName);
-    channel.bind(eventName, callback);
+    channel.bind(types.newPayment, (data) => callback(types.newPayment, data));
+    channel.bind(types.recoverAccount, (data) => callback(types.recoverAccount, data));
 
     return () => {
       pusher.disconnect();
@@ -33,9 +34,8 @@ export const useRecoverAccountChannel = (channelId, callback = () => {}) => {
     });
 
     const channelName = `recover-account-${channelId}`;
-    const eventName = 'recoverAccount';
     const channel = pusher.subscribe(channelName);
-    channel.bind(eventName, callback);
+    channel.bind(types.recoverAccount, callback);
 
     return () => {
       pusher.disconnect();

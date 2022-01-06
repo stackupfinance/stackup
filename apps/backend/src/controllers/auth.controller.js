@@ -10,6 +10,7 @@ const {
   pusherService,
   signerService,
   transactionService,
+  notificationService,
 } = require('../services');
 
 const register = catchAsync(async (req, res) => {
@@ -56,6 +57,33 @@ const recoverPaymasterApproval = catchAsync(async (req, res) => {
   res.send({ userOperations });
 });
 
+const recoverRequestGuardianApproval = catchAsync(async (req, res) => {
+  const users = await userService.getUsersByWalletAddress(req.body.guardians);
+  await notificationService.createRecoverAccountNotifications(
+    users.map((u) => ({
+      user: u._id,
+      preview: `${req.body.username} needs your help with recovery`,
+      data: { username: req.body.username, channelId: req.body.channelId, userOperations: req.body.userOperations },
+    }))
+  );
+  pusherService.pushGuardianRecoveryRequest(users);
+
+  res.send({
+    status: users.map((user) => {
+      const { _id, ...rest } = user;
+      return { ...rest, isComplete: false };
+    }),
+  });
+});
+
+const recoverSendGuardianApproval = catchAsync(async (req, res) => {
+  await pusherService.pushRecoverAccountUpdates(req.body.channelId, {
+    username: req.user.username,
+    userOperations: req.body.userOperations,
+  });
+  res.status(httpStatus.NO_CONTENT).send();
+});
+
 const recoverSendVerificationEmail = catchAsync(async (req, res) => {
   const [email, codeDoc] = await codeService.generateRecoverAccountCode(req.body.username);
   await emailService.sendRecoverAccountEmail(req.body.username, email, codeDoc.code);
@@ -98,6 +126,8 @@ module.exports = {
   refreshTokens,
   recoverLookup,
   recoverPaymasterApproval,
+  recoverRequestGuardianApproval,
+  recoverSendGuardianApproval,
   recoverSendVerificationEmail,
   recoverVerifyEmail,
   recoverConfirm,

@@ -1,6 +1,7 @@
 import create from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import axios from 'axios';
+import { nanoid } from 'nanoid';
 import { wallet, constants } from '@stackupfinance/contracts';
 import {
   provider,
@@ -22,6 +23,7 @@ export const recoverLoginPageSelector = (state) => ({
 
 export const recoverHomePageSelector = (state) => ({
   clear: state.clear,
+  selectGuardianRequest: state.selectGuardianRequest,
 });
 
 export const recoverRecoverLookupPageSelector = (state) => ({
@@ -44,11 +46,25 @@ export const recoverRecoverVerifyEmailPageSelector = (state) => ({
   verifyEmail: state.verifyEmail,
 });
 
+export const recoverRecoverStatusPageSelector = (state) => ({
+  loading: state.loading,
+  userOperations: state.userOperations,
+  status: state.status,
+  channelId: state.channelId,
+});
+
+export const recoverRecoverApproveRequestPageSelector = (state) => ({
+  loading: state.loading,
+  savedGuardianRequest: state.savedGuardianRequest,
+  approveGuardianRequest: state.approveGuardianRequest,
+});
+
 export const recoverRecoverConfirmPageSelector = (state) => ({
   loading: state.loading,
   userOperations: state.userOperations,
   confirm: state.confirm,
   onComplete: state.onComplete,
+  channelId: state.channelId,
 });
 
 const defaultState = {
@@ -56,12 +72,15 @@ const defaultState = {
   user: undefined,
   encryptedSigner: undefined,
   userOperations: undefined,
+  status: undefined,
   guardians: undefined,
+  channelId: undefined,
+  savedGuardianRequest: undefined,
 };
 
 const paymasterApproval = async (userOperations) => {
   try {
-    const res = await axios.post(`${App.stackup.backendUrl}/v1/auth/recover/paymasterApproval`, {
+    const res = await axios.post(`${App.stackup.backendUrl}/v1/auth/recover/paymaster-approval`, {
       userOperations,
     });
 
@@ -79,7 +98,8 @@ export const useRecoverStore = create(
 
         createSignerAndUserOps: async (password) => {
           const user = get().user;
-          if (!user) return;
+          const guardians = get().guardians;
+          if (!user || !guardians) return;
           set({ loading: true });
 
           try {
@@ -120,7 +140,22 @@ export const useRecoverStore = create(
               .then((ops) => ops.filter(Boolean))
               .then(paymasterApproval);
 
-            set({ loading: false, encryptedSigner, userOperations });
+            const channelId = nanoid(16);
+            let status;
+            if (guardians.length > 1) {
+              const res = await axios.post(
+                `${App.stackup.backendUrl}/v1/auth/recover/request-guardian-approval`,
+                {
+                  channelId,
+                  username: user.username,
+                  guardians: guardians.filter((g) => g !== App.web3.paymaster),
+                  userOperations,
+                },
+              );
+              status = res.data.status;
+            }
+
+            set({ loading: false, encryptedSigner, userOperations, status, channelId });
           } catch (error) {
             set({ loading: false });
             throw error;
@@ -185,9 +220,9 @@ export const useRecoverStore = create(
           }
         },
 
-        confirm: async (channelId, password) => {
-          const { user, encryptedSigner, userOperations } = get();
-          if (!user || !encryptedSigner || !userOperations) return;
+        confirm: async (password) => {
+          const { user, encryptedSigner, userOperations, channelId } = get();
+          if (!user || !encryptedSigner || !userOperations || !channelId) return;
           set({ loading: true });
 
           try {
@@ -210,6 +245,43 @@ export const useRecoverStore = create(
         },
 
         onComplete: async () => set({ loading: false }),
+
+        selectGuardianRequest: (savedGuardianRequest) => set({ savedGuardianRequest }),
+
+        approveGuardianRequest: async (userWallet, password, options) => {
+          const { savedGuardianRequest } = get();
+          if (!savedGuardianRequest) return;
+
+          const signer = wallet.proxy.decryptSigner(userWallet, password);
+          if (!signer) {
+            throw new Error('Incorrect password');
+          }
+          set({ loading: true });
+
+          try {
+            const userOperations = await Promise.all(
+              savedGuardianRequest.data.userOperations.map((op) =>
+                wallet.userOperations.signAsGuardian(signer, userWallet.walletAddress, op),
+              ),
+            );
+
+            await axios.post(
+              `${App.stackup.backendUrl}/v1/auth/recover/send-guardian-approval`,
+              {
+                channelId: savedGuardianRequest.data.channelId,
+                userOperations,
+              },
+              {
+                headers: { Authorization: `Bearer ${options.accessToken}` },
+              },
+            );
+
+            set({ loading: false });
+          } catch (error) {
+            set({ loading: false });
+            throw error;
+          }
+        },
 
         clear: () => set({ ...defaultState }),
       }),

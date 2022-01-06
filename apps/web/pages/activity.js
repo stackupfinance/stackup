@@ -20,10 +20,11 @@ import {
   useWalletStore,
   walletActivityPageSelector,
 } from '../src/state';
-import { useActivityChannel } from '../src/hooks';
+import { useAuthChannel } from '../src/hooks';
 import { Routes } from '../src/config';
 import { getToUserFromActivity } from '../src/utils/activity';
 import { displayUSDC } from '../src/utils/web3';
+import { types } from '../src/utils/events';
 import { EVENTS, logEvent } from '../src/utils/analytics';
 
 const loadingList = [
@@ -70,9 +71,11 @@ export default function Activity() {
   const [payError, setPayError] = useState('');
   const isInverse = (activityItems?.results || []).length || activityLoading;
 
-  useActivityChannel((data) => {
-    updateActivityItemFromChannel(data);
-    fetchBalance(wallet);
+  useAuthChannel((event, data) => {
+    if (event === types.newPayment) {
+      updateActivityItemFromChannel(data);
+      fetchBalance(wallet);
+    }
   });
 
   useEffect(() => {

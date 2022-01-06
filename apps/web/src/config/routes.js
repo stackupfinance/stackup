@@ -16,5 +16,6 @@ export const Routes = {
   RECOVER_NOT_POSSIBLE: '/recover/not-possible',
   RECOVER_VERIFY_EMAIL: '/recover/verify-email',
   RECOVER_STATUS: '/recover/status',
+  RECOVER_APPROVE_REQUEST: 'recover/approve-request',
   RECOVER_CONFIRM: '/recover/confirm',
 };

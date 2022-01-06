@@ -1,5 +1,6 @@
 const Pusher = require('pusher');
 const { realTime } = require('../config/config');
+const { types } = require('../config/events');
 
 const pusher = new Pusher({
   appId: realTime.pusher.appId,
@@ -13,17 +14,22 @@ const auth = async (socketId, channelName) => {
   return pusher.authenticate(socketId, channelName);
 };
 
-const pushRecoverAccountStatus = async (channelId, data) => {
-  return pusher.trigger(`recover-account-${channelId}`, 'recoverAccount', data);
+const pushRecoverAccountUpdates = async (channelId, data) => {
+  return pusher.trigger(`recover-account-${channelId}`, types.recoverAccount, data);
+};
+
+const pushGuardianRecoveryRequest = async (users) => {
+  return Promise.all(users.map((u) => pusher.trigger(`private-${u._id}-activity`, types.recoverAccount, {})));
 };
 
 const pushNewPaymentUpdate = async (activityItem) => {
   const users = [activityItem.fromUser, activityItem.toUser];
-  return Promise.all(users.map((user) => pusher.trigger(`private-${user}-activity`, 'newPayment', { activityItem })));
+  return Promise.all(users.map((user) => pusher.trigger(`private-${user}-activity`, types.newPayment, { activityItem })));
 };
 
 module.exports = {
   auth,
-  pushRecoverAccountStatus,
+  pushRecoverAccountUpdates,
+  pushGuardianRecoveryRequest,
   pushNewPaymentUpdate,
 };

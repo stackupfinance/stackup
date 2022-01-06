@@ -10,6 +10,7 @@ import {
   List,
   UserCard,
   ExploreTabMockup,
+  Notifications,
 } from '../src/components';
 import {
   useAccountStore,
@@ -24,9 +25,12 @@ import {
   onboardHomePageSelector,
   useRecoverStore,
   recoverHomePageSelector,
+  useNotificationStore,
+  notificationHomePageSelector,
 } from '../src/state';
-import { useActivityChannel, useLogout } from '../src/hooks';
+import { useAuthChannel, useLogout } from '../src/hooks';
 import { getToUserFromActivity } from '../src/utils/activity';
+import { types } from '../src/utils/events';
 import { Routes } from '../src/config';
 import { EVENTS, logEvent } from '../src/utils/analytics';
 
@@ -86,16 +90,29 @@ export default function Home() {
     selectActivity,
     updateActivityListFromChannel,
   } = useActivityStore(activityHomePageSelector);
+  const {
+    loading: notificationLoading,
+    notifications: savedNotifications,
+    fetchNotifications,
+    deleteNotification,
+  } = useNotificationStore(notificationHomePageSelector);
   const { clear: clearOnboardData } = useOnboardStore(onboardHomePageSelector);
-  const { clear: clearRecover } = useRecoverStore(recoverHomePageSelector);
+  const { clear: clearRecover, selectGuardianRequest } = useRecoverStore(recoverHomePageSelector);
   const logout = useLogout();
   const router = useRouter();
   const [showSearch, setShowSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [tabIndex, setTabIndex] = useState(tabs.EXPLORE);
+  const [notifications, setNotifications] = useState([]);
+
+  useEffect(() => {
+    setNotifications(savedNotifications);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [savedNotifications]);
 
   useEffect(() => {
     router.prefetch(Routes.ACTIVITY);
+    router.prefetch(Routes.RECOVER_APPROVE_REQUEST);
   }, [router]);
 
   useEffect(() => {
@@ -108,14 +125,32 @@ export default function Home() {
     clearOnboardData();
     clearRecover();
     fetchActivities({ userId: user.id, accessToken: accessToken.token });
+    fetchNotifications({ userId: user.id, accessToken: accessToken.token });
     fetchBalance(wallet);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [enabled]);
 
-  useActivityChannel((data) => {
-    updateActivityListFromChannel(data, { userId: user.id, accessToken: accessToken.token });
-    fetchBalance(wallet);
+  useAuthChannel((event, data) => {
+    if (event === types.newPayment) {
+      updateActivityListFromChannel(data, { userId: user.id, accessToken: accessToken.token });
+      fetchBalance(wallet);
+    } else if (event === types.recoverAccount) {
+      fetchNotifications({ userId: user.id, accessToken: accessToken.token });
+    }
   });
+
+  const onNotificationClick = async (notification) => {
+    if (notification.type === types.recoverAccount) {
+      selectGuardianRequest({ notificationId: notification.id, ...notification.data });
+      router.push(Routes.RECOVER_APPROVE_REQUEST);
+    }
+  };
+
+  const onDeleteNotification = async (notification) => {
+    if (!enabled) return;
+
+    deleteNotification(notification.id, { userId: user.id, accessToken: accessToken.token });
+  };
 
   const onSearch = async (query) => {
     if (!enabled) return;
@@ -199,7 +234,18 @@ export default function Home() {
       <Head title="Stackup | Home" />
 
       <PageContainer>
-        <Search onSearch={onSearch} onClear={onClear} />
+        <Search
+          onSearch={onSearch}
+          onClear={onClear}
+          rightItem={
+            <Notifications
+              isLoading={notificationLoading}
+              items={notifications}
+              onItemClick={onNotificationClick}
+              onDeleteItem={onDeleteNotification}
+            />
+          }
+        />
 
         <AppContainer minMargin>
           <Tabs

@@ -1,6 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { nanoid } from 'nanoid';
 import { useToast, Text, Link } from '@chakra-ui/react';
 import {
   Head,
@@ -27,8 +26,8 @@ function RecoverConfirm() {
     userOperations,
     confirm,
     onComplete,
+    channelId,
   } = useRecoverStore(recoverRecoverConfirmPageSelector);
-  const [channelId] = useState(nanoid(16));
 
   useRecoverAccountChannel(channelId, (data) => {
     toast({
@@ -74,7 +73,7 @@ function RecoverConfirm() {
   }, [userOperations]);
 
   const onConfirmTrasaction = async (data) => {
-    await confirm(channelId, data.password);
+    await confirm(data.password);
     logEvent(EVENTS.RECOVER_ACCOUNT_CONFIRM);
     toast({
       title: 'Recovery initiated',
