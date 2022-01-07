@@ -59,7 +59,7 @@ const recoverPaymasterApproval = catchAsync(async (req, res) => {
 
 const recoverRequestGuardianApproval = catchAsync(async (req, res) => {
   const users = await userService.getUsersByWalletAddress(req.body.guardians);
-  await notificationService.createRecoverAccountNotifications(
+  await notificationService.createRequestGuardianApprovals(
     users.map((u) => ({
       user: u._id,
       preview: `${req.body.username} needs your help with recovery`,

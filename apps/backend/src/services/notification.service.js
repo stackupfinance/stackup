@@ -5,7 +5,7 @@ module.exports.getNotificationsByUserId = async (userId) => {
   return Notification.find({ user: userId }).sort('-createdAt').limit(10).select('-user -updatedAt');
 };
 
-module.exports.createRecoverAccountNotifications = async (notifications) => {
+module.exports.createRequestGuardianApprovals = async (notifications) => {
   return Notification.create(notifications.map((n) => ({ type: types.recoverAccount, ...n })));
 };
 
