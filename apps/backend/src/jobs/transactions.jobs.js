@@ -1,4 +1,3 @@
-const jobs = require('../config/jobs');
 const logger = require('../config/logger');
 const activityService = require('../services/activity.service');
 const signerService = require('../services/signer.service');
@@ -6,11 +5,12 @@ const paymentService = require('../services/payment.service');
 const pusherService = require('../services/pusher.service');
 const { getTransactionStatus } = require('../utils/web3');
 const { status } = require('../config/transaction');
+const { types } = require('../config/events');
 
-const log = (msg) => logger.info(`JOB ${jobs.NEW_PAYMENT}: ${msg}`);
+const log = (msg) => logger.info(`JOB ${types.newPayment}: ${msg}`);
 
 const transactions = (queue) => {
-  queue.define(jobs.NEW_PAYMENT, async (job) => {
+  queue.define(types.newPayment, async (job) => {
     const { paymentId, userOperations } = job.attrs.data;
     const payment = await paymentService.getPaymentById(paymentId);
 
@@ -20,13 +20,13 @@ const transactions = (queue) => {
       await paymentService.updatePaymentDoc(payment, { transactionHash: tx.hash });
       log(`Forwarded user ops to EntryPoint in ${tx.hash}`);
 
-      queue.now(jobs.NEW_PAYMENT, { paymentId });
+      queue.now(types.newPayment, { paymentId });
     } else if (payment.status === status.pending && payment.transactionHash) {
       const txStatus = await getTransactionStatus(payment.transactionHash);
 
       if (txStatus === status.pending) {
         log(`Transaction ${payment.transactionHash} still pending. Requeuing job`);
-        queue.now(jobs.NEW_PAYMENT, { paymentId });
+        queue.now(types.newPayment, { paymentId });
       } else {
         const updatedPayment = await paymentService.updatePaymentDoc(payment, { status: txStatus });
         await activityService.updateActivityPreview(updatedPayment.activity, updatedPayment.message);

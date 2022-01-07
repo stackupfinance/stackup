@@ -58,6 +58,18 @@ const getUserByUsernameWithWallet = async (username) => {
   return User.findOne({ username }).populate('wallet', '-_id -user -updatedAt');
 };
 
+const getUsersByWalletAddress = async (addresses) => {
+  return User.aggregate()
+    .lookup({
+      from: 'wallets',
+      localField: 'wallet',
+      foreignField: '_id',
+      as: 'wallets',
+    })
+    .match({ 'wallets.walletAddress': { $in: addresses } })
+    .project({ username: true });
+};
+
 /**
  * Get username only and populate encrypted signer
  * @param {String} username
@@ -132,6 +144,7 @@ module.exports = {
   getUserById,
   getUserByUsername,
   getUserByUsernameWithWallet,
+  getUsersByWalletAddress,
   getWalletForLogin,
   getWalletForRecovery,
   updateUserById,

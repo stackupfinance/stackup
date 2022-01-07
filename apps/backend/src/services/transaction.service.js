@@ -2,7 +2,7 @@ const httpStatus = require('http-status');
 const { contracts } = require('@stackupfinance/contracts');
 const ApiError = require('../utils/ApiError');
 const queue = require('../queue');
-const jobs = require('../config/jobs');
+const { types } = require('../config/events');
 const { recoverAddressFromLoginSignature } = require('../utils/web3');
 
 const verifyRecoverAccountUserOps = async (signature, userOps) => {
@@ -15,11 +15,11 @@ const verifyRecoverAccountUserOps = async (signature, userOps) => {
 };
 
 const monitorRecoverAccountTransaction = async (data) => {
-  queue.now(jobs.RECOVER_ACCOUNT, data);
+  queue.now(types.recoverAccount, data);
 };
 
 const monitorNewPaymentTransaction = async (data) => {
-  queue.now(jobs.NEW_PAYMENT, data);
+  queue.now(types.newPayment, data);
 };
 
 module.exports = {

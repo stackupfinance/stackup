@@ -52,6 +52,22 @@ const recoverPaymasterApproval = {
   }),
 };
 
+const recoverRequestGuardianApproval = {
+  body: Joi.object().keys({
+    channelId: Joi.string().required(),
+    username: Joi.string().required(),
+    guardians: Joi.array().items(Joi.string()).required().min(1),
+    userOperations: Joi.array().items(userOperation).required().min(1),
+  }),
+};
+
+const recoverSendGuardianApproval = {
+  body: Joi.object().keys({
+    channelId: Joi.string().required(),
+    userOperations: Joi.array().items(userOperation).required().min(1),
+  }),
+};
+
 const recoverSendVerificationEmail = {
   body: Joi.object().keys({
     username: Joi.string().required(),
@@ -97,6 +113,8 @@ module.exports = {
   refreshTokens,
   recoverLookup,
   recoverPaymasterApproval,
+  recoverRequestGuardianApproval,
+  recoverSendGuardianApproval,
   recoverSendVerificationEmail,
   recoverVerifyEmail,
   recoverConfirm,

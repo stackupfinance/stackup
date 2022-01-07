@@ -50,6 +50,19 @@ const getUserWallet = {
   }),
 };
 
+const getUserNotifications = {
+  params: Joi.object().keys({
+    userId: Joi.string().custom(objectId),
+  }),
+};
+
+const deleteUserNotification = {
+  params: Joi.object().keys({
+    userId: Joi.string().custom(objectId),
+    notificationId: Joi.string().custom(objectId),
+  }),
+};
+
 const getUserSearch = {
   params: Joi.object().keys({
     userId: Joi.string().custom(objectId),
@@ -129,6 +142,8 @@ module.exports = {
   deleteUser,
   updateUserWallet,
   getUserWallet,
+  getUserNotifications,
+  deleteUserNotification,
   getUserSearch,
   findUserActivity,
   approveUserActivity,

@@ -14,6 +14,8 @@ import {
   onboardUseAuthSelector,
   useRecoverStore,
   recoverUseAuthSelector,
+  useNotificationStore,
+  notificationUseAuthSelector,
 } from '../state';
 import { Routes } from '../config';
 
@@ -36,6 +38,7 @@ export const useLogout = () => {
   const { clear: clearWallet } = useWalletStore(walletUseAuthSelector);
   const { clear: clearOnboard } = useOnboardStore(onboardUseAuthSelector);
   const { clear: clearRecover } = useRecoverStore(recoverUseAuthSelector);
+  const { clear: clearNotification } = useNotificationStore(notificationUseAuthSelector);
 
   return async () => {
     clearSearch();
@@ -43,6 +46,7 @@ export const useLogout = () => {
     clearWallet();
     clearOnboard();
     clearRecover();
+    clearNotification();
     await logout();
   };
 };

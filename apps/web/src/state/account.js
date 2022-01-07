@@ -78,6 +78,12 @@ export const accountOnboardSummaryPageSelector = (state) => ({
   saveEncryptedWallet: state.saveEncryptedWallet,
 });
 
+export const accountRecoverApproveRequestPageSelector = (state) => ({
+  enabled: state.enabled,
+  wallet: state.wallet,
+  accessToken: state.accessToken,
+});
+
 const defaultState = {
   enabled: false,
   loading: false,

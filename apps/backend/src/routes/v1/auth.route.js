@@ -13,9 +13,20 @@ router.post('/logout', validate(authValidation.logout), authController.logout);
 router.post('/refresh-tokens', validate(authValidation.refreshTokens), authController.refreshTokens);
 router.post('/recover/lookup', validate(authValidation.recoverLookup), authController.recoverLookup);
 router.post(
-  '/recover/paymasterApproval',
+  '/recover/paymaster-approval',
   validate(authValidation.recoverPaymasterApproval),
   authController.recoverPaymasterApproval
+);
+router.post(
+  '/recover/request-guardian-approval',
+  validate(authValidation.recoverRequestGuardianApproval),
+  authController.recoverRequestGuardianApproval
+);
+router.post(
+  '/recover/send-guardian-approval',
+  auth(),
+  validate(authValidation.recoverSendGuardianApproval),
+  authController.recoverSendGuardianApproval
 );
 router.post(
   '/recover/send-verification-email',

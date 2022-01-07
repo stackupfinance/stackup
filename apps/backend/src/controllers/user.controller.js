@@ -9,6 +9,7 @@ const {
   activityService,
   signerService,
   paymentService,
+  notificationService,
 } = require('../services');
 
 const getUser = catchAsync(async (req, res) => {
@@ -39,6 +40,18 @@ const getUserWallet = catchAsync(async (req, res) => {
   const { userId } = req.params;
   const wallet = await walletService.getUserWallet(userId);
   res.send(wallet);
+});
+
+const getUserNotifications = catchAsync(async (req, res) => {
+  const { userId } = req.params;
+  const notifications = await notificationService.getNotificationsByUserId(userId);
+  res.send({ notifications });
+});
+
+const deleteUserNotification = catchAsync(async (req, res) => {
+  const { userId, notificationId } = req.params;
+  const notifications = await notificationService.deleteNotification(userId, notificationId);
+  res.send({ notifications });
 });
 
 const getUserSearch = catchAsync(async (req, res) => {
@@ -130,6 +143,8 @@ module.exports = {
   deleteUser,
   updateUserWallet,
   getUserWallet,
+  getUserNotifications,
+  deleteUserNotification,
   getUserSearch,
   getUserActivities,
   createUserActivity,

@@ -17,6 +17,14 @@ router
   .patch(auth('manageUsers'), validate(userValidation.updateUserWallet), userController.updateUserWallet)
   .get(auth('getUsers'), validate(userValidation.getUserWallet), userController.getUserWallet);
 
+router
+  .route('/:userId/notifications')
+  .get(auth('getUsers'), validate(userValidation.getUserNotifications), userController.getUserNotifications);
+
+router
+  .route('/:userId/notifications/:notificationId')
+  .delete(auth('manageUsers'), validate(userValidation.deleteUserNotification), userController.deleteUserNotification);
+
 router.route('/:userId/search').get(auth('getUsers'), validate(userValidation.getUserSearch), userController.getUserSearch);
 
 router
