@@ -18,7 +18,7 @@ const pushRecoverAccountUpdates = async (channelId, data) => {
   return pusher.trigger(`recover-account-${channelId}`, types.recoverAccount, data);
 };
 
-const pushGuardianRecoveryRequest = async (users) => {
+const pushRequestGuardianApproval = async (users) => {
   return Promise.all(users.map((u) => pusher.trigger(`private-${u._id}-activity`, types.recoverAccount, {})));
 };
 
@@ -30,6 +30,6 @@ const pushNewPaymentUpdate = async (activityItem) => {
 module.exports = {
   auth,
   pushRecoverAccountUpdates,
-  pushGuardianRecoveryRequest,
+  pushRequestGuardianApproval,
   pushNewPaymentUpdate,
 };

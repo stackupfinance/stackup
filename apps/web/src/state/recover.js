@@ -97,8 +97,7 @@ export const useRecoverStore = create(
         ...defaultState,
 
         createSignerAndUserOps: async (password) => {
-          const user = get().user;
-          const guardians = get().guardians;
+          const { user, guardians } = get();
           if (!user || !guardians) return;
           set({ loading: true });
 

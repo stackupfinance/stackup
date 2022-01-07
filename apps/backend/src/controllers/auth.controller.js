@@ -66,7 +66,7 @@ const recoverRequestGuardianApproval = catchAsync(async (req, res) => {
       data: { username: req.body.username, channelId: req.body.channelId, userOperations: req.body.userOperations },
     }))
   );
-  pusherService.pushGuardianRecoveryRequest(users);
+  pusherService.pushRequestGuardianApproval(users);
 
   res.send({
     status: users.map((user) => {
