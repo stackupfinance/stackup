@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/router';
 import { useToast, Text, Link } from '@chakra-ui/react';
 import { wallet as walletLib } from '@stackupfinance/contracts';
@@ -47,6 +47,8 @@ function RecoverApproveRequest() {
   const [isWalletDeployed, setIsWalletDeployed] = useState(true);
   const [isTransactionLoading, setIsTransactionLoading] = useState(false);
   const [password, setPassword] = useState('');
+  const passwordRef = useRef();
+  passwordRef.current = password;
 
   const approveRequest = async (password) => {
     await approveGuardianRequest(wallet, password, {
@@ -92,7 +94,7 @@ function RecoverApproveRequest() {
 
       if (data.status === txStatus.success) {
         setIsTransactionLoading(false);
-        approveRequest(password);
+        approveRequest(passwordRef.current);
       }
     }
   });
