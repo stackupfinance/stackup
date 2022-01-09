@@ -2,6 +2,38 @@ const { ethers } = require("ethers");
 const userOperations = require("../constants/userOperations");
 const message = require("./message");
 
+module.exports.appendGuardianSignature = (UserOp, signedUserOp) => {
+  const ws1 =
+    UserOp.signature !== userOperations.nullCode
+      ? ethers.utils.defaultAbiCoder.decode(
+          ["uint8", "(address signer, bytes signature)[]"],
+          UserOp.signature
+        )
+      : [undefined, []];
+  const ws2 = ethers.utils.defaultAbiCoder.decode(
+    ["uint8", "(address signer, bytes signature)[]"],
+    signedUserOp.signature
+  );
+  const signatureSet = new Set([]);
+  const walletSignatureValues = [
+    ...ws1[1].map((v) => ({ signer: v.signer, signature: v.signature })),
+    ...ws2[1].map((v) => ({ signer: v.signer, signature: v.signature })),
+  ].filter((v) => {
+    if (signatureSet.has(v.signer)) return false;
+
+    signatureSet.add(v.signer);
+    return true;
+  });
+
+  return {
+    ...UserOp,
+    signature: ethers.utils.defaultAbiCoder.encode(
+      ["uint8", "(address signer, bytes signature)[]"],
+      [1, walletSignatureValues]
+    ),
+  };
+};
+
 module.exports.get = (sender, override = {}) => {
   return {
     sender,
