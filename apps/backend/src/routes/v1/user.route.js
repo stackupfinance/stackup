@@ -1,6 +1,7 @@
 const express = require('express');
 const auth = require('../../middlewares/auth');
 const validate = require('../../middlewares/validate');
+const { airdropUSDC } = require('../../middlewares/testnet/airdropUsdc');
 const userValidation = require('../../validations/user.validation');
 const userController = require('../../controllers/user.controller');
 
@@ -14,7 +15,7 @@ router
 
 router
   .route('/:userId/wallet')
-  .patch(auth('manageUsers'), validate(userValidation.updateUserWallet), userController.updateUserWallet)
+  .patch(auth('manageUsers'), validate(userValidation.updateUserWallet), airdropUSDC, userController.updateUserWallet)
   .get(auth('getUsers'), validate(userValidation.getUserWallet), userController.getUserWallet);
 
 router

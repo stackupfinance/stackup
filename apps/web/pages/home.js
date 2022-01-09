@@ -136,6 +136,8 @@ export default function Home() {
       fetchBalance(wallet);
     } else if (event === types.recoverAccount) {
       fetchNotifications({ userId: user.id, accessToken: accessToken.token });
+    } else if (event === types.genericRelay) {
+      fetchBalance(wallet);
     }
   });
 
