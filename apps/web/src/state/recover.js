@@ -48,9 +48,9 @@ export const recoverRecoverVerifyEmailPageSelector = (state) => ({
 
 export const recoverRecoverStatusPageSelector = (state) => ({
   loading: state.loading,
-  userOperations: state.userOperations,
   status: state.status,
   channelId: state.channelId,
+  updateStatus: state.updateStatus,
 });
 
 export const recoverRecoverApproveRequestPageSelector = (state) => ({
@@ -218,6 +218,22 @@ export const useRecoverStore = create(
             set({ loading: false });
             throw error;
           }
+        },
+
+        updateStatus: (data) => {
+          const { userOperations, status } = get();
+          if (!userOperations || !status) return;
+
+          const updatedUserOps = userOperations.map((op, i) =>
+            wallet.userOperations.appendGuardianSignature(op, data.userOperations[i]),
+          );
+          const updatedStatus = status.map((s) => {
+            if (s.username === data.username) {
+              return { ...s, isComplete: true };
+            }
+            return s;
+          });
+          set({ userOperations: updatedUserOps, status: updatedStatus });
         },
 
         confirm: async (password) => {

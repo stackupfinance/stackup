@@ -142,6 +142,7 @@ export default function Home() {
   const onNotificationClick = async (notification) => {
     if (notification.type === types.recoverAccount) {
       selectGuardianRequest({ notificationId: notification.id, ...notification.data });
+      logEvent(EVENTS.RECOVER_ACCOUNT_GUARDIAN_GO_TO_APPROVE);
       router.push(Routes.RECOVER_APPROVE_REQUEST);
     }
   };
