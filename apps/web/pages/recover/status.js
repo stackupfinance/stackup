@@ -10,6 +10,7 @@ import {
 } from '../../src/components';
 import { useRecoverStore, recoverRecoverStatusPageSelector } from '../../src/state';
 import { useRecoverAccountChannel } from '../../src/hooks';
+import { signatureCount } from '../../src/utils/web3';
 import { logEvent, EVENTS } from '../../src/utils/analytics';
 import { Routes } from '../../src/config';
 
@@ -18,6 +19,8 @@ function RecoverStatus() {
   const toast = useToast();
   const {
     loading: recoverLoading,
+    userOperations,
+    guardians,
     status,
     channelId,
     updateStatus,
@@ -51,14 +54,15 @@ function RecoverStatus() {
       setDebounce(false);
     }
 
-    const completeCount = status.reduce((prev, curr) => {
-      return prev + (curr.isComplete ? 1 : 0);
-    }, 0);
-    if (completeCount >= Math.ceil(status.length / 2)) {
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [status]);
+
+  useEffect(() => {
+    if (signatureCount(userOperations[0]) >= Math.ceil(guardians.length / 2)) {
       setIsNextDisabled(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [status]);
+  }, [userOperations]);
 
   const onNextClick = () => {
     router.push(Routes.RECOVER_CONFIRM);

@@ -48,6 +48,8 @@ export const recoverRecoverVerifyEmailPageSelector = (state) => ({
 
 export const recoverRecoverStatusPageSelector = (state) => ({
   loading: state.loading,
+  userOperations: state.userOperations,
+  guardians: state.guardians,
   status: state.status,
   channelId: state.channelId,
   updateStatus: state.updateStatus,

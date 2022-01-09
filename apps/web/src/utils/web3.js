@@ -1,5 +1,5 @@
 import { ethers } from 'ethers';
-import { contracts } from '@stackupfinance/contracts';
+import { contracts, constants } from '@stackupfinance/contracts';
 import { App } from '../config';
 
 const formatter = new Intl.NumberFormat('en-US', {
@@ -32,4 +32,16 @@ export const balanceToString = (balance = ethers.constants.Zero) => {
 
 export const displayUSDC = (balance) => {
   return formatter.format(balanceToString(balance));
+};
+
+export const signatureCount = (userOp) => {
+  const ws =
+    userOp.signature !== constants.userOperations.nullCode
+      ? ethers.utils.defaultAbiCoder.decode(
+          ['uint8', '(address signer, bytes signature)[]'],
+          userOp.signature,
+        )
+      : [undefined, []];
+
+  return ws[1].length;
 };
