@@ -52,7 +52,7 @@ function RecoverApproveRequest() {
     await approveGuardianRequest(wallet, password, {
       accessToken: accessToken.token,
     });
-    logEvent(EVENTS.RECOVER_ACCOUNT_SIGN_AS_GUARDIAN);
+    logEvent(EVENTS.RECOVER_ACCOUNT_GUARDIAN_SIGN_OP);
 
     await deleteNotification(savedGuardianRequest.notificationId, {
       userId: user.id,

@@ -2,12 +2,12 @@ const { ethers } = require("ethers");
 const userOperations = require("../constants/userOperations");
 const message = require("./message");
 
-module.exports.appendGuardianSignature = (UserOp, signedUserOp) => {
+module.exports.appendGuardianSignature = (userOp, signedUserOp) => {
   const ws1 =
-    UserOp.signature !== userOperations.nullCode
+    userOp.signature !== userOperations.nullCode
       ? ethers.utils.defaultAbiCoder.decode(
           ["uint8", "(address signer, bytes signature)[]"],
-          UserOp.signature
+          userOp.signature
         )
       : [undefined, []];
   const ws2 = ethers.utils.defaultAbiCoder.decode(
@@ -26,7 +26,7 @@ module.exports.appendGuardianSignature = (UserOp, signedUserOp) => {
   });
 
   return {
-    ...UserOp,
+    ...userOp,
     signature: ethers.utils.defaultAbiCoder.encode(
       ["uint8", "(address signer, bytes signature)[]"],
       [1, walletSignatureValues]
