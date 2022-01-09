@@ -91,9 +91,8 @@ function RecoverApproveRequest() {
       });
 
       if (data.status === txStatus.success) {
-        approveRequest(password);
-        logEvent(EVENTS.RECOVER_ACCOUNT_GUARDIAN_DEPLOY_WALLET);
         setIsTransactionLoading(false);
+        approveRequest(password);
       }
     }
   });
@@ -131,8 +130,9 @@ function RecoverApproveRequest() {
         userId: user.id,
         accessToken: accessToken.token,
       });
-      setIsTransactionLoading(true);
+      logEvent(EVENTS.RECOVER_ACCOUNT_GUARDIAN_DEPLOY_WALLET);
       setPassword(data.password);
+      setIsTransactionLoading(true);
       toast({
         title: 'Account activation initiated',
         description: 'This might take a minute. Stay on this page for updates...',
