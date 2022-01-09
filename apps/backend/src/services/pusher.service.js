@@ -18,6 +18,10 @@ const pushRecoverAccountUpdates = async (channelId, data) => {
   return pusher.trigger(`recover-account-${channelId}`, types.recoverAccount, data);
 };
 
+const pushGenericRelayUpdates = async (userId, data) => {
+  return pusher.trigger(`private-${userId}-activity`, types.genericRelay, data);
+};
+
 const pushRequestGuardianApprovals = async (users) => {
   return Promise.all(users.map((u) => pusher.trigger(`private-${u._id}-activity`, types.recoverAccount, {})));
 };
@@ -30,6 +34,7 @@ const pushNewPaymentUpdate = async (activityItem) => {
 module.exports = {
   auth,
   pushRecoverAccountUpdates,
+  pushGenericRelayUpdates,
   pushRequestGuardianApprovals,
   pushNewPaymentUpdate,
 };

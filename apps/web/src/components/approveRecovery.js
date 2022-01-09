@@ -10,11 +10,18 @@ import {
   InputGroup,
   InputLeftElement,
   Input,
+  Alert,
+  AlertIcon,
 } from '@chakra-ui/react';
 import { LockIcon } from '@chakra-ui/icons';
 import { InlineError } from '.';
 
-export const ApproveRecovery = ({ isLoading, username, onConfirmRequest = () => {} }) => {
+export const ApproveRecovery = ({
+  isLoading,
+  isWalletDeployed,
+  username,
+  onConfirmRequest = () => {},
+}) => {
   const {
     register,
     handleSubmit,
@@ -60,6 +67,13 @@ export const ApproveRecovery = ({ isLoading, username, onConfirmRequest = () => 
           </Box>
 
           <Box p="16px" borderWidth="1px" borderRadius="lg" w="100%">
+            {isWalletDeployed ? undefined : (
+              <Alert status="warning" mb="16px" borderRadius="lg">
+                <AlertIcon />
+                {`Your wallet hasn't been activated. You'll need to submit a transaction when approving this request.`}
+              </Alert>
+            )}
+
             <form onSubmit={handleSubmit(onSubmit)} onChange={() => setError('')}>
               <InputGroup size="lg" mb="8px">
                 <InputLeftElement pointerEvents="none">

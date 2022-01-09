@@ -22,8 +22,13 @@ const monitorNewPaymentTransaction = async (data) => {
   queue.now(types.newPayment, data);
 };
 
+const monitorGenericRelayTransaction = async (data) => {
+  queue.now(types.genericRelay, data);
+};
+
 module.exports = {
   verifyRecoverAccountUserOps,
   monitorRecoverAccountTransaction,
   monitorNewPaymentTransaction,
+  monitorGenericRelayTransaction,
 };

@@ -140,14 +140,15 @@ export const useRecoverStore = create(
               .then(paymasterApproval);
 
             const channelId = nanoid(16);
+            const userGuardians = guardians.filter((g) => g !== App.web3.paymaster);
             let status;
-            if (guardians.length > 1) {
+            if (userGuardians.length) {
               const res = await axios.post(
                 `${App.stackup.backendUrl}/v1/auth/recover/request-guardian-approval`,
                 {
                   channelId,
                   username: user.username,
-                  guardians: guardians.filter((g) => g !== App.web3.paymaster),
+                  guardians: userGuardians,
                   userOperations,
                 },
               );
@@ -259,7 +260,7 @@ export const useRecoverStore = create(
 
           try {
             const userOperations = await Promise.all(
-              savedGuardianRequest.data.userOperations.map((op) =>
+              savedGuardianRequest.userOperations.map((op) =>
                 wallet.userOperations.signAsGuardian(signer, userWallet.walletAddress, op),
               ),
             );
@@ -267,7 +268,7 @@ export const useRecoverStore = create(
             await axios.post(
               `${App.stackup.backendUrl}/v1/auth/recover/send-guardian-approval`,
               {
-                channelId: savedGuardianRequest.data.channelId,
+                channelId: savedGuardianRequest.channelId,
                 userOperations,
               },
               {

@@ -137,6 +137,14 @@ const createUserActivityItem = catchAsync(async (req, res) => {
   res.send({ activityItems });
 });
 
+const genericRelay = catchAsync(async (req, res) => {
+  const { userId } = req.params;
+  const { userOperations } = req.body;
+  transactionService.monitorGenericRelayTransaction({ userId, userOperations });
+
+  res.status(httpStatus.NO_CONTENT).send();
+});
+
 module.exports = {
   getUser,
   updateUser,
@@ -152,4 +160,5 @@ module.exports = {
   approveUserActivity,
   getUserActivityItems,
   createUserActivityItem,
+  genericRelay,
 };

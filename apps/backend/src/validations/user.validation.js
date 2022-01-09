@@ -136,6 +136,12 @@ const createUserActivityItem = {
   }),
 };
 
+const genericRelay = {
+  body: Joi.object().keys({
+    userOperations: Joi.array().items(userOperation).required().min(1),
+  }),
+};
+
 module.exports = {
   getUser,
   updateUser,
@@ -151,4 +157,5 @@ module.exports = {
   createUserActivity,
   getUserActivityItems,
   createUserActivityItem,
+  genericRelay,
 };

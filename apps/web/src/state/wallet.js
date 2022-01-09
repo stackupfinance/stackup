@@ -28,6 +28,11 @@ export const walletActivityPageSelector = (state) => ({
   signNewPaymentUserOps: state.signNewPaymentUserOps,
 });
 
+export const walletRecoverApproveRequestPageSelector = (state) => ({
+  loading: state.loading,
+  setupWalletUserOps: state.setupWalletUserOps,
+});
+
 const defaultState = {
   loading: false,
   balance: ethers.constants.Zero,
@@ -52,6 +57,20 @@ const paymasterApproval =
 const signUserOps = (signer) => async (ops) => {
   return Promise.all(ops.map((op) => wallet.userOperations.sign(signer, op)));
 };
+
+const genericRelay =
+  (options = {}) =>
+  async (userOperations) => {
+    try {
+      await axios.post(
+        `${App.stackup.backendUrl}/v1/users/${options.userId}/genericRelay`,
+        { userOperations },
+        { headers: { Authorization: `Bearer ${options.accessToken}` } },
+      );
+    } catch (error) {
+      throw error;
+    }
+  };
 
 export const useWalletStore = create(
   devtools(
@@ -121,6 +140,43 @@ export const useWalletStore = create(
 
             set({ loading: false });
             return newPaymentUserOps;
+          } catch (error) {
+            set({ loading: false });
+            throw error;
+          }
+        },
+
+        setupWalletUserOps: async (userWallet, password, options) => {
+          const signer = wallet.proxy.decryptSigner(userWallet, password);
+          if (!signer) {
+            throw new Error('Incorrect password');
+          }
+          set({ loading: true });
+
+          try {
+            await Promise.all([
+              wallet.userOperations.get(userWallet.walletAddress, {
+                callGas: constants.userOperations.defaultGas * 2,
+                verificationGas: constants.userOperations.defaultGas * 2,
+                preVerificationGas: constants.userOperations.defaultGas * 2,
+                initCode: wallet.proxy.getInitCode(
+                  userWallet.initImplementation,
+                  userWallet.initEntryPoint,
+                  userWallet.initOwner,
+                  userWallet.initGuardians,
+                ),
+                callData: wallet.encodeFunctionData.ERC20Approve(
+                  App.web3.usdc,
+                  App.web3.paymaster,
+                  defaultPaymasterApproval,
+                ),
+              }),
+            ])
+              .then(paymasterApproval(options))
+              .then(signUserOps(signer))
+              .then(genericRelay(options));
+
+            set({ loading: false });
           } catch (error) {
             set({ loading: false });
             throw error;
