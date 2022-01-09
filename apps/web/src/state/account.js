@@ -80,6 +80,7 @@ export const accountOnboardSummaryPageSelector = (state) => ({
 
 export const accountRecoverApproveRequestPageSelector = (state) => ({
   enabled: state.enabled,
+  user: state.user,
   wallet: state.wallet,
   accessToken: state.accessToken,
 });

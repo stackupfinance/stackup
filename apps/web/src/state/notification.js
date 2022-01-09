@@ -15,6 +15,11 @@ export const notificationHomePageSelector = (state) => ({
   selectNotification: state.selectNotification,
 });
 
+export const notificationRecoverApproveRequestPageSelector = (state) => ({
+  loading: state.loading,
+  deleteNotification: state.deleteNotification,
+});
+
 const defaultState = {
   loading: false,
   notifications: undefined,

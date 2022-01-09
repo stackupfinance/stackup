@@ -45,4 +45,8 @@ router
   .get(auth('getUsers'), validate(userValidation.getUserActivityItems), userController.getUserActivityItems)
   .post(auth('manageUsers'), validate(userValidation.createUserActivityItem), userController.createUserActivityItem);
 
+router
+  .route('/:userId/genericRelay')
+  .post(auth('manageUsers'), validate(userValidation.getUserNotifications), userController.genericRelay);
+
 module.exports = router;

@@ -17,6 +17,7 @@ export const useAuthChannel = (callback = () => {}) => {
     });
     const channelName = `private-${user.id}-activity`;
     const channel = pusher.subscribe(channelName);
+    channel.bind(types.genericRelay, (data) => callback(types.genericRelay, data));
     channel.bind(types.newPayment, (data) => callback(types.newPayment, data));
     channel.bind(types.recoverAccount, (data) => callback(types.recoverAccount, data));
 
