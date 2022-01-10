@@ -1,5 +1,5 @@
 import create from 'zustand';
-import { devtools, persist } from 'zustand/middleware';
+import { persist } from 'zustand/middleware';
 import { wallet } from '@stackupfinance/contracts';
 import { App } from '../config';
 
@@ -49,36 +49,34 @@ const defaultState = {
 };
 
 export const useOnboardStore = create(
-  devtools(
-    persist(
-      (set, get) => ({
-        ...defaultState,
+  persist(
+    (set, get) => ({
+      ...defaultState,
 
-        createEphemeralWallet: (password) =>
-          set({ ephemeralWallet: wallet.proxy.initEncryptedIdentity(password) }),
+      createEphemeralWallet: (password) =>
+        set({ ephemeralWallet: wallet.proxy.initEncryptedIdentity(password) }),
 
-        setGuardian: (guardian, address) => {
-          const guardianMap = get().guardianMap;
-          guardianMap[guardian] = address;
-          set({ guardianMap });
-        },
-
-        removeGuardian: (guardian) => {
-          const { [guardian]: _, ...rest } = get().guardianMap;
-          set({ guardianMap: rest });
-        },
-
-        setEmail: (email) => set({ email }),
-
-        clear: () => set({ ...defaultState, guardianMap: { ...defaultGuardianMap } }),
-      }),
-      {
-        name: 'stackup-onboard-store',
-        partialize: (state) => {
-          const { loading, ...persisted } = state;
-          return persisted;
-        },
+      setGuardian: (guardian, address) => {
+        const guardianMap = get().guardianMap;
+        guardianMap[guardian] = address;
+        set({ guardianMap });
       },
-    ),
+
+      removeGuardian: (guardian) => {
+        const { [guardian]: _, ...rest } = get().guardianMap;
+        set({ guardianMap: rest });
+      },
+
+      setEmail: (email) => set({ email }),
+
+      clear: () => set({ ...defaultState, guardianMap: { ...defaultGuardianMap } }),
+    }),
+    {
+      name: 'stackup-onboard-store',
+      partialize: (state) => {
+        const { loading, ...persisted } = state;
+        return persisted;
+      },
+    },
   ),
 );

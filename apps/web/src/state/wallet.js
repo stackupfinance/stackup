@@ -1,5 +1,5 @@
 import create from 'zustand';
-import { persist, devtools } from 'zustand/middleware';
+import { persist } from 'zustand/middleware';
 import { ethers } from 'ethers';
 import axios from 'axios';
 import { wallet, constants } from '@stackupfinance/contracts';
@@ -73,125 +73,123 @@ const genericRelay =
   };
 
 export const useWalletStore = create(
-  devtools(
-    persist(
-      (set, get) => ({
-        ...defaultState,
+  persist(
+    (set, get) => ({
+      ...defaultState,
 
-        fetchBalance: async (wallet) => {
-          set({ loading: true });
+      fetchBalance: async (wallet) => {
+        set({ loading: true });
 
-          try {
-            const balance = await usdcContract.balanceOf(wallet.walletAddress);
-            set({ loading: false, balance });
-          } catch (error) {
-            set({ loading: false });
-            throw error;
-          }
-        },
-
-        signNewPaymentUserOps: async (userWallet, data, options) => {
-          const signer = wallet.proxy.decryptSigner(userWallet, data.password);
-          if (!signer) {
-            throw new Error('Incorrect password');
-          }
-          set({ loading: true });
-
-          try {
-            const [isDeployed, allowance] = await Promise.all([
-              wallet.proxy.isCodeDeployed(provider, userWallet.walletAddress),
-              usdcContract.allowance(userWallet.walletAddress, App.web3.paymaster),
-            ]);
-            const shouldApprove = allowance.lte(defaultPaymasterReapproval);
-            const nonce = isDeployed
-              ? await wallet.proxy.getNonce(provider, userWallet.walletAddress)
-              : constants.userOperations.initNonce;
-            const newPaymentUserOps = await Promise.all([
-              shouldApprove
-                ? wallet.userOperations.get(userWallet.walletAddress, {
-                    nonce,
-                    initCode: isDeployed
-                      ? constants.userOperations.nullCode
-                      : wallet.proxy.getInitCode(
-                          userWallet.initImplementation,
-                          userWallet.initEntryPoint,
-                          userWallet.initOwner,
-                          userWallet.initGuardians,
-                        ),
-                    callData: wallet.encodeFunctionData.ERC20Approve(
-                      App.web3.usdc,
-                      App.web3.paymaster,
-                      defaultPaymasterApproval,
-                    ),
-                  })
-                : undefined,
-              wallet.userOperations.get(userWallet.walletAddress, {
-                nonce: shouldApprove ? nonce + 1 : nonce,
-                callData: wallet.encodeFunctionData.ERC20Transfer(
-                  App.web3.usdc,
-                  data.toWalletAddress,
-                  ethers.utils.parseUnits(data.amount, App.web3.usdcUnits),
-                ),
-              }),
-            ])
-              .then((ops) => ops.filter(Boolean))
-              .then(paymasterApproval(options))
-              .then(signUserOps(signer));
-
-            set({ loading: false });
-            return newPaymentUserOps;
-          } catch (error) {
-            set({ loading: false });
-            throw error;
-          }
-        },
-
-        setupWalletUserOps: async (userWallet, password, options) => {
-          const signer = wallet.proxy.decryptSigner(userWallet, password);
-          if (!signer) {
-            throw new Error('Incorrect password');
-          }
-          set({ loading: true });
-
-          try {
-            await Promise.all([
-              wallet.userOperations.get(userWallet.walletAddress, {
-                callGas: constants.userOperations.defaultGas * 2,
-                verificationGas: constants.userOperations.defaultGas * 2,
-                preVerificationGas: constants.userOperations.defaultGas * 2,
-                initCode: wallet.proxy.getInitCode(
-                  userWallet.initImplementation,
-                  userWallet.initEntryPoint,
-                  userWallet.initOwner,
-                  userWallet.initGuardians,
-                ),
-                callData: wallet.encodeFunctionData.ERC20Approve(
-                  App.web3.usdc,
-                  App.web3.paymaster,
-                  defaultPaymasterApproval,
-                ),
-              }),
-            ])
-              .then(paymasterApproval(options))
-              .then(signUserOps(signer))
-              .then(genericRelay(options));
-
-            set({ loading: false });
-          } catch (error) {
-            set({ loading: false });
-            throw error;
-          }
-        },
-
-        clear: () => set({ ...defaultState }),
-      }),
-      {
-        name: 'stackup-wallet-store',
-        partialize: (state) => {
-          const { loading, balance, ...persisted } = state;
-          return persisted;
-        },
+        try {
+          const balance = await usdcContract.balanceOf(wallet.walletAddress);
+          set({ loading: false, balance });
+        } catch (error) {
+          set({ loading: false });
+          throw error;
+        }
       },
-    ),
+
+      signNewPaymentUserOps: async (userWallet, data, options) => {
+        const signer = wallet.proxy.decryptSigner(userWallet, data.password);
+        if (!signer) {
+          throw new Error('Incorrect password');
+        }
+        set({ loading: true });
+
+        try {
+          const [isDeployed, allowance] = await Promise.all([
+            wallet.proxy.isCodeDeployed(provider, userWallet.walletAddress),
+            usdcContract.allowance(userWallet.walletAddress, App.web3.paymaster),
+          ]);
+          const shouldApprove = allowance.lte(defaultPaymasterReapproval);
+          const nonce = isDeployed
+            ? await wallet.proxy.getNonce(provider, userWallet.walletAddress)
+            : constants.userOperations.initNonce;
+          const newPaymentUserOps = await Promise.all([
+            shouldApprove
+              ? wallet.userOperations.get(userWallet.walletAddress, {
+                  nonce,
+                  initCode: isDeployed
+                    ? constants.userOperations.nullCode
+                    : wallet.proxy.getInitCode(
+                        userWallet.initImplementation,
+                        userWallet.initEntryPoint,
+                        userWallet.initOwner,
+                        userWallet.initGuardians,
+                      ),
+                  callData: wallet.encodeFunctionData.ERC20Approve(
+                    App.web3.usdc,
+                    App.web3.paymaster,
+                    defaultPaymasterApproval,
+                  ),
+                })
+              : undefined,
+            wallet.userOperations.get(userWallet.walletAddress, {
+              nonce: shouldApprove ? nonce + 1 : nonce,
+              callData: wallet.encodeFunctionData.ERC20Transfer(
+                App.web3.usdc,
+                data.toWalletAddress,
+                ethers.utils.parseUnits(data.amount, App.web3.usdcUnits),
+              ),
+            }),
+          ])
+            .then((ops) => ops.filter(Boolean))
+            .then(paymasterApproval(options))
+            .then(signUserOps(signer));
+
+          set({ loading: false });
+          return newPaymentUserOps;
+        } catch (error) {
+          set({ loading: false });
+          throw error;
+        }
+      },
+
+      setupWalletUserOps: async (userWallet, password, options) => {
+        const signer = wallet.proxy.decryptSigner(userWallet, password);
+        if (!signer) {
+          throw new Error('Incorrect password');
+        }
+        set({ loading: true });
+
+        try {
+          await Promise.all([
+            wallet.userOperations.get(userWallet.walletAddress, {
+              callGas: constants.userOperations.defaultGas * 2,
+              verificationGas: constants.userOperations.defaultGas * 2,
+              preVerificationGas: constants.userOperations.defaultGas * 2,
+              initCode: wallet.proxy.getInitCode(
+                userWallet.initImplementation,
+                userWallet.initEntryPoint,
+                userWallet.initOwner,
+                userWallet.initGuardians,
+              ),
+              callData: wallet.encodeFunctionData.ERC20Approve(
+                App.web3.usdc,
+                App.web3.paymaster,
+                defaultPaymasterApproval,
+              ),
+            }),
+          ])
+            .then(paymasterApproval(options))
+            .then(signUserOps(signer))
+            .then(genericRelay(options));
+
+          set({ loading: false });
+        } catch (error) {
+          set({ loading: false });
+          throw error;
+        }
+      },
+
+      clear: () => set({ ...defaultState }),
+    }),
+    {
+      name: 'stackup-wallet-store',
+      partialize: (state) => {
+        const { loading, balance, ...persisted } = state;
+        return persisted;
+      },
+    },
   ),
 );
