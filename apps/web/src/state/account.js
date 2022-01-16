@@ -116,6 +116,12 @@ export const accountUpdateVerifyEmailPageSelector = (state) => ({
   verifyEmail: state.verifyEmail,
 });
 
+export const accountUpdatePasswordPageSelector = (state) => ({
+  enabled: state.enabled,
+  loading: state.loading,
+  updatePassword: state.updatePassword,
+});
+
 const defaultState = {
   enabled: false,
   loading: false,
@@ -301,6 +307,32 @@ export const useAccountStore = create(
           await get().getUser();
         } catch (error) {
           set({ loading: false });
+          throw error;
+        }
+      },
+
+      updatePassword: async (data) => {
+        const encryptedSigner = walletLib.proxy.reencryptSigner(
+          get().wallet,
+          data.password,
+          data.newPassword,
+        );
+        if (!encryptedSigner) {
+          throw new Error('Incorrect password');
+        }
+        set({ loading: true });
+
+        try {
+          await axios.patch(
+            `${App.stackup.backendUrl}/v1/users/${get().user?.id}/wallet`,
+            { encryptedSigner },
+            {
+              headers: { Authorization: `Bearer ${get().accessToken?.token}` },
+            },
+          );
+
+          await get().getUser();
+        } catch (error) {
           throw error;
         }
       },

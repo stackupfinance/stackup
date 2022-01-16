@@ -75,7 +75,7 @@ function UpdateVerifyEmail() {
 
   return (
     <>
-      <Head title="Stackup | Setup Recovery" />
+      <Head title="Stackup | Account" />
 
       <PageContainer>
         <NavigationHeader title="Verify E-mail" backLinkUrl={Routes.UPDATE_ADD_EMAIL} />
