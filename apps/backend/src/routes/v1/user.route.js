@@ -19,6 +19,10 @@ router
   .get(auth('getUsers'), validate(userValidation.getUserWallet), userController.getUserWallet);
 
 router
+  .route('/:userId/wallet/hydrate-guardians')
+  .post(auth('getUsers'), validate(userValidation.hydrateUserWalletGuardians), userController.hydrateUserWalletGuardians);
+
+router
   .route('/:userId/notifications')
   .get(auth('getUsers'), validate(userValidation.getUserNotifications), userController.getUserNotifications);
 
@@ -38,7 +42,7 @@ router
   .get(auth('getUsers'), validate(userValidation.findUserActivity), userController.findUserActivity);
 
 router
-  .route('/:userId/activity/paymasterApproval')
+  .route('/:userId/activity/paymaster-approval')
   .post(auth('manageUsers'), validate(userValidation.approveUserActivity), userController.approveUserActivity);
 
 router
@@ -47,7 +51,7 @@ router
   .post(auth('manageUsers'), validate(userValidation.createUserActivityItem), userController.createUserActivityItem);
 
 router
-  .route('/:userId/genericRelay')
+  .route('/:userId/generic-relay')
   .post(auth('manageUsers'), validate(userValidation.getUserNotifications), userController.genericRelay);
 
 module.exports = router;

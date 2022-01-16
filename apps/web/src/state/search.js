@@ -31,6 +31,15 @@ export const searchOnboardRecoveryPageSelector = (state) => ({
   clearSearchData: state.clearSearchData,
 });
 
+export const searchUpdateEditGuardiansPageSelector = (state) => ({
+  loading: state.loading,
+  searchData: state.searchData,
+  searchByUsername: state.searchByUsername,
+  fetchNextPage: state.fetchNextPage,
+  hasMore: state.hasMore,
+  clearSearchData: state.clearSearchData,
+});
+
 const defaultState = {
   loading: false,
   searchData: undefined,

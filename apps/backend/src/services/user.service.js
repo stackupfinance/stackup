@@ -1,5 +1,5 @@
 const httpStatus = require('http-status');
-const { User } = require('../models');
+const { User, Wallet } = require('../models');
 const ApiError = require('../utils/ApiError');
 
 /**
@@ -68,6 +68,19 @@ const getUsersByWalletAddress = async (addresses) => {
     })
     .match({ 'wallets.walletAddress': { $in: addresses } })
     .project({ username: true });
+};
+
+const getUsersByWalletAddressAndPopulate = async (addresses) => {
+  const users = await User.aggregate()
+    .lookup({
+      from: 'wallets',
+      localField: 'wallet',
+      foreignField: '_id',
+      as: 'wallets',
+    })
+    .match({ 'wallets.walletAddress': { $in: addresses } })
+    .project({ _id: false, username: true, wallet: true });
+  return Wallet.populate(users, { path: 'wallet', select: 'walletAddress -_id' });
 };
 
 /**
@@ -145,6 +158,7 @@ module.exports = {
   getUserByUsername,
   getUserByUsernameWithWallet,
   getUsersByWalletAddress,
+  getUsersByWalletAddressAndPopulate,
   getWalletForLogin,
   getWalletForRecovery,
   updateUserById,

@@ -26,7 +26,7 @@ async function main() {
         initCode: isDeployed
           ? constants.userOperations.nullCode
           : wallet.proxy.getInitCode(...init),
-        callData: wallet.encodeFunctionData.addEntryPointStake("0.2"),
+        callData: wallet.encodeFunctionData.addEntryPointStake("1"),
       })
     ),
     wallet.userOperations.sign(

@@ -27,6 +27,8 @@ import {
   recoverHomePageSelector,
   useNotificationStore,
   notificationHomePageSelector,
+  useUpdateStore,
+  updateHomePageSelector,
 } from '../src/state';
 import { useAuthChannel, useLogout } from '../src/hooks';
 import { getToUserFromActivity } from '../src/utils/activity';
@@ -98,6 +100,7 @@ export default function Home() {
   } = useNotificationStore(notificationHomePageSelector);
   const { clear: clearOnboardData } = useOnboardStore(onboardHomePageSelector);
   const { clear: clearRecover, selectGuardianRequest } = useRecoverStore(recoverHomePageSelector);
+  const { clear: clearUpdate } = useUpdateStore(updateHomePageSelector);
   const logout = useLogout();
   const router = useRouter();
   const [showSearch, setShowSearch] = useState(false);
@@ -121,9 +124,9 @@ export default function Home() {
       router.push(Routes.ONBOARD_RECOVERY);
       return;
     }
-
     clearOnboardData();
     clearRecover();
+    clearUpdate();
     fetchActivities({ userId: user.id, accessToken: accessToken.token });
     fetchNotifications({ userId: user.id, accessToken: accessToken.token });
     fetchBalance(wallet);

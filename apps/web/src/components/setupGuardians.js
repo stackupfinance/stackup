@@ -24,15 +24,16 @@ import {
 import { CheckIcon, AddIcon } from '@chakra-ui/icons';
 
 export const SetupGuardians = ({
+  isUpdateFlow,
   username,
   isLoading,
   isDefaultGuardianSelected,
   additionalGuardians,
-  onDefaultGuardian,
-  onAddGuardian,
-  onNext,
-  onSkip,
-  onSkipConfirm,
+  onDefaultGuardian = () => {},
+  onAddGuardian = () => {},
+  onNext = () => {},
+  onSkip = () => {},
+  onSkipConfirm = () => {},
 }) => {
   const [showSkipConfirm, setShowSkipConfirm] = useState(false);
 
@@ -69,10 +70,12 @@ export const SetupGuardians = ({
         <VStack spacing="16px" w="100%">
           <Box w="100%">
             <Heading size="md" mb="4px">
-              Welcome to Stackup, {username}! 👋
+              {isUpdateFlow ? `Update your guardians 🔐` : `Welcome to Stackup, ${username}! 👋`}
             </Heading>
             <Text>
-              {`Let's get started by quickly setting up your guardians incase you ever need to recover
+              {isUpdateFlow
+                ? `This will submit a transaction to update your guardians on-chain incase you ever need to recover your account.`
+                : `Let's get started by quickly setting up your guardians incase you ever need to recover
               your account.`}
             </Text>
           </Box>
@@ -101,6 +104,7 @@ export const SetupGuardians = ({
             <VStack mb="16px">
               <Button
                 isFullWidth
+                isDisabled={isLoading}
                 variant={isDefaultGuardianSelected ? 'solid' : 'outline'}
                 colorScheme="blue"
                 onClick={onDefaultGuardianClick}
@@ -113,6 +117,7 @@ export const SetupGuardians = ({
 
               <Button
                 isFullWidth
+                isDisabled={isLoading}
                 variant="outline"
                 onClick={onAddGuardianClick}
                 leftIcon={<AddIcon />}
@@ -134,40 +139,44 @@ export const SetupGuardians = ({
                 Next
               </Button>
 
-              <Button
-                isFullWidth
-                isLoading={isLoading}
-                variant="outline"
-                size="lg"
-                onClick={onSkipClick}
-              >
-                Skip
-              </Button>
+              {isUpdateFlow ? undefined : (
+                <Button
+                  isFullWidth
+                  isLoading={isLoading}
+                  variant="outline"
+                  size="lg"
+                  onClick={onSkipClick}
+                >
+                  Skip
+                </Button>
+              )}
             </VStack>
           </Box>
         </VStack>
       </VStack>
 
-      <Modal isOpen={showSkipConfirm} onClose={onSkipCancelClick}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Are you sure?</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            Setting this up now will enable account recovery right away. You can still add guardians
-            later by submitting a transaction on-chain.
-          </ModalBody>
+      {isUpdateFlow ? undefined : (
+        <Modal isOpen={showSkipConfirm} onClose={onSkipCancelClick}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Are you sure?</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              Setting this up now will enable account recovery right away. You can still add
+              guardians later by submitting a transaction on-chain.
+            </ModalBody>
 
-          <ModalFooter>
-            <Button isLoading={isLoading} colorScheme="blue" onClick={onSkipCancelClick}>
-              Do it now
-            </Button>
-            <Button isLoading={isLoading} variant="outline" ml="8px" onClick={onSkipConfirmClick}>
-              Skip
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+            <ModalFooter>
+              <Button isLoading={isLoading} colorScheme="blue" onClick={onSkipCancelClick}>
+                Do it now
+              </Button>
+              <Button isLoading={isLoading} variant="outline" ml="8px" onClick={onSkipConfirmClick}>
+                Skip
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+      )}
     </>
   );
 };

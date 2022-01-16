@@ -4,4 +4,5 @@ export * from './notification';
 export * from './onboard';
 export * from './recover';
 export * from './search';
+export * from './update';
 export * from './wallet';

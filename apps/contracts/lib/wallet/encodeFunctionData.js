@@ -31,6 +31,14 @@ module.exports.transferOwner = (newOwner) => {
   return Wallet.interface.encodeFunctionData("transferOwner", [newOwner]);
 };
 
+module.exports.grantGuardian = (guardian) => {
+  return Wallet.interface.encodeFunctionData("grantGuardian", [guardian]);
+};
+
+module.exports.revokeGuardian = (guardian) => {
+  return Wallet.interface.encodeFunctionData("revokeGuardian", [guardian]);
+};
+
 module.exports.addEntryPointStake = (value, override = {}) => {
   return Wallet.interface.encodeFunctionData("executeUserOp", [
     override.EntryPoint ?? EntryPoint.address,

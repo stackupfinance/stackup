@@ -42,6 +42,11 @@ const getUserWallet = catchAsync(async (req, res) => {
   res.send(wallet);
 });
 
+const hydrateUserWalletGuardians = catchAsync(async (req, res) => {
+  const { guardians } = req.body;
+  res.send({ guardians: await userService.getUsersByWalletAddressAndPopulate(guardians) });
+});
+
 const getUserNotifications = catchAsync(async (req, res) => {
   const { userId } = req.params;
   const notifications = await notificationService.getNotificationsByUserId(userId);
@@ -151,6 +156,7 @@ module.exports = {
   deleteUser,
   updateUserWallet,
   getUserWallet,
+  hydrateUserWalletGuardians,
   getUserNotifications,
   deleteUserNotification,
   getUserSearch,

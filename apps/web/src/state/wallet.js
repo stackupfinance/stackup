@@ -33,6 +33,11 @@ export const walletRecoverApproveRequestPageSelector = (state) => ({
   setupWalletUserOps: state.setupWalletUserOps,
 });
 
+export const walletUpdateConfirmGuardiansPageSelector = (state) => ({
+  loading: state.loading,
+  updateGuardianOps: state.updateGuardianOps,
+});
+
 const defaultState = {
   loading: false,
   balance: ethers.constants.Zero,
@@ -43,7 +48,7 @@ const paymasterApproval =
   async (userOperations) => {
     try {
       const res = await axios.post(
-        `${App.stackup.backendUrl}/v1/users/${options.userId}/activity/paymasterApproval`,
+        `${App.stackup.backendUrl}/v1/users/${options.userId}/activity/paymaster-approval`,
         { userOperations },
         { headers: { Authorization: `Bearer ${options.accessToken}` } },
       );
@@ -63,7 +68,7 @@ const genericRelay =
   async (userOperations) => {
     try {
       await axios.post(
-        `${App.stackup.backendUrl}/v1/users/${options.userId}/genericRelay`,
+        `${App.stackup.backendUrl}/v1/users/${options.userId}/generic-relay`,
         { userOperations },
         { headers: { Authorization: `Bearer ${options.accessToken}` } },
       );
@@ -175,6 +180,71 @@ export const useWalletStore = create(
             .then(signUserOps(signer))
             .then(genericRelay(options));
 
+          set({ loading: false });
+        } catch (error) {
+          set({ loading: false });
+          throw error;
+        }
+      },
+
+      updateGuardianOps: async (currentGuardians, newGuardians, userWallet, password, options) => {
+        const signer = wallet.proxy.decryptSigner(userWallet, password);
+        if (!signer) {
+          throw new Error('Incorrect password');
+        }
+        const removeGuardians = currentGuardians.filter((g) => !newGuardians.includes(g));
+        const addGuardians = newGuardians.filter((g) => !currentGuardians.includes(g));
+        if (!removeGuardians.length && !addGuardians.length) return;
+        set({ loading: true });
+
+        try {
+          const [isDeployed, allowance] = await Promise.all([
+            wallet.proxy.isCodeDeployed(provider, userWallet.walletAddress),
+            usdcContract.allowance(userWallet.walletAddress, App.web3.paymaster),
+          ]);
+          const shouldApprove = allowance.lte(defaultPaymasterReapproval);
+          const nonce = isDeployed
+            ? await wallet.proxy.getNonce(provider, userWallet.walletAddress)
+            : constants.userOperations.initNonce;
+          await Promise.all([
+            shouldApprove
+              ? wallet.userOperations.get(userWallet.walletAddress, {
+                  nonce,
+                  callData: wallet.encodeFunctionData.ERC20Approve(
+                    App.web3.usdc,
+                    App.web3.paymaster,
+                    defaultPaymasterApproval,
+                  ),
+                })
+              : undefined,
+            ...removeGuardians.map((g, i) => {
+              return wallet.userOperations.get(userWallet.walletAddress, {
+                nonce: nonce + i + (shouldApprove ? 1 : 0),
+                callData: wallet.encodeFunctionData.revokeGuardian(g),
+              });
+            }),
+            ...addGuardians.map((g, i) => {
+              return wallet.userOperations.get(userWallet.walletAddress, {
+                nonce: nonce + i + (shouldApprove ? 1 : 0) + removeGuardians.length,
+                callData: wallet.encodeFunctionData.grantGuardian(g),
+              });
+            }),
+          ])
+            .then((ops) => ops.filter(Boolean))
+            .then((ops) => {
+              if (!isDeployed) {
+                ops[0].initCode = wallet.proxy.getInitCode(
+                  userWallet.initImplementation,
+                  userWallet.initEntryPoint,
+                  userWallet.initOwner,
+                  userWallet.initGuardians,
+                );
+              }
+              return ops;
+            })
+            .then(paymasterApproval(options))
+            .then(signUserOps(signer))
+            .then(genericRelay(options));
           set({ loading: false });
         } catch (error) {
           set({ loading: false });
