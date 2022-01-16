@@ -22,6 +22,19 @@ module.exports.decryptSigner = (wallet, password) => {
   }
 };
 
+module.exports.reencryptSigner = (wallet, password, newPassword) => {
+  try {
+    const privateKey = AES.decrypt(wallet.encryptedSigner, password).toString(
+      Utf8
+    );
+    if (!privateKey) return;
+
+    return AES.encrypt(privateKey, newPassword).toString();
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 module.exports.initEncryptedIdentity = (password, opts = {}) => {
   const signer = EthCrypto.createIdentity();
 

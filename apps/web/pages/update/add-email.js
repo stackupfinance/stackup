@@ -54,7 +54,7 @@ function UpdateAddEmail() {
 
   return (
     <>
-      <Head title="Stackup | Setup Recovery" />
+      <Head title="Stackup | Account" />
 
       <PageContainer>
         <NavigationHeader title="Add E-mail" backLinkUrl={Routes.UPDATE_EDIT_GUARDIANS} />
