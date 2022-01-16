@@ -50,6 +50,15 @@ const getUserWallet = {
   }),
 };
 
+const hydrateUserWalletGuardians = {
+  params: Joi.object().keys({
+    userId: Joi.string().custom(objectId),
+  }),
+  body: Joi.object().keys({
+    guardians: Joi.array().items(Joi.string()).required(),
+  }),
+};
+
 const getUserNotifications = {
   params: Joi.object().keys({
     userId: Joi.string().custom(objectId),
@@ -148,6 +157,7 @@ module.exports = {
   deleteUser,
   updateUserWallet,
   getUserWallet,
+  hydrateUserWalletGuardians,
   getUserNotifications,
   deleteUserNotification,
   getUserSearch,

@@ -966,8 +966,8 @@ const verifyEmail = (username, code) => {
                     <tr>
                       <td class="content-cell">
                         <div class="f-fallback">
-                          <h1>Welcome, ${username}!</h1>
-                          <p>Thanks for verifying your Stackup account. We’re thrilled to have you on board. You can use the following code to complete verification:</p>
+                          <h1>Hi, ${username}!</h1>
+                          <p>Thanks for picking us to be one of your guardians. Let's first get you verified. You can use the following code to complete verification:</p>
                           <h1>${code}</h1>
                           <p>Thanks,
                             <br>The Stackup Team</p>

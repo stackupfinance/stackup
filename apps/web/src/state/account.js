@@ -85,6 +85,37 @@ export const accountRecoverApproveRequestPageSelector = (state) => ({
   accessToken: state.accessToken,
 });
 
+export const accountUpdateEditGuardiansPageSelector = (state) => ({
+  enabled: state.enabled,
+  loading: state.loading,
+  user: state.user,
+  wallet: state.wallet,
+  accessToken: state.accessToken,
+});
+
+export const accountUpdateConfirmGuardiansPageSelector = (state) => ({
+  enabled: state.enabled,
+  loading: state.loading,
+  user: state.user,
+  wallet: state.wallet,
+  accessToken: state.accessToken,
+  getUser: state.getUser,
+  patchUser: state.patchUser,
+});
+
+export const accountUpdateAddEmailPageSelector = (state) => ({
+  enabled: state.enabled,
+  loading: state.loading,
+  patchUser: state.patchUser,
+});
+
+export const accountUpdateVerifyEmailPageSelector = (state) => ({
+  enabled: state.enabled,
+  loading: state.loading,
+  sendVerificationEmail: state.sendVerificationEmail,
+  verifyEmail: state.verifyEmail,
+});
+
 const defaultState = {
   enabled: false,
   loading: false,

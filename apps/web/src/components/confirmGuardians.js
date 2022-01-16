@@ -67,49 +67,51 @@ export const ConfirmGuardians = ({ isLoading, onConfirm, guardianMap, email }) =
               Confirm your selection ✅
             </Heading>
             <Text>
-              {`You're almost done! You've selected `}
+              {`You're almost done! You've set `}
               <Text as="span" fontWeight="bold">
-                {guardianLength} {guardianLength > 1 ? 'guardians' : 'guardian'}
+                {guardianLength} {guardianLength === 1 ? 'guardian' : 'guardians'}
               </Text>{' '}
               for your account. Enter your password to confirm.
             </Text>
           </Box>
 
           <Box p="16px" borderWidth="1px" borderRadius="lg" w="100%">
-            <Accordion allowToggle mb="16px">
-              <AccordionItem
-                id="accordion-item-1"
-                borderWidth="1px"
-                borderTopRadius="lg"
-                borderBottomRadius={email ? '0' : 'lg'}
-              >
-                <AccordionButton>
-                  <Box flex="1" textAlign="left" fontWeight="500">
-                    Show my guardians
-                  </Box>
-                  <AccordionIcon />
-                </AccordionButton>
-
-                <AccordionPanel>{guardianMapToString()}</AccordionPanel>
-              </AccordionItem>
-
-              {email && (
+            {guardianLength > 0 && (
+              <Accordion allowToggle mb="16px">
                 <AccordionItem
-                  id="accordion-item-2"
-                  borderWidth="0 1px 1px 1px"
-                  borderBottomRadius="lg"
+                  id="accordion-item-1"
+                  borderWidth="1px"
+                  borderTopRadius="lg"
+                  borderBottomRadius={email ? '0' : 'lg'}
                 >
                   <AccordionButton>
                     <Box flex="1" textAlign="left" fontWeight="500">
-                      Show my recovery email
+                      Show my guardians
                     </Box>
                     <AccordionIcon />
                   </AccordionButton>
 
-                  <AccordionPanel>{email}</AccordionPanel>
+                  <AccordionPanel>{guardianMapToString()}</AccordionPanel>
                 </AccordionItem>
-              )}
-            </Accordion>
+
+                {email && (
+                  <AccordionItem
+                    id="accordion-item-2"
+                    borderWidth="0 1px 1px 1px"
+                    borderBottomRadius="lg"
+                  >
+                    <AccordionButton>
+                      <Box flex="1" textAlign="left" fontWeight="500">
+                        Show my recovery email
+                      </Box>
+                      <AccordionIcon />
+                    </AccordionButton>
+
+                    <AccordionPanel>{email}</AccordionPanel>
+                  </AccordionItem>
+                )}
+              </Accordion>
+            )}
 
             <form onSubmit={handleSubmit(onSubmit)} onChange={() => setError('')}>
               <InputGroup size="lg" mb="16px">
@@ -125,7 +127,7 @@ export const ConfirmGuardians = ({ isLoading, onConfirm, guardianMap, email }) =
               </InputGroup>
 
               <Button isFullWidth isLoading={isLoading} colorScheme="blue" size="lg" type="submit">
-                Confirm setup
+                Confirm
               </Button>
             </form>
 

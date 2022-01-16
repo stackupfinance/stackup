@@ -1,6 +1,7 @@
 const httpStatus = require('http-status');
 const ApiError = require('../utils/ApiError');
 const Wallet = require('../models/wallet.model');
+const { getWalletGuardians } = require('../utils/web3');
 
 /**
  * Create an internal wallet
@@ -24,6 +25,11 @@ const createWallet = async (userId, walletBody) => {
  */
 const getUserWallet = async (userId) => {
   return Wallet.findOne({ user: userId });
+};
+
+const getUserWalletGuardians = async (userId) => {
+  const wallet = await getUserWallet(userId);
+  return getWalletGuardians(wallet);
 };
 
 /**
@@ -55,6 +61,7 @@ const deleteUserWallets = async (userId) => {
 module.exports = {
   createWallet,
   getUserWallet,
+  getUserWalletGuardians,
   updateUserWallet,
   deleteUserWallets,
 };

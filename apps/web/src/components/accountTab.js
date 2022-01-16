@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-// import NextLink from 'next/link';
+import NextLink from 'next/link';
 import {
   Tabs,
   TabList,
@@ -8,7 +8,7 @@ import {
   TabPanel,
   VStack,
   Button,
-  // Divider,
+  Divider,
   useBreakpointValue,
   Stat,
   StatLabel,
@@ -18,8 +18,8 @@ import {
   Spacer,
   Skeleton,
 } from '@chakra-ui/react';
-import { /*Routes,*/ App } from '../config';
-import { /*ChevronRightIcon,*/ ExternalLinkIcon } from '@chakra-ui/icons';
+import { Routes, App } from '../config';
+import { ChevronRightIcon, ExternalLinkIcon } from '@chakra-ui/icons';
 import { displayUSDC } from '../utils/web3';
 
 export const AccountTab = ({
@@ -49,21 +49,7 @@ export const AccountTab = ({
       <TabPanels>
         <TabPanel px="0px">
           <VStack spacing="16px" borderWidth="1px" borderRadius="lg" p="16px" w="100%">
-            {/* <NextLink href={Routes.EDIT_PROFILE} passHref>
-              <Button
-                isFullWidth
-                isLoading={isAccountLoading}
-                as="a"
-                mt="16px"
-                variant="outline"
-                size={buttonSize}
-                rightIcon={<ChevronRightIcon />}
-              >
-                Profile
-              </Button>
-            </NextLink>
-
-            <NextLink href={Routes.EDIT_PASSWORD} passHref>
+            <NextLink href={Routes.UPDATE_PASSWORD} passHref>
               <Button
                 isFullWidth
                 isLoading={isAccountLoading}
@@ -77,7 +63,7 @@ export const AccountTab = ({
               </Button>
             </NextLink>
 
-            <NextLink href={Routes.EDIT_EMAIL} passHref>
+            <NextLink href={Routes.UPDATE_EDIT_GUARDIANS} passHref>
               <Button
                 isFullWidth
                 isLoading={isAccountLoading}
@@ -87,11 +73,11 @@ export const AccountTab = ({
                 size={buttonSize}
                 rightIcon={<ChevronRightIcon />}
               >
-                Email
+                Guardians
               </Button>
             </NextLink>
 
-            <Divider /> */}
+            <Divider />
 
             <Button
               isFullWidth

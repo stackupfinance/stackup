@@ -27,3 +27,12 @@ module.exports.isWalletDeployed = async (walletAddress) => wallet.proxy.isCodeDe
 module.exports.recoverAddressFromLoginSignature = (signature) => ethers.utils.verifyMessage(loginMessage, signature);
 
 module.exports.walletContract = (walletAddress) => contracts.Wallet.getInstance(provider).attach(walletAddress);
+
+module.exports.getWalletGuardians = async (userWallet) => {
+  const isDeployed = await wallet.proxy.isCodeDeployed(provider, userWallet.walletAddress);
+  const guardians = isDeployed
+    ? await wallet.access.getGuardians(this.walletContract(userWallet.walletAddress))
+    : userWallet.initGuardians;
+
+  return guardians;
+};

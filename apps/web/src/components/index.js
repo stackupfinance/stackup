@@ -4,6 +4,7 @@ export * from './addEmail';
 export * from './appContainer';
 export * from './approveRecovery';
 export * from './confirmGuardians';
+export * from './confirmTransaction';
 export * from './exploreTabMockup';
 export * from './guardianStatus';
 export * from './head';
