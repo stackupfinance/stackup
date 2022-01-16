@@ -70,7 +70,7 @@ const getUsersByWalletAddress = async (addresses) => {
     .project({ username: true });
 };
 
-const getUsersByWalletAddressInclusive = async (addresses) => {
+const getUsersByWalletAddressAndPopulate = async (addresses) => {
   const users = await User.aggregate()
     .lookup({
       from: 'wallets',
@@ -158,7 +158,7 @@ module.exports = {
   getUserByUsername,
   getUserByUsernameWithWallet,
   getUsersByWalletAddress,
-  getUsersByWalletAddressInclusive,
+  getUsersByWalletAddressAndPopulate,
   getWalletForLogin,
   getWalletForRecovery,
   updateUserById,

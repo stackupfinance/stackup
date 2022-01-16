@@ -44,7 +44,7 @@ const getUserWallet = catchAsync(async (req, res) => {
 
 const hydrateUserWalletGuardians = catchAsync(async (req, res) => {
   const { guardians } = req.body;
-  res.send({ guardians: await userService.getUsersByWalletAddressInclusive(guardians) });
+  res.send({ guardians: await userService.getUsersByWalletAddressAndPopulate(guardians) });
 });
 
 const getUserNotifications = catchAsync(async (req, res) => {
