@@ -16,6 +16,7 @@ export * from './newPassword';
 export * from './newPaymentCard';
 export * from './notifications';
 export * from './pageContainer';
+export * from './passwordStrength';
 export * from './pay';
 export * from './recoverAccount';
 export * from './search';

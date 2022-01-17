@@ -12,7 +12,7 @@ import {
   Input,
 } from '@chakra-ui/react';
 import { LockIcon } from '@chakra-ui/icons';
-import { InlineError } from '.';
+import { InlineError, PasswordStrength } from '.';
 
 export const NewPassword = ({ isLoading, onNext }) => {
   const {
@@ -64,22 +64,23 @@ export const NewPassword = ({ isLoading, onNext }) => {
 
           <Box p="16px" borderWidth="1px" borderRadius="lg" w="100%">
             <form onSubmit={handleSubmit(onSubmit)} onChange={() => setError('')}>
-              <InputGroup size="lg" mb="8px">
+              <InputGroup size="lg" mb="4px">
                 <InputLeftElement pointerEvents="none">
                   <LockIcon color="gray.300" />
                 </InputLeftElement>
 
                 <Input
-                  placeholder="Password"
+                  placeholder="Create password"
                   type="password"
                   isInvalid={errors.password}
                   {...register('password', { required: true })}
                 />
               </InputGroup>
+              <PasswordStrength password={watch('password')} />
 
               <Input
                 size="lg"
-                mb="8px"
+                my="8px"
                 placeholder="Confirm password"
                 type="password"
                 isInvalid={errors.confirmPassword}

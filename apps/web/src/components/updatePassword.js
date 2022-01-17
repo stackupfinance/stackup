@@ -12,7 +12,7 @@ import {
   Input,
 } from '@chakra-ui/react';
 import { LockIcon } from '@chakra-ui/icons';
-import { InlineError } from '.';
+import { InlineError, PasswordStrength } from '.';
 
 export const UpdatePassword = ({ isLoading, onConfirm = () => {} }) => {
   const {
@@ -81,16 +81,17 @@ export const UpdatePassword = ({ isLoading, onConfirm = () => {} }) => {
 
               <Input
                 size="lg"
-                mb="8px"
+                mb="4px"
                 placeholder="New password"
                 type="password"
                 isInvalid={errors.newPassword}
                 {...register('newPassword', { required: true })}
               />
+              <PasswordStrength password={watch('newPassword')} />
 
               <Input
                 size="lg"
-                mb="8px"
+                my="8px"
                 placeholder="Confirm password"
                 type="password"
                 isInvalid={errors.confirmPassword}
