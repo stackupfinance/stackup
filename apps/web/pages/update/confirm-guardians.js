@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/router';
 import { useToast, Text, Link } from '@chakra-ui/react';
 import {
@@ -44,6 +44,8 @@ function UpdateConfirmGuardians() {
   const [isTransactionLoading, setIsTransactionLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [guardianMap, setGuardianMap] = useState({});
+  const guardianMapRef = useRef();
+  guardianMapRef.current = guardianMap;
 
   useAuthChannel(async (event, data) => {
     if (event === types.genericRelay) {
@@ -72,7 +74,7 @@ function UpdateConfirmGuardians() {
 
       setIsTransactionLoading(false);
       if (data.status === txStatus.success) {
-        if (!guardianMap.defaultGuardian) {
+        if (!guardianMapRef.current.defaultGuardian) {
           await patchUser({ unset: ['email'] });
           await getUser();
         }

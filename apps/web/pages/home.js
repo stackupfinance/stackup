@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react';
+import { Tabs, TabList, TabPanels, Tab, TabPanel, Image } from '@chakra-ui/react';
 import {
   PageContainer,
   AppContainer,
@@ -107,6 +107,7 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');
   const [tabIndex, setTabIndex] = useState(tabs.EXPLORE);
   const [notifications, setNotifications] = useState([]);
+  const [username, setUsername] = useState('');
 
   useEffect(() => {
     setNotifications(savedNotifications);
@@ -127,6 +128,7 @@ export default function Home() {
     clearOnboardData();
     clearRecover();
     clearUpdate();
+    setUsername(user.username);
     fetchActivities({ userId: user.id, accessToken: accessToken.token });
     fetchNotifications({ userId: user.id, accessToken: accessToken.token });
     fetchBalance(wallet);
@@ -299,6 +301,7 @@ export default function Home() {
                   onLogout={logoutHandler}
                   walletBalance={balance}
                   walletAddress={wallet?.walletAddress}
+                  username={username}
                 />
               </TabPanel>
             </TabPanels>
@@ -315,9 +318,15 @@ export default function Home() {
               maxW="544px"
               w="100%"
             >
-              <Tab borderRadius="lg">Explore</Tab>
-              <Tab borderRadius="lg">Pay</Tab>
-              <Tab borderRadius="lg">Account</Tab>
+              <Tab borderRadius="lg">
+                <Image src="/home-blue.png" maxW="32px" maxH="32px" alt="home tab" />
+              </Tab>
+              <Tab borderRadius="lg">
+                <Image src="/p2p-blue.png" maxW="32px" maxH="32px" alt="activity tab" />
+              </Tab>
+              <Tab borderRadius="lg">
+                <Image src="/user-blue.png" maxW="32px" maxH="32px" alt="user tab" />
+              </Tab>
             </TabList>
           </Tabs>
         </AppContainer>
