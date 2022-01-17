@@ -17,7 +17,7 @@ export const PasswordStrength = ({ password = '' }) => {
       colorScheme = 'yellow';
       break;
 
-    case 60:
+    case 80:
       colorScheme = 'green';
       break;
 
