@@ -90,7 +90,15 @@ export const AccountOverview = ({
             p="16px"
             size="md"
           >
-            Gm, {username} ☀️
+            <Skeleton
+              width={isAccountLoading && '128px'}
+              isLoaded={!isAccountLoading}
+              borderRadius="lg"
+              startColor="blue.500"
+              endColor="blue.50"
+            >
+              Gm, {username} ☀️
+            </Skeleton>
           </Heading>
           <Stat
             mb="16px"
