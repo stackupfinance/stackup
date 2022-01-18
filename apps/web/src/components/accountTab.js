@@ -18,9 +18,12 @@ import {
   Spacer,
   Skeleton,
   Heading,
+  useToast,
+  Box,
 } from '@chakra-ui/react';
 import { Routes, App } from '../config';
 import { CopyIcon, ChevronRightIcon, ExternalLinkIcon } from '@chakra-ui/icons';
+import { MdOutlineMoreHoriz } from 'react-icons/md';
 import { displayUSDC } from '../utils/web3';
 
 export const AccountTab = ({
@@ -31,7 +34,9 @@ export const AccountTab = ({
   walletBalance,
   walletAddress,
   username,
+  transactionsContent,
 }) => {
+  const toast = useToast();
   const buttonSize = useBreakpointValue({ base: 'md', sm: 'lg' });
   const [explorerLink, setExplorerLink] = useState(App.web3.explorer);
 
@@ -41,11 +46,27 @@ export const AccountTab = ({
     }
   }, [walletAddress]);
 
+  const onCopy = async () => {
+    await navigator.clipboard.writeText(walletAddress);
+    toast({
+      title: 'Wallet address copied.',
+      status: 'success',
+      position: 'top-right',
+      duration: 5000,
+      isClosable: true,
+    });
+  };
+
   return (
     <Tabs id="home-tabs" isFitted w="100%" variant="soft-rounded" colorScheme="blue" align="center">
-      <TabList borderWidth="1px" borderRadius="lg" p="8px" bg="gray.50">
-        <Tab borderRadius="lg">Wallet</Tab>
-        <Tab borderRadius="lg">Account</Tab>
+      <TabList borderWidth="1px" borderRadius="lg" p="4px" bg="gray.50">
+        <Tab borderRadius="lg" fontSize="sm">
+          Wallet
+        </Tab>
+
+        <Tab borderRadius="lg" fontSize="sm">
+          Preferences
+        </Tab>
       </TabList>
 
       <TabPanels>
@@ -59,9 +80,10 @@ export const AccountTab = ({
             p="16px"
             size="md"
           >
-            gm, {username} ☀️
+            Gm, {username} ☀️
           </Heading>
           <Stat
+            mb="16px"
             borderWidth="1px"
             borderTopWidth="0px"
             borderBottomRadius="lg"
@@ -70,11 +92,12 @@ export const AccountTab = ({
             p="16px"
             textAlign="left"
           >
-            <HStack>
+            <HStack mb="8px">
               <StatLabel fontSize="md">Total balance</StatLabel>
+
               <Spacer />
-              <IconButton size="xs" icon={<CopyIcon />} />
-              1
+
+              <IconButton size="xs" icon={<CopyIcon onClick={onCopy} />} />
               <IconButton
                 as="a"
                 href={explorerLink}
@@ -82,12 +105,36 @@ export const AccountTab = ({
                 size="xs"
                 icon={<ExternalLinkIcon />}
               />
+              <IconButton size="xs" icon={<MdOutlineMoreHoriz />} />
             </HStack>
-            <Skeleton isLoaded={!isWalletLoading} mt={isWalletLoading && '8px'}>
+            <Skeleton isLoaded={!isWalletLoading} borderRadius="lg">
               <StatNumber>{displayUSDC(walletBalance)}</StatNumber>
             </Skeleton>
           </Stat>
+
+          <Heading
+            borderWidth="1px"
+            borderBottomWidth="0px"
+            borderTopRadius="lg"
+            bg="gray.50"
+            textAlign="left"
+            p="16px"
+            size="md"
+          >
+            Transactions
+          </Heading>
+          <Box
+            borderWidth="1px"
+            borderTopWidth="0px"
+            borderBottomRadius="lg"
+            bg="white"
+            w="100%"
+            py="1px"
+          >
+            {transactionsContent}
+          </Box>
         </TabPanel>
+
         <TabPanel px="0px">
           <VStack spacing="16px" borderWidth="1px" borderRadius="lg" p="16px" w="100%">
             <NextLink href={Routes.UPDATE_PASSWORD} passHref>

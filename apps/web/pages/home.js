@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-import { Tabs, TabList, TabPanels, Tab, TabPanel, Image } from '@chakra-ui/react';
+import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react';
 import {
   PageContainer,
   AppContainer,
@@ -9,7 +9,6 @@ import {
   AccountTab,
   List,
   UserCard,
-  ExploreTabMockup,
   Notifications,
 } from '../src/components';
 import {
@@ -108,6 +107,7 @@ export default function Home() {
   const [tabIndex, setTabIndex] = useState(tabs.EXPLORE);
   const [notifications, setNotifications] = useState([]);
   const [username, setUsername] = useState('');
+  const [initLoad, setInitLoad] = useState(true);
 
   useEffect(() => {
     setNotifications(savedNotifications);
@@ -132,6 +132,7 @@ export default function Home() {
     fetchActivities({ userId: user.id, accessToken: accessToken.token });
     fetchNotifications({ userId: user.id, accessToken: accessToken.token });
     fetchBalance(wallet);
+    setInitLoad(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [enabled]);
 
@@ -267,9 +268,26 @@ export default function Home() {
             onChange={handleTabsChange}
           >
             <TabPanels>
-              <TabPanel px="0px" mb={['64px', '128px']}>
-                <ExploreTabMockup />
+              <TabPanel px="0px">
+                <AccountTab
+                  isEnabled={enabled}
+                  isAccountLoading={accountLoading}
+                  isWalletLoading={initLoad || walletLoading}
+                  onLogout={logoutHandler}
+                  walletBalance={balance}
+                  walletAddress={wallet?.walletAddress}
+                  username={username}
+                  transactionsContent={
+                    <List
+                      items={[]}
+                      hasMore={false}
+                      next={() => {}}
+                      emptyHeading="No wallet activity yet! 🆕"
+                    />
+                  }
+                />
               </TabPanel>
+
               <TabPanel px="0px" mb={['64px', '128px']}>
                 {showSearch ? (
                   <List
@@ -293,17 +311,6 @@ export default function Home() {
                   />
                 )}
               </TabPanel>
-              <TabPanel px="0px">
-                <AccountTab
-                  isEnabled={enabled}
-                  isAccountLoading={accountLoading}
-                  isWalletLoading={walletLoading}
-                  onLogout={logoutHandler}
-                  walletBalance={balance}
-                  walletAddress={wallet?.walletAddress}
-                  username={username}
-                />
-              </TabPanel>
             </TabPanels>
 
             <TabList
@@ -318,15 +325,9 @@ export default function Home() {
               maxW="544px"
               w="100%"
             >
-              <Tab borderRadius="lg">
-                <Image src="/home-blue.png" maxW="32px" maxH="32px" alt="home tab" />
-              </Tab>
-              <Tab borderRadius="lg">
-                <Image src="/p2p-blue.png" maxW="32px" maxH="32px" alt="activity tab" />
-              </Tab>
-              <Tab borderRadius="lg">
-                <Image src="/user-blue.png" maxW="32px" maxH="32px" alt="user tab" />
-              </Tab>
+              <Tab borderRadius="lg">Account</Tab>
+
+              <Tab borderRadius="lg">Activity</Tab>
             </TabList>
           </Tabs>
         </AppContainer>
