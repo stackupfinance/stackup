@@ -47,14 +47,14 @@ const loadingList = [
     isFirst
     username="username"
     preview="preview"
-    timestamp={new Date()}
+    timestamp={new Date('2021-01-01T00:00:00')}
   />,
   <UserCard
     key="loading-card-2"
     isLoading
     username="username"
     preview="preview"
-    timestamp={new Date()}
+    timestamp={new Date('2021-01-01T00:00:00')}
   />,
   <UserCard
     key="loading-card-3"
@@ -62,7 +62,7 @@ const loadingList = [
     isLast
     username="username"
     preview="preview"
-    timestamp={new Date()}
+    timestamp={new Date('2021-01-01T00:00:00')}
   />,
 ];
 
