@@ -6,10 +6,9 @@ import {
   AppContainer,
   Head,
   Search,
-  AccountTab,
+  AccountOverview,
   List,
   UserCard,
-  ExploreTabMockup,
   Notifications,
 } from '../src/components';
 import {
@@ -107,6 +106,8 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');
   const [tabIndex, setTabIndex] = useState(tabs.EXPLORE);
   const [notifications, setNotifications] = useState([]);
+  const [username, setUsername] = useState('');
+  const [initLoad, setInitLoad] = useState(true);
 
   useEffect(() => {
     setNotifications(savedNotifications);
@@ -127,9 +128,11 @@ export default function Home() {
     clearOnboardData();
     clearRecover();
     clearUpdate();
+    setUsername(user.username);
     fetchActivities({ userId: user.id, accessToken: accessToken.token });
     fetchNotifications({ userId: user.id, accessToken: accessToken.token });
     fetchBalance(wallet);
+    setInitLoad(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [enabled]);
 
@@ -265,9 +268,26 @@ export default function Home() {
             onChange={handleTabsChange}
           >
             <TabPanels>
-              <TabPanel px="0px" mb={['64px', '128px']}>
-                <ExploreTabMockup />
+              <TabPanel px="0px">
+                <AccountOverview
+                  isEnabled={enabled}
+                  isAccountLoading={accountLoading}
+                  isWalletLoading={initLoad || walletLoading}
+                  onLogout={logoutHandler}
+                  walletBalance={balance}
+                  walletAddress={wallet?.walletAddress}
+                  username={username}
+                  transactionsContent={
+                    <List
+                      items={[]}
+                      hasMore={false}
+                      next={() => {}}
+                      emptyHeading="No wallet activity yet! 🆕"
+                    />
+                  }
+                />
               </TabPanel>
+
               <TabPanel px="0px" mb={['64px', '128px']}>
                 {showSearch ? (
                   <List
@@ -291,16 +311,6 @@ export default function Home() {
                   />
                 )}
               </TabPanel>
-              <TabPanel px="0px">
-                <AccountTab
-                  isEnabled={enabled}
-                  isAccountLoading={accountLoading}
-                  isWalletLoading={walletLoading}
-                  onLogout={logoutHandler}
-                  walletBalance={balance}
-                  walletAddress={wallet?.walletAddress}
-                />
-              </TabPanel>
             </TabPanels>
 
             <TabList
@@ -315,9 +325,9 @@ export default function Home() {
               maxW="544px"
               w="100%"
             >
-              <Tab borderRadius="lg">Explore</Tab>
-              <Tab borderRadius="lg">Pay</Tab>
               <Tab borderRadius="lg">Account</Tab>
+
+              <Tab borderRadius="lg">Activity</Tab>
             </TabList>
           </Tabs>
         </AppContainer>

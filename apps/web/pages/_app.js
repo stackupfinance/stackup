@@ -1,5 +1,6 @@
 import { ChakraProvider, extendTheme } from '@chakra-ui/react';
 import { useAuth } from '../src/hooks';
+import '../styles.css';
 
 const theme = extendTheme({
   config: {

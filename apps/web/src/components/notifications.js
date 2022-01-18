@@ -52,8 +52,8 @@ export const Notifications = ({
     return (
       <Skeleton isLoaded={!isLoading}>
         <MenuItem minH="48px">
-          <Text mr="8px">📭</Text>
-          <Text>No notifications yet!</Text>
+          <Text>{`You're all caught up!`}</Text>
+          <Text ml="8px">📭</Text>
         </MenuItem>
       </Skeleton>
     );

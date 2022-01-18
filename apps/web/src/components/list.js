@@ -54,7 +54,7 @@ export const List = ({
             {items}
           </InfiniteScroll>
         )) || (
-          <Heading size="md" px="16px" py="128px" color="gray.500" textAlign="center">
+          <Heading size="md" px="16px" py="64px" color="gray.500" textAlign="center">
             {emptyHeading}
           </Heading>
         )}
