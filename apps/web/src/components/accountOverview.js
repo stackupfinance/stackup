@@ -26,7 +26,7 @@ import { CopyIcon, ChevronRightIcon, ExternalLinkIcon } from '@chakra-ui/icons';
 import { MdOutlineMoreHoriz } from 'react-icons/md';
 import { displayUSDC } from '../utils/web3';
 
-export const AccountTab = ({
+export const AccountOverview = ({
   isEnabled,
   isAccountLoading,
   isWalletLoading,
@@ -51,6 +51,16 @@ export const AccountTab = ({
     toast({
       title: 'Wallet address copied.',
       status: 'success',
+      position: 'top-right',
+      duration: 5000,
+      isClosable: true,
+    });
+  };
+
+  const onMore = async () => {
+    toast({
+      title: 'Wallet breakdown coming soon.',
+      status: 'info',
       position: 'top-right',
       duration: 5000,
       isClosable: true,
@@ -97,7 +107,7 @@ export const AccountTab = ({
 
               <Spacer />
 
-              <IconButton size="xs" icon={<CopyIcon onClick={onCopy} />} />
+              <IconButton size="xs" icon={<CopyIcon />} onClick={onCopy} />
               <IconButton
                 as="a"
                 href={explorerLink}
@@ -105,7 +115,7 @@ export const AccountTab = ({
                 size="xs"
                 icon={<ExternalLinkIcon />}
               />
-              <IconButton size="xs" icon={<MdOutlineMoreHoriz />} />
+              <IconButton size="xs" icon={<MdOutlineMoreHoriz />} onClick={onMore} />
             </HStack>
             <Skeleton isLoaded={!isWalletLoading} borderRadius="lg">
               <StatNumber>{displayUSDC(walletBalance)}</StatNumber>

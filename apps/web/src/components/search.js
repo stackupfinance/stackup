@@ -48,13 +48,13 @@ export const Search = ({ onSearch, onClear, rightItem }) => {
 
   return (
     <header>
-      <Box borderBottomWidth="1px">
+      <Box borderBottomWidth="1px" bg="gray.50">
         <HStack spacing="8px" py="16px" px="16px" maxW="xl" margin="0 auto">
           <LinkBox>
             <NextLink href={Routes.HOME} passHref>
               <LinkOverlay>
                 <Image
-                  src="./mark-blue.png"
+                  src="/mark-blue.png"
                   maxW="32px"
                   maxH="32px"
                   alt="stackup logo"
@@ -66,7 +66,7 @@ export const Search = ({ onSearch, onClear, rightItem }) => {
 
           <Spacer />
 
-          <InputGroup>
+          <InputGroup bg="white" borderRadius="lg">
             {value && (
               <InputLeftElement>
                 <IconButton size="xs" onClick={clearHandler} icon={<CloseIcon />} />

@@ -6,7 +6,7 @@ import {
   AppContainer,
   Head,
   Search,
-  AccountTab,
+  AccountOverview,
   List,
   UserCard,
   Notifications,
@@ -269,7 +269,7 @@ export default function Home() {
           >
             <TabPanels>
               <TabPanel px="0px">
-                <AccountTab
+                <AccountOverview
                   isEnabled={enabled}
                   isAccountLoading={accountLoading}
                   isWalletLoading={initLoad || walletLoading}

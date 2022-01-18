@@ -1,4 +1,4 @@
-export * from './accountTab';
+export * from './accountOverview';
 export * from './activityHeader';
 export * from './addEmail';
 export * from './appContainer';
