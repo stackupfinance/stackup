@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import Pusher from 'pusher-js';
 import { useAccountStore, accountPusherSelector } from '../state';
 import { App } from '../config';
-import { types } from '../utils/events';
+import { txType } from '../utils/transaction';
 
 export const useAuthChannel = (callback = () => {}) => {
   const { enabled, accessToken, user } = useAccountStore(accountPusherSelector);
@@ -17,9 +17,9 @@ export const useAuthChannel = (callback = () => {}) => {
     });
     const channelName = `private-${user.id}-activity`;
     const channel = pusher.subscribe(channelName);
-    channel.bind(types.genericRelay, (data) => callback(types.genericRelay, data));
-    channel.bind(types.newPayment, (data) => callback(types.newPayment, data));
-    channel.bind(types.recoverAccount, (data) => callback(types.recoverAccount, data));
+    channel.bind(txType.genericRelay, (data) => callback(txType.genericRelay, data));
+    channel.bind(txType.newPayment, (data) => callback(txType.newPayment, data));
+    channel.bind(txType.recoverAccount, (data) => callback(txType.recoverAccount, data));
 
     return () => {
       pusher.disconnect();
@@ -36,7 +36,7 @@ export const useRecoverAccountChannel = (channelId, callback = () => {}) => {
 
     const channelName = `recover-account-${channelId}`;
     const channel = pusher.subscribe(channelName);
-    channel.bind(types.recoverAccount, callback);
+    channel.bind(txType.recoverAccount, callback);
 
     return () => {
       pusher.disconnect();

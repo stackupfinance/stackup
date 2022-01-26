@@ -1,13 +1,13 @@
 const Joi = require('joi');
-const { objectId, userOperation } = require('./custom.validation');
+const { activityId, objectId, userOperation } = require('./custom.validation');
 
-const getUser = {
+module.exports.getUser = {
   params: Joi.object().keys({
     userId: Joi.string().custom(objectId),
   }),
 };
 
-const updateUser = {
+module.exports.updateUser = {
   params: Joi.object().keys({
     userId: Joi.required().custom(objectId),
   }),
@@ -22,13 +22,13 @@ const updateUser = {
     .min(1),
 };
 
-const deleteUser = {
+module.exports.deleteUser = {
   params: Joi.object().keys({
     userId: Joi.string().custom(objectId),
   }),
 };
 
-const updateUserWallet = {
+module.exports.updateUserWallet = {
   params: Joi.object().keys({
     userId: Joi.string().custom(objectId),
   }),
@@ -44,13 +44,13 @@ const updateUserWallet = {
     .min(1),
 };
 
-const getUserWallet = {
+module.exports.getUserWallet = {
   params: Joi.object().keys({
     userId: Joi.string().custom(objectId),
   }),
 };
 
-const hydrateUserWalletGuardians = {
+module.exports.hydrateUserWalletGuardians = {
   params: Joi.object().keys({
     userId: Joi.string().custom(objectId),
   }),
@@ -59,20 +59,20 @@ const hydrateUserWalletGuardians = {
   }),
 };
 
-const getUserNotifications = {
+module.exports.getUserNotifications = {
   params: Joi.object().keys({
     userId: Joi.string().custom(objectId),
   }),
 };
 
-const deleteUserNotification = {
+module.exports.deleteUserNotification = {
   params: Joi.object().keys({
     userId: Joi.string().custom(objectId),
     notificationId: Joi.string().custom(objectId),
   }),
 };
 
-const getUserSearch = {
+module.exports.getUserSearch = {
   params: Joi.object().keys({
     userId: Joi.string().custom(objectId),
   }),
@@ -84,25 +84,7 @@ const getUserSearch = {
   }),
 };
 
-const findUserActivity = {
-  params: Joi.object().keys({
-    userId: Joi.string().custom(objectId),
-  }),
-  query: Joi.object().keys({
-    toUserId: Joi.string().custom(objectId).required(),
-  }),
-};
-
-const approveUserActivity = {
-  params: Joi.object().keys({
-    userId: Joi.string().custom(objectId),
-  }),
-  body: Joi.object().keys({
-    userOperations: Joi.array().items(userOperation).required().min(1),
-  }),
-};
-
-const getUserActivities = {
+module.exports.getUserActivities = {
   params: Joi.object().keys({
     userId: Joi.string().custom(objectId),
   }),
@@ -112,19 +94,10 @@ const getUserActivities = {
   }),
 };
 
-const createUserActivity = {
+module.exports.getUserActivityItems = {
   params: Joi.object().keys({
     userId: Joi.string().custom(objectId),
-  }),
-  body: Joi.object().keys({
-    toUserId: Joi.string().custom(objectId),
-  }),
-};
-
-const getUserActivityItems = {
-  params: Joi.object().keys({
-    userId: Joi.string().custom(objectId),
-    activityId: Joi.string().custom(objectId),
+    activityId: Joi.string().custom(activityId),
   }),
   query: Joi.object().keys({
     limit: Joi.number().integer(),
@@ -132,40 +105,21 @@ const getUserActivityItems = {
   }),
 };
 
-const createUserActivityItem = {
+module.exports.postTransaction = {
   params: Joi.object().keys({
     userId: Joi.string().custom(objectId),
-    activityId: Joi.string().custom(objectId),
   }),
   body: Joi.object().keys({
-    toUser: Joi.string().custom(objectId).required(),
-    amount: Joi.number().required(),
-    message: Joi.string().required(),
+    message: Joi.string().default(''),
     userOperations: Joi.array().items(userOperation).required().min(1),
   }),
 };
 
-const genericRelay = {
+module.exports.transactionPaymasterApproval = {
+  params: Joi.object().keys({
+    userId: Joi.string().custom(objectId),
+  }),
   body: Joi.object().keys({
     userOperations: Joi.array().items(userOperation).required().min(1),
   }),
-};
-
-module.exports = {
-  getUser,
-  updateUser,
-  deleteUser,
-  updateUserWallet,
-  getUserWallet,
-  hydrateUserWalletGuardians,
-  getUserNotifications,
-  deleteUserNotification,
-  getUserSearch,
-  findUserActivity,
-  approveUserActivity,
-  getUserActivities,
-  createUserActivity,
-  getUserActivityItems,
-  createUserActivityItem,
-  genericRelay,
 };

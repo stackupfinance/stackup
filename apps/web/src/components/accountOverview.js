@@ -111,7 +111,7 @@ export const AccountOverview = ({
             textAlign="left"
           >
             <HStack mb="8px">
-              <StatLabel fontSize="md">Total balance</StatLabel>
+              <StatLabel fontSize="md">Available</StatLabel>
 
               <Spacer />
 
@@ -134,7 +134,7 @@ export const AccountOverview = ({
             borderWidth="1px"
             borderBottomWidth="0px"
             borderTopRadius="lg"
-            bg="gray.50"
+            bg="blue.50"
             textAlign="left"
             p="16px"
             size="md"
@@ -147,7 +147,7 @@ export const AccountOverview = ({
             borderBottomRadius="lg"
             bg="white"
             w="100%"
-            py="1px"
+            // pt="1px"
           >
             {transactionsContent}
           </Box>

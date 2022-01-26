@@ -9,16 +9,10 @@ export const searchHomePageSelector = (state) => ({
   searchByUsername: state.searchByUsername,
   fetchNextPage: state.fetchNextPage,
   hasMore: state.hasMore,
-  selectResult: state.selectResult,
   clearSearchData: state.clearSearchData,
 });
 
 export const searchUseAuthSelector = (state) => ({
-  clear: state.clear,
-});
-
-export const searchActivityPageSelector = (state) => ({
-  selectedResult: state.selectedResult,
   clear: state.clear,
 });
 
@@ -103,8 +97,6 @@ export const useSearchStore = create(
 
         return searchData.page < searchData.totalPages;
       },
-
-      selectResult: (selectedResult) => set({ selectedResult }),
 
       clearSearchData: () => set({ searchData: undefined }),
 

@@ -1,4 +1,4 @@
-export const types = {
+export const txType = {
   genericRelay: 'genericRelay',
   newPayment: 'newPayment',
   recoverAccount: 'recoverAccount',

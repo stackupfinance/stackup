@@ -11,8 +11,6 @@ import {
   NewPaymentCard,
 } from '../src/components';
 import {
-  useSearchStore,
-  searchActivityPageSelector,
   useActivityStore,
   activityActivityPageSelector,
   useAccountStore,
@@ -22,9 +20,8 @@ import {
 } from '../src/state';
 import { useAuthChannel } from '../src/hooks';
 import { Routes } from '../src/config';
-import { getToUserFromActivity } from '../src/utils/activity';
 import { displayUSDC } from '../src/utils/web3';
-import { types } from '../src/utils/events';
+import { txType } from '../src/utils/transaction';
 import { EVENTS, logEvent } from '../src/utils/analytics';
 
 const loadingList = [
@@ -52,13 +49,11 @@ export default function Activity() {
     loading: activityLoading,
     savedActivity,
     activityItems,
-    findOrCreateActivity,
     clearSavedActivity,
-    createActivityItem,
     fetchActivityItems,
+    sendNewPaymentTransaction,
     updateActivityItemFromChannel,
   } = useActivityStore(activityActivityPageSelector);
-  const { clear: clearSearch, selectedResult } = useSearchStore(searchActivityPageSelector);
   const {
     loading: walletLoading,
     balance,
@@ -72,7 +67,7 @@ export default function Activity() {
   const isInverse = (activityItems?.results || []).length || activityLoading;
 
   useAuthChannel((event, data) => {
-    if (event === types.newPayment) {
+    if (event === txType.newPayment) {
       updateActivityItemFromChannel(data);
       fetchBalance(wallet);
     }
@@ -81,25 +76,19 @@ export default function Activity() {
   useEffect(() => {
     if (!enabled) return;
 
-    if (selectedResult) {
-      findOrCreateActivity(selectedResult.id, {
-        userId: user.id,
-        accessToken: accessToken.token,
-      }).then(() => clearSearch());
-    } else if (!selectedResult && !savedActivity) {
-      router.push(Routes.HOME);
-    }
-
     fetchBalance(wallet);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [enabled]);
 
   useEffect(() => {
-    if (!savedActivity) return '';
+    if (!savedActivity) {
+      router.push(Routes.HOME);
+      return;
+    }
 
-    const toUser = getToUserFromActivity(savedActivity, user.id);
+    const toUser = savedActivity.toUser;
     setUsername(toUser.username);
-    setWalletAddress(toUser.wallet.walletAddress);
+    setWalletAddress(toUser.walletAddress);
     fetchActivityItems({
       userId: user.id,
       accessToken: accessToken.token,
@@ -125,11 +114,10 @@ export default function Activity() {
         userId: user.id,
         accessToken: accessToken.token,
       });
-      await createActivityItem(userOps, data.amount, data.message, {
+      await sendNewPaymentTransaction(userOps, data.message, {
         userId: user.id,
         accessToken: accessToken.token,
       });
-      fetchBalance(wallet);
       logEvent(EVENTS.CONFIRM_PAY);
     } catch (error) {
       setPayError(error.response?.data?.message || error.message);
@@ -142,21 +130,15 @@ export default function Activity() {
   };
 
   const renderActivityItems = () => {
-    if (!savedActivity) return [];
-    const toUser = getToUserFromActivity(savedActivity, user.id);
-
     return (activityItems?.results || []).map((item, i) => {
-      const isReceiving = item.toUser === user.id;
-      const fromUsername = isReceiving ? toUser.username : user.username;
-      const toUsername = isReceiving ? user.username : toUser.username;
       return (
         <NewPaymentCard
           key={`new-payment-card-${i}`}
           isFirst={i === 0}
-          isReceiving={isReceiving}
-          toUsername={toUsername}
-          fromUsername={fromUsername}
-          amount={displayUSDC(item.amount)}
+          isReceiving={item.isReceiving}
+          toUsername={item.toUser.username}
+          fromUsername={item.fromUser.username}
+          amount={displayUSDC(item.value)}
           message={item.message}
           status={item.status}
         />

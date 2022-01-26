@@ -18,7 +18,7 @@ import {
 } from '../../src/state';
 import { App, Routes } from '../../src/config';
 import { useAuthChannel } from '../../src/hooks';
-import { types, txStatus } from '../../src/utils/events';
+import { txType, txStatus } from '../../src/utils/transaction';
 import { logEvent, EVENTS } from '../../src/utils/analytics';
 
 function UpdateConfirmGuardians() {
@@ -48,7 +48,7 @@ function UpdateConfirmGuardians() {
   guardianMapRef.current = guardianMap;
 
   useAuthChannel(async (event, data) => {
-    if (event === types.genericRelay) {
+    if (event === txType.genericRelay) {
       toast({
         title:
           data.status === txStatus.success ? 'Guardian update success' : 'Guardian update fail',

@@ -48,7 +48,7 @@ const paymasterApproval =
   async (userOperations) => {
     try {
       const res = await axios.post(
-        `${App.stackup.backendUrl}/v1/users/${options.userId}/activity/paymaster-approval`,
+        `${App.stackup.backendUrl}/v1/users/${options.userId}/transaction/paymaster-approval`,
         { userOperations },
         { headers: { Authorization: `Bearer ${options.accessToken}` } },
       );
@@ -68,7 +68,7 @@ const genericRelay =
   async (userOperations) => {
     try {
       await axios.post(
-        `${App.stackup.backendUrl}/v1/users/${options.userId}/generic-relay`,
+        `${App.stackup.backendUrl}/v1/users/${options.userId}/transaction`,
         { userOperations },
         { headers: { Authorization: `Bearer ${options.accessToken}` } },
       );

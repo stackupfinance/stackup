@@ -1,9 +1,7 @@
 import create from 'zustand';
 import { persist } from 'zustand/middleware';
 import axios from 'axios';
-import { ethers } from 'ethers';
 import { App } from '../config';
-import { getToUserFromActivity } from '../utils/activity';
 
 export const activityUseAuthSelector = (state) => ({
   clear: state.clear,
@@ -21,9 +19,8 @@ export const activityActivityPageSelector = (state) => ({
   loading: state.loading,
   savedActivity: state.savedActivity,
   activityItems: state.activityItems,
-  findOrCreateActivity: state.findOrCreateActivity,
   clearSavedActivity: state.clearSavedActivity,
-  createActivityItem: state.createActivityItem,
+  sendNewPaymentTransaction: state.sendNewPaymentTransaction,
   fetchActivityItems: state.fetchActivityItems,
   updateActivityItemFromChannel: state.updateActivityItemFromChannel,
 });
@@ -43,7 +40,7 @@ export const useActivityStore = create(
 
         try {
           const res = await axios.get(
-            `${App.stackup.backendUrl}/v1/users/${options.userId}/activity`,
+            `${App.stackup.backendUrl}/v1/users/${options.userId}/activities`,
             {
               params: { limit: 20, page: 1 },
               headers: { Authorization: `Bearer ${options.accessToken}` },
@@ -53,6 +50,52 @@ export const useActivityStore = create(
           set({
             loading: false,
             activityList: res.data,
+          });
+        } catch (error) {
+          set({ loading: false });
+          throw error;
+        }
+      },
+
+      fetchActivityItems: async (options = {}) => {
+        const savedActivity = get().savedActivity;
+        if (!savedActivity) return;
+        set({ loading: true });
+
+        try {
+          const res = await axios.get(
+            `${App.stackup.backendUrl}/v1/users/${options.userId}/activity/${savedActivity.id}`,
+            {
+              params: { limit: 100, page: 1 },
+              headers: { Authorization: `Bearer ${options.accessToken}` },
+            },
+          );
+
+          set({ loading: false, activityItems: res.data.activityItems });
+        } catch (error) {
+          set({ loading: false });
+          throw error;
+        }
+      },
+
+      sendNewPaymentTransaction: async (userOperations, message, options = {}) => {
+        const { savedActivity, activityItems } = get();
+        if (!savedActivity || !activityItems) return;
+        set({ loading: true });
+
+        try {
+          const res = await axios.post(
+            `${App.stackup.backendUrl}/v1/users/${options.userId}/transaction`,
+            { message, userOperations },
+            { headers: { Authorization: `Bearer ${options.accessToken}` } },
+          );
+
+          set({
+            loading: false,
+            activityItems: {
+              ...activityItems,
+              results: [res.data.pendingNewPayment, ...activityItems.results],
+            },
           });
         } catch (error) {
           set({ loading: false });
@@ -90,60 +133,6 @@ export const useActivityStore = create(
         }
       },
 
-      findOrCreateActivity: async (toUserId, options = {}) => {
-        set({ loading: true });
-
-        try {
-          const find = await axios.get(
-            `${App.stackup.backendUrl}/v1/users/${options.userId}/activity/find`,
-            {
-              params: { toUserId },
-              headers: { Authorization: `Bearer ${options.accessToken}` },
-            },
-          );
-
-          if (!find.data.activity) {
-            const create = await axios.post(
-              `${App.stackup.backendUrl}/v1/users/${options.userId}/activity`,
-              { toUserId },
-              { headers: { Authorization: `Bearer ${options.accessToken}` } },
-            );
-
-            set({ loading: false, savedActivity: create.data.activity });
-          } else {
-            set({ loading: false, savedActivity: find.data.activity });
-          }
-        } catch (error) {
-          set({ loading: false });
-          throw error;
-        }
-      },
-
-      createActivityItem: async (userOperations, amount, message, options = {}) => {
-        set({ loading: true });
-        const savedActivity = get().savedActivity;
-        const toUser = getToUserFromActivity(savedActivity, options.userId);
-        const data = {
-          toUser: toUser.id,
-          amount: ethers.utils.parseUnits(amount, App.web3.usdcUnits).toNumber(),
-          message,
-          userOperations,
-        };
-
-        try {
-          const res = await axios.post(
-            `${App.stackup.backendUrl}/v1/users/${options.userId}/activity/${savedActivity.id}`,
-            data,
-            { headers: { Authorization: `Bearer ${options.accessToken}` } },
-          );
-
-          set({ loading: false, activityItems: res.data.activityItems });
-        } catch (error) {
-          set({ loading: false });
-          throw error;
-        }
-      },
-
       updateActivityItemFromChannel: (data) => {
         const { activityItem } = data;
         const activityItems = get().activityItems;
@@ -166,27 +155,6 @@ export const useActivityStore = create(
               }),
             },
           });
-        }
-      },
-
-      fetchActivityItems: async (options = {}) => {
-        const savedActivity = get().savedActivity;
-        if (!savedActivity) return;
-        set({ loading: true });
-
-        try {
-          const res = await axios.get(
-            `${App.stackup.backendUrl}/v1/users/${options.userId}/activity/${savedActivity?.id}`,
-            {
-              params: { limit: 20, page: 1 },
-              headers: { Authorization: `Bearer ${options.accessToken}` },
-            },
-          );
-
-          set({ loading: false, activityItems: res.data.activityItems });
-        } catch (error) {
-          set({ loading: false });
-          throw error;
         }
       },
 
