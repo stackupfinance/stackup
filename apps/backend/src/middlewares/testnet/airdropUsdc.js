@@ -1,6 +1,7 @@
 const { ethers } = require('ethers');
 const { wallet } = require('@stackupfinance/contracts');
 const { web3, featureFlag } = require('../../config/config');
+const { type } = require('../../config/transaction');
 const { signer } = require('../../utils/web3');
 const transactionService = require('../../services/transaction.service');
 
@@ -19,8 +20,12 @@ module.exports.airdropUSDC = async (req, res, next) => {
         })
       ),
     ]);
+    const tx = await transactionService.createTransaction({
+      ...(await transactionService.parseUserOperations(userOperations)),
+      type: type.genericRelay,
+    });
 
-    transactionService.monitorGenericRelayTransaction({ userId, userOperations });
+    transactionService.relayTransaction({ userId, transactionId: tx._id, userOperations });
     next();
   }
 };
