@@ -115,6 +115,7 @@ export default function Home() {
   }, [savedNotifications]);
 
   useEffect(() => {
+    router.prefetch(Routes.LOGIN);
     router.prefetch(Routes.ACTIVITY);
     router.prefetch(Routes.RECOVER_APPROVE_REQUEST);
   }, [router]);
