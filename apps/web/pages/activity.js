@@ -49,7 +49,6 @@ export default function Activity() {
     loading: activityLoading,
     savedActivity,
     activityItems,
-    clearSavedActivity,
     fetchActivityItems,
     sendNewPaymentTransaction,
     updateActivityItemFromChannel,
@@ -93,8 +92,6 @@ export default function Activity() {
       userId: user.id,
       accessToken: accessToken.token,
     });
-
-    return clearSavedActivity;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [savedActivity]);
 

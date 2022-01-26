@@ -2,6 +2,7 @@ import create from 'zustand';
 import { persist } from 'zustand/middleware';
 import axios from 'axios';
 import { App } from '../config';
+import { getActivityId } from '../utils/transaction';
 
 export const activityUseAuthSelector = (state) => ({
   clear: state.clear,
@@ -19,7 +20,6 @@ export const activityActivityPageSelector = (state) => ({
   loading: state.loading,
   savedActivity: state.savedActivity,
   activityItems: state.activityItems,
-  clearSavedActivity: state.clearSavedActivity,
   sendNewPaymentTransaction: state.sendNewPaymentTransaction,
   fetchActivityItems: state.fetchActivityItems,
   updateActivityItemFromChannel: state.updateActivityItemFromChannel,
@@ -103,22 +103,21 @@ export const useActivityStore = create(
         }
       },
 
-      updateActivityListFromChannel: async (data, options) => {
+      updateActivityListFromChannel: async (data) => {
         const activityList = get().activityList;
         if (!activityList) return;
 
         try {
           const { activityItem } = data;
-          const toUserId =
-            activityItem.toUser === options.userId ? activityItem.fromUser : activityItem.toUser;
-          const res = await axios.get(
-            `${App.stackup.backendUrl}/v1/users/${options.userId}/activity/find`,
-            {
-              params: { toUserId },
-              headers: { Authorization: `Bearer ${options.accessToken}` },
-            },
-          );
-          const activity = res.data.activity;
+          const activity = {
+            id: getActivityId(
+              activityItem.fromUser.walletAddress,
+              activityItem.toUser.walletAddress,
+            ),
+            toUser: activityItem.isReceiving ? activityItem.fromUser : activityItem.toUser,
+            preview: activityItem.message,
+            updatedAt: activityItem.updatedAt,
+          };
           set({
             activityList: {
               ...activityList,
@@ -159,8 +158,6 @@ export const useActivityStore = create(
       },
 
       selectActivity: (savedActivity) => set({ savedActivity }),
-
-      clearSavedActivity: () => set({ savedActivity: undefined, activityItems: undefined }),
 
       clear: () => set({ ...defaultState }),
     }),

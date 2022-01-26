@@ -32,7 +32,7 @@ import {
   updateHomePageSelector,
 } from '../src/state';
 import { useAuthChannel, useLogout } from '../src/hooks';
-import { txType } from '../src/utils/transaction';
+import { txType, getActivityId } from '../src/utils/transaction';
 import { Routes } from '../src/config';
 import { EVENTS, logEvent } from '../src/utils/analytics';
 
@@ -193,7 +193,7 @@ export default function Home() {
 
   const onSearchResultHandler = (result) => {
     selectActivity({
-      id: `${wallet.walletAddress}-${result.wallet.walletAddress}`,
+      id: getActivityId(wallet.walletAddress, result.wallet.walletAddress),
       toUser: { username: result.username, walletAddress: result.wallet.walletAddress },
     });
     logEvent(EVENTS.GO_TO_SEARCH_RESULT);

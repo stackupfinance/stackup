@@ -141,8 +141,8 @@ module.exports.queryActivity = async (walletAddress) => {
       addresses: {
         $cond: {
           if: { $eq: [{ $strcasecmp: ['$from', '$to'] }, 1] },
-          then: { $concat: ['$from', '-', '$to'] },
-          else: { $concat: ['$to', '-', '$from'] },
+          then: { $concat: ['$to', '-', '$from'] },
+          else: { $concat: ['$from', '-', '$to'] },
         },
       },
       toAddress: {
@@ -251,13 +251,14 @@ module.exports.queryActivityItems = async (user, address1, address2, opts = { li
       _id: false,
       id: '$_id',
       isReceiving: true,
-      fromUser: { username: '$fromUser.username' },
-      toUser: { username: '$toUser.username' },
+      fromUser: { username: '$fromUser.username', walletAddress: '$fromWallet.walletAddress' },
+      toUser: { username: '$toUser.username', walletAddress: '$toWallet.walletAddress' },
       value: true,
       units: true,
       prefix: true,
       suffix: true,
       message: true,
       status: true,
+      updatedAt: true,
     });
 };
