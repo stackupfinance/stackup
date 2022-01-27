@@ -3,6 +3,6 @@
 * From https://aykevl.nl/2014/09/fix-jumping-scrollbar
 */
 html {
-  margin-left: calc(100vw - 100%);
-  margin-right: 0;
+  width: 100vw;
+  overflow-x: hidden;
 }

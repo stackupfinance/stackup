@@ -14,7 +14,7 @@ import { ChevronLeftIcon } from '@chakra-ui/icons';
 export const NavigationHeader = ({ title, backLinkUrl }) => {
   return (
     <header>
-      <Box borderBottomWidth="1px">
+      <Box borderBottomWidth="1px" bg="gray.50">
         <HStack spacing={['8px', '16px']} py="16px" px="16px" maxW="xl" margin="0 auto">
           {backLinkUrl && (
             <NextLink href={backLinkUrl} passHref>
