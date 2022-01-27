@@ -120,8 +120,11 @@ const postTransaction = catchAsync(async (req, res) => {
   await transactionService.relayTransaction({ userId, transactionId: tx._id, userOperations });
 
   if (tx.type === type.newPayment) {
+    const [address1, address2] = transactionService.resolveNewPaymentTransferAddresses(tx);
     res.send({
-      pendingNewPayment: await transactionService.queryActivityItems(user, tx.from, tx.to, { limit: 1 }).then((r) => r[0]),
+      pendingNewPayment: await transactionService
+        .queryActivityItems(user, address1, address2, { limit: 1 })
+        .then((r) => r[0]),
     });
   } else {
     res.status(httpStatus.NO_CONTENT).send();

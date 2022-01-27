@@ -24,11 +24,10 @@ module.exports.parseUserOperations = async (userOperations) => {
       opcd.signature === functionSignatures.walletExecuteUserOp ? wallet.decodeCallData.fromExecuteUserOp(opcd) : opcd;
 
     let lineItem = {};
-    let tokenMeta = {};
     let type = txType.genericRelay;
     switch (wcd.signature) {
-      case functionSignatures.erc20Transfer:
-        tokenMeta = await getERC20TokenMeta(opcd.args[0]);
+      case functionSignatures.erc20Transfer: {
+        const tokenMeta = await getERC20TokenMeta(opcd.args[0]);
         lineItem = {
           from: userOp.sender,
           to: wcd.args[0],
@@ -39,39 +38,51 @@ module.exports.parseUserOperations = async (userOperations) => {
         };
         type = txType.newPayment;
         break;
+      }
 
-      case functionSignatures.erc20Approve:
-        tokenMeta = await getERC20TokenMeta(opcd.args[0]);
+      case functionSignatures.erc20Approve: {
+        const tokenMeta = await getERC20TokenMeta(opcd.args[0]);
+        const from = userOp.sender;
+        const to = wcd.args[0];
         lineItem = {
-          from: userOp.sender,
-          to: wcd.args[0],
-          sideEffect: `${lineItem.from} approved ${lineItem.to} for ${formatERC20Value(tokenMeta, wcd.args[1])}`,
+          from,
+          to,
+          sideEffect: `${from} approved ${to} for ${formatERC20Value(tokenMeta, wcd.args[1])}`,
         };
         break;
+      }
 
-      case functionSignatures.walletGrantGuardian:
+      case functionSignatures.walletGrantGuardian: {
+        const from = userOp.sender;
+        const to = wcd.args[0];
         lineItem = {
-          from: userOp.sender,
-          to: wcd.args[0],
-          sideEffect: `${lineItem.from} added ${lineItem.to} as a guardian`,
+          from,
+          to,
+          sideEffect: `${from} added ${to} as a guardian`,
         };
         break;
+      }
 
-      case functionSignatures.walletRevokeGuardian:
+      case functionSignatures.walletRevokeGuardian: {
+        const from = userOp.sender;
+        const to = wcd.args[0];
         lineItem = {
-          from: userOp.sender,
-          to: wcd.args[0],
-          sideEffect: `${lineItem.from} removed ${lineItem.to} as a guardian`,
+          from,
+          to,
+          sideEffect: `${from} removed ${to} as a guardian`,
         };
         break;
+      }
 
-      case functionSignatures.walletTransferOwner:
+      case functionSignatures.walletTransferOwner: {
+        const from = userOp.sender;
         lineItem = {
-          from: userOp.sender,
-          sideEffect: `${lineItem.from} recovered account with ${signatureCount(userOp)} guardians`,
+          from,
+          sideEffect: `${from} recovered account with ${signatureCount(userOp)} guardians`,
         };
         type = txType.recoverAccount;
         break;
+      }
 
       default:
         throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid UserOperation');
@@ -80,9 +91,8 @@ module.exports.parseUserOperations = async (userOperations) => {
     if (i === 0) {
       transaction = {
         chainId: await getChainId(),
-        ...lineItem,
         type,
-        extraLineItems: [],
+        lineItems: [{ ...lineItem }],
         fee: {
           ...(await getERC20TokenMeta(web3.usdc)),
         },
@@ -91,7 +101,7 @@ module.exports.parseUserOperations = async (userOperations) => {
       transaction = {
         ...transaction,
         type,
-        extraLineItems: [...transaction.extraLineItems, { ...lineItem }],
+        lineItems: [...transaction.lineItems, { ...lineItem }],
       };
     }
   }
@@ -128,28 +138,43 @@ module.exports.relayTransaction = async (data) => {
   queue.now(types.relayTransaction, data);
 };
 
+module.exports.resolveNewPaymentTransferAddresses = (transaction) => {
+  return transaction.lineItems.length > 1
+    ? [transaction.lineItems[1].from, transaction.lineItems[1].to]
+    : [transaction.lineItems[0].from, transaction.lineItems[0].to];
+};
+
 module.exports.queryActivity = async (walletAddress) => {
   return Transaction.aggregate()
     .match({
       $and: [
         { type: { $eq: txType.newPayment } },
-        { $or: [{ from: { $eq: walletAddress } }, { to: { $eq: walletAddress } }] },
+        {
+          $or: [
+            { 'lineItems.0.from': { $eq: walletAddress } },
+            { 'lineItems.0.to': { $eq: walletAddress } },
+            { 'lineItems.1.from': { $eq: walletAddress } },
+            { 'lineItems.1.to': { $eq: walletAddress } },
+          ],
+        },
       ],
     })
+    .unwind('lineItems')
+    .match({ 'lineItems.value': { $exists: true } })
     .sort('-updatedAt')
     .addFields({
       addresses: {
         $cond: {
-          if: { $eq: [{ $strcasecmp: ['$from', '$to'] }, 1] },
-          then: { $concat: ['$to', '-', '$from'] },
-          else: { $concat: ['$from', '-', '$to'] },
+          if: { $eq: [{ $strcasecmp: ['$lineItems.from', '$lineItems.to'] }, 1] },
+          then: { $concat: ['$lineItems.to', '-', '$lineItems.from'] },
+          else: { $concat: ['$lineItems.from', '-', '$lineItems.to'] },
         },
       },
       toAddress: {
         $cond: {
-          if: { $eq: [walletAddress, '$from'] },
-          then: '$to',
-          else: '$from',
+          if: { $eq: [walletAddress, '$lineItems.from'] },
+          then: '$lineItems.to',
+          else: '$lineItems.from',
         },
       },
     })
@@ -197,8 +222,14 @@ module.exports.queryActivityItems = async (user, address1, address2, opts = { li
               { type: { $eq: txType.newPayment } },
               {
                 $or: [
-                  { from: { $eq: address1 }, to: { $eq: address2 } },
-                  { from: { $eq: address2 }, to: { $eq: address1 } },
+                  {
+                    'lineItems.0.from': { $in: [address1, address2] },
+                    'lineItems.0.to': { $in: [address1, address2] },
+                  },
+                  {
+                    'lineItems.1.from': { $in: [address1, address2] },
+                    'lineItems.1.to': { $in: [address1, address2] },
+                  },
                 ],
               },
             ],
@@ -206,10 +237,12 @@ module.exports.queryActivityItems = async (user, address1, address2, opts = { li
     )
     .sort('-updatedAt')
     .limit(opts.limit)
+    .unwind('lineItems')
+    .match({ 'lineItems.value': { $exists: true } })
     .addFields({
       isReceiving: {
         $cond: {
-          if: { $eq: [user.wallet.walletAddress, '$to'] },
+          if: { $eq: [user.wallet.walletAddress, '$lineItems.to'] },
           then: true,
           else: false,
         },
@@ -217,13 +250,13 @@ module.exports.queryActivityItems = async (user, address1, address2, opts = { li
     })
     .lookup({
       from: 'wallets',
-      localField: 'from',
+      localField: 'lineItems.from',
       foreignField: 'walletAddress',
       as: 'fromWallet',
     })
     .lookup({
       from: 'wallets',
-      localField: 'to',
+      localField: 'lineItems.to',
       foreignField: 'walletAddress',
       as: 'toWallet',
     })
@@ -253,10 +286,10 @@ module.exports.queryActivityItems = async (user, address1, address2, opts = { li
       isReceiving: true,
       fromUser: { username: '$fromUser.username', walletAddress: '$fromWallet.walletAddress' },
       toUser: { username: '$toUser.username', walletAddress: '$toWallet.walletAddress' },
-      value: true,
-      units: true,
-      prefix: true,
-      suffix: true,
+      value: '$lineItems.value',
+      units: '$lineItems.units',
+      prefix: '$lineItems.prefix',
+      suffix: '$lineItems.suffix',
       message: true,
       status: true,
       updatedAt: true,

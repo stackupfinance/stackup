@@ -157,7 +157,7 @@ export const useActivityStore = create(
         }
       },
 
-      selectActivity: (savedActivity) => set({ savedActivity }),
+      selectActivity: (savedActivity) => set({ savedActivity, activityItems: undefined }),
 
       clear: () => set({ ...defaultState }),
     }),

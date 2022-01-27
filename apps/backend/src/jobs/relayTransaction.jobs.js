@@ -13,9 +13,12 @@ const log = (msg) => logger.info(`JOB ${types.relayTransaction}: ${msg}`);
 const postTransaction = async (userId, transaction, context = {}) => {
   switch (transaction.type) {
     case txType.newPayment: {
-      const [u1, u2] = await userService.getUsersByWalletAddressAndPopulate([transaction.from, transaction.to], {
-        withUserId: true,
-      });
+      const [u1, u2] = await userService.getUsersByWalletAddressAndPopulate(
+        transactionService.resolveNewPaymentTransferAddresses(transaction),
+        {
+          withUserId: true,
+        }
+      );
       const [ai1, ai2] = await Promise.all([
         transactionService.queryActivityItems(u1, '', '', { limit: 1, id: transaction._id }).then((r) => r[0]),
         transactionService.queryActivityItems(u2, '', '', { limit: 1, id: transaction._id }).then((r) => r[0]),

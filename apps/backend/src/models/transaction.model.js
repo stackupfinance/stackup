@@ -60,8 +60,8 @@ const transactionSchema = mongoose.Schema(
       trim: true,
     },
 
-    ...lineItem,
-    extraLineItems: [{ ...lineItem }],
+    lineItems: [{ ...lineItem }],
+
     fee: {
       value: {
         type: String,
