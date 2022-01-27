@@ -52,4 +52,8 @@ router
   .route('/:userId/transaction')
   .post(auth('manageUsers'), validate(userValidation.postTransaction), userController.postTransaction);
 
+router
+  .route('/:userId/transaction/history')
+  .get(auth('getUsers'), validate(userValidation.getUserTransactionHistory), userController.getUserTransactionHistory);
+
 module.exports = router;

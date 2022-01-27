@@ -151,10 +151,8 @@ module.exports.queryActivity = async (walletAddress) => {
         { type: { $eq: txType.newPayment } },
         {
           $or: [
-            { 'lineItems.0.from': { $eq: walletAddress } },
-            { 'lineItems.0.to': { $eq: walletAddress } },
-            { 'lineItems.1.from': { $eq: walletAddress } },
-            { 'lineItems.1.to': { $eq: walletAddress } },
+            { lineItems: { $elemMatch: { from: { $eq: walletAddress } } } },
+            { lineItems: { $elemMatch: { to: { $eq: walletAddress } } } },
           ],
         },
       ],
@@ -220,23 +218,12 @@ module.exports.queryActivityItems = async (user, address1, address2, opts = { li
         : {
             $and: [
               { type: { $eq: txType.newPayment } },
-              {
-                $or: [
-                  {
-                    'lineItems.0.from': { $in: [address1, address2] },
-                    'lineItems.0.to': { $in: [address1, address2] },
-                  },
-                  {
-                    'lineItems.1.from': { $in: [address1, address2] },
-                    'lineItems.1.to': { $in: [address1, address2] },
-                  },
-                ],
-              },
+              { lineItems: { $elemMatch: { from: { $in: [address1, address2] }, to: { $in: [address1, address2] } } } },
             ],
           }
     )
-    .sort('-updatedAt')
     .limit(opts.limit)
+    .sort('-updatedAt')
     .unwind('lineItems')
     .match({ 'lineItems.value': { $exists: true } })
     .addFields({
@@ -292,6 +279,61 @@ module.exports.queryActivityItems = async (user, address1, address2, opts = { li
       suffix: '$lineItems.suffix',
       message: true,
       status: true,
+      updatedAt: true,
+    });
+};
+
+module.exports.queryHistory = async (user, opts = { limit: 100 }) => {
+  return Transaction.aggregate()
+    .match({
+      $or: [
+        { lineItems: { $elemMatch: { from: { $eq: user.wallet.walletAddress } } } },
+        { lineItems: { $elemMatch: { to: { $eq: user.wallet.walletAddress } } } },
+      ],
+    })
+    .limit(opts.limit)
+    .sort('-updatedAt')
+    .addFields({
+      lineItems: {
+        $filter: {
+          input: '$lineItems',
+          as: 'lineItem',
+          cond: {
+            $or: [
+              { $eq: ['$$lineItem.from', user.wallet.walletAddress] },
+              { $eq: ['$$lineItem.to', user.wallet.walletAddress] },
+            ],
+          },
+        },
+      },
+    })
+    .project({
+      _id: false,
+      status: true,
+      hash: true,
+      lineItems: {
+        $map: {
+          input: '$lineItems',
+          as: 'lineItem',
+          in: {
+            from: '$$lineItem.from',
+            to: '$$lineItem.to',
+            value: '$$lineItem.value',
+            units: '$$lineItem.units',
+            prefix: '$$lineItem.prefix',
+            suffix: '$$lineItem.suffix',
+            sideEffect: '$$lineItem.sideEffect',
+            isReceiving: {
+              $cond: {
+                if: { $eq: [user.wallet.walletAddress, '$$lineItem.to'] },
+                then: true,
+                else: false,
+              },
+            },
+          },
+        },
+      },
+      fee: true,
       updatedAt: true,
     });
 };

@@ -1,3 +1,4 @@
+module.exports.addressService = require('./address.service');
 module.exports.authService = require('./auth.service');
 module.exports.codeService = require('./code.service');
 module.exports.emailService = require('./email.service');

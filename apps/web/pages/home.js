@@ -30,6 +30,8 @@ import {
   notificationHomePageSelector,
   useUpdateStore,
   updateHomePageSelector,
+  useHistoryStore,
+  historyHomePageSelector,
 } from '../src/state';
 import { useAuthChannel, useLogout } from '../src/hooks';
 import { txType, getActivityId } from '../src/utils/transaction';
@@ -97,6 +99,11 @@ export default function Home() {
     fetchNotifications,
     deleteNotification,
   } = useNotificationStore(notificationHomePageSelector);
+  const {
+    // loading: historyLoading,
+    // transactions,
+    fetchTransactions,
+  } = useHistoryStore(historyHomePageSelector);
   const { clear: clearOnboardData } = useOnboardStore(onboardHomePageSelector);
   const { clear: clearRecover, selectGuardianRequest } = useRecoverStore(recoverHomePageSelector);
   const { clear: clearUpdate } = useUpdateStore(updateHomePageSelector);
@@ -132,6 +139,7 @@ export default function Home() {
     setUsername(user.username);
     fetchActivities({ userId: user.id, accessToken: accessToken.token });
     fetchNotifications({ userId: user.id, accessToken: accessToken.token });
+    fetchTransactions({ userId: user.id, accessToken: accessToken.token });
     fetchBalance(wallet);
     setInitLoad(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps

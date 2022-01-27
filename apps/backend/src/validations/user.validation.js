@@ -123,3 +123,13 @@ module.exports.transactionPaymasterApproval = {
     userOperations: Joi.array().items(userOperation).required().min(1),
   }),
 };
+
+module.exports.getUserTransactionHistory = {
+  params: Joi.object().keys({
+    userId: Joi.string().custom(objectId),
+  }),
+  query: Joi.object().keys({
+    limit: Joi.number().integer(),
+    page: Joi.number().integer(),
+  }),
+};
