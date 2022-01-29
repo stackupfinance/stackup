@@ -158,22 +158,22 @@ module.exports.queryActivity = async (walletAddress) => {
         },
       ],
     })
-    .unwind('lineItems')
-    .match({ 'lineItems.value': { $exists: true } })
-    .sort('-updatedAt')
+    .addFields({
+      lastLineItem: { $last: '$lineItems' },
+    })
     .addFields({
       addresses: {
         $cond: {
-          if: { $eq: [{ $strcasecmp: ['$lineItems.from', '$lineItems.to'] }, 1] },
-          then: { $concat: ['$lineItems.to', '-', '$lineItems.from'] },
-          else: { $concat: ['$lineItems.from', '-', '$lineItems.to'] },
+          if: { $eq: [{ $strcasecmp: ['$lastLineItem.from', '$lastLineItem.to'] }, 1] },
+          then: { $concat: ['$lastLineItem.to', '-', '$lastLineItem.from'] },
+          else: { $concat: ['$lastLineItem.from', '-', '$lastLineItem.to'] },
         },
       },
       toAddress: {
         $cond: {
-          if: { $eq: [walletAddress, '$lineItems.from'] },
-          then: '$lineItems.to',
-          else: '$lineItems.from',
+          if: { $eq: [walletAddress, '$lastLineItem.from'] },
+          then: '$lastLineItem.to',
+          else: '$lastLineItem.from',
         },
       },
     })
@@ -208,7 +208,8 @@ module.exports.queryActivity = async (walletAddress) => {
       toUser: { username: '$toUser.username', walletAddress: '$toWallet.walletAddress' },
       preview: true,
       updatedAt: true,
-    });
+    })
+    .sort('-updatedAt');
 };
 
 module.exports.queryActivityItems = async (user, address1, address2, opts = { limit: 100, id: undefined }) => {
@@ -225,12 +226,13 @@ module.exports.queryActivityItems = async (user, address1, address2, opts = { li
     )
     .limit(opts.limit)
     .sort('-updatedAt')
-    .unwind('lineItems')
-    .match({ 'lineItems.value': { $exists: true } })
+    .addFields({
+      lastLineItem: { $last: '$lineItems' },
+    })
     .addFields({
       isReceiving: {
         $cond: {
-          if: { $eq: [user.wallet.walletAddress, '$lineItems.to'] },
+          if: { $eq: [user.wallet.walletAddress, '$lastLineItem.to'] },
           then: true,
           else: false,
         },
@@ -238,13 +240,13 @@ module.exports.queryActivityItems = async (user, address1, address2, opts = { li
     })
     .lookup({
       from: 'wallets',
-      localField: 'lineItems.from',
+      localField: 'lastLineItem.from',
       foreignField: 'walletAddress',
       as: 'fromWallet',
     })
     .lookup({
       from: 'wallets',
-      localField: 'lineItems.to',
+      localField: 'lastLineItem.to',
       foreignField: 'walletAddress',
       as: 'toWallet',
     })
@@ -274,10 +276,10 @@ module.exports.queryActivityItems = async (user, address1, address2, opts = { li
       isReceiving: true,
       fromUser: { username: '$fromUser.username', walletAddress: '$fromWallet.walletAddress' },
       toUser: { username: '$toUser.username', walletAddress: '$toWallet.walletAddress' },
-      value: '$lineItems.value',
-      units: '$lineItems.units',
-      prefix: '$lineItems.prefix',
-      suffix: '$lineItems.suffix',
+      value: '$lastLineItem.value',
+      units: '$lastLineItem.units',
+      prefix: '$lastLineItem.prefix',
+      suffix: '$lastLineItem.suffix',
       message: true,
       status: true,
       updatedAt: true,

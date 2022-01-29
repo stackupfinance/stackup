@@ -141,14 +141,7 @@ export const AccountOverview = ({
           >
             Transactions
           </Heading>
-          <Box
-            borderWidth="1px"
-            borderTopWidth="0px"
-            borderBottomRadius="lg"
-            bg="white"
-            w="100%"
-            // pt="1px"
-          >
+          <Box borderWidth="1px" borderTopWidth="0px" borderBottomRadius="lg" bg="white" w="100%">
             {transactionsContent}
           </Box>
         </TabPanel>
