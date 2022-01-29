@@ -4,7 +4,7 @@ const { contracts, wallet } = require('@stackupfinance/contracts');
 const ApiError = require('../utils/ApiError');
 const { Transaction } = require('../models');
 const queue = require('../queue');
-const { functionSignatures, type: txType } = require('../config/transaction');
+const { functionSignatures, type: txType, status: txStatus } = require('../config/transaction');
 const { types } = require('../config/queue');
 const { web3 } = require('../config/config');
 const {
@@ -76,9 +76,10 @@ module.exports.parseUserOperations = async (userOperations) => {
 
       case functionSignatures.walletTransferOwner: {
         const from = userOp.sender;
+        const sigCount = signatureCount(userOp);
         lineItem = {
           from,
-          sideEffect: `${from} recovered account with ${signatureCount(userOp)} guardians`,
+          sideEffect: `${from} recovered account with ${sigCount} guardian${sigCount === 1 ? '' : 's'}`,
         };
         type = txType.recoverAccount;
         break;
@@ -286,9 +287,14 @@ module.exports.queryActivityItems = async (user, address1, address2, opts = { li
 module.exports.queryHistory = async (user, opts = { limit: 100 }) => {
   return Transaction.aggregate()
     .match({
-      $or: [
-        { lineItems: { $elemMatch: { from: { $eq: user.wallet.walletAddress } } } },
-        { lineItems: { $elemMatch: { to: { $eq: user.wallet.walletAddress } } } },
+      $and: [
+        { status: { $eq: txStatus.success } },
+        {
+          $or: [
+            { lineItems: { $elemMatch: { from: { $eq: user.wallet.walletAddress } } } },
+            { lineItems: { $elemMatch: { to: { $eq: user.wallet.walletAddress } } } },
+          ],
+        },
       ],
     })
     .limit(opts.limit)

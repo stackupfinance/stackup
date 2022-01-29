@@ -2,7 +2,7 @@ const userService = require('./user.service');
 const { web3 } = require('../config/config');
 
 module.exports.transformHistoryWithName = async (userWalletAddress, history) => {
-  const addressMap = { [web3.paymaster]: 'paymaster', [userWalletAddress]: 'you' };
+  const addressMap = { [web3.paymaster]: 'stackup', [userWalletAddress]: 'you' };
 
   return Promise.all(
     history.map(async (h) => {
