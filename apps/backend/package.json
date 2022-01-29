@@ -51,7 +51,7 @@
     "pm2": "^5.1.2",
     "pusher": "^5.0.0",
     "validator": "^13.7.0",
-    "winston": "^3.3.3",
+    "winston": "^3.5.0",
     "xss-clean": "^0.1.1"
   },
   "devDependencies": {
@@ -64,7 +64,7 @@
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-security": "^1.4.0",
     "faker": "^5.5.3",
-    "jest": "^27.4.5",
+    "jest": "^27.4.7",
     "node-mocks-http": "^1.11.0",
     "nodemon": "^2.0.15",
     "prettier": "^2.5.1",
