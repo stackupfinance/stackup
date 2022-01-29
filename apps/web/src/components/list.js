@@ -15,13 +15,12 @@ export const List = ({
   return (
     <>
       {items.length > 0 && listHeading && (
-        <Heading textAlign="left" size="sm">
+        <Heading textAlign="left" size="sm" mb="8px">
           {listHeading}
         </Heading>
       )}
       <Box
         id="infinite-scroll-wrapper"
-        mt="8px"
         overflow={isInverse ? 'auto' : undefined}
         display={isInverse ? 'flex' : undefined}
         height={isInverse ? `calc(100vh - ${heightOffset})` : undefined}

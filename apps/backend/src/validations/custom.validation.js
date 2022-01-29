@@ -1,13 +1,20 @@
 const Joi = require('joi');
 
-const objectId = (value, helpers) => {
+module.exports.activityId = (value, helpers) => {
+  if (!value.match(/^0x[a-fA-F0-9]{40}-0x[a-fA-F0-9]{40}$/)) {
+    return helpers.message('"{{#label}}" must be a valid activity id');
+  }
+  return value;
+};
+
+module.exports.objectId = (value, helpers) => {
   if (!value.match(/^[0-9a-fA-F]{24}$/)) {
     return helpers.message('"{{#label}}" must be a valid mongo id');
   }
   return value;
 };
 
-const username = (value, helpers) => {
+module.exports.username = (value, helpers) => {
   if (!value.match(/^[a-zA-Z0-9_.-]*$/)) {
     return helpers.message('Username can only contain alphanumeric characters, periods, underscores and hyphens');
   }
@@ -15,7 +22,7 @@ const username = (value, helpers) => {
 };
 
 // TODO: Make this more specific.
-const userOperation = Joi.object().keys({
+module.exports.userOperation = Joi.object().keys({
   sender: Joi.string().required(),
   nonce: Joi.number().required(),
   initCode: Joi.string().required(),
@@ -29,9 +36,3 @@ const userOperation = Joi.object().keys({
   paymasterData: Joi.string().required(),
   signature: Joi.string().required(),
 });
-
-module.exports = {
-  objectId,
-  username,
-  userOperation,
-};

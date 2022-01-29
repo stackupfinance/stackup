@@ -1,4 +1,4 @@
-module.exports.activityService = require('./activity.service');
+module.exports.addressService = require('./address.service');
 module.exports.authService = require('./auth.service');
 module.exports.codeService = require('./code.service');
 module.exports.emailService = require('./email.service');
@@ -7,6 +7,5 @@ module.exports.tokenService = require('./token.service');
 module.exports.transactionService = require('./transaction.service');
 module.exports.userService = require('./user.service');
 module.exports.walletService = require('./wallet.service');
-module.exports.paymentService = require('./payment.service');
 module.exports.pusherService = require('./pusher.service');
 module.exports.signerService = require('./signer.service');

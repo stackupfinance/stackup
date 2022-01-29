@@ -40,7 +40,15 @@ async function main() {
 
   const tx = await contracts.EntryPoint.getInstance(signer)
     .handleOps(paymasterOps, signer.address, {
-      gasLimit: 5000000,
+      gasLimit: paymasterOps.reduce((prev, op) => {
+        return prev.add(
+          ethers.BigNumber.from(
+            op.callGas + op.verificationGas + op.preVerificationGas
+          )
+        );
+      }, ethers.constants.Zero),
+      maxFeePerGas: constants.userOperations.defaultMaxFee,
+      maxPriorityFeePerGas: constants.userOperations.defaultMaxPriorityFee,
     })
     .then((tx) => tx.wait());
   console.log("Paymaster add stake transaction:", tx);

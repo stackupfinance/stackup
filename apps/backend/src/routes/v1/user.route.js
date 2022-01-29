@@ -33,25 +33,27 @@ router
 router.route('/:userId/search').get(auth('getUsers'), validate(userValidation.getUserSearch), userController.getUserSearch);
 
 router
-  .route('/:userId/activity')
-  .get(auth('getUsers'), validate(userValidation.getUserActivities), userController.getUserActivities)
-  .post(auth('manageUsers'), validate(userValidation.createUserActivity), userController.createUserActivity);
-
-router
-  .route('/:userId/activity/find')
-  .get(auth('getUsers'), validate(userValidation.findUserActivity), userController.findUserActivity);
-
-router
-  .route('/:userId/activity/paymaster-approval')
-  .post(auth('manageUsers'), validate(userValidation.approveUserActivity), userController.approveUserActivity);
+  .route('/:userId/activities')
+  .get(auth('getUsers'), validate(userValidation.getUserActivities), userController.getUserActivities);
 
 router
   .route('/:userId/activity/:activityId')
-  .get(auth('getUsers'), validate(userValidation.getUserActivityItems), userController.getUserActivityItems)
-  .post(auth('manageUsers'), validate(userValidation.createUserActivityItem), userController.createUserActivityItem);
+  .get(auth('getUsers'), validate(userValidation.getUserActivityItems), userController.getUserActivityItems);
 
 router
-  .route('/:userId/generic-relay')
-  .post(auth('manageUsers'), validate(userValidation.getUserNotifications), userController.genericRelay);
+  .route('/:userId/transaction/paymaster-approval')
+  .post(
+    auth('manageUsers'),
+    validate(userValidation.transactionPaymasterApproval),
+    userController.transactionPaymasterApproval
+  );
+
+router
+  .route('/:userId/transaction')
+  .post(auth('manageUsers'), validate(userValidation.postTransaction), userController.postTransaction);
+
+router
+  .route('/:userId/transaction/history')
+  .get(auth('getUsers'), validate(userValidation.getUserTransactionHistory), userController.getUserTransactionHistory);
 
 module.exports = router;

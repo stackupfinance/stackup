@@ -23,7 +23,7 @@ import { useAuthChannel } from '../../src/hooks';
 import { App, Routes } from '../../src/config';
 import { provider } from '../../src/utils/web3';
 import { logEvent, EVENTS } from '../../src/utils/analytics';
-import { types, txStatus } from '../../src/utils/events';
+import { txType, txStatus } from '../../src/utils/transaction';
 
 function RecoverApproveRequest() {
   const router = useRouter();
@@ -64,7 +64,7 @@ function RecoverApproveRequest() {
   };
 
   useAuthChannel((event, data) => {
-    if (event === types.genericRelay) {
+    if (event === txType.genericRelay) {
       toast({
         title:
           data.status === txStatus.success

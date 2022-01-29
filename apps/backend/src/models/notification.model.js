@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const { toJSON, paginate } = require('./plugins');
-const { types } = require('../config/events');
+const { type } = require('../config/transaction');
 
 const notificationSchema = mongoose.Schema(
   {
@@ -16,7 +16,7 @@ const notificationSchema = mongoose.Schema(
     },
     type: {
       type: String,
-      enum: [types.recoverAccount, types.newPayment],
+      enum: [type.recoverAccount, type.newPayment],
       required: true,
     },
     data: {

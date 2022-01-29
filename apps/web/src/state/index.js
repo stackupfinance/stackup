@@ -1,5 +1,6 @@
 export * from './account';
 export * from './activity';
+export * from './history';
 export * from './notification';
 export * from './onboard';
 export * from './recover';

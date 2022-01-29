@@ -18,6 +18,8 @@ import {
   notificationUseAuthSelector,
   useUpdateStore,
   updateUseAuthSelector,
+  useHistoryStore,
+  historyUseAuthSelector,
 } from '../state';
 import { Routes } from '../config';
 
@@ -42,6 +44,7 @@ export const useLogout = () => {
   const { clear: clearRecover } = useRecoverStore(recoverUseAuthSelector);
   const { clear: clearNotification } = useNotificationStore(notificationUseAuthSelector);
   const { clear: clearUpdate } = useUpdateStore(updateUseAuthSelector);
+  const { clear: clearHistory } = useHistoryStore(historyUseAuthSelector);
 
   return async () => {
     clearSearch();
@@ -51,6 +54,7 @@ export const useLogout = () => {
     clearRecover();
     clearNotification();
     clearUpdate();
+    clearHistory();
     await logout();
   };
 };

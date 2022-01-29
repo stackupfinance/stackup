@@ -8,6 +8,8 @@ import {
   Search,
   AccountOverview,
   List,
+  TransactionCard,
+  TransactionDateDivider,
   UserCard,
   Notifications,
 } from '../src/components';
@@ -28,10 +30,11 @@ import {
   notificationHomePageSelector,
   useUpdateStore,
   updateHomePageSelector,
+  useHistoryStore,
+  historyHomePageSelector,
 } from '../src/state';
 import { useAuthChannel, useLogout } from '../src/hooks';
-import { getToUserFromActivity } from '../src/utils/activity';
-import { types } from '../src/utils/events';
+import { txType, getActivityId } from '../src/utils/transaction';
 import { Routes } from '../src/config';
 import { EVENTS, logEvent } from '../src/utils/analytics';
 
@@ -66,6 +69,55 @@ const loadingList = [
   />,
 ];
 
+const historyLoadingList = [
+  <TransactionDateDivider
+    isLoading
+    key="loading-history-1"
+    timestamp={new Date('2021-01-01T00:00:00')}
+  />,
+  <TransactionCard
+    isLoading
+    key="loading-history-2"
+    lineItems={[
+      { to: 'name', value: '3500000' },
+      { to: 'name', value: '3500000' },
+    ]}
+    fee="10000"
+    timestamp={new Date('2021-01-01T00:00:00')}
+  />,
+  <TransactionCard
+    isLoading
+    isLastInSection
+    key="loading-history-3"
+    lineItems={[{ to: 'name', value: '3500000' }]}
+    fee="10000"
+    timestamp={new Date('2021-01-01T00:00:00')}
+  />,
+  <TransactionDateDivider
+    isLoading
+    key="loading-history-4"
+    timestamp={new Date('2021-01-01T00:00:00')}
+  />,
+  <TransactionCard
+    isLoading
+    key="loading-history-5"
+    lineItems={[{ to: 'name', value: '3500000' }]}
+    fee="10000"
+    timestamp={new Date('2021-01-01T00:00:00')}
+  />,
+  <TransactionCard
+    isLoading
+    isLastInList
+    key="loading-history-6"
+    lineItems={[
+      { to: 'name', value: '3500000' },
+      { to: 'name', value: '3500000' },
+    ]}
+    fee="10000"
+    timestamp={new Date('2021-01-01T00:00:00')}
+  />,
+];
+
 export default function Home() {
   const {
     enabled,
@@ -80,7 +132,6 @@ export default function Home() {
     searchByUsername,
     fetchNextPage,
     hasMore,
-    selectResult,
     clearSearchData,
   } = useSearchStore(searchHomePageSelector);
   const { loading: walletLoading, balance, fetchBalance } = useWalletStore(walletHomePageSelector);
@@ -97,6 +148,11 @@ export default function Home() {
     fetchNotifications,
     deleteNotification,
   } = useNotificationStore(notificationHomePageSelector);
+  const {
+    loading: historyLoading,
+    transactions,
+    fetchTransactions,
+  } = useHistoryStore(historyHomePageSelector);
   const { clear: clearOnboardData } = useOnboardStore(onboardHomePageSelector);
   const { clear: clearRecover, selectGuardianRequest } = useRecoverStore(recoverHomePageSelector);
   const { clear: clearUpdate } = useUpdateStore(updateHomePageSelector);
@@ -115,6 +171,7 @@ export default function Home() {
   }, [savedNotifications]);
 
   useEffect(() => {
+    router.prefetch(Routes.LOGIN);
     router.prefetch(Routes.ACTIVITY);
     router.prefetch(Routes.RECOVER_APPROVE_REQUEST);
   }, [router]);
@@ -131,24 +188,26 @@ export default function Home() {
     setUsername(user.username);
     fetchActivities({ userId: user.id, accessToken: accessToken.token });
     fetchNotifications({ userId: user.id, accessToken: accessToken.token });
+    fetchTransactions({ userId: user.id, accessToken: accessToken.token });
     fetchBalance(wallet);
     setInitLoad(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [enabled]);
 
   useAuthChannel((event, data) => {
-    if (event === types.newPayment) {
+    if (event === txType.newPayment) {
       updateActivityListFromChannel(data, { userId: user.id, accessToken: accessToken.token });
       fetchBalance(wallet);
-    } else if (event === types.recoverAccount) {
+    } else if (event === txType.recoverAccount) {
       fetchNotifications({ userId: user.id, accessToken: accessToken.token });
-    } else if (event === types.genericRelay) {
+    } else if (event === txType.genericRelay) {
       fetchBalance(wallet);
     }
+    fetchTransactions({ userId: user.id, accessToken: accessToken.token });
   });
 
   const onNotificationClick = async (notification) => {
-    if (notification.type === types.recoverAccount) {
+    if (notification.type === txType.recoverAccount) {
       selectGuardianRequest({ notificationId: notification.id, ...notification.data });
       logEvent(EVENTS.RECOVER_ACCOUNT_GUARDIAN_GO_TO_APPROVE);
       router.push(Routes.RECOVER_APPROVE_REQUEST);
@@ -192,7 +251,10 @@ export default function Home() {
   };
 
   const onSearchResultHandler = (result) => {
-    selectResult(result);
+    selectActivity({
+      id: getActivityId(wallet.walletAddress, result.wallet.walletAddress),
+      toUser: { username: result.username, walletAddress: result.wallet.walletAddress },
+    });
     logEvent(EVENTS.GO_TO_SEARCH_RESULT);
     router.push(Routes.ACTIVITY);
   };
@@ -219,19 +281,49 @@ export default function Home() {
 
   const renderActivityList = (results = []) => {
     return results.map((result, i) => {
-      const toUser = getToUserFromActivity(result, user.id);
       return (
         <UserCard
           key={`activity-list-item-${i}`}
           isFirst={i === 0}
           isLast={i === results.length - 1}
-          username={toUser.username}
+          username={result.toUser.username}
           onClick={() => onActivityHandler(result)}
           preview={result.preview}
           timestamp={result.updatedAt}
         />
       );
     });
+  };
+
+  const renderTransactionHistory = () => {
+    return (transactions?.results || []).reduce((prev, curr, i) => {
+      const isLastBatch = i === transactions.results.length - 1;
+
+      const divider = (
+        <TransactionDateDivider
+          key={`history-date-divider-${i}`}
+          timestamp={new Date(curr.lastDate)}
+        />
+      );
+
+      const items = curr.transactions.map((tx, j) => {
+        const isLastInSection = j === curr.transactions.length - 1;
+        return (
+          <TransactionCard
+            isLastInSection={isLastInSection}
+            isLastInList={isLastInSection && isLastBatch}
+            key={`history-transaction-${i}-${j}`}
+            lineItems={tx.lineItems}
+            fee={tx.fee.value}
+            hash={tx.hash}
+            status={tx.status}
+            timestamp={tx.updatedAt}
+          />
+        );
+      });
+
+      return [...prev, divider, ...items];
+    }, []);
   };
 
   const handleTabsChange = (index) => {
@@ -268,7 +360,7 @@ export default function Home() {
             onChange={handleTabsChange}
           >
             <TabPanels>
-              <TabPanel px="0px">
+              <TabPanel px="0px" mb="80px">
                 <AccountOverview
                   isEnabled={enabled}
                   isAccountLoading={accountLoading}
@@ -279,7 +371,9 @@ export default function Home() {
                   username={username}
                   transactionsContent={
                     <List
-                      items={[]}
+                      items={
+                        !enabled || historyLoading ? historyLoadingList : renderTransactionHistory()
+                      }
                       hasMore={false}
                       next={() => {}}
                       emptyHeading="No wallet activity yet! 🆕"

@@ -70,7 +70,7 @@ const getUsersByWalletAddress = async (addresses) => {
     .project({ username: true });
 };
 
-const getUsersByWalletAddressAndPopulate = async (addresses) => {
+const getUsersByWalletAddressAndPopulate = async (addresses, opts = { withUserId: false }) => {
   const users = await User.aggregate()
     .lookup({
       from: 'wallets',
@@ -79,7 +79,7 @@ const getUsersByWalletAddressAndPopulate = async (addresses) => {
       as: 'wallets',
     })
     .match({ 'wallets.walletAddress': { $in: addresses } })
-    .project({ _id: false, username: true, wallet: true });
+    .project({ _id: opts.withUserId, username: true, wallet: true });
   return Wallet.populate(users, { path: 'wallet', select: 'walletAddress -_id' });
 };
 

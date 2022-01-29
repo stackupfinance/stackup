@@ -12,7 +12,7 @@ import { useRecoverStore, recoverRecoverConfirmPageSelector } from '../../src/st
 import { useRecoverAccountChannel } from '../../src/hooks';
 import { App, Routes } from '../../src/config';
 import { logEvent, EVENTS } from '../../src/utils/analytics';
-import { txStatus } from '../../src/utils/events';
+import { txStatus } from '../../src/utils/transaction';
 
 function RecoverConfirm() {
   const router = useRouter();

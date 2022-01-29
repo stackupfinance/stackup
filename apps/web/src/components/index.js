@@ -21,6 +21,8 @@ export * from './recoverAccount';
 export * from './search';
 export * from './searchModal';
 export * from './setupGuardians';
+export * from './transactionCard';
+export * from './transactionDateDivider';
 export * from './updatePassword';
 export * from './userCard';
 export * from './verifyEmail';

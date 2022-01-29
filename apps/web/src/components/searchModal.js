@@ -65,7 +65,7 @@ export const SearchModal = ({
             scrollbarWidth: 'none',
           }}
         >
-          <InputGroup size="lg">
+          <InputGroup size="lg" mb="8px">
             <InputLeftElement pointerEvents="none">
               <SearchIcon color="gray.300" />
             </InputLeftElement>
