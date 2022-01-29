@@ -335,5 +335,11 @@ module.exports.queryHistory = async (user, opts = { limit: 100 }) => {
       },
       fee: true,
       updatedAt: true,
-    });
+    })
+    .group({
+      _id: { $dateToString: { format: '%d-%m-%Y', date: '$updatedAt' } },
+      lastDate: { $last: '$updatedAt' },
+      transactions: { $push: '$$ROOT' },
+    })
+    .project({ _id: false, lastDate: true, transactions: true });
 };

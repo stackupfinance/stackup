@@ -37,7 +37,7 @@ export const useHistoryStore = create(
 
           set({
             loading: false,
-            // transactions: res.data,
+            transactions: res.data.transactions,
           });
         } catch (error) {
           set({ loading: false });

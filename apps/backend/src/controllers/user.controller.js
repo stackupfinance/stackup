@@ -127,10 +127,9 @@ module.exports.postTransaction = catchAsync(async (req, res) => {
   await transactionService.relayTransaction({ userId, transactionId: tx._id, userOperations });
 
   if (tx.type === type.newPayment) {
-    const [address1, address2] = transactionService.resolveNewPaymentTransferAddresses(tx);
     res.send({
       pendingNewPayment: await transactionService
-        .queryActivityItems(user, address1, address2, { limit: 1 })
+        .queryActivityItems(user, '', '', { limit: 1, id: tx._id })
         .then((r) => r[0]),
     });
   } else {
@@ -141,11 +140,12 @@ module.exports.postTransaction = catchAsync(async (req, res) => {
 module.exports.getUserTransactionHistory = catchAsync(async (req, res) => {
   const { userId } = req.params;
   const user = await userService.getUserById(userId);
-  const results = await addressService.transformTransactionsWithName(
+  const results = await addressService.transformHistoryWithName(
     user.wallet.walletAddress,
     await transactionService.queryHistory(user)
   );
 
+  // TODO: Implement actual pagination.
   res.send({
     transactions: {
       results,

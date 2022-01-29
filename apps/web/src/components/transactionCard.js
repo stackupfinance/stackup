@@ -1,21 +1,21 @@
 import format from 'date-fns/format';
-import { Heading, HStack, VStack, Avatar, Text, Icon, Spacer } from '@chakra-ui/react';
+import { Heading, HStack, VStack, Avatar, Text, Icon, Spacer, Skeleton } from '@chakra-ui/react';
 import { AiOutlineExclamation } from 'react-icons/ai';
 import { displayUSDC } from '../utils/web3';
 
 export const TransactionCard = ({
-  // isLoading,
+  isLoading,
   isLastInSection,
   isLastInList,
-  isIncoming,
-  name,
-  value,
-  effect,
+  lineItems = [],
   fee,
-  extraLineItems = [],
   timestamp,
   onClick = () => {},
 }) => {
+  const [firstLineItem, ...otherLineItems] = lineItems;
+  const extraLineItems = otherLineItems ?? [];
+  const { from, to, value, sideEffect, isReceiving } = firstLineItem;
+
   return (
     <>
       <HStack
@@ -27,7 +27,9 @@ export const TransactionCard = ({
         pl="16px"
         spacing="16px"
       >
-        <Avatar size="sm" borderRadius="lg" />
+        <Skeleton isLoaded={!isLoading} borderRadius="lg">
+          <Avatar size="sm" borderRadius="lg" />
+        </Skeleton>
 
         <HStack
           w="100%"
@@ -38,31 +40,39 @@ export const TransactionCard = ({
           }
         >
           <VStack spacing="4px" alignItems="left">
-            <Heading fontSize="sm" textAlign="left">
-              {effect ?? name}
-            </Heading>
+            <Skeleton isLoaded={!isLoading} width={isLoading && '128px'}>
+              <Heading fontSize="sm" textAlign="left">
+                {sideEffect ?? (isReceiving ? from : to)}
+              </Heading>
+            </Skeleton>
 
-            <Text fontSize="xs" textAlign="left" color="gray.500">
-              {format(new Date(timestamp), 'h:mmaaa')}
-            </Text>
+            <Skeleton isLoaded={!isLoading} width={isLoading && '64px'}>
+              <Text fontSize="xs" textAlign="left" color="gray.500">
+                {format(new Date(timestamp), 'h:mmaaa')}
+              </Text>
+            </Skeleton>
           </VStack>
 
           <Spacer />
 
           <VStack spacing="4px" alignItems="right">
-            <Text
-              color={isIncoming && 'green.500'}
-              fontSize="sm"
-              textAlign="right"
-              fontWeight="bold"
-            >
-              {effect ? '-' : `${isIncoming ? '+ ' : ''}${displayUSDC(value)}`}
-            </Text>
-
-            {isIncoming ? undefined : (
-              <Text fontSize="xs" textAlign="right" color="gray.500">
-                {displayUSDC(fee)} fee
+            <Skeleton isLoaded={!isLoading}>
+              <Text
+                color={isReceiving && 'green.500'}
+                fontSize="sm"
+                textAlign="right"
+                fontWeight="bold"
+              >
+                {sideEffect ? '-' : `${isReceiving ? '+ ' : ''}${displayUSDC(value)}`}
               </Text>
+            </Skeleton>
+
+            {isReceiving ? undefined : (
+              <Skeleton isLoaded={!isLoading}>
+                <Text fontSize="xs" textAlign="right" color="gray.500">
+                  {displayUSDC(fee)} fee
+                </Text>
+              </Skeleton>
             )}
           </VStack>
         </HStack>
@@ -89,22 +99,30 @@ export const TransactionCard = ({
                 ((!isLastInSection && !isLastInList) || i !== extraLineItems.length - 1) && '1px'
               }
             >
-              <Avatar size="xs" borderRadius="lg" />
+              <Skeleton isLoaded={!isLoading} borderRadius="lg">
+                <Avatar size="xs" borderRadius="lg" />
+              </Skeleton>
 
-              <Text fontSize="xs" fontWeight="500" textAlign="left">
-                {line.effect ?? line.name}
-              </Text>
+              <Skeleton isLoaded={!isLoading}>
+                <Text fontSize="xs" fontWeight="500" textAlign="left">
+                  {line.sideEffect ?? (line.isReceiving ? line.from : line.to)}
+                </Text>
+              </Skeleton>
 
               <Spacer />
 
-              <Text
-                color={line.isIncoming && 'green.500'}
-                fontSize="xs"
-                textAlign="right"
-                fontWeight="500"
-              >
-                {line.effect ? '-' : `${line.isIncoming ? '+ ' : ''}${line.value}`}
-              </Text>
+              <Skeleton isLoaded={!isLoading}>
+                <Text
+                  color={line.isReceiving && 'green.500'}
+                  fontSize="xs"
+                  textAlign="right"
+                  fontWeight="500"
+                >
+                  {line.sideEffect
+                    ? '-'
+                    : `${line.isReceiving ? '+ ' : ''}${displayUSDC(line.value)}`}
+                </Text>
+              </Skeleton>
             </HStack>
           </HStack>
         );

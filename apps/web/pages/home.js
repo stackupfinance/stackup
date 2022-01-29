@@ -69,6 +69,55 @@ const loadingList = [
   />,
 ];
 
+const historyLoadingList = [
+  <TransactionDateDivider
+    isLoading
+    key="loading-history-1"
+    timestamp={new Date('2021-01-01T00:00:00')}
+  />,
+  <TransactionCard
+    isLoading
+    key="loading-history-2"
+    lineItems={[
+      { to: 'name', value: '3500000' },
+      { to: 'name', value: '3500000' },
+    ]}
+    fee="10000"
+    timestamp={new Date('2021-01-01T00:00:00')}
+  />,
+  <TransactionCard
+    isLoading
+    isLastInSection
+    key="loading-history-3"
+    lineItems={[{ to: 'name', value: '3500000' }]}
+    fee="10000"
+    timestamp={new Date('2021-01-01T00:00:00')}
+  />,
+  <TransactionDateDivider
+    isLoading
+    key="loading-history-4"
+    timestamp={new Date('2021-01-01T00:00:00')}
+  />,
+  <TransactionCard
+    isLoading
+    key="loading-history-5"
+    lineItems={[{ to: 'name', value: '3500000' }]}
+    fee="10000"
+    timestamp={new Date('2021-01-01T00:00:00')}
+  />,
+  <TransactionCard
+    isLoading
+    isLastInList
+    key="loading-history-6"
+    lineItems={[
+      { to: 'name', value: '3500000' },
+      { to: 'name', value: '3500000' },
+    ]}
+    fee="10000"
+    timestamp={new Date('2021-01-01T00:00:00')}
+  />,
+];
+
 export default function Home() {
   const {
     enabled,
@@ -100,8 +149,8 @@ export default function Home() {
     deleteNotification,
   } = useNotificationStore(notificationHomePageSelector);
   const {
-    // loading: historyLoading,
-    // transactions,
+    loading: historyLoading,
+    transactions,
     fetchTransactions,
   } = useHistoryStore(historyHomePageSelector);
   const { clear: clearOnboardData } = useOnboardStore(onboardHomePageSelector);
@@ -154,6 +203,7 @@ export default function Home() {
     } else if (event === txType.genericRelay) {
       fetchBalance(wallet);
     }
+    fetchTransactions({ userId: user.id, accessToken: accessToken.token });
   });
 
   const onNotificationClick = async (notification) => {
@@ -245,6 +295,37 @@ export default function Home() {
     });
   };
 
+  const renderTransactionHistory = () => {
+    return (transactions?.results || []).reduce((prev, curr, i) => {
+      const isLastBatch = i === transactions.results.length - 1;
+
+      const divider = (
+        <TransactionDateDivider
+          key={`history-date-divider-${i}`}
+          timestamp={new Date(curr.lastDate)}
+        />
+      );
+
+      const items = curr.transactions.map((tx, j) => {
+        const isLastInSection = j === curr.transactions.length - 1;
+        return (
+          <TransactionCard
+            isLastInSection={isLastInSection}
+            isLastInList={isLastInSection && isLastBatch}
+            key={`history-transaction-${i}-${j}`}
+            lineItems={tx.lineItems}
+            fee={tx.fee.value}
+            hash={tx.hash}
+            status={tx.status}
+            timestamp={tx.updatedAt}
+          />
+        );
+      });
+
+      return [...prev, divider, ...items];
+    }, []);
+  };
+
   const handleTabsChange = (index) => {
     setTabIndex(index);
   };
@@ -290,82 +371,9 @@ export default function Home() {
                   username={username}
                   transactionsContent={
                     <List
-                      items={[
-                        <TransactionDateDivider
-                          key="transaction-history-0"
-                          timestamp={new Date()}
-                        />,
-                        <TransactionCard
-                          key="transaction-history-0-1"
-                          effect="You approved paymaster for $5"
-                          fee="80000"
-                          extraLineItems={[{ name: 'Jane', value: '$3.84' }]}
-                          timestamp={new Date('2021-01-01T00:00:00')}
-                        />,
-                        <TransactionCard
-                          key="transaction-history-1-1"
-                          isIncoming
-                          effect="Bob approved you for $2.50"
-                          timestamp={new Date('2021-01-01T00:00:00')}
-                        />,
-                        <TransactionCard
-                          key="transaction-history-2-1"
-                          effect="Recovered account with 2 guardians"
-                          fee="80000"
-                          timestamp={new Date('2021-01-01T00:00:00')}
-                        />,
-                        <TransactionCard
-                          key="transaction-history-1"
-                          name="alice"
-                          value="1500000"
-                          fee="80000"
-                          timestamp={new Date('2021-01-01T00:00:00')}
-                        />,
-                        <TransactionCard
-                          key="transaction-history-2"
-                          isLastInSection
-                          name="johnrising.eth"
-                          value="25320000"
-                          fee="100000"
-                          timestamp={new Date('2021-01-01T00:00:00')}
-                        />,
-                        <TransactionDateDivider
-                          key="transaction-history-3"
-                          timestamp={new Date('2022-01-18T00:00:00')}
-                        />,
-                        <TransactionCard
-                          key="transaction-history-4"
-                          isIncoming
-                          name="0x619...0B6dE"
-                          value="1000000"
-                          timestamp={new Date('2021-01-01T00:00:00')}
-                        />,
-                        <TransactionCard
-                          key="transaction-history-5"
-                          name="UniSwap V3"
-                          value="150000000"
-                          fee="160000"
-                          extraLineItems={[{ name: 'WETH', value: '0.12 ETH', isIncoming: true }]}
-                          timestamp={new Date('2021-01-01T00:00:00')}
-                        />,
-                        <TransactionCard
-                          key="transaction-history-6"
-                          name="OpenSea"
-                          value="1500000000"
-                          fee="160000"
-                          extraLineItems={[{ name: 'BAYC', value: '#13152', isIncoming: true }]}
-                          timestamp={new Date('2021-01-01T00:00:00')}
-                        />,
-                        <TransactionCard
-                          key="transaction-history-7"
-                          isLastInList
-                          name="Aave"
-                          value="1500000000"
-                          fee="160000"
-                          extraLineItems={[{ name: 'amUSDC', value: '$150.00', isIncoming: true }]}
-                          timestamp={new Date('2021-01-01T00:00:00')}
-                        />,
-                      ]}
+                      items={
+                        !enabled || historyLoading ? historyLoadingList : renderTransactionHistory()
+                      }
                       hasMore={false}
                       next={() => {}}
                       emptyHeading="No wallet activity yet! 🆕"
