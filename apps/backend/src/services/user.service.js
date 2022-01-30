@@ -1,6 +1,7 @@
 const httpStatus = require('http-status');
 const { User, Wallet } = require('../models');
 const ApiError = require('../utils/ApiError');
+const { isBlacklisted } = require('../config/username');
 
 /**
  * Create a user
@@ -10,6 +11,9 @@ const ApiError = require('../utils/ApiError');
 const createUser = async (userBody) => {
   if (await User.isUsernameTaken(userBody.username)) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Username already taken');
+  }
+  if (isBlacklisted(userBody.username)) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'That username is not allowed');
   }
   return User.create(userBody);
 };
