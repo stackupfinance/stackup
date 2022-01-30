@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
 const { toJSON, paginate } = require('./plugins');
-const { roles } = require('../config/roles');
 const walletService = require('../services/wallet.service');
 
 const userSchema = mongoose.Schema(
@@ -53,11 +52,6 @@ const userSchema = mongoose.Schema(
     wallet: {
       type: mongoose.SchemaTypes.ObjectId,
       ref: 'Wallet',
-    },
-    role: {
-      type: String,
-      enum: roles,
-      default: 'user',
     },
   },
   {
