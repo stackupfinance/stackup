@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import {
   Box,
   Button,
@@ -47,6 +47,7 @@ export const Pay = ({
   const [password, setPassword] = useState('');
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [sendError, setSendError] = useState('');
+  const initialRef = useRef();
 
   const format = (val) => {
     const parts = val.toString().split('.');
@@ -167,7 +168,7 @@ export const Pay = ({
         )}
       </Box>
 
-      <Modal isOpen={showConfirmModal} onClose={onCloseConfirm}>
+      <Modal isOpen={showConfirmModal} onClose={onCloseConfirm} initialFocusRef={initialRef}>
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>Confirm transaction</ModalHeader>
@@ -187,6 +188,7 @@ export const Pay = ({
               </Text>
               <Box w="100%">
                 <Input
+                  ref={initialRef}
                   placeholder="Password"
                   type="password"
                   onChange={(ev) => setPassword(ev.target.value)}

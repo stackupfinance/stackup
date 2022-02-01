@@ -3,7 +3,6 @@ import {
   Box,
   HStack,
   Image,
-  Spacer,
   LinkBox,
   LinkOverlay,
   IconButton,
@@ -64,8 +63,6 @@ export const Search = ({ onSearch, onClear, rightItem }) => {
             </NextLink>
           </LinkBox>
 
-          <Spacer />
-
           <InputGroup bg="white" borderRadius="lg">
             {value && (
               <InputLeftElement>
@@ -74,8 +71,7 @@ export const Search = ({ onSearch, onClear, rightItem }) => {
             )}
 
             <Input
-              pr="88px"
-              placeholder="Search for user"
+              placeholder="Lookup account"
               onChange={onChangeHandler}
               onKeyDown={handleKeyDown}
               value={value}
@@ -91,9 +87,7 @@ export const Search = ({ onSearch, onClear, rightItem }) => {
             </InputRightElement>
           </InputGroup>
 
-          {rightItem && <Spacer />}
-
-          {rightItem && <Box>{rightItem}</Box>}
+          {rightItem}
         </HStack>
       </Box>
     </header>

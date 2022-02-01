@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react';
+import { Tabs, TabList, TabPanels, Tab, TabPanel, HStack } from '@chakra-ui/react';
 import {
   PageContainer,
   AppContainer,
@@ -12,6 +12,7 @@ import {
   TransactionDateDivider,
   UserCard,
   Notifications,
+  Apps,
 } from '../src/components';
 import {
   useAccountStore,
@@ -339,12 +340,15 @@ export default function Home() {
           onSearch={onSearch}
           onClear={onClear}
           rightItem={
-            <Notifications
-              isLoading={notificationLoading}
-              items={notifications}
-              onItemClick={onNotificationClick}
-              onDeleteItem={onDeleteNotification}
-            />
+            <HStack spacing="8px">
+              <Apps />
+              <Notifications
+                isLoading={notificationLoading}
+                items={notifications}
+                onItemClick={onNotificationClick}
+                onDeleteItem={onDeleteNotification}
+              />
+            </HStack>
           }
         />
 
