@@ -3,6 +3,13 @@ const { wallet, contracts, constants } = require('@stackupfinance/contracts');
 const { web3 } = require('../config/config');
 const { eventSignatures, status } = require('../config/transaction');
 
+const formatter = new Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: 'USD',
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
+
 const loginMessage = 'Welcome to Stackup!';
 
 const provider = new ethers.providers.JsonRpcProvider(web3.rpc);
@@ -67,9 +74,11 @@ module.exports.getERC20TokenMeta = async (address) => {
 };
 
 module.exports.formatERC20Value = (tokenMeta, value) => {
-  return `${tokenMeta.prefix ? `${tokenMeta.prefix}` : ''}${ethers.utils.formatUnits(value, tokenMeta.units)}${
-    tokenMeta.suffix ? ` ${tokenMeta.suffix}` : ''
-  }`;
+  return tokenMeta.prefix === '$'
+    ? formatter.format(ethers.utils.formatUnits(value, tokenMeta.units))
+    : `${tokenMeta.prefix ? `${tokenMeta.prefix}` : ''}${ethers.utils.formatUnits(value, tokenMeta.units)}${
+        tokenMeta.suffix ? ` ${tokenMeta.suffix}` : ''
+      }`;
 };
 
 module.exports.signatureCount = (userOp) => {

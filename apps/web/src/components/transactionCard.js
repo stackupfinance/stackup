@@ -31,7 +31,8 @@ export const TransactionCard = ({
           <Avatar size="sm" borderRadius="lg" />
         </Skeleton>
 
-        <HStack
+        <VStack
+          spacing="4px"
           w="100%"
           py="8px"
           pr="16px"
@@ -39,33 +40,37 @@ export const TransactionCard = ({
             ((!isLastInSection && !isLastInList) || extraLineItems.length > 0) && '1px'
           }
         >
-          <VStack spacing="4px" alignItems="left">
+          <HStack w="100%">
             <Skeleton isLoaded={!isLoading} width={isLoading && '128px'}>
               <Heading fontSize="sm" textAlign="left">
                 {sideEffect ?? (isReceiving ? from : to)}
               </Heading>
             </Skeleton>
 
+            {!sideEffect && <Spacer />}
+
+            {sideEffect ? undefined : (
+              <Skeleton isLoaded={!isLoading}>
+                <Text
+                  color={isReceiving && 'green.500'}
+                  fontSize="sm"
+                  textAlign="right"
+                  fontWeight="bold"
+                >
+                  {`${isReceiving ? '+ ' : ''}${displayUSDC(value)}`}
+                </Text>
+              </Skeleton>
+            )}
+          </HStack>
+
+          <HStack w="100%">
             <Skeleton isLoaded={!isLoading} width={isLoading && '64px'}>
               <Text fontSize="xs" textAlign="left" color="gray.500">
                 {format(new Date(timestamp), 'h:mmaaa')}
               </Text>
             </Skeleton>
-          </VStack>
 
-          <Spacer />
-
-          <VStack spacing="4px" alignItems="right">
-            <Skeleton isLoaded={!isLoading}>
-              <Text
-                color={isReceiving && 'green.500'}
-                fontSize="sm"
-                textAlign="right"
-                fontWeight="bold"
-              >
-                {sideEffect ? '-' : `${isReceiving ? '+ ' : ''}${displayUSDC(value)}`}
-              </Text>
-            </Skeleton>
+            <Spacer />
 
             {isReceiving ? undefined : (
               <Skeleton isLoaded={!isLoading}>
@@ -74,8 +79,8 @@ export const TransactionCard = ({
                 </Text>
               </Skeleton>
             )}
-          </VStack>
-        </HStack>
+          </HStack>
+        </VStack>
       </HStack>
 
       {extraLineItems.map((line, i) => {

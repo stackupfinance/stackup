@@ -47,7 +47,7 @@ module.exports.parseUserOperations = async (userOperations) => {
         lineItem = {
           from,
           to,
-          sideEffect: `${from} approved ${to} for ${formatERC20Value(tokenMeta, wcd.args[1])}`,
+          sideEffect: `${from} approved ${to} to transact up to ${formatERC20Value(tokenMeta, wcd.args[1])}`,
         };
         break;
       }
@@ -179,9 +179,9 @@ module.exports.queryActivity = async (walletAddress) => {
     })
     .group({
       _id: '$addresses',
-      toAddress: { $first: '$toAddress' },
-      preview: { $first: '$message' },
-      updatedAt: { $first: '$updatedAt' },
+      toAddress: { $last: '$toAddress' },
+      preview: { $last: '$message' },
+      updatedAt: { $last: '$updatedAt' },
     })
     .limit(20)
     .lookup({
@@ -349,5 +349,6 @@ module.exports.queryHistory = async (user, opts = { limit: 100 }) => {
       lastDate: { $last: '$updatedAt' },
       transactions: { $push: '$$ROOT' },
     })
+    .sort('-lastDate')
     .project({ _id: false, lastDate: true, transactions: true });
 };
