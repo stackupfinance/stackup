@@ -91,7 +91,7 @@ export const AccountOverview = ({
             size="md"
           >
             <Skeleton
-              width={isAccountLoading && '128px'}
+              width={isAccountLoading && '144px'}
               isLoaded={!isAccountLoading}
               borderRadius="lg"
               startColor="blue.500"
