@@ -20,6 +20,8 @@ import {
   updateUseAuthSelector,
   useHistoryStore,
   historyUseAuthSelector,
+  useAppsStore,
+  appUseAuthSelector,
 } from '../state';
 import { Routes } from '../config';
 
@@ -45,6 +47,7 @@ export const useLogout = () => {
   const { clear: clearNotification } = useNotificationStore(notificationUseAuthSelector);
   const { clear: clearUpdate } = useUpdateStore(updateUseAuthSelector);
   const { clear: clearHistory } = useHistoryStore(historyUseAuthSelector);
+  const { clear: clearApps } = useAppsStore(appUseAuthSelector);
 
   return async () => {
     clearSearch();
@@ -55,14 +58,16 @@ export const useLogout = () => {
     clearNotification();
     clearUpdate();
     clearHistory();
+    clearApps();
     await logout();
   };
 };
 
 export const useAuth = () => {
   const router = useRouter();
-  const { accessToken, refreshToken, refresh, enableAccount } =
+  const { wallet, accessToken, refreshToken, refresh, enableAccount } =
     useAccountStore(accountUseAuthSelector);
+  const { initAppSessions } = useAppsStore(appUseAuthSelector);
   const logout = useLogout();
   const [isFirst, setIsFirst] = useState(true);
 
@@ -94,7 +99,11 @@ export const useAuth = () => {
       }
     };
 
-    authCheck().then(enableAccount);
+    authCheck()
+      .then(enableAccount)
+      .then(() => {
+        if (wallet) initAppSessions(wallet.walletAddress);
+      });
   }, [refreshToken]);
 
   useEffect(() => {

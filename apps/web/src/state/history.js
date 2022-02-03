@@ -50,7 +50,7 @@ export const useHistoryStore = create(
     {
       name: 'stackup-history-store',
       partialize: (state) => {
-        const { loading, searchData, ...persisted } = state;
+        const { loading, ...persisted } = state;
         return persisted;
       },
     },

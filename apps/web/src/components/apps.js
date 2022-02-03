@@ -4,6 +4,7 @@ import {
   VStack,
   IconButton,
   Text,
+  Image,
   Badge,
   Menu,
   MenuButton,
@@ -28,44 +29,44 @@ import {
   Tab,
   TabPanel,
 } from '@chakra-ui/react';
-import { UnlockIcon, CloseIcon, AddIcon } from '@chakra-ui/icons';
+import { CloseIcon } from '@chakra-ui/icons';
 import { BsLightningChargeFill } from 'react-icons/bs';
 import { QRCodeScanner } from '.';
 
 export const Apps = ({
   isLoading,
-  items = [],
-  onItemClick = () => {},
-  onDeleteItem = () => {},
+  sessions = {},
+  onAppConnect = () => {},
+  onAppDisconnect = () => {},
 }) => {
   const [wcModal, setWcModal] = useState(false);
+  const [wcUri, setWcUri] = useState('');
   const initialRef = useRef();
+  const items = Object.entries(sessions);
 
-  const onItemHandler = (item) => (_ev) => {
-    onItemClick(item);
-  };
-
-  const onDeleteHandler = (item) => (ev) => {
+  const onDeleteHandler = (sessionId) => (ev) => {
     ev.stopPropagation();
-    onDeleteItem(item);
+    onAppDisconnect(sessionId);
   };
 
   const renderItems = () => {
-    return items.map((item, i) => (
-      <MenuItem
-        as="div"
-        key={`notifications-menu-item-${i}`}
-        minH="48px"
-        maxW={['xs', 'sm']}
-        onClick={onItemHandler(item)}
-        icon={<IconButton size="xs" icon={<CloseIcon onClick={onDeleteHandler(item)} />} />}
-      >
-        <HStack>
-          <Text fontWeight={500}>{item.preview}</Text>
+    return items.map(([key, value]) => (
+      <MenuItem as="div" key={`apps-menu-item-${key}`} minH="48px" maxW={['xs', 'sm']}>
+        <HStack w="100%">
+          <Image
+            boxSize="24px"
+            borderRadius="md"
+            src={value.peerMeta.icons[value.peerMeta.icons.length - 1]}
+            alt="app logo"
+          />
+
+          <Text fontWeight={500} textOverflow="ellipsis" noOfLines={1}>
+            {value.peerMeta.name}
+          </Text>
 
           <Spacer />
 
-          <UnlockIcon />
+          <IconButton size="xs" icon={<CloseIcon onClick={onDeleteHandler(key)} />} />
         </HStack>
       </MenuItem>
     ));
@@ -90,9 +91,14 @@ export const Apps = ({
     setWcModal(false);
   };
 
-  const onWalletConnectScanSuccess = (decodedText, decodedResult) => {
-    console.log(decodedText);
-    console.log(decodedResult);
+  const walletConnectScanHandler = (uri) => {
+    onWalletConnectClose();
+    onAppConnect(uri);
+  };
+
+  const walletConnectButtonHandler = () => {
+    onWalletConnectClose();
+    onAppConnect(wcUri);
   };
 
   return (
@@ -124,8 +130,17 @@ export const Apps = ({
 
           <MenuDivider />
 
-          <MenuItem icon={<AddIcon />} onClick={onWalletConnectOpen}>
-            WalletConnect
+          <MenuItem onClick={onWalletConnectOpen}>
+            <Image
+              boxSize="24px"
+              borderRadius="md"
+              src="/walletconnect-square-blue.svg"
+              alt="WalletConnect logo"
+              mr="4px"
+            />
+            <Text as="span" fontWeight={500}>
+              Get connected
+            </Text>
           </MenuItem>
         </MenuList>
       </Menu>
@@ -157,7 +172,7 @@ export const Apps = ({
 
               <TabPanels>
                 <TabPanel px="0px">
-                  <QRCodeScanner onSuccess={onWalletConnectScanSuccess} />
+                  <QRCodeScanner onSuccess={walletConnectScanHandler} />
                 </TabPanel>
                 <TabPanel px="0px">
                   <VStack spacing="16px">
@@ -169,7 +184,11 @@ export const Apps = ({
                       underneath the WalletConnect QR code and paste it below.
                     </Text>
 
-                    <Input ref={initialRef} placeholder="Paste code here!" />
+                    <Input
+                      ref={initialRef}
+                      placeholder="Paste code here!"
+                      onChange={(ev) => setWcUri(ev.target.value)}
+                    />
                   </VStack>
                 </TabPanel>
               </TabPanels>
@@ -178,7 +197,9 @@ export const Apps = ({
 
           <ModalFooter>
             <HStack spacing="8px">
-              <Button colorScheme="blue">Connect</Button>
+              <Button isDisabled={!wcUri} colorScheme="blue" onClick={walletConnectButtonHandler}>
+                Connect
+              </Button>
               <Button onClick={onWalletConnectClose}>Cancel</Button>
             </HStack>
           </ModalFooter>

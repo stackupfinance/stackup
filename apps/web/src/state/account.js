@@ -6,6 +6,7 @@ import { loginMessage } from '../utils/web3';
 import { App } from '../config';
 
 export const accountUseAuthSelector = (state) => ({
+  wallet: state.wallet,
   accessToken: state.accessToken,
   refreshToken: state.refreshToken,
   logout: state.logout,

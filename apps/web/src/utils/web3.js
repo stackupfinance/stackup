@@ -21,6 +21,10 @@ export const provider = new ethers.providers.JsonRpcProvider(App.web3.rpc);
 
 export const usdcContract = contracts.Erc20.getInstance(App.web3.usdc, provider);
 
+export const getChainId = async () => {
+  return provider.getNetwork().then((n) => n.chainId);
+};
+
 export const walletContract = (walletAddress) =>
   contracts.Wallet.getInstance(provider).attach(walletAddress);
 

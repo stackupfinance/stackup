@@ -33,6 +33,8 @@ import {
   updateHomePageSelector,
   useHistoryStore,
   historyHomePageSelector,
+  useAppsStore,
+  appsHomePageSelector,
 } from '../src/state';
 import { useAuthChannel, useLogout } from '../src/hooks';
 import { txType, getActivityId } from '../src/utils/transaction';
@@ -154,6 +156,12 @@ export default function Home() {
     transactions,
     fetchTransactions,
   } = useHistoryStore(historyHomePageSelector);
+  const {
+    loading: appsLoading,
+    sessions,
+    connectToApp,
+    disconnectFromApp,
+  } = useAppsStore(appsHomePageSelector);
   const { clear: clearOnboardData } = useOnboardStore(onboardHomePageSelector);
   const { clear: clearRecover, selectGuardianRequest } = useRecoverStore(recoverHomePageSelector);
   const { clear: clearUpdate } = useUpdateStore(updateHomePageSelector);
@@ -331,9 +339,19 @@ export default function Home() {
     setTabIndex(index);
   };
 
+  const onAppConnect = (uri) => {
+    if (!enabled) return;
+
+    connectToApp(wallet.walletAddress, { uri });
+  };
+
+  const onAppDisconnect = (sessionId) => {
+    disconnectFromApp(sessionId);
+  };
+
   return (
     <>
-      <Head title="Stackup | Home" />
+      <Head title="Stackup" />
 
       <PageContainer>
         <Search
@@ -341,7 +359,12 @@ export default function Home() {
           onClear={onClear}
           rightItem={
             <HStack spacing="8px">
-              <Apps />
+              <Apps
+                isLoading={appsLoading}
+                sessions={sessions}
+                onAppConnect={onAppConnect}
+                onAppDisconnect={onAppDisconnect}
+              />
               <Notifications
                 isLoading={notificationLoading}
                 items={notifications}

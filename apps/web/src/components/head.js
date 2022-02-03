@@ -4,7 +4,7 @@ export const Head = ({ title }) => {
   return (
     <NextHead>
       <title>{title}</title>
-      <meta name={title} content="Making Web 3.0 accessible for everyone" />
+      <meta name={title} content="Own your digital life." />
 
       {/* <!--  Essential META Tags --> */}
       <meta property="og:title" content={title} />
@@ -14,7 +14,7 @@ export const Head = ({ title }) => {
       <meta name="twitter:card" content="summary_large_image" />
 
       {/* <!--  Non-Essential, But Recommended --> */}
-      <meta property="og:description" content="Making Web 3.0 accessible for everyone" />
+      <meta property="og:description" content="Own your digital life." />
       <meta property="og:site_name" content="Stackup" />
       <meta name="twitter:image:alt" content="Stackup logotype" />
 
