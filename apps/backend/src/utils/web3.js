@@ -1,96 +1,32 @@
-/**
- * This file has some overlapping fuctions with
- * ./apps/contracts/utils/contractHelpers.js.
- *
- * These functions are commented with "Overlap code" for reference.
- *
- * TODO: Consider consolidating the two modules into a single package.
- */
 const { ethers } = require('ethers');
+const { wallet, contracts, constants } = require('@stackupfinance/contracts');
 const { web3 } = require('../config/config');
-const { status } = require('../config/payments');
-const { abi: ENTRY_POINT_ABI } = require('../config/contracts/EntryPoint.json');
+const { eventSignatures, status } = require('../config/transaction');
 
-// Overlap code
-const PAYMASTER_FEE = ethers.BigNumber.from(100000);
-// ------------
+const formatter = new Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: 'USD',
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
 
-// These contracts have the same address on any chain.
-const ENTRY_POINT_ADDRESS = '0x6dDAE1a8f3ff1B42907B2ef4b08C2A7fc16B0F25';
-const PAYMASTER_ADDRESS = '0x2158d5f5d83a70cbba65fce7EdF4BB3A653A0310';
+const loginMessage = 'Welcome to Stackup!';
 
 const provider = new ethers.providers.JsonRpcProvider(web3.rpc);
-const signer = ethers.Wallet.fromMnemonic(web3.mnemonic).connect(provider);
-const entryPointContract = new ethers.Contract(ENTRY_POINT_ADDRESS, ENTRY_POINT_ABI, provider);
 
-// Overlap code
-const getPaymasterDataHash = (op, paymasterFee, erc20Token, dataFeed) => {
-  const messageHash = ethers.utils.keccak256(
-    ethers.utils.solidityPack(
-      [
-        'address',
-        'uint256',
-        'bytes32',
-        'bytes32',
-        'uint256',
-        'uint256',
-        'uint256',
-        'uint256',
-        'uint256',
-        'address',
-        'bytes32',
-      ],
-      [
-        op.sender,
-        op.nonce,
-        ethers.utils.keccak256(op.initCode),
-        ethers.utils.keccak256(op.callData),
-        op.callGas,
-        op.verificationGas,
-        op.preVerificationGas,
-        op.maxFeePerGas,
-        op.maxPriorityFeePerGas,
-        op.paymaster,
-        // Hash all paymasterData together
-        ethers.utils.keccak256(
-          ethers.utils.solidityPack(['uint256', 'address', 'address'], [paymasterFee, erc20Token, dataFeed])
-        ),
-      ]
-    )
-  );
-  return ethers.utils.arrayify(messageHash);
+module.exports.defaultPaymasterFee = ethers.BigNumber.from(100000);
+
+module.exports.signer = ethers.Wallet.fromMnemonic(web3.mnemonic).connect(provider);
+
+module.exports.getChainId = async () => {
+  return provider.getNetwork().then((n) => n.chainId);
 };
 
-// Overlap code (partial)
-const withPaymaster = async (op, opts = {}) => {
-  const userOp = {
-    ...op,
-    paymaster: PAYMASTER_ADDRESS,
-  };
-  const fee = typeof opts.fee !== 'undefined' ? opts.fee : PAYMASTER_FEE;
-
-  return {
-    ...userOp,
-    paymasterData: ethers.utils.defaultAbiCoder.encode(
-      ['uint256', 'address', 'address', 'bytes'],
-      [
-        fee,
-        web3.usdc,
-        web3.usdcPriceFeed,
-        await signer.signMessage(getPaymasterDataHash(userOp, fee, web3.usdc, web3.usdcPriceFeed)),
-      ]
-    ),
-  };
+module.exports.getTransactionReceipt = async (hash) => {
+  return provider.getTransactionReceipt(hash);
 };
 
-const entryPointHandleOps = async (userOps) => {
-  return entryPointContract.connect(signer).handleOps(userOps, signer.address, {
-    gasLimit: 5000000,
-  });
-};
-
-const getTransactionStatus = async (transactionHash) => {
-  const txReceipt = await provider.getTransactionReceipt(transactionHash);
+module.exports.getTransactionStatus = (txReceipt) => {
   if (!txReceipt) {
     return status.pending;
   }
@@ -100,8 +36,56 @@ const getTransactionStatus = async (transactionHash) => {
   return status.failed;
 };
 
-module.exports = {
-  withPaymaster,
-  entryPointHandleOps,
-  getTransactionStatus,
+module.exports.withTokenFeeValue = (txReceipt, feeData) => {
+  if (!txReceipt) return;
+
+  const tokenFee = txReceipt.logs
+    .map((log) => {
+      if (feeData.tokenAddress !== log.address) return undefined;
+      return contracts.Erc20.interface.parseLog(log);
+    })
+    .filter(Boolean)
+    .reduce((prev, curr) => {
+      if (curr.signature === eventSignatures.erc20Transfer && curr.args[1] === web3.paymaster) {
+        return prev.add(curr.args[2]);
+      }
+
+      return prev;
+    }, ethers.constants.Zero);
+
+  return {
+    ...feeData,
+    value: tokenFee.toString(),
+  };
+};
+
+module.exports.isWalletDeployed = async (walletAddress) => wallet.proxy.isCodeDeployed(provider, walletAddress);
+
+module.exports.recoverAddressFromLoginSignature = (signature) => ethers.utils.verifyMessage(loginMessage, signature);
+
+module.exports.walletContract = (walletAddress) => contracts.Wallet.getInstance(provider).attach(walletAddress);
+
+module.exports.getERC20TokenMeta = async (address) => {
+  const token = contracts.Erc20.getInstance(address, provider);
+  const [units, symbol] = await Promise.all([token.decimals(), token.symbol()]);
+  const prefix = address === web3.usdc ? '$' : undefined;
+  const suffix = address === web3.usdc ? undefined : symbol;
+  return { units, prefix, suffix, tokenAddress: address };
+};
+
+module.exports.formatERC20Value = (tokenMeta, value) => {
+  return tokenMeta.prefix === '$'
+    ? formatter.format(ethers.utils.formatUnits(value, tokenMeta.units))
+    : `${tokenMeta.prefix ? `${tokenMeta.prefix}` : ''}${ethers.utils.formatUnits(value, tokenMeta.units)}${
+        tokenMeta.suffix ? ` ${tokenMeta.suffix}` : ''
+      }`;
+};
+
+module.exports.signatureCount = (userOp) => {
+  const ws =
+    userOp.signature !== constants.userOperations.nullCode
+      ? ethers.utils.defaultAbiCoder.decode(['uint8', '(address signer, bytes signature)[]'], userOp.signature)
+      : [undefined, []];
+
+  return ws[1].length;
 };

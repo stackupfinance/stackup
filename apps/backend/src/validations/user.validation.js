@@ -1,72 +1,78 @@
 const Joi = require('joi');
-const { password, objectId, userOperation } = require('./custom.validation');
-const { status } = require('../config/users');
+const { activityId, objectId, userOperation } = require('./custom.validation');
 
-const createUser = {
-  body: Joi.object().keys({
-    email: Joi.string().required().email(),
-    password: Joi.string().required().custom(password),
-    name: Joi.string().required(),
-    role: Joi.string().required().valid('user', 'admin'),
-  }),
-};
-
-const getUsers = {
-  query: Joi.object().keys({
-    username: Joi.string(),
-    role: Joi.string(),
-    sortBy: Joi.string(),
-    limit: Joi.number().integer(),
-    page: Joi.number().integer(),
-  }),
-};
-
-const getUser = {
+module.exports.getUser = {
   params: Joi.object().keys({
     userId: Joi.string().custom(objectId),
   }),
 };
 
-const updateUser = {
+module.exports.updateUser = {
   params: Joi.object().keys({
     userId: Joi.required().custom(objectId),
   }),
   body: Joi.object()
     .keys({
+      isOnboarded: Joi.boolean(),
       email: Joi.string().email(),
-      password: Joi.string().custom(password),
       avatar: Joi.string().uri(),
       bio: Joi.string().max(150),
-      status: Joi.string().valid(status.created, status.onboarded),
       unset: Joi.array().items(Joi.string().valid('email', 'avatar', 'bio')).default([]),
     })
     .min(1),
 };
 
-const deleteUser = {
+module.exports.deleteUser = {
   params: Joi.object().keys({
     userId: Joi.string().custom(objectId),
   }),
 };
 
-const createUserWallet = {
+module.exports.updateUserWallet = {
+  params: Joi.object().keys({
+    userId: Joi.string().custom(objectId),
+  }),
+  body: Joi.object()
+    .keys({
+      walletAddress: Joi.string(),
+      initImplementation: Joi.string(),
+      initEntryPoint: Joi.string(),
+      initOwner: Joi.string(),
+      initGuardians: Joi.array().items(Joi.string()),
+      encryptedSigner: Joi.string().base64(),
+    })
+    .min(1),
+};
+
+module.exports.getUserWallet = {
+  params: Joi.object().keys({
+    userId: Joi.string().custom(objectId),
+  }),
+};
+
+module.exports.hydrateUserWalletGuardians = {
   params: Joi.object().keys({
     userId: Joi.string().custom(objectId),
   }),
   body: Joi.object().keys({
-    walletAddress: Joi.string().required(),
-    initSignerAddress: Joi.string().required(),
-    encryptedSigner: Joi.string().base64().required(),
+    guardians: Joi.array().items(Joi.string()).required(),
   }),
 };
 
-const getUserWallet = {
+module.exports.getUserNotifications = {
   params: Joi.object().keys({
     userId: Joi.string().custom(objectId),
   }),
 };
 
-const getUserSearch = {
+module.exports.deleteUserNotification = {
+  params: Joi.object().keys({
+    userId: Joi.string().custom(objectId),
+    notificationId: Joi.string().custom(objectId),
+  }),
+};
+
+module.exports.getUserSearch = {
   params: Joi.object().keys({
     userId: Joi.string().custom(objectId),
   }),
@@ -78,25 +84,7 @@ const getUserSearch = {
   }),
 };
 
-const findUserActivity = {
-  params: Joi.object().keys({
-    userId: Joi.string().custom(objectId),
-  }),
-  query: Joi.object().keys({
-    toUserId: Joi.string().custom(objectId).required(),
-  }),
-};
-
-const approveUserActivity = {
-  params: Joi.object().keys({
-    userId: Joi.string().custom(objectId),
-  }),
-  body: Joi.object().keys({
-    userOperations: Joi.array().items(userOperation).required().min(1),
-  }),
-};
-
-const getUserActivities = {
+module.exports.getUserActivities = {
   params: Joi.object().keys({
     userId: Joi.string().custom(objectId),
   }),
@@ -106,19 +94,10 @@ const getUserActivities = {
   }),
 };
 
-const createUserActivity = {
+module.exports.getUserActivityItems = {
   params: Joi.object().keys({
     userId: Joi.string().custom(objectId),
-  }),
-  body: Joi.object().keys({
-    toUserId: Joi.string().custom(objectId),
-  }),
-};
-
-const getUserActivityItems = {
-  params: Joi.object().keys({
-    userId: Joi.string().custom(objectId),
-    activityId: Joi.string().custom(objectId),
+    activityId: Joi.string().custom(activityId),
   }),
   query: Joi.object().keys({
     limit: Joi.number().integer(),
@@ -126,32 +105,31 @@ const getUserActivityItems = {
   }),
 };
 
-const createUserActivityItem = {
+module.exports.postTransaction = {
   params: Joi.object().keys({
     userId: Joi.string().custom(objectId),
-    activityId: Joi.string().custom(objectId),
   }),
   body: Joi.object().keys({
-    toUser: Joi.string().custom(objectId).required(),
-    amount: Joi.number().required(),
-    message: Joi.string().required(),
+    message: Joi.string().default(''),
     userOperations: Joi.array().items(userOperation).required().min(1),
   }),
 };
 
-module.exports = {
-  createUser,
-  getUsers,
-  getUser,
-  updateUser,
-  deleteUser,
-  createUserWallet,
-  getUserWallet,
-  getUserSearch,
-  findUserActivity,
-  approveUserActivity,
-  getUserActivities,
-  createUserActivity,
-  getUserActivityItems,
-  createUserActivityItem,
+module.exports.transactionPaymasterApproval = {
+  params: Joi.object().keys({
+    userId: Joi.string().custom(objectId),
+  }),
+  body: Joi.object().keys({
+    userOperations: Joi.array().items(userOperation).required().min(1),
+  }),
+};
+
+module.exports.getUserTransactionHistory = {
+  params: Joi.object().keys({
+    userId: Joi.string().custom(objectId),
+  }),
+  query: Joi.object().keys({
+    limit: Joi.number().integer(),
+    page: Joi.number().integer(),
+  }),
 };

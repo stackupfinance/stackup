@@ -9,4 +9,11 @@ export const App = {
   amplitude: {
     apiKey: process.env.NEXT_PUBLIC_AMPLITUDE_API_KEY || '',
   },
+  web3: {
+    explorer: process.env.NEXT_PUBLIC_WEB3_EXPLORER || '',
+    paymaster: process.env.NEXT_PUBLIC_WEB3_PAYMASTER || '',
+    rpc: process.env.NEXT_PUBLIC_WEB3_RPC || '',
+    usdc: process.env.NEXT_PUBLIC_WEB3_USDC || '',
+    usdcUnits: 'mwei',
+  },
 };

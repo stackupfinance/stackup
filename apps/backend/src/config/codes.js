@@ -1,6 +1,6 @@
 const types = {
   verifyEmail: 'verifyEmail',
-  resetPassword: 'resetPassword',
+  recoverAccount: 'recoverAccount',
 };
 
 module.exports = {

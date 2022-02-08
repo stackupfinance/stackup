@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import {
-  Button,
   Box,
   HStack,
   Image,
@@ -13,11 +12,11 @@ import {
   InputLeftElement,
   InputRightElement,
 } from '@chakra-ui/react';
-import { CloseIcon } from '@chakra-ui/icons';
+import { CloseIcon, SearchIcon } from '@chakra-ui/icons';
 import NextLink from 'next/link';
 import { Routes } from '../config';
 
-export const Search = ({ onSearch, onClear }) => {
+export const Search = ({ onSearch, onClear, rightItem }) => {
   const [value, setValue] = useState('');
   const [debounce, setDebounce] = useState(false);
 
@@ -49,13 +48,13 @@ export const Search = ({ onSearch, onClear }) => {
 
   return (
     <header>
-      <Box borderBottomWidth="1px">
-        <HStack spacing={['8px', '16px']} py="16px" px="16px" maxW="xl" margin="0 auto">
+      <Box borderBottomWidth="1px" bg="gray.50">
+        <HStack spacing="8px" py="16px" px="16px" maxW="xl" margin="0 auto">
           <LinkBox>
             <NextLink href={Routes.HOME} passHref>
               <LinkOverlay>
                 <Image
-                  src="./mark-blue.png"
+                  src="/mark-blue.png"
                   maxW="32px"
                   maxH="32px"
                   alt="stackup logo"
@@ -67,7 +66,7 @@ export const Search = ({ onSearch, onClear }) => {
 
           <Spacer />
 
-          <InputGroup>
+          <InputGroup bg="white" borderRadius="lg">
             {value && (
               <InputLeftElement>
                 <IconButton size="xs" onClick={clearHandler} icon={<CloseIcon />} />
@@ -82,12 +81,19 @@ export const Search = ({ onSearch, onClear }) => {
               value={value}
             />
 
-            <InputRightElement width="80px">
-              <Button size="sm" colorScheme="blue" onClick={searchHandler}>
-                Search
-              </Button>
+            <InputRightElement>
+              <IconButton
+                size="sm"
+                colorScheme="blue"
+                onClick={searchHandler}
+                icon={<SearchIcon />}
+              />
             </InputRightElement>
           </InputGroup>
+
+          {rightItem && <Spacer />}
+
+          {rightItem && <Box>{rightItem}</Box>}
         </HStack>
       </Box>
     </header>

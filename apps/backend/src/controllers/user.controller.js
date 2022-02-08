@@ -3,27 +3,16 @@ const pick = require('../utils/pick');
 const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
 const {
+  addressService,
   userService,
   walletService,
   transactionService,
-  activityService,
   signerService,
-  paymentService,
+  notificationService,
 } = require('../services');
+const { type } = require('../config/transaction');
 
-const createUser = catchAsync(async (req, res) => {
-  const user = await userService.createUser(req.body);
-  res.status(httpStatus.CREATED).send(user);
-});
-
-const getUsers = catchAsync(async (req, res) => {
-  const filter = pick(req.query, ['username', 'role']);
-  const options = pick(req.query, ['sortBy', 'limit', 'page']);
-  const result = await userService.queryUsers(filter, options);
-  res.send(result);
-});
-
-const getUser = catchAsync(async (req, res) => {
+module.exports.getUser = catchAsync(async (req, res) => {
   const user = await userService.getUserById(req.params.userId);
   if (!user) {
     throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
@@ -31,34 +20,50 @@ const getUser = catchAsync(async (req, res) => {
   res.send(user);
 });
 
-const updateUser = catchAsync(async (req, res) => {
+module.exports.updateUser = catchAsync(async (req, res) => {
   const user = await userService.updateUserById(req.params.userId, req.body);
   res.send(user);
 });
 
-const deleteUser = catchAsync(async (req, res) => {
+module.exports.deleteUser = catchAsync(async (req, res) => {
   await userService.deleteUserById(req.params.userId);
   res.status(httpStatus.NO_CONTENT).send();
 });
 
-const createUserWallet = catchAsync(async (req, res) => {
+module.exports.updateUserWallet = catchAsync(async (req, res) => {
   const { userId } = req.params;
-  const wallet = await walletService.createWallet(userId, req.body);
-  await userService.updateUserById(userId, { wallet: wallet.id });
+  const wallet = await walletService.updateUserWallet(userId, req.body);
   res.send(wallet);
 });
 
-const getUserWallet = catchAsync(async (req, res) => {
+module.exports.getUserWallet = catchAsync(async (req, res) => {
   const { userId } = req.params;
   const wallet = await walletService.getUserWallet(userId);
   res.send(wallet);
 });
 
-const getUserSearch = catchAsync(async (req, res) => {
+module.exports.hydrateUserWalletGuardians = catchAsync(async (req, res) => {
+  const { guardians } = req.body;
+  res.send({ guardians: await userService.getUsersByWalletAddressAndPopulate(guardians) });
+});
+
+module.exports.getUserNotifications = catchAsync(async (req, res) => {
+  const { userId } = req.params;
+  const notifications = await notificationService.getNotificationsByUserId(userId);
+  res.send({ notifications });
+});
+
+module.exports.deleteUserNotification = catchAsync(async (req, res) => {
+  const { userId, notificationId } = req.params;
+  const notifications = await notificationService.deleteNotification(userId, notificationId);
+  res.send({ notifications });
+});
+
+module.exports.getUserSearch = catchAsync(async (req, res) => {
   const { userId } = req.params;
   const options = pick(req.query, ['sortBy', 'limit', 'page']);
   const result = await userService.queryUsers(
-    { username: { $regex: req.query.username, $options: 'i' }, _id: { $ne: userId } },
+    { username: { $regex: req.query.username, $options: 'i' }, _id: { $ne: userId }, isOnboarded: { $eq: true } },
     {
       ...options,
       projection: 'username wallet _id',
@@ -69,87 +74,85 @@ const getUserSearch = catchAsync(async (req, res) => {
   res.send(result);
 });
 
-const getUserActivities = catchAsync(async (req, res) => {
+module.exports.getUserActivities = catchAsync(async (req, res) => {
   const { userId } = req.params;
-  const options = pick(req.query, ['limit', 'page']);
-  const result = await activityService.queryActivity(
-    { users: userId, preview: { $ne: null } },
-    { ...options, sortBy: 'updatedAt:desc' }
-  );
-  res.send(result);
+  const user = await userService.getUserById(userId);
+  const results = await transactionService.queryActivity(user.wallet.walletAddress);
+
+  // TODO: Implement actual pagination.
+  res.send({
+    results,
+    page: 1,
+    limit: 20,
+    totalPages: 1,
+    totalResults: results.length,
+  });
 });
 
-const createUserActivity = catchAsync(async (req, res) => {
-  const { userId } = req.params;
-  const { toUserId } = req.body;
-  const activity = await activityService.createActivity(userId, toUserId);
-  res.send({ activity });
+module.exports.getUserActivityItems = catchAsync(async (req, res) => {
+  const { userId, activityId } = req.params;
+  const addresses = activityId.split('-');
+  const user = await userService.getUserById(userId);
+  if (!addresses.includes(user.wallet.walletAddress)) {
+    throw new ApiError(httpStatus.FORBIDDEN, 'Activity items not associated with this account');
+  }
+
+  // TODO: Implement actual pagination.
+  const results = await transactionService.queryActivityItems(user, ...addresses);
+  res.send({
+    activityItems: {
+      results,
+      page: 1,
+      limit: 100,
+      totalPages: 1,
+      totalResults: results.length,
+    },
+  });
 });
 
-const findUserActivity = catchAsync(async (req, res) => {
-  const { userId } = req.params;
-  const { toUserId } = req.query;
-  const activity = await activityService.findActivity(userId, toUserId);
-  res.send({ activity });
-});
-
-const approveUserActivity = catchAsync(async (req, res) => {
+module.exports.transactionPaymasterApproval = catchAsync(async (req, res) => {
   // TODO: Run additional verification before approving?
   const userOperations = await Promise.all(req.body.userOperations.map(signerService.signUserOpWithPaymaster));
   res.send({ userOperations });
 });
 
-const getUserActivityItems = catchAsync(async (req, res) => {
-  const { userId, activityId } = req.params;
-  const options = pick(req.query, ['limit', 'page']);
-  const activity = await activityService.getActivityByIdAndPartialUser(activityId, userId);
-  if (!activity) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'Activity not found');
-  }
-  const activityItems = await paymentService.queryPayments(
-    { activity: activity.id },
-    { ...options, sortBy: 'updatedAt:desc' }
+module.exports.postTransaction = catchAsync(async (req, res) => {
+  const { userId } = req.params;
+  const { message, userOperations } = req.body;
+  const user = await userService.getUserById(userId);
+  const tx = await transactionService.createTransaction(
+    await transactionService.parseUserOperations(userOperations),
+    message
   );
+  await transactionService.relayTransaction({ userId, transactionId: tx._id, userOperations });
 
-  res.send({ activityItems });
+  if (tx.type === type.newPayment) {
+    res.send({
+      pendingNewPayment: await transactionService
+        .queryActivityItems(user, '', '', { limit: 1, id: tx._id })
+        .then((r) => r[0]),
+    });
+  } else {
+    res.status(httpStatus.NO_CONTENT).send();
+  }
 });
 
-const createUserActivityItem = catchAsync(async (req, res) => {
-  const { userId, activityId } = req.params;
-  const { toUser, amount, message, userOperations } = req.body;
-  const activity = await activityService.getActivityByIdAndUsers(activityId, [userId, toUser]);
-  if (!activity) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'Activity not found');
-  }
-  const payment = await paymentService.createNewPayment({
-    activity: activity.id,
-    fromUser: userId,
-    toUser,
-    amount,
-    message,
+module.exports.getUserTransactionHistory = catchAsync(async (req, res) => {
+  const { userId } = req.params;
+  const user = await userService.getUserById(userId);
+  const results = await addressService.transformHistoryWithName(
+    user.wallet.walletAddress,
+    await transactionService.queryHistory(user)
+  );
+
+  // TODO: Implement actual pagination.
+  res.send({
+    transactions: {
+      results,
+      page: 1,
+      limit: 100,
+      totalPages: 1,
+      totalResults: results.length,
+    },
   });
-  const activityItems = await paymentService.queryPayments(
-    { activity: activity.id },
-    { limit: 20, page: 1, sortBy: 'updatedAt:desc' }
-  );
-
-  transactionService.monitorNewPaymentTransaction({ paymentId: payment.id, userOperations });
-  res.send({ activityItems });
 });
-
-module.exports = {
-  createUser,
-  getUsers,
-  getUser,
-  updateUser,
-  deleteUser,
-  createUserWallet,
-  getUserWallet,
-  getUserSearch,
-  getUserActivities,
-  createUserActivity,
-  findUserActivity,
-  approveUserActivity,
-  getUserActivityItems,
-  createUserActivityItem,
-};

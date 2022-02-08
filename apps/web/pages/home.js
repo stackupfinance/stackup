@@ -6,9 +6,12 @@ import {
   AppContainer,
   Head,
   Search,
-  AccountTab,
+  AccountOverview,
   List,
+  TransactionCard,
+  TransactionDateDivider,
   UserCard,
+  Notifications,
 } from '../src/components';
 import {
   useAccountStore,
@@ -19,11 +22,26 @@ import {
   walletHomePageSelector,
   useActivityStore,
   activityHomePageSelector,
+  useOnboardStore,
+  onboardHomePageSelector,
+  useRecoverStore,
+  recoverHomePageSelector,
+  useNotificationStore,
+  notificationHomePageSelector,
+  useUpdateStore,
+  updateHomePageSelector,
+  useHistoryStore,
+  historyHomePageSelector,
 } from '../src/state';
-import { useActivityChannel, useLogout } from '../src/hooks';
-import { getToUserFromActivity } from '../src/utils/activity';
+import { useAuthChannel, useLogout } from '../src/hooks';
+import { txType, getActivityId } from '../src/utils/transaction';
 import { Routes } from '../src/config';
 import { EVENTS, logEvent } from '../src/utils/analytics';
+
+const tabs = {
+  EXPLORE: 0,
+  PAY: 1,
+};
 
 const loadingList = [
   <UserCard
@@ -32,14 +50,14 @@ const loadingList = [
     isFirst
     username="username"
     preview="preview"
-    timestamp={new Date()}
+    timestamp={new Date('2021-01-01T00:00:00')}
   />,
   <UserCard
     key="loading-card-2"
     isLoading
     username="username"
     preview="preview"
-    timestamp={new Date()}
+    timestamp={new Date('2021-01-01T00:00:00')}
   />,
   <UserCard
     key="loading-card-3"
@@ -47,7 +65,56 @@ const loadingList = [
     isLast
     username="username"
     preview="preview"
-    timestamp={new Date()}
+    timestamp={new Date('2021-01-01T00:00:00')}
+  />,
+];
+
+const historyLoadingList = [
+  <TransactionDateDivider
+    isLoading
+    key="loading-history-1"
+    timestamp={new Date('2021-01-01T00:00:00')}
+  />,
+  <TransactionCard
+    isLoading
+    key="loading-history-2"
+    lineItems={[
+      { to: 'name', value: '3500000' },
+      { to: 'name', value: '3500000' },
+    ]}
+    fee="10000"
+    timestamp={new Date('2021-01-01T00:00:00')}
+  />,
+  <TransactionCard
+    isLoading
+    isLastInSection
+    key="loading-history-3"
+    lineItems={[{ to: 'name', value: '3500000' }]}
+    fee="10000"
+    timestamp={new Date('2021-01-01T00:00:00')}
+  />,
+  <TransactionDateDivider
+    isLoading
+    key="loading-history-4"
+    timestamp={new Date('2021-01-01T00:00:00')}
+  />,
+  <TransactionCard
+    isLoading
+    key="loading-history-5"
+    lineItems={[{ to: 'name', value: '3500000' }]}
+    fee="10000"
+    timestamp={new Date('2021-01-01T00:00:00')}
+  />,
+  <TransactionCard
+    isLoading
+    isLastInList
+    key="loading-history-6"
+    lineItems={[
+      { to: 'name', value: '3500000' },
+      { to: 'name', value: '3500000' },
+    ]}
+    fee="10000"
+    timestamp={new Date('2021-01-01T00:00:00')}
   />,
 ];
 
@@ -65,7 +132,6 @@ export default function Home() {
     searchByUsername,
     fetchNextPage,
     hasMore,
-    selectResult,
     clearSearchData,
   } = useSearchStore(searchHomePageSelector);
   const { loading: walletLoading, balance, fetchBalance } = useWalletStore(walletHomePageSelector);
@@ -76,31 +142,88 @@ export default function Home() {
     selectActivity,
     updateActivityListFromChannel,
   } = useActivityStore(activityHomePageSelector);
+  const {
+    loading: notificationLoading,
+    notifications: savedNotifications,
+    fetchNotifications,
+    deleteNotification,
+  } = useNotificationStore(notificationHomePageSelector);
+  const {
+    loading: historyLoading,
+    transactions,
+    fetchTransactions,
+  } = useHistoryStore(historyHomePageSelector);
+  const { clear: clearOnboardData } = useOnboardStore(onboardHomePageSelector);
+  const { clear: clearRecover, selectGuardianRequest } = useRecoverStore(recoverHomePageSelector);
+  const { clear: clearUpdate } = useUpdateStore(updateHomePageSelector);
   const logout = useLogout();
   const router = useRouter();
   const [showSearch, setShowSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [tabIndex, setTabIndex] = useState(tabs.EXPLORE);
+  const [notifications, setNotifications] = useState([]);
+  const [username, setUsername] = useState('');
+  const [initLoad, setInitLoad] = useState(true);
 
   useEffect(() => {
+    setNotifications(savedNotifications);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [savedNotifications]);
+
+  useEffect(() => {
+    router.prefetch(Routes.LOGIN);
     router.prefetch(Routes.ACTIVITY);
+    router.prefetch(Routes.RECOVER_APPROVE_REQUEST);
   }, [router]);
 
   useEffect(() => {
-    if (enabled) {
-      fetchActivities({ userId: user.id, accessToken: accessToken.token });
-      fetchBalance(wallet);
+    if (!enabled) return;
+    if (!user.isOnboarded) {
+      router.push(Routes.ONBOARD_RECOVERY);
+      return;
     }
+    clearOnboardData();
+    clearRecover();
+    clearUpdate();
+    setUsername(user.username);
+    fetchActivities({ userId: user.id, accessToken: accessToken.token });
+    fetchNotifications({ userId: user.id, accessToken: accessToken.token });
+    fetchTransactions({ userId: user.id, accessToken: accessToken.token });
+    fetchBalance(wallet);
+    setInitLoad(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [enabled]);
 
-  useActivityChannel((data) => {
-    updateActivityListFromChannel(data, { userId: user.id, accessToken: accessToken.token });
-    fetchBalance(wallet);
+  useAuthChannel((event, data) => {
+    if (event === txType.newPayment) {
+      updateActivityListFromChannel(data, { userId: user.id, accessToken: accessToken.token });
+      fetchBalance(wallet);
+    } else if (event === txType.recoverAccount) {
+      fetchNotifications({ userId: user.id, accessToken: accessToken.token });
+    } else if (event === txType.genericRelay) {
+      fetchBalance(wallet);
+    }
+    fetchTransactions({ userId: user.id, accessToken: accessToken.token });
   });
+
+  const onNotificationClick = async (notification) => {
+    if (notification.type === txType.recoverAccount) {
+      selectGuardianRequest({ notificationId: notification.id, ...notification.data });
+      logEvent(EVENTS.RECOVER_ACCOUNT_GUARDIAN_GO_TO_APPROVE);
+      router.push(Routes.RECOVER_APPROVE_REQUEST);
+    }
+  };
+
+  const onDeleteNotification = async (notification) => {
+    if (!enabled) return;
+
+    deleteNotification(notification.id, { userId: user.id, accessToken: accessToken.token });
+  };
 
   const onSearch = async (query) => {
     if (!enabled) return;
 
+    setTabIndex(tabs.PAY);
     setShowSearch(true);
     setSearchQuery(query);
     searchByUsername(query, { userId: user.id, accessToken: accessToken.token });
@@ -128,7 +251,10 @@ export default function Home() {
   };
 
   const onSearchResultHandler = (result) => {
-    selectResult(result);
+    selectActivity({
+      id: getActivityId(wallet.walletAddress, result.wallet.walletAddress),
+      toUser: { username: result.username, walletAddress: result.wallet.walletAddress },
+    });
     logEvent(EVENTS.GO_TO_SEARCH_RESULT);
     router.push(Routes.ACTIVITY);
   };
@@ -155,13 +281,12 @@ export default function Home() {
 
   const renderActivityList = (results = []) => {
     return results.map((result, i) => {
-      const toUser = getToUserFromActivity(result, user.id);
       return (
         <UserCard
           key={`activity-list-item-${i}`}
           isFirst={i === 0}
           isLast={i === results.length - 1}
-          username={toUser.username}
+          username={result.toUser.username}
           onClick={() => onActivityHandler(result)}
           preview={result.preview}
           timestamp={result.updatedAt}
@@ -170,12 +295,58 @@ export default function Home() {
     });
   };
 
+  const renderTransactionHistory = () => {
+    return (transactions?.results || []).reduce((prev, curr, i) => {
+      const isLastBatch = i === transactions.results.length - 1;
+
+      const divider = (
+        <TransactionDateDivider
+          key={`history-date-divider-${i}`}
+          timestamp={new Date(curr.lastDate)}
+        />
+      );
+
+      const items = curr.transactions.map((tx, j) => {
+        const isLastInSection = j === curr.transactions.length - 1;
+        return (
+          <TransactionCard
+            isLastInSection={isLastInSection}
+            isLastInList={isLastInSection && isLastBatch}
+            key={`history-transaction-${i}-${j}`}
+            lineItems={tx.lineItems}
+            fee={tx.fee.value}
+            hash={tx.hash}
+            status={tx.status}
+            timestamp={tx.updatedAt}
+          />
+        );
+      });
+
+      return [...prev, divider, ...items];
+    }, []);
+  };
+
+  const handleTabsChange = (index) => {
+    setTabIndex(index);
+  };
+
   return (
     <>
       <Head title="Stackup | Home" />
 
       <PageContainer>
-        <Search onSearch={onSearch} onClear={onClear} />
+        <Search
+          onSearch={onSearch}
+          onClear={onClear}
+          rightItem={
+            <Notifications
+              isLoading={notificationLoading}
+              items={notifications}
+              onItemClick={onNotificationClick}
+              onDeleteItem={onDeleteNotification}
+            />
+          }
+        />
 
         <AppContainer minMargin>
           <Tabs
@@ -185,8 +356,32 @@ export default function Home() {
             variant="soft-rounded"
             colorScheme="blue"
             align="center"
+            index={tabIndex}
+            onChange={handleTabsChange}
           >
             <TabPanels>
+              <TabPanel px="0px" mb="80px">
+                <AccountOverview
+                  isEnabled={enabled}
+                  isAccountLoading={accountLoading}
+                  isWalletLoading={initLoad || walletLoading}
+                  onLogout={logoutHandler}
+                  walletBalance={balance}
+                  walletAddress={wallet?.walletAddress}
+                  username={username}
+                  transactionsContent={
+                    <List
+                      items={
+                        !enabled || historyLoading ? historyLoadingList : renderTransactionHistory()
+                      }
+                      hasMore={false}
+                      next={() => {}}
+                      emptyHeading="No wallet activity yet! 🆕"
+                    />
+                  }
+                />
+              </TabPanel>
+
               <TabPanel px="0px" mb={['64px', '128px']}>
                 {showSearch ? (
                   <List
@@ -210,16 +405,6 @@ export default function Home() {
                   />
                 )}
               </TabPanel>
-              <TabPanel px="0px">
-                <AccountTab
-                  isEnabled={enabled}
-                  isAccountLoading={accountLoading}
-                  isWalletLoading={walletLoading}
-                  onLogout={logoutHandler}
-                  walletBalance={balance}
-                  walletAddress={wallet?.walletAddress}
-                />
-              </TabPanel>
             </TabPanels>
 
             <TabList
@@ -234,8 +419,9 @@ export default function Home() {
               maxW="544px"
               w="100%"
             >
-              <Tab borderRadius="lg">Pay</Tab>
               <Tab borderRadius="lg">Account</Tab>
+
+              <Tab borderRadius="lg">Activity</Tab>
             </TabList>
           </Tabs>
         </AppContainer>

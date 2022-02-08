@@ -2,8 +2,20 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { Image, VStack, Box, Input, Button } from '@chakra-ui/react';
 import { useForm } from 'react-hook-form';
-import { PageContainer, AppContainer, Head, Header, InlineError } from '../src/components';
-import { useAccountStore, accountSignUpPageSelector } from '../src/state';
+import {
+  PageContainer,
+  AppContainer,
+  Head,
+  Header,
+  InlineError,
+  PasswordStrength,
+} from '../src/components';
+import {
+  useAccountStore,
+  accountSignUpPageSelector,
+  useOnboardStore,
+  onboardSignUpPageSelector,
+} from '../src/state';
 import { Routes } from '../src/config';
 import { EVENTS, logEvent } from '../src/utils/analytics';
 
@@ -15,7 +27,8 @@ export default function SignUp() {
     watch,
     formState: { errors },
   } = useForm();
-  const account = useAccountStore(accountSignUpPageSelector);
+  const { loading, register: registerAccount } = useAccountStore(accountSignUpPageSelector);
+  const { createEphemeralWallet } = useOnboardStore(onboardSignUpPageSelector);
   const [registerError, setRegisterError] = useState('');
 
   useEffect(() => {
@@ -27,7 +40,8 @@ export default function SignUp() {
     const { username, password } = data;
 
     try {
-      await account.register({ username, password });
+      await registerAccount({ username, password });
+      createEphemeralWallet(password);
       logEvent(EVENTS.SIGN_UP_FINISH);
       router.push(Routes.WELCOME);
     } catch (error) {
@@ -67,37 +81,35 @@ export default function SignUp() {
 
             <Box borderWidth="1px" borderRadius="lg" p="16px" w="100%">
               <form onSubmit={handleSubmit(onSubmit)} onChange={() => setRegisterError('')}>
-                <VStack spacing="16px">
-                  <Input
-                    placeholder="Username"
-                    isInvalid={errors.username}
-                    {...register('username', { required: true })}
-                  />
-                  <Input
-                    placeholder="Password"
-                    type="password"
-                    isInvalid={errors.password}
-                    {...register('password', { required: true })}
-                  />
-                  <Input
-                    placeholder="Confirm password"
-                    type="password"
-                    isInvalid={errors.confirmPassword}
-                    {...register('confirmPassword', {
-                      required: true,
-                      validate: (value) => value === watch('password'),
-                    })}
-                  />
-                  <Button
-                    isFullWidth
-                    isLoading={account.loading}
-                    colorScheme="blue"
-                    size="lg"
-                    type="submit"
-                  >
-                    Next
-                  </Button>
-                </VStack>
+                <Input
+                  mb="16px"
+                  placeholder="Username"
+                  isInvalid={errors.username}
+                  {...register('username', { required: true })}
+                />
+
+                <Input
+                  mb="4px"
+                  placeholder="Create password"
+                  type="password"
+                  isInvalid={errors.password}
+                  {...register('password', { required: true })}
+                />
+                <PasswordStrength password={watch('password')} />
+
+                <Input
+                  my="16px"
+                  placeholder="Confirm password"
+                  type="password"
+                  isInvalid={errors.confirmPassword}
+                  {...register('confirmPassword', {
+                    required: true,
+                    validate: (value) => value === watch('password'),
+                  })}
+                />
+                <Button isFullWidth isLoading={loading} colorScheme="blue" size="lg" type="submit">
+                  Next
+                </Button>
               </form>
 
               {renderError()}

@@ -1,5 +1,6 @@
 const Pusher = require('pusher');
 const { realTime } = require('../config/config');
+const { type } = require('../config/transaction');
 
 const pusher = new Pusher({
   appId: realTime.pusher.appId,
@@ -9,16 +10,22 @@ const pusher = new Pusher({
   useTLS: true,
 });
 
-const auth = async (socketId, channelName) => {
+module.exports.auth = async (socketId, channelName) => {
   return pusher.authenticate(socketId, channelName);
 };
 
-const pushNewPaymentUpdate = async (activityItem) => {
-  const users = [activityItem.fromUser, activityItem.toUser];
-  return Promise.all(users.map((user) => pusher.trigger(`private-${user}-activity`, 'newPayment', { activityItem })));
+module.exports.pushRecoverAccountUpdates = async (channelId, data) => {
+  return pusher.trigger(`recover-account-${channelId}`, type.recoverAccount, data);
 };
 
-module.exports = {
-  auth,
-  pushNewPaymentUpdate,
+module.exports.pushGenericRelayUpdates = async (userId, data) => {
+  return pusher.trigger(`private-${userId}-activity`, type.genericRelay, data);
+};
+
+module.exports.pushRequestGuardianApprovals = async (users) => {
+  return Promise.all(users.map((u) => pusher.trigger(`private-${u._id}-activity`, type.recoverAccount, {})));
+};
+
+module.exports.pushNewPaymentUpdate = async (userId, activityItem) => {
+  return pusher.trigger(`private-${userId}-activity`, type.newPayment, { activityItem });
 };

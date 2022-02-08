@@ -1,9 +1,16 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import NextLink from 'next/link';
 import { Image, VStack, Box, Input, Button, Divider } from '@chakra-ui/react';
 import { useForm } from 'react-hook-form';
 import { PageContainer, AppContainer, Head, Header, InlineError } from '../src/components';
-import { useAccountStore, accountLoginPageSelector } from '../src/state';
+import {
+  useAccountStore,
+  accountLoginPageSelector,
+  useOnboardStore,
+  onboardLoginPageSelector,
+  useRecoverStore,
+  recoverLoginPageSelector,
+} from '../src/state';
 import { Routes } from '../src/config';
 import { EVENTS, logEvent } from '../src/utils/analytics';
 
@@ -14,17 +21,31 @@ export default function Login() {
     formState: { errors },
   } = useForm();
   const { loading, login } = useAccountStore(accountLoginPageSelector);
+  const { createEphemeralWallet } = useOnboardStore(onboardLoginPageSelector);
+  const { clear: clearRecover } = useRecoverStore(recoverLoginPageSelector);
   const [loginError, setLoginError] = useState('');
+
+  useEffect(() => {
+    clearRecover();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const onSubmit = async (data) => {
     setLoginError('');
 
     try {
       await login(data);
+      createEphemeralWallet(data.password);
       logEvent(EVENTS.LOGIN);
     } catch (error) {
-      setLoginError(error.response?.data?.message || 'Unknown error, try again later!');
+      setLoginError(
+        error.response?.data?.message || error.message || 'Unknown error, try again later!',
+      );
     }
+  };
+
+  const onRecoverAccount = () => {
+    logEvent(EVENTS.RECOVER_ACCOUNT_START);
   };
 
   const onCreateProfile = () => {
@@ -78,16 +99,19 @@ export default function Login() {
 
               {renderError()}
 
-              {/* <Button
-                isDisabled
-                isFullWidth
-                isLoading={loading}
-                mt="16px"
-                variant="outline"
-                size="lg"
-              >
-                Recover account
-              </Button> */}
+              <NextLink href={Routes.RECOVER_LOOKUP} passHref>
+                <Button
+                  isFullWidth
+                  isLoading={loading}
+                  as="a"
+                  mt="16px"
+                  variant="outline"
+                  size="lg"
+                  onClick={onRecoverAccount}
+                >
+                  Recover account
+                </Button>
+              </NextLink>
 
               <Divider mt="16px" />
 

@@ -21,11 +21,11 @@ const saveCode = async (userId, type) => {
 };
 
 /**
- * Generate reset password code
+ * Generate an account recovery code
  * @param {String} username
  * @returns {Promise<Code>}
  */
-const generateResetPasswordCode = async (username) => {
+const generateRecoverAccountCode = async (username) => {
   const user = await userService.getUserByUsername(username);
   if (!user) {
     throw new ApiError(httpStatus.NOT_FOUND, 'No account found with this username');
@@ -34,7 +34,7 @@ const generateResetPasswordCode = async (username) => {
     throw new ApiError(httpStatus.BAD_REQUEST, 'No verified e-mail for this account');
   }
 
-  return Promise.all([user.email, saveCode(user.id, types.resetPassword)]);
+  return Promise.all([user.email, saveCode(user.id, types.recoverAccount)]);
 };
 
 /**
@@ -61,7 +61,7 @@ const checkCode = async (userId, code, type) => {
 };
 
 module.exports = {
-  generateResetPasswordCode,
+  generateRecoverAccountCode,
   generateVerifyEmailCode,
   checkCode,
 };

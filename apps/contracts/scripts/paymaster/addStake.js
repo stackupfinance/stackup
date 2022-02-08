@@ -1,68 +1,59 @@
-const hre = require("hardhat");
-const { SINGLETON_FACTORY_ADDRESS } = require("../../utils/deployHelpers");
-const {
-  INITIAL_NONCE,
-  signUserOperation,
-  getUserOperation,
-  encodeAddStake,
-  encodeLockStake,
-} = require("../../utils/contractHelpers");
-const {
-  abi: EntryPointABI,
-} = require("../../artifacts/contracts/ERC4337/EntryPoint.sol/EntryPoint.json");
+const { ethers } = require("hardhat");
+const { contracts, wallet, constants } = require("../../lib");
 
 async function main() {
-  const [signer] = await hre.ethers.getSigners();
-  const EntryPointFactory = await hre.ethers.getContractFactory("EntryPoint");
-  const EntryPointSalt = hre.ethers.utils.formatBytes32String(INITIAL_NONCE);
-  const EntryPointInitCode = EntryPointFactory.getDeployTransaction(
-    SINGLETON_FACTORY_ADDRESS
-  ).data;
-  const EntrPointAddress = hre.ethers.utils.getCreate2Address(
-    SINGLETON_FACTORY_ADDRESS,
-    EntryPointSalt,
-    hre.ethers.utils.keccak256(EntryPointInitCode)
-  );
-  const EntryPoint = new hre.ethers.Contract(
-    EntrPointAddress,
-    EntryPointABI,
-    signer
-  );
-  console.log("EntryPoint address:", EntrPointAddress);
+  const [signer] = await ethers.getSigners();
+  const init = [
+    contracts.Wallet.address,
+    contracts.EntryPoint.address,
+    signer.address,
+    [],
+  ];
 
-  const WalletFactory = await hre.ethers.getContractFactory("Wallet");
-  const WalletSalt = hre.ethers.utils.formatBytes32String(INITIAL_NONCE);
-  const WalletInitCode = WalletFactory.getDeployTransaction(
-    EntrPointAddress,
-    signer.address
-  ).data;
-  const WalletAddress = hre.ethers.utils.getCreate2Address(
-    SINGLETON_FACTORY_ADDRESS,
-    WalletSalt,
-    hre.ethers.utils.keccak256(WalletInitCode)
+  const paymaster = process.env.PAYMASTER ?? wallet.proxy.getAddress(...init);
+  const isDeployed = await wallet.proxy.isCodeDeployed(
+    ethers.provider,
+    paymaster
   );
-  console.log("Wallet address:", WalletAddress);
-
-  const paymasterSetupOps = await Promise.all([
-    signUserOperation(
+  const nonce = isDeployed
+    ? await wallet.proxy.getNonce(ethers.provider, paymaster)
+    : constants.userOperations.initNonce;
+  const paymasterOps = await Promise.all([
+    wallet.userOperations.sign(
       signer,
-      getUserOperation(WalletAddress, {
-        initCode: WalletInitCode,
-        callData: encodeAddStake(EntrPointAddress, "1"),
+      wallet.userOperations.get(paymaster, {
+        nonce,
+        initCode: isDeployed
+          ? constants.userOperations.nullCode
+          : wallet.proxy.getInitCode(...init),
+        callData: wallet.encodeFunctionData.addEntryPointStake("1"),
       })
     ),
-    signUserOperation(
+    wallet.userOperations.sign(
       signer,
-      getUserOperation(WalletAddress, {
-        callData: encodeLockStake(EntrPointAddress),
+      wallet.userOperations.get(paymaster, {
+        nonce: nonce + 1,
+        callData: wallet.encodeFunctionData.lockEntryPointStake(),
       })
     ),
-  ]);
+  ]).then((ops) => ops.filter(Boolean));
 
-  const tx = await EntryPoint.handleOps(paymasterSetupOps, signer.address, {
-    gasLimit: 5000000,
-  }).then((tx) => tx.wait());
+  const tx = await contracts.EntryPoint.getInstance(signer)
+    .handleOps(paymasterOps, signer.address, {
+      gasLimit: paymasterOps.reduce((prev, op) => {
+        return prev.add(
+          ethers.BigNumber.from(
+            op.callGas + op.verificationGas + op.preVerificationGas
+          )
+        );
+      }, ethers.constants.Zero),
+      maxFeePerGas: constants.userOperations.defaultMaxFee,
+      maxPriorityFeePerGas: constants.userOperations.defaultMaxPriorityFee,
+    })
+    .then((tx) => tx.wait());
   console.log("Paymaster add stake transaction:", tx);
+  console.log("Paymaster wallet address:", paymaster);
+  console.log("EntryPoint address:", contracts.EntryPoint.address);
 }
 
 main()

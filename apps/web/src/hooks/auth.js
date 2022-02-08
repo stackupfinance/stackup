@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { isExpired } from 'react-jwt';
 import {
@@ -10,22 +10,51 @@ import {
   activityUseAuthSelector,
   useWalletStore,
   walletUseAuthSelector,
+  useOnboardStore,
+  onboardUseAuthSelector,
+  useRecoverStore,
+  recoverUseAuthSelector,
+  useNotificationStore,
+  notificationUseAuthSelector,
+  useUpdateStore,
+  updateUseAuthSelector,
+  useHistoryStore,
+  historyUseAuthSelector,
 } from '../state';
 import { Routes } from '../config';
 
 const REFRESH_INTERVAL_MS = 300000; // 5 minutes
-const initAuthRoutes = new Set([Routes.LOGIN, Routes.SIGN_UP]);
+const initAuthRoutes = new Set([
+  Routes.LOGIN,
+  Routes.SIGN_UP,
+  Routes.RECOVER_LOOKUP,
+  Routes.RECOVER_NEW_PASSWORD,
+  Routes.RECOVER_NOT_POSSIBLE,
+  Routes.RECOVER_VERIFY_EMAIL,
+  Routes.RECOVER_STATUS,
+  Routes.RECOVER_CONFIRM,
+]);
 
 export const useLogout = () => {
   const { logout } = useAccountStore(accountUseAuthSelector);
   const { clear: clearSearch } = useSearchStore(searchUseAuthSelector);
   const { clear: clearActivity } = useActivityStore(activityUseAuthSelector);
   const { clear: clearWallet } = useWalletStore(walletUseAuthSelector);
+  const { clear: clearOnboard } = useOnboardStore(onboardUseAuthSelector);
+  const { clear: clearRecover } = useRecoverStore(recoverUseAuthSelector);
+  const { clear: clearNotification } = useNotificationStore(notificationUseAuthSelector);
+  const { clear: clearUpdate } = useUpdateStore(updateUseAuthSelector);
+  const { clear: clearHistory } = useHistoryStore(historyUseAuthSelector);
 
   return async () => {
     clearSearch();
     clearActivity();
     clearWallet();
+    clearOnboard();
+    clearRecover();
+    clearNotification();
+    clearUpdate();
+    clearHistory();
     await logout();
   };
 };
@@ -35,24 +64,33 @@ export const useAuth = () => {
   const { accessToken, refreshToken, refresh, enableAccount } =
     useAccountStore(accountUseAuthSelector);
   const logout = useLogout();
+  const [isFirst, setIsFirst] = useState(true);
 
   const isLoggedOut = () => !refreshToken;
   const refreshTokenExpired = () => isExpired(refreshToken?.token);
   const accessTokenExpired = () => isExpired(accessToken?.token);
-  const notOnLoginOrSignUpPage = () => !initAuthRoutes.has(location.pathname);
+  const notOnAuthPage = () => !initAuthRoutes.has(location.pathname);
   const onLoginPage = () => location.pathname === Routes.LOGIN;
   const shouldRefresh = () => accessToken && refreshToken && !isExpired(refreshToken.token);
 
   useEffect(() => {
     const authCheck = async () => {
-      if (isLoggedOut()) {
-        notOnLoginOrSignUpPage() && router.push(Routes.LOGIN);
-      } else if (refreshTokenExpired()) {
-        await logout();
-        notOnLoginOrSignUpPage() && router.push(Routes.LOGIN);
-      } else {
-        accessTokenExpired() && (await refresh());
-        onLoginPage() && router.push(Routes.HOME);
+      try {
+        if (isLoggedOut()) {
+          notOnAuthPage() && router.push(Routes.LOGIN);
+        } else if (refreshTokenExpired()) {
+          await logout();
+          notOnAuthPage() && router.push(Routes.LOGIN);
+        } else if (isFirst) {
+          setIsFirst(false);
+          await refresh();
+        } else {
+          accessTokenExpired() && (await refresh());
+          onLoginPage() && router.push(Routes.HOME);
+        }
+      } catch (error) {
+        console.error(error);
+        await logout().catch(console.error);
       }
     };
 

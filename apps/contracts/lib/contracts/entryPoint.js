@@ -17,3 +17,8 @@ module.exports.address = ethers.utils.getCreate2Address(
   this.deploySalt,
   ethers.utils.keccak256(this.deployInitCode)
 );
+
+module.exports.interface = new ethers.utils.Interface(source.abi);
+
+module.exports.getInstance = (signerOrProvider) =>
+  new ethers.Contract(this.address, source.abi, signerOrProvider);

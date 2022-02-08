@@ -1,6 +1,7 @@
 const httpStatus = require('http-status');
-const { User } = require('../models');
+const { User, Wallet } = require('../models');
 const ApiError = require('../utils/ApiError');
+const { isBlacklisted } = require('../config/username');
 
 /**
  * Create a user
@@ -10,6 +11,9 @@ const ApiError = require('../utils/ApiError');
 const createUser = async (userBody) => {
   if (await User.isUsernameTaken(userBody.username)) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Username already taken');
+  }
+  if (isBlacklisted(userBody.username)) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'That username is not allowed');
   }
   return User.create(userBody);
 };
@@ -37,7 +41,7 @@ const queryUsers = async (filter, options) => {
  * @returns {Promise<User>}
  */
 const getUserById = async (id) => {
-  return User.findById(id);
+  return User.findById(id).populate('wallet', '-_id -user -updatedAt');
 };
 
 /**
@@ -50,12 +54,68 @@ const getUserByUsername = async (username) => {
 };
 
 /**
- * Get user by username and populate wallet field
+ * Get user by username and populate wallet
  * @param {String} username
  * @returns {Promise<User>}
  */
 const getUserByUsernameWithWallet = async (username) => {
-  return User.findOne({ username }).populate('wallet', '-user');
+  return User.findOne({ username }).populate('wallet', '-_id -user -updatedAt');
+};
+
+const getUsersByWalletAddress = async (addresses) => {
+  return User.aggregate()
+    .lookup({
+      from: 'wallets',
+      localField: 'wallet',
+      foreignField: '_id',
+      as: 'wallets',
+    })
+    .match({ 'wallets.walletAddress': { $in: addresses } })
+    .project({ username: true });
+};
+
+const getUsersByWalletAddressAndPopulate = async (addresses, opts = { withUserId: false }) => {
+  const users = await User.aggregate()
+    .lookup({
+      from: 'wallets',
+      localField: 'wallet',
+      foreignField: '_id',
+      as: 'wallets',
+    })
+    .match({ 'wallets.walletAddress': { $in: addresses } })
+    .project({ _id: opts.withUserId, username: true, wallet: true });
+  return Wallet.populate(users, { path: 'wallet', select: 'walletAddress -_id' });
+};
+
+/**
+ * Get username only and populate encrypted signer
+ * @param {String} username
+ * @returns {Promise<User>}
+ */
+const getWalletForLogin = async (username) => {
+  const user = await User.findOne({ username }, 'username wallet -_id').populate('wallet', 'encryptedSigner -_id');
+  if (!user) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
+  }
+
+  return user;
+};
+
+/**
+ * Get username only and populate wallet
+ * @param {String} username
+ * @returns {Promise<User>}
+ */
+const getWalletForRecovery = async (username) => {
+  const user = await User.findOne({ username }, 'username wallet -_id').populate(
+    'wallet',
+    '-_id -user -encryptedSigner -updatedAt'
+  );
+  if (!user) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
+  }
+
+  return user;
 };
 
 /**
@@ -101,6 +161,10 @@ module.exports = {
   getUserById,
   getUserByUsername,
   getUserByUsernameWithWallet,
+  getUsersByWalletAddress,
+  getUsersByWalletAddressAndPopulate,
+  getWalletForLogin,
+  getWalletForRecovery,
   updateUserById,
   deleteUserById,
 };

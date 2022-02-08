@@ -16,7 +16,7 @@ export const Header = ({ backLinkUrl, backLinkLabel }) => {
 
   return (
     <header>
-      <Box borderBottomWidth="1px">
+      <Box borderBottomWidth="1px" bg="gray.50">
         <HStack spacing={['8px', '16px']} py="16px" px="16px" maxW="xl" margin="0 auto">
           {backLinkUrl && (
             <NextLink href={backLinkUrl} passHref>
@@ -31,7 +31,7 @@ export const Header = ({ backLinkUrl, backLinkLabel }) => {
           <LinkBox>
             <LinkOverlay href="https://stackup.sh/" target="_blank">
               <Image
-                src="./logotype-blue-navy-32x142.png"
+                src="/logotype-blue-navy-32x142.png"
                 maxW="142px"
                 maxH="32px"
                 alt="stackup logo"

@@ -1,1 +1,1 @@
-module.exports.TransactionsJobs = require('./transactions.jobs');
+module.exports.RelayTransactionJobs = require('./relayTransaction.jobs');

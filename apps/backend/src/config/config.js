@@ -12,12 +12,6 @@ const envVarsSchema = Joi.object()
     JWT_SECRET: Joi.string().required().description('JWT secret key'),
     JWT_ACCESS_EXPIRATION_MINUTES: Joi.number().default(30).description('minutes after which access tokens expire'),
     JWT_REFRESH_EXPIRATION_DAYS: Joi.number().default(30).description('days after which refresh tokens expire'),
-    JWT_RESET_PASSWORD_EXPIRATION_MINUTES: Joi.number()
-      .default(10)
-      .description('minutes after which reset password token expires'),
-    JWT_VERIFY_EMAIL_EXPIRATION_MINUTES: Joi.number()
-      .default(10)
-      .description('minutes after which verify email token expires'),
     SMTP_HOST: Joi.string().description('server that will send the emails'),
     SMTP_PORT: Joi.number().description('port to connect to the email server'),
     SMTP_USERNAME: Joi.string().description('username for email server'),
@@ -28,10 +22,12 @@ const envVarsSchema = Joi.object()
     PUSHER_SECRET: Joi.string().required().description('Secret for Pusher channels'),
     PUSHER_CLUSTER: Joi.string().required().description('Cluster for Pusher channels'),
     WEB3_MNEMONIC: Joi.string().required().description('Mnemonic for paymaster signer and relayer'),
+    WEB3_PAYMASTER: Joi.string().required().description('Paymaster address for sponsoring gasless transactions'),
     WEB3_RPC: Joi.string().required().description('RPC for the correct network'),
     WEB3_USDC: Joi.string().required().description('ERC20 token address for USDC'),
     WEB3_USDC_PRICE_FEED: Joi.string().required().description('Chainlink address for USDC price feed'),
     ANALYTICS_URL: Joi.string().required().description('Analytics url for proxying events'),
+    FEATURE_FLAG_AIRDROP_USDC: Joi.boolean().default(false).description('Automatically send new testnet accounts USDC'),
   })
   .unknown();
 
@@ -52,8 +48,6 @@ module.exports = {
     secret: envVars.JWT_SECRET,
     accessExpirationMinutes: envVars.JWT_ACCESS_EXPIRATION_MINUTES,
     refreshExpirationDays: envVars.JWT_REFRESH_EXPIRATION_DAYS,
-    resetPasswordExpirationMinutes: envVars.JWT_RESET_PASSWORD_EXPIRATION_MINUTES,
-    verifyEmailExpirationMinutes: envVars.JWT_VERIFY_EMAIL_EXPIRATION_MINUTES,
   },
   email: {
     smtp: {
@@ -76,11 +70,15 @@ module.exports = {
   },
   web3: {
     mnemonic: envVars.WEB3_MNEMONIC,
+    paymaster: envVars.WEB3_PAYMASTER,
     rpc: envVars.WEB3_RPC,
     usdc: envVars.WEB3_USDC,
     usdcPriceFeed: envVars.WEB3_USDC_PRICE_FEED,
   },
   analytics: {
     url: envVars.ANALYTICS_URL,
+  },
+  featureFlag: {
+    airdropUSDC: envVars.FEATURE_FLAG_AIRDROP_USDC,
   },
 };

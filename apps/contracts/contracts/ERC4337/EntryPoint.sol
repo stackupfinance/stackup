@@ -77,7 +77,7 @@ contract EntryPoint is IEntryPoint, IEntryPointStakeController {
   }
 
   function addStake() external payable {
-    _paymasterStakes[msg.sender].value = msg.value;
+    _paymasterStakes[msg.sender].value += msg.value;
   }
 
   function lockStake() external {

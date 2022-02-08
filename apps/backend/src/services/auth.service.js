@@ -2,21 +2,29 @@ const httpStatus = require('http-status');
 const tokenService = require('./token.service');
 const userService = require('./user.service');
 const codeService = require('./code.service');
+const signerService = require('./signer.service');
 const Token = require('../models/token.model');
 const Code = require('../models/code.model');
 const ApiError = require('../utils/ApiError');
 const { tokenTypes } = require('../config/tokens');
 const { types } = require('../config/codes');
+const { isWalletDeployed, recoverAddressFromLoginSignature, walletContract } = require('../utils/web3');
 
 /**
- * Login with username and password
+ * Login with username and signature
  * @param {String} email
- * @param {String} password
+ * @param {String} signature
  * @returns {Promise<User>}
  */
-const loginUserWithUsernameAndPassword = async (username, password) => {
+const loginUserWithUsernameAndSignature = async (username, signature) => {
   const user = await userService.getUserByUsernameWithWallet(username);
-  if (!user || !(await user.isPasswordMatch(password))) {
+  const {
+    wallet: { walletAddress, initOwner },
+  } = user;
+  const recoveredAddress = recoverAddressFromLoginSignature(signature);
+  const owner = (await isWalletDeployed(walletAddress)) ? await walletContract(walletAddress).getOwner(0) : initOwner;
+
+  if (!user || recoveredAddress !== owner) {
     throw new ApiError(httpStatus.UNAUTHORIZED, 'Incorrect username or password');
   }
   return user;
@@ -55,28 +63,28 @@ const refreshAuth = async (refreshToken) => {
 };
 
 /**
- * Reset password
+ * Verify email for account recovery
  * @param {String} username
  * @param {String} code
- * @param {String} newPassword
+ * @param {String} userOperations
  * @returns {Promise}
  */
-const resetPassword = async (username, code, newPassword) => {
+const recoverVerifyEmail = async (username, code, userOperations) => {
   try {
     const user = await userService.getUserByUsername(username);
-    if (!user) {
+    if (!user || !user.wallet) {
       throw new Error();
     }
 
-    const codeDoc = await codeService.checkCode(user.id, code, types.resetPassword);
+    const codeDoc = await codeService.checkCode(user.id, code, types.recoverAccount);
     if (!codeDoc) {
       throw new Error();
     }
 
-    await Code.deleteMany({ user: user.id, type: types.resetPassword });
-    await userService.updateUserById(user.id, { password: newPassword });
+    await Code.deleteMany({ user: user.id, type: types.recoverAccount });
+    return signerService.signUserOpAsGuardian(userOperations);
   } catch (error) {
-    throw new ApiError(httpStatus.UNAUTHORIZED, 'Password reset failed');
+    throw new ApiError(httpStatus.UNAUTHORIZED, 'Recover account verification failed');
   }
 };
 
@@ -100,9 +108,9 @@ const verifyEmail = async (userId, code) => {
 };
 
 module.exports = {
-  loginUserWithUsernameAndPassword,
+  loginUserWithUsernameAndSignature,
   logout,
   refreshAuth,
-  resetPassword,
+  recoverVerifyEmail,
   verifyEmail,
 };
