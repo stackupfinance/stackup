@@ -159,6 +159,7 @@ export default function Home() {
   const {
     loading: appsLoading,
     sessions,
+    callRequestQueue,
     connectToApp,
     disconnectFromApp,
   } = useAppsStore(appsHomePageSelector);
@@ -351,7 +352,7 @@ export default function Home() {
 
   return (
     <>
-      <Head title="Stackup" />
+      <Head title="Stackup" showNotification={initLoad ? false : callRequestQueue?.length > 0} />
 
       <PageContainer>
         <Search
@@ -361,13 +362,13 @@ export default function Home() {
             <HStack spacing="8px">
               <Apps
                 isLoading={appsLoading}
-                sessions={sessions}
+                sessions={initLoad ? [] : sessions}
                 onAppConnect={onAppConnect}
                 onAppDisconnect={onAppDisconnect}
               />
               <Notifications
                 isLoading={notificationLoading}
-                items={notifications}
+                items={initLoad ? [] : notifications}
                 onItemClick={onNotificationClick}
                 onDeleteItem={onDeleteNotification}
               />

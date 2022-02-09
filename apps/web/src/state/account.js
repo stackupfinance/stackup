@@ -14,6 +14,12 @@ export const accountUseAuthSelector = (state) => ({
   enableAccount: state.enableAccount,
 });
 
+export const accountWeb3TransactionsSelector = (state) => ({
+  wallet: state.wallet,
+  accessToken: state.accessToken,
+  user: state.user,
+});
+
 export const accountPusherSelector = (state) => ({
   enabled: state.enabled,
   accessToken: state.accessToken,

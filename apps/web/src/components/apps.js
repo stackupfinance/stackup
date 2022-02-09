@@ -66,7 +66,12 @@ export const Apps = ({
 
           <Spacer />
 
-          <IconButton size="xs" icon={<CloseIcon onClick={onDeleteHandler(key)} />} />
+          <IconButton
+            isDisabled={isLoading}
+            size="xs"
+            icon={<CloseIcon />}
+            onClick={onDeleteHandler(key)}
+          />
         </HStack>
       </MenuItem>
     ));
@@ -145,7 +150,7 @@ export const Apps = ({
         </MenuList>
       </Menu>
 
-      <Modal isL initialFocusRef={initialRef} isOpen={wcModal} onClose={onWalletConnectClose}>
+      <Modal initialFocusRef={initialRef} isOpen={wcModal} onClose={onWalletConnectClose}>
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>Connect to an app 🔌</ModalHeader>

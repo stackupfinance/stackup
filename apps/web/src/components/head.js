@@ -1,9 +1,12 @@
 import NextHead from 'next/head';
 
-export const Head = ({ title }) => {
+export const Head = ({ title, showNotification }) => {
   return (
     <NextHead>
-      <title>{title}</title>
+      <title>
+        {showNotification ? '❗️ ' : ''}
+        {title}
+      </title>
       <meta name={title} content="Own your digital life." />
 
       {/* <!--  Essential META Tags --> */}

@@ -21,7 +21,7 @@ import {
   useHistoryStore,
   historyUseAuthSelector,
   useAppsStore,
-  appUseAuthSelector,
+  appsUseAuthSelector,
 } from '../state';
 import { Routes } from '../config';
 
@@ -47,7 +47,7 @@ export const useLogout = () => {
   const { clear: clearNotification } = useNotificationStore(notificationUseAuthSelector);
   const { clear: clearUpdate } = useUpdateStore(updateUseAuthSelector);
   const { clear: clearHistory } = useHistoryStore(historyUseAuthSelector);
-  const { clear: clearApps } = useAppsStore(appUseAuthSelector);
+  const { clear: clearApps } = useAppsStore(appsUseAuthSelector);
 
   return async () => {
     clearSearch();
@@ -67,7 +67,7 @@ export const useAuth = () => {
   const router = useRouter();
   const { wallet, accessToken, refreshToken, refresh, enableAccount } =
     useAccountStore(accountUseAuthSelector);
-  const { initAppSessions } = useAppsStore(appUseAuthSelector);
+  const { initAppSessions } = useAppsStore(appsUseAuthSelector);
   const logout = useLogout();
   const [isFirst, setIsFirst] = useState(true);
 

@@ -20,12 +20,22 @@ module.exports.parseUserOperations = async (userOperations) => {
   for (let i = 0; i < userOperations.length; i += 1) {
     const userOp = userOperations[i];
     const opcd = wallet.decodeCallData.fromUserOperation(userOp);
-    const wcd =
-      opcd.signature === functionSignatures.walletExecuteUserOp ? wallet.decodeCallData.fromExecuteUserOp(opcd) : opcd;
+    const wcd = wallet.decodeCallData.Erc20FromExecuteUserOp(opcd) ?? opcd;
 
     let lineItem = {};
     let type = txType.genericRelay;
     switch (wcd.signature) {
+      case functionSignatures.walletExecuteUserOp: {
+        const from = userOp.sender;
+        const to = wcd.args[0];
+        lineItem = {
+          from,
+          to,
+          sideEffect: `${from} made a transaction to ${to}`,
+        };
+        break;
+      }
+
       case functionSignatures.erc20Transfer: {
         const tokenMeta = await getERC20TokenMeta(opcd.args[0]);
         lineItem = {
