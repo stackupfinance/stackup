@@ -5,6 +5,10 @@ module.exports.fromUserOperation = (userOp) => {
   return Wallet.interface.parseTransaction({ data: userOp.callData });
 };
 
-module.exports.fromExecuteUserOp = (wcd) => {
-  return ERC20.interface.parseTransaction({ data: wcd.args.data });
+module.exports.Erc20FromExecuteUserOp = (wcd) => {
+  try {
+    return ERC20.interface.parseTransaction({ data: wcd.args.data });
+  } catch (_error) {
+    return undefined;
+  }
 };

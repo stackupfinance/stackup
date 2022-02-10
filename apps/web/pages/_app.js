@@ -1,5 +1,6 @@
 import { ChakraProvider, extendTheme } from '@chakra-ui/react';
 import { useAuth } from '../src/hooks';
+import { Web3Transactions } from '../src/containers';
 import '../styles.css';
 
 const theme = extendTheme({
@@ -14,7 +15,9 @@ function App({ Component, pageProps }) {
 
   return (
     <ChakraProvider theme={theme}>
-      <Component {...pageProps} />
+      <Web3Transactions>
+        <Component {...pageProps} />
+      </Web3Transactions>
     </ChakraProvider>
   );
 }

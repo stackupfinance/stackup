@@ -2,6 +2,7 @@ const { ethers } = require("ethers");
 const ERC20 = require("../contracts/erc20");
 const EntryPoint = require("../contracts/entryPoint");
 const Wallet = require("../contracts/wallet");
+const userOperations = require("../constants/userOperations");
 
 module.exports.ERC20Approve = (tokenAddress, spender, value) => {
   return Wallet.interface.encodeFunctionData("executeUserOp", [
@@ -16,6 +17,14 @@ module.exports.ERC20Transfer = (tokenAddress, to, value) => {
     tokenAddress,
     0,
     ERC20.interface.encodeFunctionData("transfer", [to, value]),
+  ]);
+};
+
+module.exports.executeUserOp = (to, value, data) => {
+  return Wallet.interface.encodeFunctionData("executeUserOp", [
+    to,
+    value ?? ethers.constants.Zero,
+    data ?? userOperations.nullCode,
   ]);
 };
 

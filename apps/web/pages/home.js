@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react';
+import { Tabs, TabList, TabPanels, Tab, TabPanel, HStack } from '@chakra-ui/react';
 import {
   PageContainer,
   AppContainer,
@@ -12,6 +12,7 @@ import {
   TransactionDateDivider,
   UserCard,
   Notifications,
+  Apps,
 } from '../src/components';
 import {
   useAccountStore,
@@ -32,6 +33,8 @@ import {
   updateHomePageSelector,
   useHistoryStore,
   historyHomePageSelector,
+  useAppsStore,
+  appsHomePageSelector,
 } from '../src/state';
 import { useAuthChannel, useLogout } from '../src/hooks';
 import { txType, getActivityId } from '../src/utils/transaction';
@@ -153,6 +156,13 @@ export default function Home() {
     transactions,
     fetchTransactions,
   } = useHistoryStore(historyHomePageSelector);
+  const {
+    loading: appsLoading,
+    sessions,
+    callRequestQueue,
+    connectToApp,
+    disconnectFromApp,
+  } = useAppsStore(appsHomePageSelector);
   const { clear: clearOnboardData } = useOnboardStore(onboardHomePageSelector);
   const { clear: clearRecover, selectGuardianRequest } = useRecoverStore(recoverHomePageSelector);
   const { clear: clearUpdate } = useUpdateStore(updateHomePageSelector);
@@ -330,21 +340,59 @@ export default function Home() {
     setTabIndex(index);
   };
 
+  const onAppConnectStart = () => {
+    logEvent(EVENTS.WALLET_CONNECT_START);
+  };
+
+  const onAppConnectCancel = () => {
+    logEvent(EVENTS.WALLET_CONNECT_CANCEL);
+  };
+
+  const onAppConnectWithQR = (uri) => {
+    if (!enabled) return;
+
+    logEvent(EVENTS.WALLET_CONNECT_WITH_QR);
+    connectToApp(wallet.walletAddress, { uri });
+  };
+
+  const onAppConnectWithText = (uri) => {
+    if (!enabled) return;
+
+    logEvent(EVENTS.WALLET_CONNECT_WITH_TEXT);
+    connectToApp(wallet.walletAddress, { uri });
+  };
+
+  const onAppDisconnect = (sessionId) => {
+    logEvent(EVENTS.WALLET_CONNECT_DISCONNECT);
+    disconnectFromApp(sessionId);
+  };
+
   return (
     <>
-      <Head title="Stackup | Home" />
+      <Head title="Stackup" showNotification={initLoad ? false : callRequestQueue?.length > 0} />
 
       <PageContainer>
         <Search
           onSearch={onSearch}
           onClear={onClear}
           rightItem={
-            <Notifications
-              isLoading={notificationLoading}
-              items={notifications}
-              onItemClick={onNotificationClick}
-              onDeleteItem={onDeleteNotification}
-            />
+            <HStack spacing="8px">
+              <Apps
+                isLoading={appsLoading}
+                sessions={initLoad ? [] : sessions}
+                onAppConnectStart={onAppConnectStart}
+                onAppConnectCancel={onAppConnectCancel}
+                onAppConnectWithQR={onAppConnectWithQR}
+                onAppConnectWithText={onAppConnectWithText}
+                onAppDisconnect={onAppDisconnect}
+              />
+              <Notifications
+                isLoading={notificationLoading}
+                items={initLoad ? [] : notifications}
+                onItemClick={onNotificationClick}
+                onDeleteItem={onDeleteNotification}
+              />
+            </HStack>
           }
         />
 

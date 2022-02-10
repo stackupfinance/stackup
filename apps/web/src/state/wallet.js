@@ -15,6 +15,11 @@ export const walletUseAuthSelector = (state) => ({
   clear: state.clear,
 });
 
+export const walletWeb3TransactionsSelector = (state) => ({
+  loading: state.loading,
+  sendUserOpFromWalletConnect: state.sendUserOpFromWalletConnect,
+});
+
 export const walletHomePageSelector = (state) => ({
   loading: state.loading,
   balance: state.balance,
@@ -228,6 +233,64 @@ export const useWalletStore = create(
                 nonce: nonce + i + (shouldApprove ? 1 : 0) + removeGuardians.length,
                 callData: wallet.encodeFunctionData.grantGuardian(g),
               });
+            }),
+          ])
+            .then((ops) => ops.filter(Boolean))
+            .then((ops) => {
+              if (!isDeployed) {
+                ops[0].initCode = wallet.proxy.getInitCode(
+                  userWallet.initImplementation,
+                  userWallet.initEntryPoint,
+                  userWallet.initOwner,
+                  userWallet.initGuardians,
+                );
+              }
+              return ops;
+            })
+            .then(paymasterApproval(options))
+            .then(signUserOps(signer))
+            .then(genericRelay(options));
+          set({ loading: false });
+        } catch (error) {
+          set({ loading: false });
+          throw error;
+        }
+      },
+
+      sendUserOpFromWalletConnect: async (userWallet, password, transaction, options) => {
+        const signer = wallet.proxy.decryptSigner(userWallet, password);
+        if (!signer) {
+          throw new Error('Incorrect password');
+        }
+        set({ loading: true });
+
+        try {
+          const [isDeployed, allowance] = await Promise.all([
+            wallet.proxy.isCodeDeployed(provider, userWallet.walletAddress),
+            usdcContract.allowance(userWallet.walletAddress, App.web3.paymaster),
+          ]);
+          const shouldApprove = allowance.lte(defaultPaymasterReapproval);
+          const nonce = isDeployed
+            ? await wallet.proxy.getNonce(provider, userWallet.walletAddress)
+            : constants.userOperations.initNonce;
+          await Promise.all([
+            shouldApprove
+              ? wallet.userOperations.get(userWallet.walletAddress, {
+                  nonce,
+                  callData: wallet.encodeFunctionData.ERC20Approve(
+                    App.web3.usdc,
+                    App.web3.paymaster,
+                    defaultPaymasterApproval,
+                  ),
+                })
+              : undefined,
+            wallet.userOperations.get(userWallet.walletAddress, {
+              nonce: nonce + (shouldApprove ? 1 : 0),
+              callData: wallet.encodeFunctionData.executeUserOp(
+                transaction.to,
+                transaction.value,
+                transaction.data,
+              ),
             }),
           ])
             .then((ops) => ops.filter(Boolean))

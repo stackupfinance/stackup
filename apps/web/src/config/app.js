@@ -15,5 +15,6 @@ export const App = {
     rpc: process.env.NEXT_PUBLIC_WEB3_RPC || '',
     usdc: process.env.NEXT_PUBLIC_WEB3_USDC || '',
     usdcUnits: 'mwei',
+    nativeSymbol: 'MATIC',
   },
 };

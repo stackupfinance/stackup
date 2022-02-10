@@ -42,7 +42,7 @@ export const TransactionCard = ({
         >
           <HStack w="100%">
             <Skeleton isLoaded={!isLoading} width={isLoading && '128px'}>
-              <Heading fontSize="sm" textAlign="left">
+              <Heading fontSize="sm" textAlign="left" wordBreak="break-word">
                 {sideEffect ?? (isReceiving ? from : to)}
               </Heading>
             </Skeleton>
