@@ -40,7 +40,7 @@
     "prettier-plugin-solidity": "^1.0.0-beta.18",
     "solhint": "^3.3.6",
     "solhint-plugin-prettier": "^0.0.5",
-    "solidity-coverage": "^0.7.17"
+    "solidity-coverage": "^0.7.19"
   },
   "dependencies": {
     "@chainlink/contracts": "^0.2.2",
