@@ -26,7 +26,7 @@
     "framer-motion": "^5",
     "html5-qrcode": "^2.1.6",
     "nanoid": "^3.1.31",
-    "next": "12.0.7",
+    "next": "12.0.9",
     "pusher-js": "^7.0.6",
     "react": "17.0.2",
     "react-dom": "17.0.2",
