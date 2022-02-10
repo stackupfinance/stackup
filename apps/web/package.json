@@ -21,7 +21,7 @@
     "@walletconnect/client": "^1.7.1",
     "amplitude-js": "8.13.1",
     "axios": "^0.25.0",
-    "date-fns": "^2.27.0",
+    "date-fns": "^2.28.0",
     "ethers": "^5.5.2",
     "framer-motion": "^5",
     "html5-qrcode": "^2.1.6",
