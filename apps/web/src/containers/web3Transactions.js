@@ -35,6 +35,7 @@ import { App } from '../config';
 import { getNameFromAddress } from '../utils/addressNames';
 import { txType, txStatus } from '../utils/transaction';
 import { useAuthChannel } from '../hooks';
+import { EVENTS, logEvent } from '../utils/analytics';
 
 const RPC_METHODS = {
   personalSign: 'personal_sign',
@@ -69,6 +70,7 @@ export const Web3Transactions = ({ children }) => {
           id: payload.current.id,
           result: await signMessage(wallet, payload.current.params[0], password),
         });
+        logEvent(EVENTS.WALLET_CONNECT_APPROVE_PERSONAL_SIGN);
         removeLastInCallRequestQueue();
       } else if (payload.current.method === RPC_METHODS.ethSendTransaction) {
         await sendUserOpFromWalletConnect(wallet, password, payload.current.params[0], {
@@ -76,6 +78,7 @@ export const Web3Transactions = ({ children }) => {
           accessToken: accessToken.token,
         });
         setIsTransactionLoading(true);
+        logEvent(EVENTS.WALLET_CONNECT_APPROVE_ETH_SEND_TRANSACTION);
         toast({
           title: 'Transaction initiated',
           description: 'This might take a minute. Stay on this page for updates...',
@@ -97,6 +100,7 @@ export const Web3Transactions = ({ children }) => {
         message: 'USER_REJECTED',
       },
     });
+    logEvent(EVENTS.WALLET_CONNECT_REJECT_CALL_REQUEST);
     removeLastInCallRequestQueue();
   };
 
@@ -174,16 +178,19 @@ export const Web3Transactions = ({ children }) => {
         // setTimeout required to prevent the initial duplication.
         setTimeout(() => {
           !toast.isActive(payload.current.id) &&
-            toast({
-              id: payload.current.id,
-              title: `${session.peerMeta.name} sent a request we can't handle`,
-              description: `Drop us a support message and we'll try sort you out!`,
-              status: 'error',
-              duration: null,
-              position: 'top-right',
-              isClosable: true,
-              onCloseComplete: onReject,
-            });
+            (() => {
+              toast({
+                id: payload.current.id,
+                title: `${session.peerMeta.name} sent a request we can't handle`,
+                description: `Drop us a support message and we'll try sort you out!`,
+                status: 'error',
+                duration: null,
+                position: 'top-right',
+                isClosable: true,
+                onCloseComplete: onReject,
+              });
+              logEvent(EVENTS.WALLET_CONNECT_UNSUPPORTED_CALL_REQUEST);
+            })();
         }, 1);
     }
   }
@@ -260,7 +267,7 @@ export const Web3Transactions = ({ children }) => {
                   {isTransaction() ? 'Transaction summary' : 'Message'}
                 </Text>
                 <VStack
-                  spacing="16px"
+                  spacing={isTransaction() ? '16px' : '8px'}
                   p="8px"
                   w="100%"
                   align="left"

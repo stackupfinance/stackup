@@ -340,13 +340,30 @@ export default function Home() {
     setTabIndex(index);
   };
 
-  const onAppConnect = (uri) => {
+  const onAppConnectStart = () => {
+    logEvent(EVENTS.WALLET_CONNECT_START);
+  };
+
+  const onAppConnectCancel = () => {
+    logEvent(EVENTS.WALLET_CONNECT_CANCEL);
+  };
+
+  const onAppConnectWithQR = (uri) => {
     if (!enabled) return;
 
+    logEvent(EVENTS.WALLET_CONNECT_WITH_QR);
+    connectToApp(wallet.walletAddress, { uri });
+  };
+
+  const onAppConnectWithText = (uri) => {
+    if (!enabled) return;
+
+    logEvent(EVENTS.WALLET_CONNECT_WITH_TEXT);
     connectToApp(wallet.walletAddress, { uri });
   };
 
   const onAppDisconnect = (sessionId) => {
+    logEvent(EVENTS.WALLET_CONNECT_DISCONNECT);
     disconnectFromApp(sessionId);
   };
 
@@ -363,7 +380,10 @@ export default function Home() {
               <Apps
                 isLoading={appsLoading}
                 sessions={initLoad ? [] : sessions}
-                onAppConnect={onAppConnect}
+                onAppConnectStart={onAppConnectStart}
+                onAppConnectCancel={onAppConnectCancel}
+                onAppConnectWithQR={onAppConnectWithQR}
+                onAppConnectWithText={onAppConnectWithText}
                 onAppDisconnect={onAppDisconnect}
               />
               <Notifications

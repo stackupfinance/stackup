@@ -36,7 +36,10 @@ import { QRCodeScanner } from '.';
 export const Apps = ({
   isLoading,
   sessions = {},
-  onAppConnect = () => {},
+  onAppConnectStart = () => {},
+  onAppConnectCancel = () => {},
+  onAppConnectWithQR = () => {},
+  onAppConnectWithText = () => {},
   onAppDisconnect = () => {},
 }) => {
   const [wcModal, setWcModal] = useState(false);
@@ -88,22 +91,24 @@ export const Apps = ({
     );
   };
 
-  const onWalletConnectOpen = () => {
+  const walletConnectOpenHandler = () => {
+    onAppConnectStart();
     setWcModal(true);
   };
 
-  const onWalletConnectClose = () => {
+  const walletConnectCancelHandler = () => {
     setWcModal(false);
+    onAppConnectCancel();
   };
 
   const walletConnectScanHandler = (uri) => {
-    onWalletConnectClose();
-    onAppConnect(uri);
+    setWcModal(false);
+    onAppConnectWithQR(uri);
   };
 
   const walletConnectButtonHandler = () => {
-    onWalletConnectClose();
-    onAppConnect(wcUri);
+    setWcModal(false);
+    onAppConnectWithText(wcUri);
   };
 
   return (
@@ -135,7 +140,7 @@ export const Apps = ({
 
           <MenuDivider />
 
-          <MenuItem onClick={onWalletConnectOpen}>
+          <MenuItem onClick={walletConnectOpenHandler}>
             <Image
               boxSize="24px"
               borderRadius="md"
@@ -150,7 +155,7 @@ export const Apps = ({
         </MenuList>
       </Menu>
 
-      <Modal initialFocusRef={initialRef} isOpen={wcModal} onClose={onWalletConnectClose}>
+      <Modal initialFocusRef={initialRef} isOpen={wcModal} onClose={walletConnectCancelHandler}>
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>Connect to an app 🔌</ModalHeader>
@@ -205,7 +210,7 @@ export const Apps = ({
               <Button isDisabled={!wcUri} colorScheme="blue" onClick={walletConnectButtonHandler}>
                 Connect
               </Button>
-              <Button onClick={onWalletConnectClose}>Cancel</Button>
+              <Button onClick={walletConnectCancelHandler}>Cancel</Button>
             </HStack>
           </ModalFooter>
         </ModalContent>
