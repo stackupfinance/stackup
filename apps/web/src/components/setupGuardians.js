@@ -75,7 +75,7 @@ export const SetupGuardians = ({
             <Text>
               {isUpdateFlow
                 ? `This will submit a transaction to update your guardians on-chain incase you ever need to recover your account.`
-                : `Let's get started by quickly setting up your guardians incase you ever need to recover
+                : `Let's get started by quickly setting up your guardians in case you ever need to recover
               your account.`}
             </Text>
           </Box>
