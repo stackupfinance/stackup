@@ -18,6 +18,7 @@ export const useAuthChannel = (callback = () => {}) => {
     delete callbacks[callbackId];
     if (Object.keys(callbacks).length === 0 && pusherSingleton) {
       pusherSingleton.disconnect();
+      pusherSingleton = undefined;
     }
   };
 

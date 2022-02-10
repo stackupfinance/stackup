@@ -41,7 +41,6 @@ export const useAppsStore = create(
       ...defaultState,
 
       connectToApp: (walletAddress, opts = {}) => {
-        const { sessions = {} } = get();
         const sessionId = opts.sessionId ?? nanoid(6);
         const connector = new WalletConnect({
           uri: opts.uri,
@@ -49,7 +48,7 @@ export const useAppsStore = create(
         });
         // Hacky workaround since connectorOpts.storage is bugged.
         connector._sessionStorage = {
-          getSession: () => sessions[sessionId] || null,
+          getSession: () => (get().sessions || {})[sessionId] || null,
           setSession: (session) =>
             set({
               sessions: { ...(get().sessions || {}), [sessionId]: session },
