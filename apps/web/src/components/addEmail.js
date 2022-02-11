@@ -51,7 +51,7 @@ export const AddEmail = ({ isLoading, onNext }) => {
               Add your e-mail 📧
             </Heading>
             <Text>
-              {`Since you've selected us to be one of your guardians, we'll use this e-mail to confirm your identity incase you ever need to recover your account.`}
+              {`Since you've selected us to be one of your guardians, we'll use this e-mail to confirm your identity in case you ever need to recover your account.`}
             </Text>
           </Box>
 

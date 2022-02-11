@@ -22,6 +22,8 @@ import {
   historyUseAuthSelector,
   useAppsStore,
   appsUseAuthSelector,
+  usePusherStore,
+  pusherUseAuthSelector,
 } from '../state';
 import { Routes } from '../config';
 
@@ -48,6 +50,7 @@ export const useLogout = () => {
   const { clear: clearUpdate } = useUpdateStore(updateUseAuthSelector);
   const { clear: clearHistory } = useHistoryStore(historyUseAuthSelector);
   const { clear: clearApps } = useAppsStore(appsUseAuthSelector);
+  const { clear: clearPusher } = usePusherStore(pusherUseAuthSelector);
 
   return async () => {
     clearSearch();
@@ -59,6 +62,7 @@ export const useLogout = () => {
     clearUpdate();
     clearHistory();
     clearApps();
+    clearPusher();
     await logout();
   };
 };
