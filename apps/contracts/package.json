@@ -47,7 +47,7 @@
     "@openzeppelin/contracts": "^4.4.0",
     "@openzeppelin/contracts-upgradeable": "^4.4.0",
     "crypto-js": "^4.1.1",
-    "eth-crypto": "^2.1.0",
+    "eth-crypto": "^2.2.0",
     "ethers": "^5.5.4",
     "solidity-bytes-utils": "^0.8.0"
   }
