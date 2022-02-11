@@ -63,7 +63,7 @@
     "eslint-plugin-jest": "^26.1.0",
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-security": "^1.4.0",
-    "faker": "^5.5.3",
+    "faker": "^6.6.6",
     "jest": "^27.5.1",
     "node-mocks-http": "^1.11.0",
     "nodemon": "^2.0.15",
