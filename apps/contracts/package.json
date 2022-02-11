@@ -35,12 +35,12 @@
     "eslint-config-prettier": "^8.3.0",
     "ethereum-waffle": "^3.4.0",
     "hardhat": "^2.8.3",
-    "hardhat-contract-sizer": "^2.2.0",
+    "hardhat-contract-sizer": "^2.4.0",
     "prettier": "2.5.1",
     "prettier-plugin-solidity": "^1.0.0-beta.18",
     "solhint": "^3.3.6",
     "solhint-plugin-prettier": "^0.0.5",
-    "solidity-coverage": "^0.7.17"
+    "solidity-coverage": "^0.7.19"
   },
   "dependencies": {
     "@chainlink/contracts": "^0.2.2",
@@ -48,7 +48,7 @@
     "@openzeppelin/contracts-upgradeable": "^4.4.0",
     "crypto-js": "^4.1.1",
     "eth-crypto": "^2.1.0",
-    "ethers": "^5.5.2",
+    "ethers": "^5.5.4",
     "solidity-bytes-utils": "^0.8.0"
   }
 }
