@@ -38,7 +38,7 @@
     "hardhat-contract-sizer": "^2.4.0",
     "prettier": "2.5.1",
     "prettier-plugin-solidity": "^1.0.0-beta.18",
-    "solhint": "^3.3.6",
+    "solhint": "^3.3.7",
     "solhint-plugin-prettier": "^0.0.5",
     "solidity-coverage": "^0.7.19"
   },
@@ -47,7 +47,7 @@
     "@openzeppelin/contracts": "^4.4.0",
     "@openzeppelin/contracts-upgradeable": "^4.4.0",
     "crypto-js": "^4.1.1",
-    "eth-crypto": "^2.1.0",
+    "eth-crypto": "^2.2.0",
     "ethers": "^5.5.4",
     "solidity-bytes-utils": "^0.8.0"
   }
