@@ -53,7 +53,7 @@ export const usePusherStore = create((set, get) => ({
     set({
       pusherSingleton,
       accessTokenUsed: accessToken,
-      callbacks: { ...(get().callbacks, {}), [callbackId]: callback },
+      callbacks: { ...get().callbacks, [callbackId]: callback },
     });
   },
 
