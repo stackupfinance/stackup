@@ -49,7 +49,7 @@
     "passport": "^0.5.2",
     "passport-jwt": "^4.0.0",
     "pm2": "^5.1.2",
-    "pusher": "^5.0.0",
+    "pusher": "^5.0.1",
     "validator": "^13.7.0",
     "winston": "^3.5.1",
     "xss-clean": "^0.1.1"
