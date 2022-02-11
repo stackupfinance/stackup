@@ -36,7 +36,7 @@
     "ethers": "^5.5.4",
     "express": "^4.17.2",
     "express-http-proxy": "^1.6.3",
-    "express-mongo-sanitize": "^2.1.0",
+    "express-mongo-sanitize": "^2.2.0",
     "express-rate-limit": "^5.5.1",
     "helmet": "^5.0.2",
     "http-status": "^1.5.0",
@@ -68,6 +68,6 @@
     "node-mocks-http": "^1.11.0",
     "nodemon": "^2.0.15",
     "prettier": "^2.5.1",
-    "supertest": "^6.1.6"
+    "supertest": "^6.2.2"
   }
 }
