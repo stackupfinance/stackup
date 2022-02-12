@@ -48,7 +48,7 @@ export default function Activity() {
   const {
     loading: activityLoading,
     savedActivity,
-    activityItems,
+    activityItems: savedActivityItems,
     fetchActivityItems,
     sendNewPaymentTransaction,
     updateActivityItemFromChannel,
@@ -63,6 +63,7 @@ export default function Activity() {
   const [username, setUsername] = useState('');
   const [walletAddress, setWalletAddress] = useState('');
   const [payError, setPayError] = useState('');
+  const [activityItems, setActivityItems] = useState();
   const isInverse = (activityItems?.results || []).length || activityLoading;
 
   useAuthChannel((event, data) => {
@@ -94,6 +95,10 @@ export default function Activity() {
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [savedActivity]);
+
+  useEffect(() => {
+    setActivityItems(savedActivityItems);
+  }, [savedActivityItems]);
 
   const onPayHandler = () => {
     logEvent(EVENTS.OPEN_PAY);
