@@ -12,7 +12,7 @@ export const Head = ({ title, showNotification }) => {
       {/* <!--  Essential META Tags --> */}
       <meta property="og:title" content={title} />
       <meta property="og:type" content="website" />
-      <meta property="og:image" content="https://i.imgur.com/27qZCWm.png" />
+      <meta property="og:image" content="https://i.imgur.com/hNJp1R1.png" />
       {/* <meta property="og:url" content="https://stackup.sh" /> */}
       <meta name="twitter:card" content="summary_large_image" />
 

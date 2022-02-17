@@ -1,42 +1,30 @@
+# @stackupfinance/web
+
+A responsive web frontend.
+
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
-## Getting Started
+## App setup
 
-First, set the environment variables:
+This setup assumes that all dependencies have been installed from the project root.
 
-```bash
-cp .env.example .env.development.local
+### Environment variables
 
-# open .env and modify the environment variables (if needed)
-```
-
-Then, run the development server:
+Create a `.env` file for local development. Variables in here will not be commited to the git repository.
 
 ```bash
-npm run dev
-# or
-yarn dev
+$ cp ./apps/web/.env.example ./apps/web/.env.development.local
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Summary of environment variables:
 
-You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
-
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.js`.
-
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+| Variable                          | Description                                                                                                                                                                                                                                                                                                              |
+| --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `NEXT_PUBLIC_STACKUP_BACKEND_URL` | Url for making API requests to `@stackupfinance/backend`.                                                                                                                                                                                                                                                                |
+| `NEXT_PUBLIC_PUSHER_APP_KEY`      | [Pusher channels](https://pusher.com/channels) config for supporting real-time features. You can use the free tier for development.                                                                                                                                                                                      |
+| `NEXT_PUBLIC_PUSHER_APP_CLUSTER`  | See above.                                                                                                                                                                                                                                                                                                               |
+| `NEXT_PUBLIC_WEB3_EXPLORER`       | Block explorer url for polygon/mumbai network.                                                                                                                                                                                                                                                                           |
+| `NEXT_PUBLIC_WEB3_RPC`            | RPC to connect to the polygon/mumbai network. Note that the publically available RPCs listed [here](https://docs.polygon.technology/docs/develop/network-details/network/) can sometimes cause intermittent issues. You can replace it with an [Alchemy](https://www.alchemy.com/) node if you're experiencing problems. |
+| `NEXT_PUBLIC_WEB3_USDC`           | USDC contract address.                                                                                                                                                                                                                                                                                                   |
+| `NEXT_PUBLIC_WEB3_PAYMASTER`      | Address of the paymaster. This should be the same as the one used in `@stackupfinance/contracts`.                                                                                                                                                                                                                        |
+| `NEXT_PUBLIC_AMPLITUDE_API_KEY`   | Amplitude API key for sending analytics data.                                                                                                                                                                                                                                                                            |
