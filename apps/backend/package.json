@@ -51,7 +51,7 @@
     "pm2": "^5.1.2",
     "pusher": "^5.0.1",
     "validator": "^13.7.0",
-    "winston": "^3.5.1",
+    "winston": "^3.6.0",
     "xss-clean": "^0.1.1"
   },
   "devDependencies": {
@@ -60,7 +60,7 @@
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-import": "^2.25.4",
-    "eslint-plugin-jest": "^26.1.0",
+    "eslint-plugin-jest": "^26.1.1",
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-security": "^1.4.0",
     "faker": "^6.6.6",
