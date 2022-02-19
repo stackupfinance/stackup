@@ -4,11 +4,8 @@ import NextLink from 'next/link';
 import { Image, VStack, Box, Input, Button } from '@chakra-ui/react';
 import { useForm } from 'react-hook-form';
 import { PageContainer, AppContainer, Head, Header, InlineError } from '../src/components';
-import { Routes } from '../src/config';
-import axios from 'axios';
-import { App } from '../src/config';
 import { useRouter } from 'next/router';
-
+import { useInviteStore, inviteHomePageSelector } from '../src/state';
 export default function Invite() {
   const {
     register,
@@ -17,6 +14,7 @@ export default function Invite() {
   } = useForm();
   const [loginError, setLoginError] = useState('');
   const router = useRouter();
+  const { loading, invite, fetchInvite } = useInviteStore(inviteHomePageSelector);
 
   const renderError = () => {
     if (errors.invite) {
@@ -31,10 +29,8 @@ export default function Invite() {
   const onSubmit = async (data) => {
     setLoginError('');
     try {
-      const res = await axios.get(`${App.stackup.backendUrl}/v1/invite`, {
-        params: { invite: data.invite },
-      });
-      if (res.status === 200) router.push('/sign-up');
+      await fetchInvite(data);
+      if (invite) router.push('/sign-up');
     } catch (error) {
       setLoginError(
         error.response?.data?.message || error.message || 'Unknown error, try again later!',
@@ -57,8 +53,14 @@ export default function Invite() {
                     placeholder="Enter your unique Invite Code"
                     {...register('invite', { required: true })}
                   />
-                  <Button isFullWidth isLoading={false} colorScheme="blue" size="lg" type="submit">
-                    Log in
+                  <Button
+                    isFullWidth
+                    isLoading={loading}
+                    colorScheme="blue"
+                    size="lg"
+                    type="submit"
+                  >
+                    Next Step
                   </Button>
                 </VStack>
               </form>

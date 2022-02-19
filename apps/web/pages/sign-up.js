@@ -1,3 +1,4 @@
+/* eslint-disable unused-imports/no-unused-vars */
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { Image, VStack, Box, Input, Button } from '@chakra-ui/react';
@@ -15,6 +16,8 @@ import {
   accountSignUpPageSelector,
   useOnboardStore,
   onboardSignUpPageSelector,
+  useInviteStore,
+  inviteHomePageSelector,
 } from '../src/state';
 import { Routes } from '../src/config';
 import { EVENTS, logEvent } from '../src/utils/analytics';
@@ -30,6 +33,7 @@ export default function SignUp() {
   const { loading, register: registerAccount } = useAccountStore(accountSignUpPageSelector);
   const { createEphemeralWallet } = useOnboardStore(onboardSignUpPageSelector);
   const [registerError, setRegisterError] = useState('');
+  const { invite } = useInviteStore(inviteHomePageSelector);
 
   useEffect(() => {
     router.prefetch(Routes.WELCOME);
@@ -40,10 +44,14 @@ export default function SignUp() {
     const { username, password } = data;
 
     try {
-      await registerAccount({ username, password });
-      createEphemeralWallet(password);
-      logEvent(EVENTS.SIGN_UP_FINISH);
-      router.push(Routes.WELCOME);
+      // console.log(invite)
+      if (invite) {
+        await registerAccount({ username, password });
+        createEphemeralWallet(password);
+        logEvent(EVENTS.SIGN_UP_FINISH);
+        router.push(Routes.WELCOME);
+      }
+      setRegisterError('Invite code not found. Please use invite code to proceed.');
     } catch (error) {
       setRegisterError(error.response?.data?.message || 'Unknown error, try again later!');
     }

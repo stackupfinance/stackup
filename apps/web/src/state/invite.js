@@ -23,7 +23,7 @@ export const useInviteStore = create(
     (set, _get) => ({
       ...defaultState,
 
-      fetchInvite: async (_options) => {
+      fetchInvite: async (data) => {
         set({ loading: true });
 
         try {
@@ -31,9 +31,11 @@ export const useInviteStore = create(
             params: { invite: data.invite },
           });
 
+          console.log(res);
+
           set({
             loading: false,
-            transactions: res.data.invite,
+            invite: res.data.invite,
           });
         } catch (error) {
           set({ loading: false });
