@@ -9,3 +9,4 @@ export * from './recover';
 export * from './search';
 export * from './update';
 export * from './wallet';
+export * from './invite';
