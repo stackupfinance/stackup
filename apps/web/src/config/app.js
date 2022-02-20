@@ -18,6 +18,6 @@ export const App = {
     nativeSymbol: 'MATIC',
   },
   intercom: {
-    apiKey: process.env.NEXT_PUBLIC_INTERCOM_API_KEY || '',
+    appId: process.env.NEXT_PUBLIC_INTERCOM_APP_ID || '',
   },
 };
