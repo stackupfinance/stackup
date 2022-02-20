@@ -17,4 +17,7 @@ export const App = {
     usdcUnits: 'mwei',
     nativeSymbol: 'MATIC',
   },
+  intercom: {
+    apiKey: process.env.NEXT_PUBLIC_INTERCOM_API_KEY || '',
+  }
 };
