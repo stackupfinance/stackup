@@ -19,5 +19,5 @@ export const App = {
   },
   intercom: {
     apiKey: process.env.NEXT_PUBLIC_INTERCOM_API_KEY || '',
-  }
+  },
 };
