@@ -40,6 +40,7 @@ import { useAuthChannel, useLogout } from '../src/hooks';
 import { txType, getActivityId } from '../src/utils/transaction';
 import { Routes } from '../src/config';
 import { EVENTS, logEvent } from '../src/utils/analytics';
+import { App } from '../src/config';
 
 const tabs = {
   EXPLORE: 0,
@@ -215,6 +216,21 @@ export default function Home() {
     }
     fetchTransactions({ userId: user.id, accessToken: accessToken.token });
   });
+
+  // Intercom user auth integration
+  useEffect(() => {
+    if (window !== undefined) {
+      console.log(window.Intercom);
+      window.Intercom('boot', {
+        api_base: 'https://api-iam.intercom.io',
+        app_id: App.intercom.appId,
+        name: username, // Full name
+        email: username, // Email address
+        created_at: Date.now(), // Signup date as a Unix timestamp
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const onNotificationClick = async (notification) => {
     if (notification.type === txType.recoverAccount) {
