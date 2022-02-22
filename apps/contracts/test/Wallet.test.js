@@ -211,14 +211,14 @@ describe("Wallet", () => {
           nonce: 1,
         })
       );
-      const invalidRequestId = wallet.message.requestId(
+      const requestId = wallet.message.requestId(
         invalidUserOp,
         contracts.EntryPoint.address,
         network.config.chainId
       );
 
       await expect(
-        paymasterUserWallet.validateUserOp(invalidUserOp, invalidRequestId, 0)
+        paymasterUserWallet.validateUserOp(invalidUserOp, requestId, 0)
       ).to.be.revertedWith("Wallet: Invalid nonce");
     });
 
