@@ -192,14 +192,14 @@ describe("Wallet", () => {
         paymasterUser,
         wallet.userOperations.get(paymasterUserWallet.address)
       );
-      const validRequestId = wallet.message.requestId(
+      const requestId = wallet.message.requestId(
         validUserOp,
         contracts.EntryPoint.address,
         network.config.chainId
       );
 
       await expect(
-        paymasterUserWallet.validateUserOp(validUserOp, validRequestId, 0)
+        paymasterUserWallet.validateUserOp(validUserOp, requestId, 0)
       ).to.not.be.reverted;
       expect(await paymasterUserWallet.nonce()).to.equal(1);
     });
