@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const validator = require('validator');
 const { toJSON } = require('./plugins');
 
 const inviteSchema = mongoose.Schema(
@@ -10,6 +11,17 @@ const inviteSchema = mongoose.Schema(
     used: {
       type: Boolean,
       default: false,
+    },
+    email: {
+      type: String,
+      trim: true,
+      lowercase: true,
+      unique: true,
+      validate(value) {
+        if (!validator.isEmail(value)) {
+          throw new Error('Invalid email');
+        }
+      },
     },
   },
   {
