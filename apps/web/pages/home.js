@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { Tabs, TabList, TabPanels, Tab, TabPanel, HStack } from '@chakra-ui/react';
+import HmacSHA256 from 'crypto-js/hmac-sha256';
 import {
   PageContainer,
   AppContainer,
@@ -219,19 +220,17 @@ export default function Home() {
 
   // Intercom user auth integration
   useEffect(() => {
-    // create hmac
-    const hmac = crypto
-      .createHmac('sha256', process.env.NEXT_PUBLIC_INTERCOM_HMAC)
-      .update(username)
-      .digest('hex');
-
     if (window !== undefined) {
+      const hmac = HmacSHA256(user.id, App.intercom.hmacSecret).toString();
+
+      console.log(hmac);
+
       window.Intercom('boot', {
         api_base: 'https://api-iam.intercom.io',
         app_id: App.intercom.appId,
         name: username, // Full name
-        email: username, // Email address
         created_at: Date.now(), // Signup date as a Unix timestamp
+        user_id: user.id,
         user_hash: hmac,
       });
     }
