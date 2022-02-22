@@ -1,5 +1,5 @@
 const { expect } = require("chai");
-const { ethers } = require("hardhat");
+const { ethers, network } = require("hardhat");
 const {
   DEFAULT_REQUIRED_PRE_FUND,
   MOCK_POST_OP_TOKEN_FEE,
@@ -55,29 +55,31 @@ describe("Wallet", () => {
       Wallet.deploy(),
       Test.deploy(),
     ]);
+    contracts.Wallet.address = walletImplementation.address;
+    contracts.EntryPoint.address = mockEntryPoint.address;
 
     [paymasterUserWalletProxy, regularUserWalletProxy, regularGuardianProxy] =
       await Promise.all([
         WalletProxy.deploy(
-          walletImplementation.address,
+          contracts.Wallet.address,
           wallet.encodeFunctionData.initialize(
-            mockEntryPoint.address,
+            contracts.EntryPoint.address,
             paymasterUser.address,
             [regularGuardian.address]
           )
         ),
         WalletProxy.deploy(
-          walletImplementation.address,
+          contracts.Wallet.address,
           wallet.encodeFunctionData.initialize(
-            mockEntryPoint.address,
+            contracts.EntryPoint.address,
             regularUser.address,
             [regularGuardian.address]
           )
         ),
         WalletProxy.deploy(
-          walletImplementation.address,
+          contracts.Wallet.address,
           wallet.encodeFunctionData.initialize(
-            mockEntryPoint.address,
+            contracts.EntryPoint.address,
             regularGuardian.address,
             []
           )
@@ -117,7 +119,7 @@ describe("Wallet", () => {
     it("Upgrades to the correct implementation", async () => {
       const firstImplementation =
         await regularUserWallet.getCurrentImplementation();
-      expect(firstImplementation).to.equal(walletImplementation.address);
+      expect(firstImplementation).to.equal(contracts.Wallet.address);
 
       await regularUserWallet.upgradeTo(newWalletImplementation.address);
       const secondImplementation =
@@ -130,7 +132,7 @@ describe("Wallet", () => {
         regularUserWallet.upgradeTo(test.address)
       ).to.be.revertedWith("ERC1967Upgrade: upgrade breaks further upgrades");
       expect(await regularUserWallet.getCurrentImplementation()).to.equal(
-        walletImplementation.address
+        contracts.Wallet.address
       );
     });
   });
@@ -141,11 +143,18 @@ describe("Wallet", () => {
         paymasterUser,
         wallet.userOperations.get(paymasterUserWallet.address)
       );
+      const requestId = wallet.message.requestId(
+        userOp,
+        contracts.EntryPoint.address,
+        network.config.chainId
+      );
 
-      await expect(paymasterUserWallet.validateUserOp(userOp, 0)).to.not.be
-        .reverted;
+      await expect(paymasterUserWallet.validateUserOp(userOp, requestId, 0)).to
+        .not.be.reverted;
       await expect(
-        paymasterUserWallet.connect(paymasterUser).validateUserOp(userOp, 0)
+        paymasterUserWallet
+          .connect(paymasterUser)
+          .validateUserOp(userOp, requestId, 0)
       ).to.be.revertedWith("Wallet: Not from EntryPoint");
     });
 
@@ -154,15 +163,27 @@ describe("Wallet", () => {
         paymasterUser,
         wallet.userOperations.get(paymasterUserWallet.address)
       );
+      const validRequestId = wallet.message.requestId(
+        validUserOp,
+        contracts.EntryPoint.address,
+        network.config.chainId
+      );
+
       const invalidUserOp = await wallet.userOperations.sign(
         regularUser,
         wallet.userOperations.get(paymasterUserWallet.address)
       );
+      const invalidRequestId = wallet.message.requestId(
+        invalidUserOp,
+        contracts.EntryPoint.address,
+        network.config.chainId
+      );
 
-      await expect(paymasterUserWallet.validateUserOp(validUserOp, 0)).to.not.be
-        .reverted;
       await expect(
-        paymasterUserWallet.validateUserOp(invalidUserOp, 0)
+        paymasterUserWallet.validateUserOp(validUserOp, validRequestId, 0)
+      ).to.not.be.reverted;
+      await expect(
+        paymasterUserWallet.validateUserOp(invalidUserOp, invalidRequestId, 0)
       ).to.be.revertedWith("Wallet: Invalid owner sig");
     });
 
@@ -171,9 +192,15 @@ describe("Wallet", () => {
         paymasterUser,
         wallet.userOperations.get(paymasterUserWallet.address)
       );
+      const validRequestId = wallet.message.requestId(
+        validUserOp,
+        contracts.EntryPoint.address,
+        network.config.chainId
+      );
 
-      await expect(paymasterUserWallet.validateUserOp(validUserOp, 0)).to.not.be
-        .reverted;
+      await expect(
+        paymasterUserWallet.validateUserOp(validUserOp, validRequestId, 0)
+      ).to.not.be.reverted;
       expect(await paymasterUserWallet.nonce()).to.equal(1);
     });
 
@@ -184,9 +211,14 @@ describe("Wallet", () => {
           nonce: 1,
         })
       );
+      const invalidRequestId = wallet.message.requestId(
+        invalidUserOp,
+        contracts.EntryPoint.address,
+        network.config.chainId
+      );
 
       await expect(
-        paymasterUserWallet.validateUserOp(invalidUserOp, 0)
+        paymasterUserWallet.validateUserOp(invalidUserOp, invalidRequestId, 0)
       ).to.be.revertedWith("Wallet: Invalid nonce");
     });
 
@@ -198,24 +230,28 @@ describe("Wallet", () => {
       ).then((res) => res.value);
       const [entryPointInitBalance, walletInitBalance] =
         await getAddressBalances([
-          mockEntryPoint.address,
+          contracts.EntryPoint.address,
           paymasterUserWallet.address,
         ]);
       expect(walletInitBalance).to.equal(requiredPrefund);
 
+      const userOp = await wallet.userOperations.sign(
+        paymasterUser,
+        wallet.userOperations.get(paymasterUserWallet.address)
+      );
+      const requestId = wallet.message.requestId(
+        userOp,
+        contracts.EntryPoint.address,
+        network.config.chainId
+      );
+
       const tx = await paymasterUserWallet
-        .validateUserOp(
-          await wallet.userOperations.sign(
-            paymasterUser,
-            wallet.userOperations.get(paymasterUserWallet.address)
-          ),
-          requiredPrefund
-        )
+        .validateUserOp(userOp, requestId, requiredPrefund)
         .then((res) => res.wait());
 
       const [entryPointFinalBalance, walletFinalBalance] =
         await getAddressBalances([
-          mockEntryPoint.address,
+          contracts.EntryPoint.address,
           paymasterUserWallet.address,
         ]);
       expect(walletFinalBalance).to.equal(0);
@@ -231,13 +267,17 @@ describe("Wallet", () => {
         "0.1"
       ).then((res) => res.value);
 
-      await paymasterUserWallet.validateUserOp(
-        await wallet.userOperations.sign(
-          paymasterUser,
-          wallet.userOperations.get(paymasterUserWallet.address)
-        ),
-        0
+      const userOp = await wallet.userOperations.sign(
+        paymasterUser,
+        wallet.userOperations.get(paymasterUserWallet.address)
       );
+      const requestId = wallet.message.requestId(
+        userOp,
+        contracts.EntryPoint.address,
+        network.config.chainId
+      );
+
+      await paymasterUserWallet.validateUserOp(userOp, requestId, 0);
       const [walletBalance] = await getAddressBalances([
         paymasterUserWallet.address,
       ]);
@@ -257,9 +297,14 @@ describe("Wallet", () => {
             ),
           })
         );
+        const requestId = wallet.message.requestId(
+          validUserOp,
+          contracts.EntryPoint.address,
+          network.config.chainId
+        );
 
         await expect(
-          regularUserWallet.validateUserOp(validUserOp, 0)
+          regularUserWallet.validateUserOp(validUserOp, requestId, 0)
         ).to.be.revertedWith("Wallet: Invalid guardian action");
       });
 
@@ -275,9 +320,14 @@ describe("Wallet", () => {
             callData: wallet.encodeFunctionData.transferOwner(newOwner.address),
           })
         );
+        const requestId = wallet.message.requestId(
+          invalidUserOp,
+          contracts.EntryPoint.address,
+          network.config.chainId
+        );
 
         await expect(
-          regularUserWallet.validateUserOp(invalidUserOp, 0)
+          regularUserWallet.validateUserOp(invalidUserOp, requestId, 0)
         ).to.be.revertedWith("Wallet: Insufficient guardians");
       });
 
@@ -299,9 +349,14 @@ describe("Wallet", () => {
 
             return op;
           });
+        const requestId = wallet.message.requestId(
+          invalidUserOp,
+          contracts.EntryPoint.address,
+          network.config.chainId
+        );
 
         await expect(
-          regularUserWallet.validateUserOp(invalidUserOp, 0)
+          regularUserWallet.validateUserOp(invalidUserOp, requestId, 0)
         ).to.be.revertedWith("Wallet: Invalid guardian sig");
       });
 
@@ -313,9 +368,14 @@ describe("Wallet", () => {
             callData: wallet.encodeFunctionData.transferOwner(newOwner.address),
           })
         );
+        const requestId = wallet.message.requestId(
+          invalidUserOp,
+          contracts.EntryPoint.address,
+          network.config.chainId
+        );
 
         await expect(
-          regularUserWallet.validateUserOp(invalidUserOp, 0)
+          regularUserWallet.validateUserOp(invalidUserOp, requestId, 0)
         ).to.be.revertedWith("Wallet: Not a guardian");
       });
 
@@ -368,11 +428,23 @@ describe("Wallet", () => {
               )
             ),
         ]);
+        const approveRequestId = wallet.message.requestId(
+          approveUserOp,
+          contracts.EntryPoint.address,
+          network.config.chainId
+        );
+        const recoverRequestId = wallet.message.requestId(
+          recoverUserOp,
+          contracts.EntryPoint.address,
+          network.config.chainId
+        );
 
-        await expect(regularUserWallet.validateUserOp(approveUserOp, 0)).to.not
-          .be.reverted;
-        await expect(regularUserWallet.validateUserOp(recoverUserOp, 0)).to.not
-          .be.reverted;
+        await expect(
+          regularUserWallet.validateUserOp(approveUserOp, approveRequestId, 0)
+        ).to.not.be.reverted;
+        await expect(
+          regularUserWallet.validateUserOp(recoverUserOp, recoverRequestId, 0)
+        ).to.not.be.reverted;
       });
     });
   });
