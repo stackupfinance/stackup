@@ -219,14 +219,20 @@ export default function Home() {
 
   // Intercom user auth integration
   useEffect(() => {
+    // create hmac
+    const hmac = crypto
+      .createHmac('sha256', process.env.NEXT_PUBLIC_INTERCOM_HMAC)
+      .update(username)
+      .digest('hex');
+
     if (window !== undefined) {
-      console.log(window.Intercom);
       window.Intercom('boot', {
         api_base: 'https://api-iam.intercom.io',
         app_id: App.intercom.appId,
         name: username, // Full name
         email: username, // Email address
         created_at: Date.now(), // Signup date as a Unix timestamp
+        user_hash: hmac,
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
