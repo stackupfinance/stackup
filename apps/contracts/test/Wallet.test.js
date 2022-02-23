@@ -99,11 +99,13 @@ describe("Wallet", () => {
 
   describe("upgradeTo", () => {
     let newWalletImplementation;
+    let noopWallet;
 
     beforeEach(async () => {
-      newWalletImplementation = await ethers
-        .getContractFactory("Wallet")
-        .then((w) => w.deploy());
+      [newWalletImplementation, noopWallet] = await Promise.all([
+        ethers.getContractFactory("Wallet").then((w) => w.deploy()),
+        ethers.getContractFactory("NoopWallet").then((w) => w.deploy()),
+      ]);
     });
 
     it("Required to be called from the Entry Point", async () => {
@@ -129,8 +131,8 @@ describe("Wallet", () => {
 
     it("Reverts if upgrading to a non UUPS compliant implementation", async () => {
       await expect(
-        regularUserWallet.upgradeTo(test.address)
-      ).to.be.revertedWith("ERC1967Upgrade: upgrade breaks further upgrades");
+        regularUserWallet.upgradeTo(noopWallet.address)
+      ).to.be.revertedWith("ERC1967Upgrade: new implementation is not UUPS");
       expect(await regularUserWallet.getCurrentImplementation()).to.equal(
         contracts.Wallet.address
       );
