@@ -64,8 +64,8 @@ const paymasterApproval =
     }
   };
 
-const signUserOps = (signer) => async (ops) => {
-  return Promise.all(ops.map((op) => wallet.userOperations.sign(signer, op)));
+const signUserOps = (signer, provider) => async (ops) => {
+  return Promise.all(ops.map((op) => wallet.userOperations.sign(signer.connect(provider), op)));
 };
 
 const genericRelay =
@@ -145,7 +145,7 @@ export const useWalletStore = create(
           ])
             .then((ops) => ops.filter(Boolean))
             .then(paymasterApproval(options))
-            .then(signUserOps(signer));
+            .then(signUserOps(signer, provider));
 
           set({ loading: false });
           return newPaymentUserOps;
@@ -182,7 +182,7 @@ export const useWalletStore = create(
             }),
           ])
             .then(paymasterApproval(options))
-            .then(signUserOps(signer))
+            .then(signUserOps(signer, provider))
             .then(genericRelay(options));
 
           set({ loading: false });
@@ -248,7 +248,7 @@ export const useWalletStore = create(
               return ops;
             })
             .then(paymasterApproval(options))
-            .then(signUserOps(signer))
+            .then(signUserOps(signer, provider))
             .then(genericRelay(options));
           set({ loading: false });
         } catch (error) {
@@ -306,7 +306,7 @@ export const useWalletStore = create(
               return ops;
             })
             .then(paymasterApproval(options))
-            .then(signUserOps(signer))
+            .then(signUserOps(signer, provider))
             .then(genericRelay(options));
           set({ loading: false });
         } catch (error) {

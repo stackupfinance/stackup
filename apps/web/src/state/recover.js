@@ -278,7 +278,11 @@ export const useRecoverStore = create(
         try {
           const userOperations = await Promise.all(
             savedGuardianRequest.userOperations.map((op) =>
-              wallet.userOperations.signAsGuardian(signer, userWallet.walletAddress, op),
+              wallet.userOperations.signAsGuardian(
+                signer.connect(provider),
+                userWallet.walletAddress,
+                op,
+              ),
             ),
           );
 
