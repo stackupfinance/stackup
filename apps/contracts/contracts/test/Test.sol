@@ -7,9 +7,6 @@ contract Test {
   // solhint-disable-next-line no-empty-blocks
   receive() external payable {}
 
-  // solhint-disable-next-line no-empty-blocks
-  fallback() external payable {}
-
   function func(bool value) external pure {
     require(value, "Test: reverted");
   }
