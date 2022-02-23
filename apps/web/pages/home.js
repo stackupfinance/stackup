@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
+import { useIntercom } from 'react-use-intercom';
 import { Tabs, TabList, TabPanels, Tab, TabPanel, HStack } from '@chakra-ui/react';
 import HmacSHA256 from 'crypto-js/hmac-sha256';
 import {
@@ -176,6 +177,7 @@ export default function Home() {
   const [notifications, setNotifications] = useState([]);
   const [username, setUsername] = useState('');
   const [initLoad, setInitLoad] = useState(true);
+  const { boot } = useIntercom();
 
   useEffect(() => {
     setNotifications(savedNotifications);
@@ -218,22 +220,16 @@ export default function Home() {
     fetchTransactions({ userId: user.id, accessToken: accessToken.token });
   });
 
+  // console.log(user)
   // Intercom user auth integration
   useEffect(() => {
-    if (window !== undefined) {
-      const hmac = HmacSHA256(user.id, App.intercom.hmacSecret).toString();
-
-      console.log(hmac);
-
-      window.Intercom('boot', {
-        api_base: 'https://api-iam.intercom.io',
-        app_id: App.intercom.appId,
-        name: username, // Full name
-        created_at: Date.now(), // Signup date as a Unix timestamp
-        user_id: user.id,
-        user_hash: hmac,
-      });
-    }
+    const hmac = HmacSHA256(user.id, App.intercom.hmacSecret).toString();
+    boot({
+      name: user.username,
+      created_at: new Date(user.updatedAt).valueOf(),
+      userId: user.id,
+      user_hash: hmac,
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
