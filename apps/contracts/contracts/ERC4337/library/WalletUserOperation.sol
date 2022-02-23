@@ -12,8 +12,6 @@ import "solidity-bytes-utils/contracts/BytesLib.sol";
 import {UserOperation} from "./UserOperation.sol";
 import {WalletSignature, WalletSignatureMode, WalletSignatureValue} from "./WalletSignature.sol";
 
-import "hardhat/console.sol";
-
 struct WalletCallData {
   address to;
   uint256 value;

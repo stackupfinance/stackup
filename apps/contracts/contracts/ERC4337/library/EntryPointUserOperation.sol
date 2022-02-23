@@ -11,8 +11,6 @@ import {IPaymaster, PostOpMode} from "../interface/IPaymaster.sol";
 import {UserOperation} from "./UserOperation.sol";
 import {Stake} from "./Stake.sol";
 
-import "hardhat/console.sol";
-
 library EntryPointUserOperation {
   function _gasPrice(UserOperation calldata op)
     internal

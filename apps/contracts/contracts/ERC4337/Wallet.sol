@@ -20,8 +20,6 @@ import {UserOperation} from "./library/UserOperation.sol";
 import {WalletUserOperation} from "./library/WalletUserOperation.sol";
 import {WalletSignature, WalletSignatureMode} from "./library/WalletSignature.sol";
 
-import "hardhat/console.sol";
-
 contract Wallet is
   IWallet,
   IPaymaster,

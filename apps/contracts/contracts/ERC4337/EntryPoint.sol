@@ -8,8 +8,6 @@ import {Stake} from "./library/Stake.sol";
 import {UserOperation} from "./library/UserOperation.sol";
 import {EntryPointUserOperation} from "./library/EntryPointUserOperation.sol";
 
-import "hardhat/console.sol";
-
 contract EntryPoint is IEntryPoint, IEntryPointStakeController {
   using EntryPointUserOperation for UserOperation;
 
