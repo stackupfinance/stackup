@@ -1,4 +1,5 @@
 const { ethers } = require("ethers");
+const EntryPoint = require("../contracts/entryPoint");
 const userOperations = require("../constants/userOperations");
 const message = require("./message");
 
@@ -56,7 +57,15 @@ module.exports.sign = async (signer, op) => {
   const walletSignatureValues = [
     {
       signer: signer.address,
-      signature: await signer.signMessage(message.userOperation(op)),
+      signature: await signer.signMessage(
+        ethers.utils.arrayify(
+          message.requestId(
+            op,
+            EntryPoint.address,
+            await signer.provider.getNetwork().then((n) => n.chainId)
+          )
+        )
+      ),
     },
   ];
 
@@ -82,7 +91,15 @@ module.exports.signAsGuardian = async (signer, guardian, op) => {
     ...ws[1].map((v) => ({ signer: v.signer, signature: v.signature })),
     {
       signer: guardian,
-      signature: await signer.signMessage(message.userOperation(op)),
+      signature: await signer.signMessage(
+        ethers.utils.arrayify(
+          message.requestId(
+            op,
+            EntryPoint.address,
+            await signer.provider.getNetwork().then((n) => n.chainId)
+          )
+        )
+      ),
     },
   ];
 

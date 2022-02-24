@@ -11,8 +11,6 @@ import {IPaymaster, PostOpMode} from "../interface/IPaymaster.sol";
 import {UserOperation} from "./UserOperation.sol";
 import {Stake} from "./Stake.sol";
 
-import "hardhat/console.sol";
-
 library EntryPointUserOperation {
   function _gasPrice(UserOperation calldata op)
     internal
@@ -35,6 +33,33 @@ library EntryPointUserOperation {
     uint256 totalGas = op.callGas + op.verificationGas + op.preVerificationGas;
 
     return totalGas * _gasPrice(op);
+  }
+
+  function _hash(UserOperation calldata op) internal pure returns (bytes32) {
+    return
+      keccak256(
+        abi.encodePacked(
+          op.sender,
+          op.nonce,
+          keccak256(op.initCode),
+          keccak256(op.callData),
+          op.callGas,
+          op.verificationGas,
+          op.preVerificationGas,
+          op.maxFeePerGas,
+          op.maxPriorityFeePerGas,
+          op.paymaster,
+          keccak256(op.paymasterData)
+        )
+      );
+  }
+
+  function _getRequestId(UserOperation calldata op)
+    internal
+    view
+    returns (bytes32)
+  {
+    return keccak256(abi.encode(_hash(op), address(this), block.chainid));
   }
 
   function gasCost(UserOperation calldata op, uint256 gas)
@@ -120,9 +145,9 @@ library EntryPointUserOperation {
   function validateUserOp(UserOperation calldata op) internal {
     uint256 requiredPrefund = hasPaymaster(op) ? 0 : _requiredPrefund(op);
     uint256 initBalance = address(this).balance;
-
     IWallet(op.sender).validateUserOp{gas: op.verificationGas}(
       op,
+      _getRequestId(op),
       requiredPrefund
     );
 

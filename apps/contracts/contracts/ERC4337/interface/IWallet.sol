@@ -8,6 +8,7 @@ import {UserOperation} from "../library/UserOperation.sol";
 interface IWallet {
   function validateUserOp(
     UserOperation calldata userOp,
+    bytes32 requestId,
     uint256 requiredPrefund
   ) external;
 }

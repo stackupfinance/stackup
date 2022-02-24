@@ -145,7 +145,7 @@ export const useWalletStore = create(
           ])
             .then((ops) => ops.filter(Boolean))
             .then(paymasterApproval(options))
-            .then(signUserOps(signer));
+            .then(signUserOps(signer.connect(provider)));
 
           set({ loading: false });
           return newPaymentUserOps;
@@ -182,7 +182,7 @@ export const useWalletStore = create(
             }),
           ])
             .then(paymasterApproval(options))
-            .then(signUserOps(signer))
+            .then(signUserOps(signer.connect(provider)))
             .then(genericRelay(options));
 
           set({ loading: false });
@@ -248,7 +248,7 @@ export const useWalletStore = create(
               return ops;
             })
             .then(paymasterApproval(options))
-            .then(signUserOps(signer))
+            .then(signUserOps(signer.connect(provider)))
             .then(genericRelay(options));
           set({ loading: false });
         } catch (error) {
@@ -306,7 +306,7 @@ export const useWalletStore = create(
               return ops;
             })
             .then(paymasterApproval(options))
-            .then(signUserOps(signer))
+            .then(signUserOps(signer.connect(provider)))
             .then(genericRelay(options));
           set({ loading: false });
         } catch (error) {

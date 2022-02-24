@@ -12,14 +12,13 @@ import "@openzeppelin/contracts/interfaces/IERC1271.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import "@openzeppelin/contracts/utils/cryptography/SignatureChecker.sol";
 import "@openzeppelin/contracts/utils/math/Math.sol";
 import {IWallet} from "./interface/IWallet.sol";
 import {PostOpMode, IPaymaster} from "./interface/IPaymaster.sol";
 import {UserOperation} from "./library/UserOperation.sol";
 import {WalletUserOperation} from "./library/WalletUserOperation.sol";
 import {WalletSignature, WalletSignatureMode} from "./library/WalletSignature.sol";
-
-import "hardhat/console.sol";
 
 contract Wallet is
   IWallet,
@@ -81,13 +80,17 @@ contract Wallet is
 
   function validateUserOp(
     UserOperation calldata userOp,
+    bytes32 requestId,
     uint256 requiredPrefund
   ) external onlyEntryPoint {
     WalletSignature memory ws = userOp.decodeWalletSignature();
 
     if (ws.mode == WalletSignatureMode.owner) {
       require(
-        hasRole(OWNER_ROLE, userOp.recoverSigner(ws.values[0].signature)),
+        hasRole(
+          OWNER_ROLE,
+          requestId.toEthSignedMessageHash().recover(ws.values[0].signature)
+        ),
         "Wallet: Invalid owner sig"
       );
     } else {
@@ -103,8 +106,9 @@ contract Wallet is
 
       for (uint256 i = 0; i < ws.values.length; i++) {
         require(
-          userOp.isValidGuardianSignature(
+          SignatureChecker.isValidSignatureNow(
             ws.values[i].signer,
+            requestId.toEthSignedMessageHash(),
             ws.values[i].signature
           ),
           "Wallet: Invalid guardian sig"

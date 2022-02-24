@@ -12,8 +12,6 @@ import "solidity-bytes-utils/contracts/BytesLib.sol";
 import {UserOperation} from "./UserOperation.sol";
 import {WalletSignature, WalletSignatureMode, WalletSignatureValue} from "./WalletSignature.sol";
 
-import "hardhat/console.sol";
-
 struct WalletCallData {
   address to;
   uint256 value;
@@ -142,25 +140,6 @@ library WalletUserOperation {
     return spender == op.paymaster && value >= _requiredTokenFee(op, maxcost);
   }
 
-  function _hash(UserOperation calldata op) internal pure returns (bytes32) {
-    return
-      keccak256(
-        abi.encodePacked(
-          op.sender,
-          op.nonce,
-          keccak256(op.initCode),
-          keccak256(op.callData),
-          op.callGas,
-          op.verificationGas,
-          op.preVerificationGas,
-          op.maxFeePerGas,
-          op.maxPriorityFeePerGas,
-          op.paymaster,
-          keccak256(op.paymasterData)
-        )
-      ).toEthSignedMessageHash();
-  }
-
   function decodeWalletSignature(UserOperation calldata op)
     internal
     pure
@@ -173,22 +152,6 @@ library WalletUserOperation {
     data.mode = mode;
     data.values = values;
     return data;
-  }
-
-  function recoverSigner(UserOperation calldata op, bytes memory signature)
-    internal
-    pure
-    returns (address)
-  {
-    return _hash(op).recover(signature);
-  }
-
-  function isValidGuardianSignature(
-    UserOperation calldata op,
-    address guardian,
-    bytes memory signature
-  ) internal view returns (bool) {
-    return SignatureChecker.isValidSignatureNow(guardian, _hash(op), signature);
   }
 
   function isGuardianCallDataOK(UserOperation calldata op, uint256 maxcost)

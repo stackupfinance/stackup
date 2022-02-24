@@ -48,17 +48,17 @@ module.exports.revokeGuardian = (guardian) => {
   return Wallet.interface.encodeFunctionData("revokeGuardian", [guardian]);
 };
 
-module.exports.addEntryPointStake = (value, override = {}) => {
+module.exports.addEntryPointStake = (value) => {
   return Wallet.interface.encodeFunctionData("executeUserOp", [
-    override.EntryPoint ?? EntryPoint.address,
+    EntryPoint.address,
     value._isBigNumber ? value : ethers.utils.parseEther(value),
     EntryPoint.interface.encodeFunctionData("addStake"),
   ]);
 };
 
-module.exports.lockEntryPointStake = (override = {}) => {
+module.exports.lockEntryPointStake = () => {
   return Wallet.interface.encodeFunctionData("executeUserOp", [
-    override.EntryPoint ?? EntryPoint.address,
+    EntryPoint.address,
     0,
     EntryPoint.interface.encodeFunctionData("lockStake"),
   ]);

@@ -45,16 +45,18 @@ describe("EntryPoint", () => {
       Wallet.deploy(),
       Test.deploy(),
     ]);
+    contracts.Wallet.address = walletImplementation.address;
+    contracts.EntryPoint.address = entryPoint.address;
 
     const ownerInit = [
-      walletImplementation.address,
-      entryPoint.address,
+      contracts.Wallet.address,
+      contracts.EntryPoint.address,
       owner.address,
       [],
     ];
     const paymasterInit = [
-      walletImplementation.address,
-      entryPoint.address,
+      contracts.Wallet.address,
+      contracts.EntryPoint.address,
       paymaster.address,
       [],
     ];
@@ -212,17 +214,14 @@ describe("EntryPoint", () => {
           wallet.userOperations.get(paymasterWallet, {
             initCode: paymasterInitCode,
             callData: wallet.encodeFunctionData.addEntryPointStake(
-              DEFAULT_REQUIRED_PRE_FUND,
-              { EntryPoint: entryPoint.address }
+              DEFAULT_REQUIRED_PRE_FUND
             ),
           })
         ),
         wallet.userOperations.sign(
           paymaster,
           wallet.userOperations.get(paymasterWallet, {
-            callData: wallet.encodeFunctionData.lockEntryPointStake({
-              EntryPoint: entryPoint.address,
-            }),
+            callData: wallet.encodeFunctionData.lockEntryPointStake(),
             nonce: 1,
           })
         ),
@@ -270,17 +269,14 @@ describe("EntryPoint", () => {
             wallet.userOperations.get(paymasterWallet, {
               initCode: paymasterInitCode,
               callData: wallet.encodeFunctionData.addEntryPointStake(
-                ethers.utils.parseEther("1"),
-                { EntryPoint: entryPoint.address }
+                ethers.utils.parseEther("1")
               ),
             })
           ),
           wallet.userOperations.sign(
             paymaster,
             wallet.userOperations.get(paymasterWallet, {
-              callData: wallet.encodeFunctionData.lockEntryPointStake({
-                EntryPoint: entryPoint.address,
-              }),
+              callData: wallet.encodeFunctionData.lockEntryPointStake(),
               nonce: 1,
             })
           ),
@@ -351,7 +347,9 @@ describe("EntryPoint", () => {
 
   describe("addStake", () => {
     it("Should receive Eth stake from paymaster", async () => {
-      expect(...(await getAddressBalances([entryPoint.address]))).to.equal(0);
+      expect(
+        ...(await getAddressBalances([contracts.EntryPoint.address]))
+      ).to.equal(0);
       expect(await entryPoint.getStake(owner.address)).to.deep.equal([
         ethers.constants.Zero,
         ethers.constants.Zero,
@@ -360,9 +358,9 @@ describe("EntryPoint", () => {
 
       await entryPoint.addStake({ value: DEFAULT_REQUIRED_PRE_FUND });
 
-      expect(...(await getAddressBalances([entryPoint.address]))).to.equal(
-        DEFAULT_REQUIRED_PRE_FUND
-      );
+      expect(
+        ...(await getAddressBalances([contracts.EntryPoint.address]))
+      ).to.equal(DEFAULT_REQUIRED_PRE_FUND);
       expect(await entryPoint.getStake(owner.address)).to.deep.equal([
         DEFAULT_REQUIRED_PRE_FUND,
         ethers.constants.Zero,
