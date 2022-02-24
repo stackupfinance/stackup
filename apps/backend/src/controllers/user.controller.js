@@ -1,4 +1,5 @@
 const httpStatus = require('http-status');
+const crypto = require('crypto');
 const pick = require('../utils/pick');
 const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
@@ -17,12 +18,13 @@ module.exports.getUser = catchAsync(async (req, res) => {
   if (!user) {
     throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
   }
-  res.send(user);
+  const hmac = crypto.createHmac('sha256', process.env.INTERCOM_HMAC).update(user._id.toString()).digest('hex');
+  res.send({ ...user, intercomHmac: hmac });
 });
 
 module.exports.updateUser = catchAsync(async (req, res) => {
   const user = await userService.updateUserById(req.params.userId, req.body);
-  res.send(user);
+  res.send({ user });
 });
 
 module.exports.deleteUser = catchAsync(async (req, res) => {

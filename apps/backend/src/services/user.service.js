@@ -41,7 +41,10 @@ const queryUsers = async (filter, options) => {
  * @returns {Promise<User>}
  */
 const getUserById = async (id) => {
-  return User.findById(id).populate('wallet', '-_id -user -updatedAt');
+  const user = await User.findById(id).lean().populate('wallet', '-_id -user -updatedAt');
+  // const hmac = crypto.createHmac('sha256', process.env.INTERCOM_HMAC).update(user.id).digest('hex');
+  // user.INTERCOM_HMAC = hmac;
+  return user;
 };
 
 /**

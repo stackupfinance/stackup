@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { useIntercom } from 'react-use-intercom';
 import { Tabs, TabList, TabPanels, Tab, TabPanel, HStack } from '@chakra-ui/react';
-import HmacSHA256 from 'crypto-js/hmac-sha256';
 import {
   PageContainer,
   AppContainer,
@@ -42,7 +41,6 @@ import { useAuthChannel, useLogout } from '../src/hooks';
 import { txType, getActivityId } from '../src/utils/transaction';
 import { Routes } from '../src/config';
 import { EVENTS, logEvent } from '../src/utils/analytics';
-import { App } from '../src/config';
 
 const tabs = {
   EXPLORE: 0,
@@ -131,6 +129,7 @@ export default function Home() {
     user,
     wallet,
     accessToken,
+    getUser,
   } = useAccountStore(accountHomePageSelector);
   const {
     loading: searchLoading,
@@ -205,6 +204,7 @@ export default function Home() {
     fetchTransactions({ userId: user.id, accessToken: accessToken.token });
     fetchBalance(wallet);
     setInitLoad(false);
+    getUser();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [enabled]);
 
@@ -220,15 +220,13 @@ export default function Home() {
     fetchTransactions({ userId: user.id, accessToken: accessToken.token });
   });
 
-  // console.log(user)
   // Intercom user auth integration
   useEffect(() => {
-    const hmac = HmacSHA256(user.id, App.intercom.hmacSecret).toString();
     boot({
       name: user.username,
       created_at: new Date(user.updatedAt).valueOf(),
       userId: user.id,
-      user_hash: hmac,
+      user_hash: user.intercomHmac,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
