@@ -15,8 +15,8 @@ export const IntercomManager = ({ children }) => {
       }
       update({
         name: user.username,
-        user_id: user.id,
-        user_hash: user.intercomHmacHash,
+        userId: user.id,
+        userHash: user.intercomHmacHash,
       });
     } else {
       shutdown();
