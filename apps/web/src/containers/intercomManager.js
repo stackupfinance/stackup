@@ -1,19 +1,15 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useIntercom } from 'react-use-intercom';
 import { useAccountStore, accountIntercomManagerSelector } from '../state';
 
 export const IntercomManager = ({ children }) => {
   const { accessToken, user } = useAccountStore(accountIntercomManagerSelector);
-  const { boot, update, shutdown } = useIntercom();
-  const [shouldBoot, setShouldBoot] = useState(true);
+  const { boot, shutdown } = useIntercom();
 
   useEffect(() => {
     if (accessToken) {
-      if (shouldBoot) {
-        boot();
-        setShouldBoot(false);
-      }
-      update({
+      shutdown();
+      boot({
         name: user.username,
         userId: user.id,
         userHash: user.intercomHmacHash,
