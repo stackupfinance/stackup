@@ -4,6 +4,7 @@ const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
 const {
   addressService,
+  intercomService,
   userService,
   walletService,
   transactionService,
@@ -17,7 +18,7 @@ module.exports.getUser = catchAsync(async (req, res) => {
   if (!user) {
     throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
   }
-  res.send(user);
+  res.send({ ...user.toJSON(), intercomHmacHash: intercomService.getHmacHash(user._id) });
 });
 
 module.exports.updateUser = catchAsync(async (req, res) => {

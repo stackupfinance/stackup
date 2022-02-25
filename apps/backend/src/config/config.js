@@ -27,6 +27,7 @@ const envVarsSchema = Joi.object()
     WEB3_USDC: Joi.string().required().description('ERC20 token address for USDC'),
     WEB3_USDC_PRICE_FEED: Joi.string().required().description('Chainlink address for USDC price feed'),
     ANALYTICS_URL: Joi.string().required().description('Analytics url for proxying events'),
+    INTERCOM_IDENTITY_VERIFICATION_SECRET: Joi.string().default('').description('Intercom identity verification secret'),
     FEATURE_FLAG_AIRDROP_USDC: Joi.boolean().default(false).description('Automatically send new testnet accounts USDC'),
   })
   .unknown();
@@ -77,6 +78,9 @@ module.exports = {
   },
   analytics: {
     url: envVars.ANALYTICS_URL,
+  },
+  intercom: {
+    identityVerificationSecret: envVars.INTERCOM_IDENTITY_VERIFICATION_SECRET,
   },
   featureFlag: {
     airdropUSDC: envVars.FEATURE_FLAG_AIRDROP_USDC,
