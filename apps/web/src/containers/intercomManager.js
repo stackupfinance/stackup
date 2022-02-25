@@ -5,22 +5,28 @@ import { useAccountStore, accountIntercomManagerSelector } from '../state';
 export const IntercomManager = ({ children }) => {
   const { accessToken, user } = useAccountStore(accountIntercomManagerSelector);
   const { boot, update, shutdown } = useIntercom();
-  const [shouldBoot, setShouldBoot] = useState(true);
+  const [shouldBootWithAuth, setShouldBootWithAuth] = useState(true);
 
   useEffect(() => {
     if (accessToken) {
-      if (shouldBoot) {
-        boot();
-        setShouldBoot(false);
+      if (shouldBootWithAuth) {
+        boot({
+          name: user.username,
+          userId: user.id,
+          userHash: user.intercomHmacHash,
+        });
+        setShouldBootWithAuth(false);
+      } else {
+        update({
+          name: user.username,
+          userId: user.id,
+          userHash: user.intercomHmacHash,
+        });
       }
-      update({
-        name: user.username,
-        userId: user.id,
-        userHash: user.intercomHmacHash,
-      });
     } else {
       shutdown();
       boot();
+      setShouldBootWithAuth(false);
     }
   }, [accessToken]);
 
