@@ -41,8 +41,7 @@ const queryUsers = async (filter, options) => {
  * @returns {Promise<User>}
  */
 const getUserById = async (id) => {
-  const user = await User.findById(id).populate('wallet', '-_id -user -updatedAt');
-  return user;
+  return User.findById(id).populate('wallet', '-_id -user -updatedAt');
 };
 
 /**
