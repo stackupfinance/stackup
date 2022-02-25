@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-import { useIntercom } from 'react-use-intercom';
 import { Tabs, TabList, TabPanels, Tab, TabPanel, HStack } from '@chakra-ui/react';
 import {
   PageContainer,
@@ -129,7 +128,6 @@ export default function Home() {
     user,
     wallet,
     accessToken,
-    getUser,
   } = useAccountStore(accountHomePageSelector);
   const {
     loading: searchLoading,
@@ -176,7 +174,6 @@ export default function Home() {
   const [notifications, setNotifications] = useState([]);
   const [username, setUsername] = useState('');
   const [initLoad, setInitLoad] = useState(true);
-  const { boot } = useIntercom();
 
   useEffect(() => {
     setNotifications(savedNotifications);
@@ -204,7 +201,6 @@ export default function Home() {
     fetchTransactions({ userId: user.id, accessToken: accessToken.token });
     fetchBalance(wallet);
     setInitLoad(false);
-    getUser();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [enabled]);
 
@@ -219,17 +215,6 @@ export default function Home() {
     }
     fetchTransactions({ userId: user.id, accessToken: accessToken.token });
   });
-
-  // Intercom user auth integration
-  useEffect(() => {
-    boot({
-      name: user.username,
-      created_at: new Date(user.updatedAt).valueOf(),
-      userId: user.id,
-      user_hash: user.intercomHmac,
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   const onNotificationClick = async (notification) => {
     if (notification.type === txType.recoverAccount) {

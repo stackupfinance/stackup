@@ -6,6 +6,7 @@ const {
   walletService,
   tokenService,
   emailService,
+  intercomService,
   codeService,
   pusherService,
   signerService,
@@ -33,7 +34,7 @@ const login = catchAsync(async (req, res) => {
   const { username, signature } = req.body;
   const user = await authService.loginUserWithUsernameAndSignature(username, signature);
   const tokens = await tokenService.generateAuthTokens(user);
-  res.send({ user, tokens });
+  res.send({ user: { ...user.toJSON(), intercomHmacHash: intercomService.getHmacHash(user._id) }, tokens });
 });
 
 const logout = catchAsync(async (req, res) => {

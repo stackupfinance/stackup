@@ -19,7 +19,5 @@ export const App = {
   },
   intercom: {
     appId: process.env.NEXT_PUBLIC_INTERCOM_APP_ID || '',
-    hmacSecret: process.env.NEXT_PUBLIC_INTERCOM_HMAC || '',
-    apiBase: process.env.NEXT_PUBLIC_INTERCOM_API_BASE || '',
   },
 };
