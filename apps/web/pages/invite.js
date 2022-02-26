@@ -50,12 +50,11 @@ export default function Invite() {
     try {
       await fetchInvite(data);
       if (invite) {
-        setLoginSuccess("That looks good!")
+        setLoginSuccess('That looks good!');
       }
       setTimeout(() => {
         setLoginSuccess('');
       }, 3000);
-      
     } catch (error) {
       setLoginError(
         error.response?.data?.message || error.message || 'Unknown error, try again later!',
