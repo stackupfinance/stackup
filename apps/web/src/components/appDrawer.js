@@ -27,6 +27,7 @@ export const AppDrawer = () => {
 
   const onChatHandler = () => {
     show();
+    onClose();
   };
 
   return (
