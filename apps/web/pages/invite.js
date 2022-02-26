@@ -3,7 +3,14 @@ import { useState } from 'react';
 import NextLink from 'next/link';
 import { Image, VStack, Box, Input, Button } from '@chakra-ui/react';
 import { useForm } from 'react-hook-form';
-import { PageContainer, AppContainer, Head, Header, InlineError } from '../src/components';
+import {
+  PageContainer,
+  AppContainer,
+  Head,
+  Header,
+  InlineError,
+  InlineSuccess,
+} from '../src/components';
 import { useRouter } from 'next/router';
 import { useInviteStore, inviteSelector } from '../src/state';
 import { Routes } from '../src/config';
@@ -15,12 +22,16 @@ export default function Invite() {
     formState: { errors },
   } = useForm();
   const [loginError, setLoginError] = useState('');
+  const [loginSuccess, setLoginSuccess] = useState('');
+
   const router = useRouter();
   const { loading, invite, fetchInvite } = useInviteStore(inviteSelector);
 
   const renderError = () => {
     if (errors.invite) {
-      return <InlineError message="Invite code is required" />;
+      return setTimeout(() => {
+        <InlineError message="Invite code is required" />;
+      }, 3000);
     }
     if (loginError) {
       return <InlineError message={loginError} />;
@@ -28,17 +39,30 @@ export default function Invite() {
     return null;
   };
 
+  const renderSuccess = () => {
+    if (loginSuccess) {
+      return <InlineSuccess message={loginSuccess} />;
+    }
+  };
+
   const onSubmit = async (data) => {
     setLoginError('');
     try {
       await fetchInvite(data);
       if (invite) {
-        router.push('/sign-up');
+        setLoginSuccess("That looks good!")
       }
+      setTimeout(() => {
+        setLoginSuccess('');
+      }, 3000);
+      
     } catch (error) {
       setLoginError(
         error.response?.data?.message || error.message || 'Unknown error, try again later!',
       );
+      setTimeout(() => {
+        setLoginError('');
+      }, 3000);
     }
   };
 
@@ -59,7 +83,7 @@ export default function Invite() {
                     required
                   />
                   {renderError()}
-
+                  {renderSuccess()}
                   <Button
                     isFullWidth
                     isLoading={loading}
