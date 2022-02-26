@@ -1,15 +1,7 @@
 import NextLink from 'next/link';
-import {
-  Box,
-  HStack,
-  Image,
-  Spacer,
-  LinkBox,
-  LinkOverlay,
-  Heading,
-  IconButton,
-} from '@chakra-ui/react';
+import { Box, HStack, Spacer, Heading, IconButton } from '@chakra-ui/react';
 import { ChevronLeftIcon } from '@chakra-ui/icons';
+import { AppDrawer } from '.';
 
 export const NavigationHeader = ({ title, backLinkUrl }) => {
   return (
@@ -28,11 +20,7 @@ export const NavigationHeader = ({ title, backLinkUrl }) => {
 
           <Spacer />
 
-          <LinkBox>
-            <LinkOverlay href="https://stackup.sh/" target="_blank">
-              <Image src="/mark-blue.png" maxW="32px" maxH="32px" alt="stackup logo" />
-            </LinkOverlay>
-          </LinkBox>
+          <AppDrawer />
         </HStack>
       </Box>
     </header>

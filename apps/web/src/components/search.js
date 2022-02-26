@@ -2,9 +2,6 @@ import { useState, useEffect } from 'react';
 import {
   Box,
   HStack,
-  Image,
-  LinkBox,
-  LinkOverlay,
   IconButton,
   InputGroup,
   Input,
@@ -12,8 +9,7 @@ import {
   InputRightElement,
 } from '@chakra-ui/react';
 import { CloseIcon, SearchIcon } from '@chakra-ui/icons';
-import NextLink from 'next/link';
-import { Routes } from '../config';
+import { AppDrawer } from '.';
 
 export const Search = ({ onSearch, onClear, rightItem }) => {
   const [value, setValue] = useState('');
@@ -49,19 +45,7 @@ export const Search = ({ onSearch, onClear, rightItem }) => {
     <header>
       <Box borderBottomWidth="1px" bg="gray.50">
         <HStack spacing="8px" py="16px" px="16px" maxW="xl" margin="0 auto">
-          <LinkBox>
-            <NextLink href={Routes.HOME} passHref>
-              <LinkOverlay>
-                <Image
-                  src="/mark-blue.png"
-                  maxW="32px"
-                  maxH="32px"
-                  alt="stackup logo"
-                  borderRadius="full"
-                />
-              </LinkOverlay>
-            </NextLink>
-          </LinkBox>
+          <AppDrawer />
 
           <InputGroup bg="white" borderRadius="lg">
             {value && (

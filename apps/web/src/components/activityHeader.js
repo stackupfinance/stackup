@@ -1,6 +1,7 @@
 import NextLink from 'next/link';
 import { Box, HStack, Heading, IconButton } from '@chakra-ui/react';
 import { ChevronLeftIcon } from '@chakra-ui/icons';
+import { AppDrawer } from '.';
 
 export const ActivityHeader = ({ backLinkUrl, username }) => {
   return (
@@ -14,6 +15,8 @@ export const ActivityHeader = ({ backLinkUrl, username }) => {
           <Heading size="md" flex={1} textAlign="center">
             {username}
           </Heading>
+
+          <AppDrawer />
         </HStack>
       </Box>
     </header>
