@@ -21,7 +21,10 @@ const register = catchAsync(async (req, res) => {
   await userService.updateUserById(u.id, { wallet: w.id });
 
   const tokens = await tokenService.generateAuthTokens(u);
-  res.status(httpStatus.CREATED).send({ user: await userService.getUserById(u.id), tokens });
+  const userDoc = await userService.getUserById(u.id);
+  res
+    .status(httpStatus.CREATED)
+    .send({ user: { ...userDoc.toJSON(), intercomHmacHash: intercomService.getHmacHash(userDoc._id) }, tokens });
 });
 
 const lookup = catchAsync(async (req, res) => {

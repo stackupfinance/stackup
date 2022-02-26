@@ -10,6 +10,7 @@ import {
   LinkOverlay,
 } from '@chakra-ui/react';
 import { ChevronLeftIcon } from '@chakra-ui/icons';
+import { AppDrawer } from '.';
 
 export const Header = ({ backLinkUrl, backLinkLabel }) => {
   const buttonSize = useBreakpointValue({ base: 'md', sm: 'lg' });
@@ -38,6 +39,10 @@ export const Header = ({ backLinkUrl, backLinkLabel }) => {
               />
             </LinkOverlay>
           </LinkBox>
+
+          <Spacer />
+
+          <AppDrawer />
         </HStack>
       </Box>
     </header>
