@@ -46,7 +46,6 @@ export default function Invite() {
   };
 
   const onSubmit = async (data) => {
-    setLoginError('');
     try {
       await fetchInvite(data);
       if (invite) {
