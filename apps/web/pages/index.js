@@ -123,19 +123,6 @@ export default function Login() {
                   mt="16px"
                   variant="outline"
                   size="lg"
-                >
-                  Got an Invite Code?
-                </Button>
-              </NextLink>
-
-              <NextLink href={Routes.SIGN_UP} passHref>
-                <Button
-                  isFullWidth
-                  isLoading={loading}
-                  as="a"
-                  mt="16px"
-                  variant="outline"
-                  size="lg"
                   onClick={onCreateProfile}
                 >
                   Create profile

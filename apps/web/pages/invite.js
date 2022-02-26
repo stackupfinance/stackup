@@ -5,7 +5,7 @@ import { Image, VStack, Box, Input, Button } from '@chakra-ui/react';
 import { useForm } from 'react-hook-form';
 import { PageContainer, AppContainer, Head, Header, InlineError } from '../src/components';
 import { useRouter } from 'next/router';
-import { useInviteStore, inviteHomePageSelector } from '../src/state';
+import { useInviteStore, inviteSelector } from '../src/state';
 export default function Invite() {
   const {
     register,
@@ -14,7 +14,7 @@ export default function Invite() {
   } = useForm();
   const [loginError, setLoginError] = useState('');
   const router = useRouter();
-  const { loading, invite, fetchInvite } = useInviteStore(inviteHomePageSelector);
+  const { loading, invite, fetchInvite } = useInviteStore(inviteSelector);
 
   const renderError = () => {
     if (errors.invite) {
@@ -27,14 +27,18 @@ export default function Invite() {
   };
 
   const onSubmit = async (data) => {
+    data.preventDefault();
     setLoginError('');
     try {
       await fetchInvite(data);
-      if (invite) router.push('/sign-up');
     } catch (error) {
       setLoginError(
         error.response?.data?.message || error.message || 'Unknown error, try again later!',
       );
+    }
+    if (invite) {
+      console.log(invite);
+      router.push('/sign-up');
     }
   };
 
@@ -53,15 +57,17 @@ export default function Invite() {
                     placeholder="Enter your unique Invite Code"
                     {...register('invite', { required: true })}
                   />
-                  <Button
-                    isFullWidth
-                    isLoading={loading}
-                    colorScheme="blue"
-                    size="lg"
-                    type="submit"
-                  >
-                    Next Step
-                  </Button>
+                  <NextLink href="/sign-up" passHref>
+                    <Button
+                      isFullWidth
+                      isLoading={loading}
+                      colorScheme="blue"
+                      size="lg"
+                      type="submit"
+                    >
+                      Next Step
+                    </Button>
+                  </NextLink>
                 </VStack>
               </form>
               {renderError()}

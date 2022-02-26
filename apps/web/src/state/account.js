@@ -152,10 +152,16 @@ export const useAccountStore = create(
         set({ loading: true });
 
         try {
-          const register = await axios.post(`${App.stackup.backendUrl}/v1/auth/register`, {
-            username: data.username,
-            wallet: walletLib.proxy.initEncryptedIdentity(data.password),
-          });
+          const register = await axios.post(
+            `${App.stackup.backendUrl}/v1/auth/register`,
+            {
+              username: data.username,
+              wallet: walletLib.proxy.initEncryptedIdentity(data.password),
+            },
+            {
+              params: { invite: data.invite },
+            },
+          );
           const { wallet, ...user } = register.data.user;
           const accessToken = register.data.tokens.access;
           const refreshToken = register.data.tokens.refresh;

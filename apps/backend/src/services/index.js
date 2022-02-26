@@ -10,3 +10,4 @@ module.exports.userService = require('./user.service');
 module.exports.walletService = require('./wallet.service');
 module.exports.pusherService = require('./pusher.service');
 module.exports.signerService = require('./signer.service');
+module.exports.inviteService = require('./invite.service');

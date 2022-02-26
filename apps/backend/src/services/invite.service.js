@@ -1,6 +1,4 @@
-// const httpStatus = require('http-status');
 const { Invite } = require('../models');
-// const ApiError = require('../utils/ApiError');
 
 async function findInviteCode(invite) {
   const findInvite = await Invite.findOne({ invite });
@@ -11,17 +9,13 @@ async function findInviteCode(invite) {
   return findInvite;
 }
 
-async function addInviteCode(invite) {
-  const findInvite = await Invite.findOne({ invite });
+async function updateInviteCodeUsed(invite) {
+  const findInvite = await Invite.findOneAndUpdate({ invite }, { used: true });
 
-  if (findInvite) {
-    throw new Error('Invite already exists');
+  if (!findInvite) {
+    throw new Error('Invite not found');
   }
-  const addInvite = new Invite({ invite });
-
-  const addInviteResult = await addInvite.save();
-  if (!addInviteResult) throw new Error('Invite not added');
-  return addInviteResult;
+  return findInvite;
 }
 
-module.exports = { findInviteCode, addInviteCode };
+module.exports = { findInviteCode, updateInviteCodeUsed };
