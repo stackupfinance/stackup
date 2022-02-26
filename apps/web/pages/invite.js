@@ -6,6 +6,8 @@ import { useForm } from 'react-hook-form';
 import { PageContainer, AppContainer, Head, Header, InlineError } from '../src/components';
 import { useRouter } from 'next/router';
 import { useInviteStore, inviteSelector } from '../src/state';
+import { Routes } from '../src/config';
+
 export default function Invite() {
   const {
     register,
@@ -27,18 +29,16 @@ export default function Invite() {
   };
 
   const onSubmit = async (data) => {
-    data.preventDefault();
     setLoginError('');
     try {
       await fetchInvite(data);
+      if (invite) {
+        router.push('/sign-up');
+      }
     } catch (error) {
       setLoginError(
         error.response?.data?.message || error.message || 'Unknown error, try again later!',
       );
-    }
-    if (invite) {
-      console.log(invite);
-      router.push('/sign-up');
     }
   };
 
@@ -56,21 +56,35 @@ export default function Invite() {
                   <Input
                     placeholder="Enter your unique Invite Code"
                     {...register('invite', { required: true })}
+                    required
                   />
-                  <NextLink href="/sign-up" passHref>
-                    <Button
-                      isFullWidth
-                      isLoading={loading}
-                      colorScheme="blue"
-                      size="lg"
-                      type="submit"
-                    >
-                      Next Step
-                    </Button>
-                  </NextLink>
+                  {renderError()}
+
+                  <Button
+                    isFullWidth
+                    isLoading={loading}
+                    mt="16px"
+                    variant="outline"
+                    size="lg"
+                    type="submit"
+                  >
+                    Check your Invite Code
+                  </Button>
+
+                  <Button
+                    isFullWidth
+                    isDisabled={invite ? false : true}
+                    as="a"
+                    colorScheme="blue"
+                    size="lg"
+                    onClick={() => {
+                      invite && router.push(Routes.SIGN_UP);
+                    }}
+                  >
+                    Create profile
+                  </Button>
                 </VStack>
               </form>
-              {renderError()}
             </Box>
           </VStack>
         </AppContainer>
