@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "@chakra-ui/icons": "^1.1.5",
-    "@chakra-ui/react": "1.7.3",
+    "@chakra-ui/react": "1.8.5",
     "@emotion/react": "^11",
     "@emotion/styled": "^11",
     "@stackupfinance/contracts": "^1.0.0",
@@ -30,7 +30,7 @@
     "pusher-js": "^7.0.6",
     "react": "17.0.2",
     "react-dom": "17.0.2",
-    "react-hook-form": "^7.27.0",
+    "react-hook-form": "^7.27.1",
     "react-icons": "^4.3.1",
     "react-infinite-scroll-component": "^6.1.0",
     "react-jwt": "^1.1.4",
