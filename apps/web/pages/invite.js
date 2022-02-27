@@ -1,71 +1,45 @@
-/* eslint-disable unused-imports/no-unused-imports */
+// TODO: Remove this page after closed beta.
+
 import { useState } from 'react';
-import NextLink from 'next/link';
-import { Image, VStack, Box, Input, Button } from '@chakra-ui/react';
-import { useForm } from 'react-hook-form';
-import {
-  PageContainer,
-  AppContainer,
-  Head,
-  Header,
-  InlineError,
-  InlineSuccess,
-} from '../src/components';
 import { useRouter } from 'next/router';
-import { useInviteStore, inviteSelector } from '../src/state';
+import {
+  Image,
+  VStack,
+  HStack,
+  Box,
+  Button,
+  PinInput,
+  PinInputField,
+  Text,
+  Link,
+} from '@chakra-ui/react';
+import { ExternalLinkIcon } from '@chakra-ui/icons';
+import { PageContainer, AppContainer, Head, Header, InlineError } from '../src/components';
+import { useInviteStore, inviteInvitePageSelector } from '../src/state';
+import { Routes } from '../src/config';
 
 export default function Invite() {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm();
-  const [loginError, setLoginError] = useState('');
-  const [loginSuccess, setLoginSuccess] = useState('');
+  const [inviteError, setInviteError] = useState('');
 
   const router = useRouter();
-  const { loading, invite, used, fetchInvite } = useInviteStore(inviteSelector);
+  const { loading, fetchInvite } = useInviteStore(inviteInvitePageSelector);
 
   const renderError = () => {
-    if (errors.invite) {
-      return setTimeout(() => {
-        <InlineError message="Invite code is required" />;
-      }, 3000);
+    if (inviteError) {
+      return <InlineError message={inviteError} />;
     }
-    if (loginError) {
-      return <InlineError message={loginError} />;
-    }
+
     return null;
   };
 
-  const renderSuccess = () => {
-    if (loginSuccess) {
-      return <InlineSuccess message={loginSuccess} />;
-    }
-  };
-
-  const onSubmit = async (data) => {
+  const onComplete = async (code) => {
     try {
-      await fetchInvite(data);
-      if (invite && !used) {
-        setLoginSuccess('That looks good!');
-      }
-      setTimeout(() => {
-        setLoginSuccess('');
-      }, 3000);
+      await fetchInvite(code);
+      router.push(Routes.SIGN_UP);
     } catch (error) {
-      setLoginError(
+      setInviteError(
         error.response?.data?.message || error.message || 'Unknown error, try again later!',
       );
-      setTimeout(() => {
-        setLoginError('');
-      }, 3000);
-    }
-  };
-
-  const pushToSignup = () => {
-    if (invite && !used) {
-      router.push('/sign-up');
     }
   };
 
@@ -73,43 +47,50 @@ export default function Invite() {
     <>
       <Head title="Stackup" />
       <PageContainer>
-        <Header />
+        <Header backLinkUrl={Routes.LOGIN} backLinkLabel="Login" />
+
         <AppContainer>
           <VStack spacing="32px" w="100%">
             <Image src="./mark-blue.png" maxW="128px" maxH="128px" alt="stackup logo" />
-            <Box borderWidth="1px" borderRadius="lg" p="16px" w="100%">
-              <form onSubmit={handleSubmit(onSubmit)} onChange={() => setLoginError('')}>
-                <VStack spacing="16px">
-                  <Input
-                    placeholder="Enter your unique Invite Code"
-                    {...register('invite', { required: true })}
-                    required
-                  />
-                  {renderError()}
-                  {renderSuccess()}
-                  <Button
-                    isFullWidth
-                    isLoading={loading}
-                    mt="16px"
-                    variant="outline"
-                    size="lg"
-                    type="submit"
-                  >
-                    Check your Invite Code
-                  </Button>
 
-                  <Button
-                    isFullWidth
-                    isDisabled={used ? true : used === undefined ? true : false}
-                    as="a"
-                    colorScheme="blue"
+            <Box w="100%">
+              <Text size="sm" mb="8px" w="100%" fontWeight={500}>
+                Enter your six digit invite code to continue 🔑
+              </Text>
+
+              <Box borderWidth="1px" borderRadius="lg" p="16px" w="100%">
+                <HStack mb="16px" justifyContent="center">
+                  <PinInput
+                    id="pin-input-1"
                     size="lg"
-                    onClick={pushToSignup}
+                    onComplete={onComplete}
+                    onChange={() => setInviteError('')}
                   >
-                    Create profile
-                  </Button>
-                </VStack>
-              </form>
+                    <PinInputField />
+                    <PinInputField />
+                    <PinInputField />
+                    <PinInputField />
+                    <PinInputField />
+                    <PinInputField />
+                  </PinInput>
+                </HStack>
+
+                <Button
+                  as={Link}
+                  _hover={{ textDecoration: 'none' }}
+                  isFullWidth
+                  isExternal
+                  href="https://stackup.sh"
+                  isLoading={loading}
+                  colorScheme="blue"
+                  variant="outline"
+                  rightIcon={<ExternalLinkIcon />}
+                >
+                  Join the waitlist
+                </Button>
+
+                {renderError()}
+              </Box>
             </Box>
           </VStack>
         </AppContainer>

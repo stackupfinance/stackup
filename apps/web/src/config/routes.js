@@ -1,9 +1,9 @@
 export const Routes = {
   LOGIN: '/',
+  INVITE: '/invite',
   SIGN_UP: '/sign-up',
   WELCOME: '/welcome',
   HOME: '/home',
-  INVITE: '/invite',
   EDIT_PROFILE: '/edit-profile',
   UPDATE_EDIT_GUARDIANS: '/update/edit-guardians',
   UPDATE_ADD_EMAIL: '/update/add-email',

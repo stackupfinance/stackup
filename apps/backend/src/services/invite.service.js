@@ -1,21 +1,13 @@
 const { Invite } = require('../models');
 
-async function findInviteCode(invite) {
-  const findInvite = await Invite.findOne({ invite });
+module.exports.findInviteByCode = async (code) => {
+  const findInvite = await Invite.findOne({ code });
 
-  if (!findInvite) {
-    throw new Error('Invite not found');
-  }
   return findInvite;
-}
+};
 
-async function updateInviteCodeUsed(invite) {
+module.exports.updateInviteCodeUsed = async (invite) => {
   const findInvite = await Invite.findOneAndUpdate({ invite }, { used: true });
 
-  if (!findInvite) {
-    throw new Error('Invite not found');
-  }
   return findInvite;
-}
-
-module.exports = { findInviteCode, updateInviteCodeUsed };
+};

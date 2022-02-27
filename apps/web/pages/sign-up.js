@@ -44,7 +44,6 @@ export default function SignUp() {
     const { username, password } = data;
 
     try {
-      // console.log(invite)
       await fetchInvite({ invite });
       if (invite && !used) {
         await registerAccount({ username, password, invite });

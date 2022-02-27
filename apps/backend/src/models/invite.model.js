@@ -3,9 +3,10 @@ const { toJSON } = require('./plugins');
 
 const inviteSchema = mongoose.Schema(
   {
-    invite: {
+    code: {
       type: String,
       required: true,
+      unique: true,
     },
     used: {
       type: Boolean,

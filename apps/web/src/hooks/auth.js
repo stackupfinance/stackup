@@ -24,12 +24,15 @@ import {
   appsUseAuthSelector,
   usePusherStore,
   pusherUseAuthSelector,
+  useInviteStore,
+  inviteUseAuthSelector,
 } from '../state';
 import { Routes } from '../config';
 
 const REFRESH_INTERVAL_MS = 300000; // 5 minutes
 const initAuthRoutes = new Set([
   Routes.LOGIN,
+  Routes.INVITE,
   Routes.SIGN_UP,
   Routes.RECOVER_LOOKUP,
   Routes.RECOVER_NEW_PASSWORD,
@@ -51,6 +54,7 @@ export const useLogout = () => {
   const { clear: clearHistory } = useHistoryStore(historyUseAuthSelector);
   const { clear: clearApps } = useAppsStore(appsUseAuthSelector);
   const { clear: clearPusher } = usePusherStore(pusherUseAuthSelector);
+  const { clear: clearInvite } = useInviteStore(inviteUseAuthSelector);
 
   return async () => {
     clearSearch();
@@ -63,6 +67,7 @@ export const useLogout = () => {
     clearHistory();
     clearApps();
     clearPusher();
+    clearInvite();
     await logout();
   };
 };

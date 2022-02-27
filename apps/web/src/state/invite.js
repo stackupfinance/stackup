@@ -7,16 +7,14 @@ export const inviteUseAuthSelector = (state) => ({
   clear: state.clear,
 });
 
-export const inviteSelector = (state) => ({
+export const inviteInvitePageSelector = (state) => ({
   loading: state.loading,
-  invite: state.invite,
-  used: state.used,
   fetchInvite: state.fetchInvite,
 });
 
 const defaultState = {
   loading: false,
-  invite: undefined,
+  code: undefined,
   used: undefined,
 };
 
@@ -25,19 +23,19 @@ export const useInviteStore = create(
     (set, _get) => ({
       ...defaultState,
 
-      fetchInvite: async (data) => {
+      fetchInvite: async (inviteCode) => {
         set({ loading: true });
 
         try {
           const res = await axios.get(`${App.stackup.backendUrl}/v1/invite`, {
-            params: { invite: data.invite },
+            params: { code: inviteCode },
           });
 
-          const { invite, used } = res.data;
+          const { code, used } = res.data;
 
           set({
             loading: false,
-            invite,
+            code,
             used,
           });
         } catch (error) {
@@ -51,7 +49,6 @@ export const useInviteStore = create(
     {
       name: 'stackup-invite-store',
       partialize: (state) => {
-        // eslint-disable-next-line unused-imports/no-unused-vars
         const { loading, ...persisted } = state;
         return persisted;
       },

@@ -29,4 +29,3 @@ export * from './transactionDateDivider';
 export * from './updatePassword';
 export * from './userCard';
 export * from './verifyEmail';
-export * from './inlineSuccess';
