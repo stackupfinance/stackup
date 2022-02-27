@@ -18,7 +18,7 @@ import { PageContainer, AppContainer, Head, Header, InlineError } from '../src/c
 import { useInviteStore, inviteInvitePageSelector } from '../src/state';
 import { Routes } from '../src/config';
 
-export default function Invite() {
+export default function Beta() {
   const [inviteError, setInviteError] = useState('');
 
   const router = useRouter();
@@ -32,9 +32,9 @@ export default function Invite() {
     return null;
   };
 
-  const onComplete = async (code) => {
+  const onComplete = async (inviteCode) => {
     try {
-      await fetchInvite(code);
+      await fetchInvite(inviteCode);
       router.push(Routes.SIGN_UP);
     } catch (error) {
       setInviteError(

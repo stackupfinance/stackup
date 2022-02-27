@@ -1,13 +1,22 @@
+const httpStatus = require('http-status');
+const ApiError = require('../utils/ApiError');
 const { Invite } = require('../models');
 
 module.exports.findInviteByCode = async (code) => {
-  const findInvite = await Invite.findOne({ code });
+  const invite = await Invite.findOne({ code });
+  if (!invite) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Invite not found, double check your e-mail or join the waitlist!');
+  }
+  if (invite.used) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Invite has already been used, contact us if you think this is a mistake.');
+  }
 
-  return findInvite;
+  return invite;
 };
 
-module.exports.updateInviteCodeUsed = async (invite) => {
-  const findInvite = await Invite.findOneAndUpdate({ invite }, { used: true });
+module.exports.updateInvite = async (invite, updates) => {
+  Object.assign(invite, updates);
 
-  return findInvite;
+  await invite.save();
+  return invite;
 };

@@ -12,7 +12,6 @@ const {
   signerService,
   transactionService,
   notificationService,
-  inviteService,
 } = require('../services');
 
 const register = catchAsync(async (req, res) => {
@@ -20,7 +19,6 @@ const register = catchAsync(async (req, res) => {
   const u = await userService.createUser(user);
   const w = await walletService.createWallet(u.id, wallet);
   await userService.updateUserById(u.id, { wallet: w.id });
-  await inviteService.updateInviteCodeUsed(req.query.invite);
 
   const tokens = await tokenService.generateAuthTokens(u);
   const userDoc = await userService.getUserById(u.id);

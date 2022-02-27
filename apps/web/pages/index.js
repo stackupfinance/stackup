@@ -115,7 +115,7 @@ export default function Login() {
 
               <Divider mt="16px" />
 
-              <NextLink href={Routes.INVITE} passHref>
+              <NextLink href={Routes.BETA} passHref>
                 <Button
                   isFullWidth
                   isLoading={loading}

@@ -32,7 +32,7 @@ import { Routes } from '../config';
 const REFRESH_INTERVAL_MS = 300000; // 5 minutes
 const initAuthRoutes = new Set([
   Routes.LOGIN,
-  Routes.INVITE,
+  Routes.BETA,
   Routes.SIGN_UP,
   Routes.RECOVER_LOOKUP,
   Routes.RECOVER_NEW_PASSWORD,

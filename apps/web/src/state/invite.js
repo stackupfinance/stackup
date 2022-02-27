@@ -28,11 +28,10 @@ export const useInviteStore = create(
 
         try {
           const res = await axios.get(`${App.stackup.backendUrl}/v1/invite`, {
-            params: { code: inviteCode },
+            params: { inviteCode },
           });
 
           const { code, used } = res.data;
-
           set({
             loading: false,
             code,
