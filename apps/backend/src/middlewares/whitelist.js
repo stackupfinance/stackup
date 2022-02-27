@@ -1,7 +1,7 @@
 const { inviteService } = require('../services');
 const { featureFlag } = require('../config/config');
 
-module.exports.burnInvite = async (req, res, next) => {
+module.exports.useInvite = async (req, res, next) => {
   if (!featureFlag.whitelist) {
     next();
   } else {
