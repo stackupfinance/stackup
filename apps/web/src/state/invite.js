@@ -1,5 +1,4 @@
 import create from 'zustand';
-import { persist } from 'zustand/middleware';
 import axios from 'axios';
 import { App } from '../config';
 
@@ -22,39 +21,28 @@ const defaultState = {
   used: undefined,
 };
 
-export const useInviteStore = create(
-  persist(
-    (set, _get) => ({
-      ...defaultState,
+export const useInviteStore = create((set, _get) => ({
+  ...defaultState,
 
-      fetchInvite: async (inviteCode) => {
-        set({ loading: true });
+  fetchInvite: async (inviteCode) => {
+    set({ loading: true });
 
-        try {
-          const res = await axios.get(`${App.stackup.backendUrl}/v1/invite`, {
-            params: { inviteCode },
-          });
+    try {
+      const res = await axios.get(`${App.stackup.backendUrl}/v1/invite`, {
+        params: { inviteCode },
+      });
 
-          const { code, used } = res.data;
-          set({
-            loading: false,
-            code,
-            used,
-          });
-        } catch (error) {
-          set({ loading: false });
-          throw error;
-        }
-      },
+      const { code, used } = res.data;
+      set({
+        loading: false,
+        code,
+        used,
+      });
+    } catch (error) {
+      set({ loading: false });
+      throw error;
+    }
+  },
 
-      clear: () => set({ ...defaultState }),
-    }),
-    {
-      name: 'stackup-invite-store',
-      partialize: (state) => {
-        const { loading, ...persisted } = state;
-        return persisted;
-      },
-    },
-  ),
-);
+  clear: () => set({ ...defaultState }),
+}));

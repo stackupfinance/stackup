@@ -8,5 +8,6 @@ module.exports.useInvite = catchAsync(async (req, res, next) => {
   } else {
     const invite = await inviteService.findInviteByCode(req.query.inviteCode);
     await inviteService.updateInvite(invite, { used: true });
+    next();
   }
 });
