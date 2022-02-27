@@ -13,7 +13,6 @@ import {
 } from '../src/components';
 import { useRouter } from 'next/router';
 import { useInviteStore, inviteSelector } from '../src/state';
-import { Routes } from '../src/config';
 
 export default function Invite() {
   const {
@@ -25,7 +24,7 @@ export default function Invite() {
   const [loginSuccess, setLoginSuccess] = useState('');
 
   const router = useRouter();
-  const { loading, invite, fetchInvite } = useInviteStore(inviteSelector);
+  const { loading, invite, used, fetchInvite } = useInviteStore(inviteSelector);
 
   const renderError = () => {
     if (errors.invite) {
@@ -48,7 +47,7 @@ export default function Invite() {
   const onSubmit = async (data) => {
     try {
       await fetchInvite(data);
-      if (invite) {
+      if (invite && !used) {
         setLoginSuccess('That looks good!');
       }
       setTimeout(() => {
@@ -61,6 +60,12 @@ export default function Invite() {
       setTimeout(() => {
         setLoginError('');
       }, 3000);
+    }
+  };
+
+  const pushToSignup = () => {
+    if (invite && !used) {
+      router.push('/sign-up');
     }
   };
 
@@ -95,13 +100,11 @@ export default function Invite() {
 
                   <Button
                     isFullWidth
-                    isDisabled={invite ? false : true}
+                    isDisabled={used ? true : used === undefined ? true : false}
                     as="a"
                     colorScheme="blue"
                     size="lg"
-                    onClick={() => {
-                      invite && router.push(Routes.SIGN_UP);
-                    }}
+                    onClick={pushToSignup}
                   >
                     Create profile
                   </Button>

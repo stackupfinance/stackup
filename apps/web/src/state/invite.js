@@ -10,12 +10,14 @@ export const inviteUseAuthSelector = (state) => ({
 export const inviteSelector = (state) => ({
   loading: state.loading,
   invite: state.invite,
+  used: state.used,
   fetchInvite: state.fetchInvite,
 });
 
 const defaultState = {
   loading: false,
   invite: undefined,
+  used: undefined,
 };
 
 export const useInviteStore = create(
@@ -31,11 +33,12 @@ export const useInviteStore = create(
             params: { invite: data.invite },
           });
 
-          console.log(res);
+          const { invite, used } = res.data;
 
           set({
             loading: false,
-            invite: res.data.invite,
+            invite,
+            used,
           });
         } catch (error) {
           set({ loading: false });

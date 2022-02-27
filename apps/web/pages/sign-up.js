@@ -33,7 +33,7 @@ export default function SignUp() {
   const { loading, register: registerAccount } = useAccountStore(accountSignUpPageSelector);
   const { createEphemeralWallet } = useOnboardStore(onboardSignUpPageSelector);
   const [registerError, setRegisterError] = useState('');
-  const { invite } = useInviteStore(inviteSelector);
+  const { invite, used, fetchInvite } = useInviteStore(inviteSelector);
 
   useEffect(() => {
     router.prefetch(Routes.WELCOME);
@@ -45,7 +45,8 @@ export default function SignUp() {
 
     try {
       // console.log(invite)
-      if (invite) {
+      await fetchInvite({ invite });
+      if (invite && !used) {
         await registerAccount({ username, password, invite });
         createEphemeralWallet(password);
         logEvent(EVENTS.SIGN_UP_FINISH);
