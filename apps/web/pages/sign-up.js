@@ -17,7 +17,7 @@ import {
   useOnboardStore,
   onboardSignUpPageSelector,
   useInviteStore,
-  inviteSelector,
+  inviteSignUpPageSelector,
 } from '../src/state';
 import { Routes } from '../src/config';
 import { EVENTS, logEvent } from '../src/utils/analytics';
@@ -32,8 +32,8 @@ export default function SignUp() {
   } = useForm();
   const { loading, register: registerAccount } = useAccountStore(accountSignUpPageSelector);
   const { createEphemeralWallet } = useOnboardStore(onboardSignUpPageSelector);
+  const { code: inviteCode } = useInviteStore(inviteSignUpPageSelector);
   const [registerError, setRegisterError] = useState('');
-  const { invite, used, fetchInvite } = useInviteStore(inviteSelector);
 
   useEffect(() => {
     router.prefetch(Routes.WELCOME);
@@ -44,14 +44,10 @@ export default function SignUp() {
     const { username, password } = data;
 
     try {
-      await fetchInvite({ invite });
-      if (invite && !used) {
-        await registerAccount({ username, password, invite });
-        createEphemeralWallet(password);
-        logEvent(EVENTS.SIGN_UP_FINISH);
-        router.push(Routes.WELCOME);
-      }
-      setRegisterError('Invite code not found. Please use invite code to proceed.');
+      await registerAccount({ username, password, inviteCode });
+      createEphemeralWallet(password);
+      logEvent(EVENTS.SIGN_UP_FINISH);
+      router.push(Routes.WELCOME);
     } catch (error) {
       setRegisterError(error.response?.data?.message || 'Unknown error, try again later!');
     }

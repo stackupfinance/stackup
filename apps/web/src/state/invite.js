@@ -7,9 +7,13 @@ export const inviteUseAuthSelector = (state) => ({
   clear: state.clear,
 });
 
-export const inviteInvitePageSelector = (state) => ({
+export const inviteBetaPageSelector = (state) => ({
   loading: state.loading,
   fetchInvite: state.fetchInvite,
+});
+
+export const inviteSignUpPageSelector = (state) => ({
+  code: state.code,
 });
 
 const defaultState = {

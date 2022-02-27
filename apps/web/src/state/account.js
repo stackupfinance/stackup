@@ -159,7 +159,7 @@ export const useAccountStore = create(
               wallet: walletLib.proxy.initEncryptedIdentity(data.password),
             },
             {
-              params: { invite: data.invite },
+              params: { inviteCode: data.inviteCode },
             },
           );
           const { wallet, ...user } = register.data.user;

@@ -15,14 +15,14 @@ import {
 } from '@chakra-ui/react';
 import { ExternalLinkIcon } from '@chakra-ui/icons';
 import { PageContainer, AppContainer, Head, Header, InlineError } from '../src/components';
-import { useInviteStore, inviteInvitePageSelector } from '../src/state';
+import { useInviteStore, inviteBetaPageSelector } from '../src/state';
 import { Routes } from '../src/config';
 
 export default function Beta() {
   const [inviteError, setInviteError] = useState('');
 
   const router = useRouter();
-  const { loading, fetchInvite } = useInviteStore(inviteInvitePageSelector);
+  const { loading, fetchInvite } = useInviteStore(inviteBetaPageSelector);
 
   const renderError = () => {
     if (inviteError) {
