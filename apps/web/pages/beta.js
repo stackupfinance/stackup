@@ -1,5 +1,3 @@
-// TODO: Remove this page after closed beta.
-
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 import {
