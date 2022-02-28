@@ -17,10 +17,9 @@ import { useInviteStore, inviteBetaPageSelector } from '../src/state';
 import { Routes } from '../src/config';
 
 export default function Beta() {
-  const [inviteError, setInviteError] = useState('');
-
   const router = useRouter();
   const { loading, fetchInvite } = useInviteStore(inviteBetaPageSelector);
+  const [inviteError, setInviteError] = useState('');
 
   const renderError = () => {
     if (inviteError) {
