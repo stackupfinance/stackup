@@ -1,4 +1,3 @@
-/* eslint-disable unused-imports/no-unused-vars */
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { Image, VStack, Box, Input, Button } from '@chakra-ui/react';
