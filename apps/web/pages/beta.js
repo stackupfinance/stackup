@@ -44,7 +44,7 @@ export default function Beta() {
 
   return (
     <>
-      <Head title="Stackup" />
+      <Head title="Stackup | Beta" />
       <PageContainer>
         <Header backLinkUrl={Routes.LOGIN} backLinkLabel="Login" />
 
