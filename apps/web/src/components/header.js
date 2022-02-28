@@ -34,7 +34,7 @@ export const Header = ({ backLinkUrl, backLinkLabel }) => {
               <Image
                 src="/logotype-blue-navy-32x142.png"
                 maxW="142px"
-                maxH="24px"
+                maxH="32px"
                 alt="stackup logo"
               />
             </LinkOverlay>
