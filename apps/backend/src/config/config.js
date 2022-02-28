@@ -29,7 +29,7 @@ const envVarsSchema = Joi.object()
     ANALYTICS_URL: Joi.string().required().description('Analytics url for proxying events'),
     INTERCOM_IDENTITY_VERIFICATION_SECRET: Joi.string().default('').description('Intercom identity verification secret'),
     FEATURE_FLAG_AIRDROP_USDC: Joi.boolean().default(false).description('Automatically send new testnet accounts USDC'),
-    FEATURE_FLAG_WHITELIST: Joi.boolean().default(false).description('Enforce a invite only whitelist for sign up.'),
+    FEATURE_FLAG_WHITELIST: Joi.boolean().default(false).description('Enforce an invite only whitelist for sign up.'),
   })
   .unknown();
 
