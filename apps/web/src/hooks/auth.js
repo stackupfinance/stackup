@@ -24,8 +24,6 @@ import {
   appsUseAuthSelector,
   usePusherStore,
   pusherUseAuthSelector,
-  useInviteStore,
-  inviteUseAuthSelector,
 } from '../state';
 import { Routes } from '../config';
 
@@ -54,7 +52,6 @@ export const useLogout = () => {
   const { clear: clearHistory } = useHistoryStore(historyUseAuthSelector);
   const { clear: clearApps } = useAppsStore(appsUseAuthSelector);
   const { clear: clearPusher } = usePusherStore(pusherUseAuthSelector);
-  const { clear: clearInvite } = useInviteStore(inviteUseAuthSelector);
 
   return async () => {
     clearSearch();
@@ -67,7 +64,6 @@ export const useLogout = () => {
     clearHistory();
     clearApps();
     clearPusher();
-    clearInvite();
     await logout();
   };
 };
