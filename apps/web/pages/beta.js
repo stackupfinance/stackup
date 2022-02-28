@@ -15,6 +15,7 @@ import { ExternalLinkIcon } from '@chakra-ui/icons';
 import { PageContainer, AppContainer, Head, Header, InlineError } from '../src/components';
 import { useInviteStore, inviteBetaPageSelector } from '../src/state';
 import { Routes } from '../src/config';
+import { EVENTS, logEvent } from '../src/utils/analytics';
 
 export default function Beta() {
   const router = useRouter();
@@ -32,6 +33,7 @@ export default function Beta() {
   const onComplete = async (inviteCode) => {
     try {
       await fetchInvite(inviteCode);
+      logEvent(EVENTS.SIGN_UP_ENTER_INVITE_CODE);
       router.push(Routes.SIGN_UP);
     } catch (error) {
       setInviteError(
