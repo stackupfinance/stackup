@@ -28,10 +28,7 @@ export const useInviteStore = create((set, _get) => ({
       });
 
       const { code } = res.data;
-      set({
-        loading: false,
-        code,
-      });
+      set({ loading: false, code });
     } catch (error) {
       set({ loading: false });
       throw error;
