@@ -3,10 +3,11 @@ const validate = require('../../middlewares/validate');
 const authValidation = require('../../validations/auth.validation');
 const authController = require('../../controllers/auth.controller');
 const auth = require('../../middlewares/auth');
+const { useInvite } = require('../../middlewares/whitelist');
 
 const router = express.Router();
 
-router.post('/register', validate(authValidation.register), authController.register);
+router.post('/register', validate(authValidation.register), useInvite, authController.register);
 router.post('/lookup', validate(authValidation.lookup), authController.lookup);
 router.post('/login', validate(authValidation.login), authController.login);
 router.post('/logout', validate(authValidation.logout), authController.logout);

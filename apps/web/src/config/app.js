@@ -20,4 +20,7 @@ export const App = {
   intercom: {
     appId: process.env.NEXT_PUBLIC_INTERCOM_APP_ID || '',
   },
+  featureFlag: {
+    whitelist: process.env.NEXT_PUBLIC_FEATURE_FLAG_WHITELIST === 'true',
+  },
 };

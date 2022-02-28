@@ -15,6 +15,8 @@ import {
   accountSignUpPageSelector,
   useOnboardStore,
   onboardSignUpPageSelector,
+  useInviteStore,
+  inviteSignUpPageSelector,
 } from '../src/state';
 import { Routes } from '../src/config';
 import { EVENTS, logEvent } from '../src/utils/analytics';
@@ -29,6 +31,7 @@ export default function SignUp() {
   } = useForm();
   const { loading, register: registerAccount } = useAccountStore(accountSignUpPageSelector);
   const { createEphemeralWallet } = useOnboardStore(onboardSignUpPageSelector);
+  const { code: inviteCode } = useInviteStore(inviteSignUpPageSelector);
   const [registerError, setRegisterError] = useState('');
 
   useEffect(() => {
@@ -40,7 +43,7 @@ export default function SignUp() {
     const { username, password } = data;
 
     try {
-      await registerAccount({ username, password });
+      await registerAccount({ username, password, inviteCode });
       createEphemeralWallet(password);
       logEvent(EVENTS.SIGN_UP_FINISH);
       router.push(Routes.WELCOME);
