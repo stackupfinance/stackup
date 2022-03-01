@@ -61,7 +61,8 @@ if (config.env === 'production') {
 app.use('/v1', routes);
 
 // agenda dashboard
-app.use('/agendash', basicAuth({ users: { admin: config.queue.dashboardPassword }, challenge: true }), Agendash(queue));
+// TODO: Get agendash to work with reverse proxy
+app.use('/api/agendash', basicAuth({ users: { admin: config.queue.dashboardPassword }, challenge: true }), Agendash(queue));
 
 // send back a 404 error for any unknown api request
 app.use((req, res, next) => {
