@@ -11,6 +11,7 @@
   "scripts": {
     "build:env": "echo \"$MONGODB_CA_CERT\" > ./ca-certificate.crt",
     "start": "NODE_ENV=production node src/index.js",
+    "start:agendash": "agendash --db=$(cat .env | grep MONGODB_URL | sed 's:.*MONGODB_URL=::') --collection=jobs --port=3001",
     "dev": "cross-env NODE_ENV=development nodemon src/index.js",
     "test": "jest -i --colors --verbose --detectOpenHandles",
     "test:watch": "jest -i --watchAll",
@@ -28,6 +29,7 @@
   "dependencies": {
     "@stackupfinance/contracts": "^1.0.0",
     "agenda": "^4.2.1",
+    "agendash": "^3.1.0",
     "bcryptjs": "^2.4.3",
     "compression": "^1.7.4",
     "cors": "^2.8.5",
