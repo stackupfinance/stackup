@@ -28,6 +28,7 @@
   "dependencies": {
     "@stackupfinance/contracts": "^1.0.0",
     "agenda": "^4.2.1",
+    "agendash": "^3.1.0",
     "bcryptjs": "^2.4.3",
     "compression": "^1.7.4",
     "cors": "^2.8.5",
@@ -35,6 +36,7 @@
     "dotenv": "^16.0.0",
     "ethers": "^5.5.4",
     "express": "^4.17.2",
+    "express-basic-auth": "^1.2.1",
     "express-http-proxy": "^1.6.3",
     "express-mongo-sanitize": "^2.2.0",
     "express-rate-limit": "^6.3.0",
