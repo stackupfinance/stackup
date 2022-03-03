@@ -1,4 +1,7 @@
 const express = require('express');
+
+const Sentry = require('@sentry/node');
+const Tracing = require('@sentry/tracing');
 const helmet = require('helmet');
 const xss = require('xss-clean');
 const mongoSanitize = require('express-mongo-sanitize');
@@ -7,6 +10,7 @@ const cors = require('cors');
 const passport = require('passport');
 const httpStatus = require('http-status');
 const proxy = require('express-http-proxy');
+
 const config = require('./config/config');
 const morgan = require('./config/morgan');
 const { jwtStrategy } = require('./config/passport');
@@ -16,6 +20,25 @@ const { errorConverter, errorHandler } = require('./middlewares/error');
 const ApiError = require('./utils/ApiError');
 
 const app = express();
+
+Sentry.init({
+  dsn: process.env.SENTRY_DSN,
+  integrations: [
+    // enable HTTP calls tracing
+    new Sentry.Integrations.Http({ tracing: true }),
+    // enable Express.js middleware tracing
+    new Tracing.Integrations.Express({ app }),
+    new Tracing.Integrations.Mongo({
+      useMongoose: true, // Default: false
+    }),
+  ],
+
+  // Set tracesSampleRate to 1.0 to capture 100%
+  // of transactions for performance monitoring.
+  // We recommend adjusting this value in production
+  tracesSampleRate: 0.5,
+  debug: true,
+});
 
 if (config.env !== 'test') {
   app.use(morgan.successHandler);
@@ -57,8 +80,22 @@ if (config.env === 'production') {
 // v1 api routes
 app.use('/v1', routes);
 
+// RequestHandler creates a separate execution context using domains, so that every
+// transaction/span/breadcrumb is attached to its own Hub instance
+app.use(Sentry.Handlers.requestHandler());
+// TracingHandler creates a trace for every incoming request
+app.use(Sentry.Handlers.tracingHandler());
+
+// The error handler must be before any other error middleware and after all controllers
+app.use(Sentry.Handlers.errorHandler());
+
 // send back a 404 error for any unknown api request
 app.use((req, res, next) => {
+  // The error id is attached to `res.sentry` to be returned
+  // and optionally displayed to the user for support.
+  res.statusCode = 500;
+  res.end(`${res.sentry}\n`);
+
   next(new ApiError(httpStatus.NOT_FOUND, 'Not found'));
 });
 
