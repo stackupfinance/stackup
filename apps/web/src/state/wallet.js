@@ -100,7 +100,7 @@ export const useWalletStore = create(
       },
 
       signNewPaymentUserOps: async (userWallet, data, options) => {
-        const signer = wallet.proxy.decryptSigner(userWallet, data.password);
+        const signer = wallet.proxy.decryptSigner(userWallet, data.password, data.username);
         if (!signer) {
           throw new Error('Incorrect password');
         }
@@ -156,7 +156,8 @@ export const useWalletStore = create(
       },
 
       setupWalletUserOps: async (userWallet, password, options) => {
-        const signer = wallet.proxy.decryptSigner(userWallet, password);
+        const { user } = get();
+        const signer = wallet.proxy.decryptSigner(userWallet, password, user.username);
         if (!signer) {
           throw new Error('Incorrect password');
         }
@@ -193,7 +194,8 @@ export const useWalletStore = create(
       },
 
       updateGuardianOps: async (currentGuardians, newGuardians, userWallet, password, options) => {
-        const signer = wallet.proxy.decryptSigner(userWallet, password);
+        const { user } = get();
+        const signer = wallet.proxy.decryptSigner(userWallet, password, user.username);
         if (!signer) {
           throw new Error('Incorrect password');
         }
@@ -258,7 +260,8 @@ export const useWalletStore = create(
       },
 
       sendUserOpFromWalletConnect: async (userWallet, password, transaction, options) => {
-        const signer = wallet.proxy.decryptSigner(userWallet, password);
+        const { user } = get();
+        const signer = wallet.proxy.decryptSigner(userWallet, password, user.username);
         if (!signer) {
           throw new Error('Incorrect password');
         }

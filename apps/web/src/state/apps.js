@@ -153,8 +153,8 @@ export const useAppsStore = create(
         set({ callRequestQueue: callRequestQueue.slice(0, -1) });
       },
 
-      signMessage: async (wallet, message, password) => {
-        const signer = walletLib.proxy.decryptSigner(wallet, password);
+      signMessage: async (wallet, message, password, username) => {
+        const signer = walletLib.proxy.decryptSigner(wallet, password, username);
         if (!signer) throw new Error('Incorrect password');
         set({ loading: true });
 

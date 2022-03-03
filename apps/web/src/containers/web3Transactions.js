@@ -68,7 +68,7 @@ export const Web3Transactions = ({ children }) => {
       if (payload.current.method === RPC_METHODS.personalSign) {
         connector.current.approveRequest({
           id: payload.current.id,
-          result: await signMessage(wallet, payload.current.params[0], password),
+          result: await signMessage(wallet, payload.current.params[0], password, user.username),
         });
         logEvent(EVENTS.WALLET_CONNECT_APPROVE_PERSONAL_SIGN);
         removeLastInCallRequestQueue();

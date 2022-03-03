@@ -103,8 +103,8 @@ export const useRecoverStore = create(
         set({ loading: true });
 
         try {
-          const { encryptedSigner } = wallet.proxy.initEncryptedIdentity(password);
-          const newOwner = wallet.proxy.decryptSigner({ encryptedSigner }, password).address;
+          const { encryptedSigner } = await wallet.proxy.initEncryptedIdentity(password);
+          const newOwner = wallet.proxy.decryptSigner({ encryptedSigner }, password, user.username).address;
           const [isDeployed, allowance] = await Promise.all([
             wallet.proxy.isCodeDeployed(provider, user.wallet.walletAddress),
             usdcContract.allowance(user.wallet.walletAddress, App.web3.paymaster),
@@ -243,7 +243,7 @@ export const useRecoverStore = create(
         set({ loading: true });
 
         try {
-          const signer = wallet.proxy.decryptSigner({ encryptedSigner }, password);
+          const signer = wallet.proxy.decryptSigner({ encryptedSigner }, password, user.username);
           if (!signer) {
             throw new Error('Incorrect password');
           }
@@ -266,10 +266,11 @@ export const useRecoverStore = create(
       selectGuardianRequest: (savedGuardianRequest) => set({ savedGuardianRequest }),
 
       approveGuardianRequest: async (userWallet, password, options) => {
+        const { user } = get();
         const { savedGuardianRequest } = get();
         if (!savedGuardianRequest) return;
 
-        const signer = wallet.proxy.decryptSigner(userWallet, password);
+        const signer = wallet.proxy.decryptSigner(userWallet, password, user.username);
         if (!signer) {
           throw new Error('Incorrect password');
         }

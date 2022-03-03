@@ -1,6 +1,7 @@
 import create from 'zustand';
 import { persist } from 'zustand/middleware';
 import axios from 'axios';
+import scrypt from 'scrypt-js';
 import { wallet as walletLib } from '@stackupfinance/contracts';
 import { loginMessage } from '../utils/web3';
 import { App } from '../config';
@@ -152,9 +153,10 @@ export const useAccountStore = create(
         set({ loading: true });
 
         try {
+          const newWallet = await walletLib.proxy.initEncryptedIdentity(data.password, data.username);
           const register = await axios.post(`${App.stackup.backendUrl}/v1/auth/register`, {
             username: data.username,
-            wallet: walletLib.proxy.initEncryptedIdentity(data.password),
+            wallet: newWallet,
           });
           const { wallet, ...user } = register.data.user;
           const accessToken = register.data.tokens.access;
@@ -180,7 +182,7 @@ export const useAccountStore = create(
           const lookup = await axios.post(`${App.stackup.backendUrl}/v1/auth/lookup`, {
             username: data.username,
           });
-          const signer = walletLib.proxy.decryptSigner(lookup.data.user.wallet, data.password);
+          const signer = await walletLib.proxy.decryptSigner(lookup.data.user.wallet, data.password, data.username);
           if (!signer) throw new Error('Incorrect password');
 
           const login = await axios.post(`${App.stackup.backendUrl}/v1/auth/login`, {
@@ -328,6 +330,7 @@ export const useAccountStore = create(
           get().wallet,
           data.password,
           data.newPassword,
+          data.username
         );
         if (!encryptedSigner) {
           throw new Error('Incorrect password');

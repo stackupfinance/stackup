@@ -41,7 +41,7 @@ export default function SignUp() {
 
     try {
       await registerAccount({ username, password });
-      createEphemeralWallet(password);
+      createEphemeralWallet(password, username);
       logEvent(EVENTS.SIGN_UP_FINISH);
       router.push(Routes.WELCOME);
     } catch (error) {

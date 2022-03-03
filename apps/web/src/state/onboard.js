@@ -53,8 +53,14 @@ export const useOnboardStore = create(
     (set, get) => ({
       ...defaultState,
 
-      createEphemeralWallet: (password) =>
-        set({ ephemeralWallet: wallet.proxy.initEncryptedIdentity(password) }),
+      createEphemeralWallet: async (password, username) => {
+        try {
+          const ephemeralWallet = await wallet.proxy.initEncryptedIdentity(password, username);
+          set({ ephemeralWallet: ephemeralWallet });
+        } catch(error) {
+          throw(error)
+        }
+      },
 
       setGuardian: (guardian, address) => {
         const guardianMap = get().guardianMap;
