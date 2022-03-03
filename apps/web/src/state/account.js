@@ -134,7 +134,7 @@ export const accountUpdatePasswordPageSelector = (state) => ({
   updatePassword: state.updatePassword,
 });
 
-export const accountFiatetDepositPageSelector = (state) => ({
+export const accountFiatDepositPageSelector = (state) => ({
   enabled: state.enabled,
   user: state.user,
   accessToken: state.accessToken,

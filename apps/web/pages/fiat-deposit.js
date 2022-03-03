@@ -3,7 +3,7 @@ import { Image, VStack, HStack, Box, Text, Progress, useToast } from '@chakra-ui
 import { AppContainer, Head } from '../src/components';
 import {
   useAccountStore,
-  accountFiatetDepositPageSelector,
+  accountFiatDepositPageSelector,
   useFiatStore,
   fiatFiatDepositPageSelector,
 } from '../src/state';
@@ -11,7 +11,7 @@ import { EVENTS, logEvent } from '../src/utils/analytics';
 
 export default function FiatDeposit() {
   const toast = useToast();
-  const { enabled, user, accessToken } = useAccountStore(accountFiatetDepositPageSelector);
+  const { enabled, user, accessToken } = useAccountStore(accountFiatDepositPageSelector);
   const { fetchFiatDepositSession } = useFiatStore(fiatFiatDepositPageSelector);
 
   useEffect(() => {
