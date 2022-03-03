@@ -11,7 +11,7 @@ module.exports.getSessionUrl = async (userWallet) => {
       `${config.fiat.wyre.apiUrl}/v3/orders/reserve`,
       {
         referrerAccountId: config.fiat.wyre.referrerAccountId,
-        dest: `ethereum:${userWallet}`,
+        dest: `matic:${userWallet}`,
         destCurrency: POLYGON_WYRE_USDC,
         lockFields: ['destCurrency', 'dest'],
       },
