@@ -1,6 +1,7 @@
 export * from './account';
 export * from './activity';
 export * from './apps';
+export * from './fiat';
 export * from './history';
 export * from './invite';
 export * from './notification';

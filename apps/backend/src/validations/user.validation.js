@@ -133,3 +133,9 @@ module.exports.getUserTransactionHistory = {
     page: Joi.number().integer(),
   }),
 };
+
+module.exports.getUserFiatDepositSession = {
+  params: Joi.object().keys({
+    userId: Joi.string().custom(objectId),
+  }),
+};

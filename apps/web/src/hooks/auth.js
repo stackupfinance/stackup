@@ -24,6 +24,8 @@ import {
   appsUseAuthSelector,
   usePusherStore,
   pusherUseAuthSelector,
+  useFiatStore,
+  fiatUseAuthSelector,
 } from '../state';
 import { Routes } from '../config';
 
@@ -52,6 +54,7 @@ export const useLogout = () => {
   const { clear: clearHistory } = useHistoryStore(historyUseAuthSelector);
   const { clear: clearApps } = useAppsStore(appsUseAuthSelector);
   const { clear: clearPusher } = usePusherStore(pusherUseAuthSelector);
+  const { clear: clearFiat } = useFiatStore(fiatUseAuthSelector);
 
   return async () => {
     clearSearch();
@@ -64,6 +67,7 @@ export const useLogout = () => {
     clearHistory();
     clearApps();
     clearPusher();
+    clearFiat();
     await logout();
   };
 };

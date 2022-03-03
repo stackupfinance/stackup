@@ -50,4 +50,8 @@ router
   .route('/:userId/transaction/history')
   .get(auth(), validate(userValidation.getUserTransactionHistory), userController.getUserTransactionHistory);
 
+router
+  .route('/:userId/fiat/deposit-session')
+  .get(auth(), validate(userValidation.getUserFiatDepositSession), userController.getUserFiatDepositSession);
+
 module.exports = router;
