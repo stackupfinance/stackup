@@ -34,6 +34,7 @@ export const AccountOverview = ({
   walletBalance,
   walletAddress,
   username,
+  walletCta,
   transactionsContent,
 }) => {
   const toast = useToast();
@@ -125,9 +126,12 @@ export const AccountOverview = ({
               />
               <IconButton size="xs" icon={<MdOutlineMoreHoriz />} onClick={onMore} />
             </HStack>
-            <Skeleton isLoaded={!isWalletLoading} borderRadius="lg">
+
+            <Skeleton mb="16px" isLoaded={!isWalletLoading} borderRadius="lg">
               <StatNumber>{displayUSDC(walletBalance)}</StatNumber>
             </Skeleton>
+
+            {walletCta}
           </Stat>
 
           <Heading

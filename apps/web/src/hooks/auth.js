@@ -24,6 +24,8 @@ import {
   appsUseAuthSelector,
   usePusherStore,
   pusherUseAuthSelector,
+  useFiatStore,
+  fiatUseAuthSelector,
 } from '../state';
 import { Routes } from '../config';
 
@@ -52,6 +54,7 @@ export const useLogout = () => {
   const { clear: clearHistory } = useHistoryStore(historyUseAuthSelector);
   const { clear: clearApps } = useAppsStore(appsUseAuthSelector);
   const { clear: clearPusher } = usePusherStore(pusherUseAuthSelector);
+  const { clear: clearFiat } = useFiatStore(fiatUseAuthSelector);
 
   return async () => {
     clearSearch();
@@ -64,6 +67,7 @@ export const useLogout = () => {
     clearHistory();
     clearApps();
     clearPusher();
+    clearFiat();
     await logout();
   };
 };
@@ -78,7 +82,6 @@ export const useAuth = () => {
 
   const isLoggedOut = () => !refreshToken;
   const refreshTokenExpired = () => isExpired(refreshToken?.token);
-  const accessTokenExpired = () => isExpired(accessToken?.token);
   const notOnAuthPage = () => !initAuthRoutes.has(location.pathname);
   const onLoginPage = () => location.pathname === Routes.LOGIN;
   const shouldRefresh = () => accessToken && refreshToken && !isExpired(refreshToken.token);
@@ -95,7 +98,6 @@ export const useAuth = () => {
           setIsFirst(false);
           await refresh();
         } else {
-          accessTokenExpired() && (await refresh());
           onLoginPage() && router.push(Routes.HOME);
         }
       } catch (error) {
@@ -112,9 +114,12 @@ export const useAuth = () => {
   }, [refreshToken]);
 
   useEffect(() => {
-    const interval = setInterval(() => {
+    const interval = setInterval(async () => {
       if (shouldRefresh()) {
-        refresh();
+        // JWTs could have been updated in other tabs.
+        // Should manually rehydrate from storage here before refresh.
+        await useAccountStore.persist.rehydrate();
+        await refresh();
       }
     }, REFRESH_INTERVAL_MS);
 
