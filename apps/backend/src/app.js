@@ -1,4 +1,6 @@
 const express = require('express');
+const Sentry = require('@sentry/node');
+const Tracing = require('@sentry/tracing');
 const helmet = require('helmet');
 const xss = require('xss-clean');
 const mongoSanitize = require('express-mongo-sanitize');
@@ -7,6 +9,7 @@ const cors = require('cors');
 const passport = require('passport');
 const httpStatus = require('http-status');
 const proxy = require('express-http-proxy');
+const isURL = require('validator/lib/isURL');
 const config = require('./config/config');
 const morgan = require('./config/morgan');
 const { jwtStrategy } = require('./config/passport');
@@ -16,6 +19,27 @@ const { errorConverter, errorHandler } = require('./middlewares/error');
 const ApiError = require('./utils/ApiError');
 
 const app = express();
+
+if (isURL(config.sentry.dns)) {
+  Sentry.init({
+    dsn: config.sentry.dns,
+    integrations: [
+      // enable HTTP calls tracing
+      new Sentry.Integrations.Http({ tracing: true }),
+      // enable Express.js middleware tracing
+      new Tracing.Integrations.Express({ app }),
+      new Tracing.Integrations.Mongo({
+        useMongoose: true, // Default: false
+      }),
+    ],
+
+    // Set tracesSampleRate to 1.0 to capture 100%
+    // of transactions for performance monitoring.
+    // We recommend adjusting this value in production
+    tracesSampleRate: 0.5,
+    debug: true,
+  });
+}
 
 if (config.env !== 'test') {
   app.use(morgan.successHandler);
@@ -54,8 +78,17 @@ if (config.env === 'production') {
   app.use('/v1/auth', authLimiter);
 }
 
+// RequestHandler creates a separate execution context using domains, so that every
+// transaction/span/breadcrumb is attached to its own Hub instance
+app.use(Sentry.Handlers.requestHandler());
+// TracingHandler creates a trace for every incoming request
+app.use(Sentry.Handlers.tracingHandler());
+
 // v1 api routes
 app.use('/v1', routes);
+
+// The error handler must be before any other error middleware and after all controllers
+app.use(Sentry.Handlers.errorHandler());
 
 // send back a 404 error for any unknown api request
 app.use((req, res, next) => {
