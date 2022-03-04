@@ -19,7 +19,7 @@ const ApiError = require('./utils/ApiError');
 
 const app = express();
 
-config.env === 'production' &&
+if (config.env === 'production') {
   Sentry.init({
     dsn: config.sentry.dns,
     integrations: [
@@ -38,6 +38,7 @@ config.env === 'production' &&
     tracesSampleRate: 0.5,
     debug: true,
   });
+}
 
 if (config.env !== 'test') {
   app.use(morgan.successHandler);
