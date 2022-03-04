@@ -5,3 +5,4 @@ public
 .DS_Store
 *.env*
 .gitkeep
+sentry.properties
