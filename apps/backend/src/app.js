@@ -9,7 +9,6 @@ const cors = require('cors');
 const passport = require('passport');
 const httpStatus = require('http-status');
 const proxy = require('express-http-proxy');
-
 const config = require('./config/config');
 const morgan = require('./config/morgan');
 const { jwtStrategy } = require('./config/passport');
