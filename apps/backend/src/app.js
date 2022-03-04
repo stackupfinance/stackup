@@ -1,5 +1,4 @@
 const express = require('express');
-
 const Sentry = require('@sentry/node');
 const Tracing = require('@sentry/tracing');
 const helmet = require('helmet');
@@ -22,7 +21,7 @@ const ApiError = require('./utils/ApiError');
 const app = express();
 
 Sentry.init({
-  dsn: process.env.SENTRY_DSN,
+  dsn: config.sentry.dns,
   integrations: [
     // enable HTTP calls tracing
     new Sentry.Integrations.Http({ tracing: true }),
@@ -77,25 +76,20 @@ if (config.env === 'production') {
   app.use('/v1/auth', authLimiter);
 }
 
-// v1 api routes
-app.use('/v1', routes);
-
 // RequestHandler creates a separate execution context using domains, so that every
 // transaction/span/breadcrumb is attached to its own Hub instance
 app.use(Sentry.Handlers.requestHandler());
 // TracingHandler creates a trace for every incoming request
 app.use(Sentry.Handlers.tracingHandler());
 
+// v1 api routes
+app.use('/v1', routes);
+
 // The error handler must be before any other error middleware and after all controllers
 app.use(Sentry.Handlers.errorHandler());
 
 // send back a 404 error for any unknown api request
 app.use((req, res, next) => {
-  // The error id is attached to `res.sentry` to be returned
-  // and optionally displayed to the user for support.
-  res.statusCode = 500;
-  res.end(`${res.sentry}\n`);
-
   next(new ApiError(httpStatus.NOT_FOUND, 'Not found'));
 });
 
