@@ -19,7 +19,7 @@ module.exports.decryptSigner = async (wallet, password, username) => {
     if (!privateKey) return;
     return new ethers.Wallet(privateKey);
   } catch (error) {
-    throw(error);
+    console.log(error.message);
   }
 };
 

@@ -55,7 +55,7 @@ function OnboardSummary() {
   }, [enabled]);
 
   const onConfirmHandler = async (data) => {
-    const ephemeralSigner = walletLib.proxy.decryptSigner(ephemeralWallet, data.password, user.username);
+    const ephemeralSigner = await walletLib.proxy.decryptSigner(ephemeralWallet, data.password, user.username);
     if (!ephemeralSigner) {
       throw new Error('Incorrect password');
     }

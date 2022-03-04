@@ -326,7 +326,7 @@ export const useAccountStore = create(
       },
 
       updatePassword: async (data) => {
-        const encryptedSigner = walletLib.proxy.reencryptSigner(
+        const encryptedSigner = await walletLib.proxy.reencryptSigner(
           get().wallet,
           data.password,
           data.newPassword,
