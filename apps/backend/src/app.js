@@ -9,6 +9,7 @@ const cors = require('cors');
 const passport = require('passport');
 const httpStatus = require('http-status');
 const proxy = require('express-http-proxy');
+const isURL = require('validator/lib/isURL');
 const config = require('./config/config');
 const morgan = require('./config/morgan');
 const { jwtStrategy } = require('./config/passport');
@@ -19,7 +20,7 @@ const ApiError = require('./utils/ApiError');
 
 const app = express();
 
-if (config.env === 'production') {
+if (isURL(config.sentry.dns)) {
   Sentry.init({
     dsn: config.sentry.dns,
     integrations: [
