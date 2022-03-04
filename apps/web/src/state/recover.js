@@ -104,7 +104,7 @@ export const useRecoverStore = create(
 
         try {
           const { encryptedSigner } = await wallet.proxy.initEncryptedIdentity(password);
-          const newOwner = wallet.proxy.decryptSigner({ encryptedSigner }, password, user.username).address;
+          const newOwner = await wallet.proxy.decryptSigner({ encryptedSigner }, password, user.username).address;
           const [isDeployed, allowance] = await Promise.all([
             wallet.proxy.isCodeDeployed(provider, user.wallet.walletAddress),
             usdcContract.allowance(user.wallet.walletAddress, App.web3.paymaster),
