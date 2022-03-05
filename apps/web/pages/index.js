@@ -11,7 +11,7 @@ import {
   useRecoverStore,
   recoverLoginPageSelector,
 } from '../src/state';
-import { Routes } from '../src/config';
+import { App, Routes } from '../src/config';
 import { EVENTS, logEvent } from '../src/utils/analytics';
 
 export default function Login() {
@@ -115,7 +115,7 @@ export default function Login() {
 
               <Divider mt="16px" />
 
-              <NextLink href={Routes.SIGN_UP} passHref>
+              <NextLink href={App.featureFlag.whitelist ? Routes.BETA : Routes.SIGN_UP} passHref>
                 <Button
                   isFullWidth
                   isLoading={loading}

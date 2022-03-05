@@ -5,6 +5,7 @@ export * from './appContainer';
 export * from './approveRecovery';
 export * from './apps';
 export * from './confirmGuardians';
+export * from './fiat';
 export * from './appDrawer';
 export * from './guardianStatus';
 export * from './head';

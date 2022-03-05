@@ -135,6 +135,12 @@ export const accountUpdatePasswordPageSelector = (state) => ({
   updatePassword: state.updatePassword,
 });
 
+export const accountFiatDepositPageSelector = (state) => ({
+  enabled: state.enabled,
+  user: state.user,
+  accessToken: state.accessToken,
+});
+
 const defaultState = {
   enabled: false,
   loading: false,
@@ -154,10 +160,16 @@ export const useAccountStore = create(
 
         try {
           const newWallet = await walletLib.proxy.initEncryptedIdentity(data.password, data.username);
-          const register = await axios.post(`${App.stackup.backendUrl}/v1/auth/register`, {
-            username: data.username,
-            wallet: newWallet,
-          });
+          const register = await axios.post(`${App.stackup.backendUrl}/v1/auth/register`, 
+            {
+              username: data.username,
+              wallet: newWallet,
+            },
+            {
+              params: { inviteCode: data.inviteCode },
+            },
+          );
+
           const { wallet, ...user } = register.data.user;
           const accessToken = register.data.tokens.access;
           const refreshToken = register.data.tokens.refresh;

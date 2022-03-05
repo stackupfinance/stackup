@@ -28,7 +28,13 @@ const envVarsSchema = Joi.object()
     WEB3_USDC_PRICE_FEED: Joi.string().required().description('Chainlink address for USDC price feed'),
     ANALYTICS_URL: Joi.string().required().description('Analytics url for proxying events'),
     INTERCOM_IDENTITY_VERIFICATION_SECRET: Joi.string().default('').description('Intercom identity verification secret'),
+    FIAT_WYRE_API_URL: Joi.string().default('').description('Base url for Wyre API'),
+    FIAT_WYRE_REFERRER_ACCOUNT_ID: Joi.string().default('').description('Wyre account identifier'),
+    FIAT_WYRE_API_KEY: Joi.string().default('').description('API key for Wyre'),
+    FIAT_WYRE_SECRET_KEY: Joi.string().default('').description('Secret key for Wyre'),
+    SENTRY_DSN: Joi.string().default('').description('Sentry dsn url to connect to error monitoring service'),
     FEATURE_FLAG_AIRDROP_USDC: Joi.boolean().default(false).description('Automatically send new testnet accounts USDC'),
+    FEATURE_FLAG_WHITELIST: Joi.boolean().default(false).description('Enforce an invite only whitelist for sign up.'),
   })
   .unknown();
 
@@ -82,7 +88,19 @@ module.exports = {
   intercom: {
     identityVerificationSecret: envVars.INTERCOM_IDENTITY_VERIFICATION_SECRET,
   },
+  fiat: {
+    wyre: {
+      apiUrl: envVars.FIAT_WYRE_API_URL,
+      referrerAccountId: envVars.FIAT_WYRE_REFERRER_ACCOUNT_ID,
+      apiKey: envVars.FIAT_WYRE_API_KEY,
+      secretKey: envVars.FIAT_WYRE_SECRET_KEY,
+    },
+  },
+  sentry: {
+    dns: envVars.SENTRY_DSN,
+  },
   featureFlag: {
     airdropUSDC: envVars.FEATURE_FLAG_AIRDROP_USDC,
+    whitelist: envVars.FEATURE_FLAG_WHITELIST,
   },
 };

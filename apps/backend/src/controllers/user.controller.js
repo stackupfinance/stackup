@@ -10,6 +10,7 @@ const {
   transactionService,
   signerService,
   notificationService,
+  fiatService,
 } = require('../services');
 const { type } = require('../config/transaction');
 
@@ -156,4 +157,11 @@ module.exports.getUserTransactionHistory = catchAsync(async (req, res) => {
       totalResults: results.length,
     },
   });
+});
+
+module.exports.getUserFiatDepositSession = catchAsync(async (req, res) => {
+  const { userId } = req.params;
+  const user = await userService.getUserById(userId);
+
+  res.send({ sessionUrl: await fiatService.getSessionUrl(user.wallet.walletAddress) });
 });
