@@ -13,6 +13,7 @@ import {
   UserCard,
   Notifications,
   Apps,
+  Fiat,
 } from '../src/components';
 import {
   useAccountStore,
@@ -417,6 +418,7 @@ export default function Home() {
                   walletBalance={balance}
                   walletAddress={wallet?.walletAddress}
                   username={username}
+                  walletCta={<Fiat isEnabled={enabled} />}
                   transactionsContent={
                     <List
                       items={

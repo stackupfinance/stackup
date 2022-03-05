@@ -17,8 +17,10 @@
     "@chakra-ui/react": "1.7.3",
     "@emotion/react": "^11",
     "@emotion/styled": "^11",
+    "@sentry/cli": "^1.73.2",
+    "@sentry/nextjs": "^6.18.1",
     "@stackupfinance/contracts": "^1.0.0",
-    "@walletconnect/client": "^1.7.1",
+    "@walletconnect/client": "^1.7.3",
     "amplitude-js": "8.17.0",
     "axios": "^0.26.0",
     "date-fns": "^2.28.0",
@@ -36,13 +38,13 @@
     "react-jwt": "^1.1.4",
     "react-use-intercom": "^1.5.0",
     "scrypt-js": "^3.0.1",
-    "zustand": "^3.7.0",
+    "zustand": "^3.7.1",
     "zxcvbn": "^4.4.2"
   },
   "devDependencies": {
     "eslint": "^8",
     "eslint-config-next": "12.1.0",
-    "eslint-config-prettier": "^8.3.0",
+    "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-unused-imports": "^2.0.0",
     "prettier": "2.5.1"
   }

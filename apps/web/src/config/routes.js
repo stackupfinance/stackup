@@ -1,8 +1,10 @@
 export const Routes = {
   LOGIN: '/',
+  BETA: '/beta',
   SIGN_UP: '/sign-up',
   WELCOME: '/welcome',
   HOME: '/home',
+  FIAT_DEPOSIT: '/fiat-deposit',
   EDIT_PROFILE: '/edit-profile',
   UPDATE_EDIT_GUARDIANS: '/update/edit-guardians',
   UPDATE_ADD_EMAIL: '/update/add-email',
