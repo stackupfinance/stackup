@@ -185,9 +185,11 @@ export const useAccountStore = create(
           const signer = await walletLib.proxy.decryptSigner(lookup.data.user.wallet, data.password, data.username);
           if (!signer) throw new Error('Incorrect password');
 
+          const timestamp = lookup.data.timestamp;
+
           const login = await axios.post(`${App.stackup.backendUrl}/v1/auth/login`, {
             username: data.username,
-            signature: await signer.signMessage(loginMessage),
+            signature: await signer.signMessage(loginMessage + timestamp),
           });
           const { wallet, ...user } = login.data.user;
           const accessToken = login.data.tokens.access;

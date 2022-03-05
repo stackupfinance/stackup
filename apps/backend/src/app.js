@@ -68,4 +68,8 @@ app.use(errorConverter);
 // handle error
 app.use(errorHandler);
 
+// timestamp
+app.locals.tutle = "test"
+app.locals.timestamp = Date.now()
+
 module.exports = app;

@@ -61,7 +61,7 @@ module.exports.withTokenFeeValue = (txReceipt, feeData) => {
 
 module.exports.isWalletDeployed = async (walletAddress) => wallet.proxy.isCodeDeployed(provider, walletAddress);
 
-module.exports.recoverAddressFromLoginSignature = (signature) => ethers.utils.verifyMessage(loginMessage, signature);
+module.exports.recoverAddressFromLoginSignature = (signature, timestamp) => ethers.utils.verifyMessage(`${loginMessage}${timestamp}`, signature);
 
 module.exports.walletContract = (walletAddress) => contracts.Wallet.getInstance(provider).attach(walletAddress);
 

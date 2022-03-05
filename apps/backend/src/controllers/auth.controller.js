@@ -14,6 +14,9 @@ const {
   notificationService,
 } = require('../services');
 
+// map of users to timestamps
+const timestampMap = {}
+
 const register = catchAsync(async (req, res) => {
   const { wallet, ...user } = req.body;
   const u = await userService.createUser(user);
@@ -30,13 +33,17 @@ const register = catchAsync(async (req, res) => {
 const lookup = catchAsync(async (req, res) => {
   const { username } = req.body;
   const user = await userService.getWalletForLogin(username);
-  res.send({ user });
+  const timestamp = Date.now();
+  timestampMap[username] = timestamp;
+  res.send({ user, timestamp });
 });
 
 const login = catchAsync(async (req, res) => {
   const { username, signature } = req.body;
-  const user = await authService.loginUserWithUsernameAndSignature(username, signature);
+  const timestamp = timestampMap[username];
+  const user = await authService.loginUserWithUsernameAndSignature(username, signature, timestamp);
   const tokens = await tokenService.generateAuthTokens(user);
+  delete timestampMap[username];
   res.send({ user: { ...user.toJSON(), intercomHmacHash: intercomService.getHmacHash(user._id) }, tokens });
 });
 

@@ -16,12 +16,12 @@ const { isWalletDeployed, recoverAddressFromLoginSignature, walletContract } = r
  * @param {String} signature
  * @returns {Promise<User>}
  */
-const loginUserWithUsernameAndSignature = async (username, signature) => {
+const loginUserWithUsernameAndSignature = async (username, signature, timestamp) => {
   const user = await userService.getUserByUsernameWithWallet(username);
   const {
     wallet: { walletAddress, initOwner },
   } = user;
-  const recoveredAddress = recoverAddressFromLoginSignature(signature);
+  const recoveredAddress = recoverAddressFromLoginSignature(signature, timestamp);
   const owner = (await isWalletDeployed(walletAddress)) ? await walletContract(walletAddress).getOwner(0) : initOwner;
 
   if (!user || recoveredAddress !== owner) {
