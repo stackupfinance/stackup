@@ -43,7 +43,6 @@ import { useAuthChannel, useLogout } from '../src/hooks';
 import { txType, getActivityId } from '../src/utils/transaction';
 import { Routes } from '../src/config';
 import { EVENTS, logEvent } from '../src/utils/analytics';
-import { ETHprovider } from '../src/utils/web3';
 
 const tabs = {
   EXPLORE: 0,
@@ -137,6 +136,7 @@ export default function Home() {
     loading: searchLoading,
     searchData,
     searchByUsername,
+    searchByEthereum,
     fetchNextPage,
     hasMore,
     clearSearchData,
@@ -240,13 +240,22 @@ export default function Home() {
     setTabIndex(tabs.PAY);
     setShowSearch(true);
     setSearchQuery(query);
+
     if (query.startsWith('0x')) {
-      console.log(ethers.utils.isAddress(query));
+      if (ethers.utils.isAddress(query)) {
+        searchByEthereum(query, { userId: user.id, accessToken: accessToken.token });
+      } else {
+        alert('Please enter a valid Ethereum address');
+      }
+    } else if (query.endsWith('.eth')) {
+      try {
+        searchByEthereum(query, { userId: user.id, accessToken: accessToken.token });
+      } catch (err) {
+        console.log(err);
+      }
+    } else {
+      searchByUsername(query, { userId: user.id, accessToken: accessToken.token });
     }
-    if (query.includes('.eth')) {
-      console.log(await ETHprovider.resolveName(query));
-    }
-    // searchByUsername(query, { userId: user.id, accessToken: accessToken.token });
     logEvent(EVENTS.SEARCH_START);
   };
 

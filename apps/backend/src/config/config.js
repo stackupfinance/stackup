@@ -35,6 +35,7 @@ const envVarsSchema = Joi.object()
     SENTRY_DSN: Joi.string().default('').description('Sentry dsn url to connect to error monitoring service'),
     FEATURE_FLAG_AIRDROP_USDC: Joi.boolean().default(false).description('Automatically send new testnet accounts USDC'),
     FEATURE_FLAG_WHITELIST: Joi.boolean().default(false).description('Enforce an invite only whitelist for sign up.'),
+    INFURA_RPC: Joi.string().default('').description('Infura RPC for the Ethereum network'),
   })
   .unknown();
 
@@ -102,5 +103,8 @@ module.exports = {
   featureFlag: {
     airdropUSDC: envVars.FEATURE_FLAG_AIRDROP_USDC,
     whitelist: envVars.FEATURE_FLAG_WHITELIST,
+  },
+  ethereum: {
+    rpc: envVars.INFURA_RPC,
   },
 };

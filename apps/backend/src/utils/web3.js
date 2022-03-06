@@ -1,6 +1,6 @@
 const { ethers } = require('ethers');
 const { wallet, contracts, constants } = require('@stackupfinance/contracts');
-const { web3 } = require('../config/config');
+const { web3, ethereum } = require('../config/config');
 const { eventSignatures, status } = require('../config/transaction');
 
 const formatter = new Intl.NumberFormat('en-US', {
@@ -13,6 +13,8 @@ const formatter = new Intl.NumberFormat('en-US', {
 const loginMessage = 'Welcome to Stackup!';
 
 const provider = new ethers.providers.JsonRpcProvider(web3.rpc);
+
+module.exports.ETHprovider = new ethers.providers.JsonRpcProvider(ethereum.rpc);
 
 module.exports.defaultPaymasterFee = ethers.BigNumber.from(100000);
 

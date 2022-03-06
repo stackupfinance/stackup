@@ -13,6 +13,7 @@ const {
   fiatService,
 } = require('../services');
 const { type } = require('../config/transaction');
+const { ETHprovider } = require('../utils/web3');
 
 module.exports.getUser = catchAsync(async (req, res) => {
   const user = await userService.getUserById(req.params.userId);
@@ -63,17 +64,69 @@ module.exports.deleteUserNotification = catchAsync(async (req, res) => {
 
 module.exports.getUserSearch = catchAsync(async (req, res) => {
   const { userId } = req.params;
-  const options = pick(req.query, ['sortBy', 'limit', 'page']);
-  const result = await userService.queryUsers(
-    { username: { $regex: req.query.username, $options: 'i' }, _id: { $ne: userId }, isOnboarded: { $eq: true } },
-    {
-      ...options,
-      projection: 'username wallet _id',
-      populate: 'wallet',
-      populateProjection: 'walletAddress -_id',
+  const { username } = req.query;
+
+  if (username.startsWith('0x')) {
+    const users = {
+      results: [
+        {
+          username: username.slice(0, 8),
+          wallet: {
+            walletAddress: username,
+          },
+          id: username,
+        },
+      ],
+      page: 1,
+      limit: 20,
+      totalPages: 1,
+      totalResults: 1,
+    };
+
+    res.send(users);
+  } else if (username.endsWith('.eth')) {
+    const walletAddress = await ETHprovider.resolveName(username);
+    if (walletAddress) {
+      const users = {
+        results: [
+          {
+            username,
+            wallet: {
+              walletAddress,
+            },
+            id: walletAddress,
+          },
+        ],
+        page: 1,
+        limit: 20,
+        totalPages: 1,
+        totalResults: 1,
+      };
+
+      res.send(users);
     }
-  );
-  res.send(result);
+    const noUsers = {
+      results: [],
+      page: 1,
+      limit: 20,
+      totalPages: 0,
+      totalResults: 0,
+    };
+
+    res.send(noUsers);
+  } else {
+    const options = pick(req.query, ['sortBy', 'limit', 'page']);
+    const result = await userService.queryUsers(
+      { username: { $regex: req.query.username, $options: 'i' }, _id: { $ne: userId }, isOnboarded: { $eq: true } },
+      {
+        ...options,
+        projection: 'username wallet _id',
+        populate: 'wallet',
+        populateProjection: 'walletAddress -_id',
+      }
+    );
+    res.send(result);
+  }
 });
 
 module.exports.getUserActivities = catchAsync(async (req, res) => {

@@ -58,6 +58,8 @@ export const useSearchStore = create(
             },
           );
 
+          console.log(search.data);
+
           set({
             loading: false,
             searchData: search.data,
@@ -68,18 +70,20 @@ export const useSearchStore = create(
         }
       },
 
-      searchByEthereum: async (address, options = {}) => {
+      searchByEthereum: async (username, options = {}) => {
         set({ loading: true });
 
         try {
           const search = await axios.get(
             `${App.stackup.backendUrl}/v1/users/${options.userId}/search`,
             {
-              params: { address },
+              params: { username },
               headers: { Authorization: `Bearer ${options.accessToken}` },
             },
           );
 
+          console.log(search.data);
+          
           set({
             loading: false,
             searchData: search.data,
