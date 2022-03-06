@@ -25,6 +25,7 @@ const login = {
   body: Joi.object().keys({
     username: Joi.string().required(),
     signature: Joi.string().required(),
+    timestamp: Joi.number().required(),
   }),
 };
 

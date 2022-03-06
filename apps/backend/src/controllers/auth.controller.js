@@ -1,5 +1,6 @@
 const httpStatus = require('http-status');
 const catchAsync = require('../utils/catchAsync');
+const ApiError = require('../utils/ApiError');
 const {
   authService,
   userService,
@@ -13,9 +14,6 @@ const {
   transactionService,
   notificationService,
 } = require('../services');
-
-// map of users to timestamps
-const timestampMap = {}
 
 const register = catchAsync(async (req, res) => {
   const { wallet, ...user } = req.body;
@@ -33,17 +31,16 @@ const register = catchAsync(async (req, res) => {
 const lookup = catchAsync(async (req, res) => {
   const { username } = req.body;
   const user = await userService.getWalletForLogin(username);
-  const timestamp = Date.now();
-  timestampMap[username] = timestamp;
-  res.send({ user, timestamp });
+  res.send({ user });
 });
 
 const login = catchAsync(async (req, res) => {
-  const { username, signature } = req.body;
-  const timestamp = timestampMap[username];
+  const { username, signature, timestamp } = req.body;
+  const currentTime = Date.now();
+  const timestampExpired = (currentTime - timestamp > 300000) ? true : false;
+  if (timestampExpired) throw new ApiError(httpStatus.UNAUTHORIZED, 'Timestamp expired');
   const user = await authService.loginUserWithUsernameAndSignature(username, signature, timestamp);
   const tokens = await tokenService.generateAuthTokens(user);
-  delete timestampMap[username];
   res.send({ user: { ...user.toJSON(), intercomHmacHash: intercomService.getHmacHash(user._id) }, tokens });
 });
 
