@@ -23,4 +23,7 @@ export const App = {
   featureFlag: {
     whitelist: process.env.NEXT_PUBLIC_FEATURE_FLAG_WHITELIST === 'true',
   },
+  ethereum: {
+    rpc: process.env.NEXT_PUBLIC_INFURA_RPC || '',
+  },
 };

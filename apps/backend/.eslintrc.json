@@ -9,7 +9,7 @@
     "ecmaVersion": 2020
   },
   "rules": {
-    "no-console": "error",
+    "no-console": "off",
     "func-names": "off",
     "no-underscore-dangle": "off",
     "consistent-return": "off",

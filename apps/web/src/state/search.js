@@ -7,6 +7,7 @@ export const searchHomePageSelector = (state) => ({
   loading: state.loading,
   searchData: state.searchData,
   searchByUsername: state.searchByUsername,
+  searchByEthereum: state.searchByEthereum,
   fetchNextPage: state.fetchNextPage,
   hasMore: state.hasMore,
   clearSearchData: state.clearSearchData,
@@ -53,6 +54,28 @@ export const useSearchStore = create(
             `${App.stackup.backendUrl}/v1/users/${options.userId}/search`,
             {
               params: { username, limit: 20, page: 1 },
+              headers: { Authorization: `Bearer ${options.accessToken}` },
+            },
+          );
+
+          set({
+            loading: false,
+            searchData: search.data,
+          });
+        } catch (error) {
+          set({ loading: false });
+          throw error;
+        }
+      },
+
+      searchByEthereum: async (address, options = {}) => {
+        set({ loading: true });
+
+        try {
+          const search = await axios.get(
+            `${App.stackup.backendUrl}/v1/users/${options.userId}/search`,
+            {
+              params: { address },
               headers: { Authorization: `Bearer ${options.accessToken}` },
             },
           );
