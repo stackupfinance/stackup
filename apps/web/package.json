@@ -20,7 +20,7 @@
     "@sentry/cli": "^1.73.2",
     "@sentry/nextjs": "^6.18.1",
     "@stackupfinance/contracts": "^1.0.0",
-    "@walletconnect/client": "^1.7.3",
+    "@walletconnect/client": "^1.7.4",
     "amplitude-js": "8.17.0",
     "axios": "^0.26.0",
     "date-fns": "^2.28.0",
