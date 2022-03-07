@@ -36,9 +36,7 @@ const lookup = catchAsync(async (req, res) => {
 
 const login = catchAsync(async (req, res) => {
   const { username, signature, timestamp } = req.body;
-  const currentTime = Date.now();
-  const timestampExpired = (currentTime - timestamp > 300000) ? true : false;
-  if (timestampExpired) throw new ApiError(httpStatus.UNAUTHORIZED, 'Timestamp expired');
+  if (authService.isTimestampExpired(timestamp)) throw new ApiError(httpStatus.UNAUTHORIZED, 'Timestamp expired');
   const user = await authService.loginUserWithUsernameAndSignature(username, signature, timestamp);
   const tokens = await tokenService.generateAuthTokens(user);
   res.send({ user: { ...user.toJSON(), intercomHmacHash: intercomService.getHmacHash(user._id) }, tokens });
