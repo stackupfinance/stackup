@@ -185,7 +185,7 @@ export default function Home() {
     router.prefetch(Routes.LOGIN);
     router.prefetch(Routes.ACTIVITY);
     router.prefetch(Routes.RECOVER_APPROVE_REQUEST);
-    router.prefetch(Routes.TOKENS);
+    router.prefetch(Routes.HOLDINGS);
   }, [router]);
 
   useEffect(() => {
