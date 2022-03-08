@@ -10,7 +10,7 @@ const formatter = new Intl.NumberFormat('en-US', {
   maximumFractionDigits: 2,
 });
 
-const loginMessage = 'Welcome to Stackup!';
+const loginMessage = 'Welcome to Stackup!\nSign this message to log into your Stackup account.\nTimestamp: ';
 
 const provider = new ethers.providers.JsonRpcProvider(web3.rpc);
 
