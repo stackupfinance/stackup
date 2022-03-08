@@ -1,6 +1,11 @@
-const { expect } = require("chai");
-const { ethers } = require("hardhat");
-const {
+import { expect } from "chai";
+import { ethers } from "hardhat";
+import { Contract } from 'ethers';
+import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/dist/src/signer-with-address'
+
+import { bn, fp } from './utils/numbers'
+
+import {
   DEFAULT_REQUIRED_PRE_FUND,
   PAYMASTER_LOCK_EXPIRY_PERIOD,
   PAYMASTER_FEE,
@@ -15,22 +20,23 @@ const {
   sendEth,
   swapEthForToken,
   transactionFee,
-} = require("../utils/contractHelpers");
+} from './utils/contractHelpers'
+
 const { wallet, contracts } = require("../lib");
 
 describe("EntryPoint", () => {
-  let owner;
-  let paymaster;
+  let owner: SignerWithAddress;
+  let paymaster: SignerWithAddress;
 
-  let entryPoint;
-  let walletImplementation;
-  let test;
+  let entryPoint: Contract;
+  let walletImplementation: Contract;
+  let test: Contract;
 
-  let initCode;
-  let paymasterInitCode;
+  let initCode: string;
+  let paymasterInitCode: string;
 
-  let sender;
-  let paymasterWallet;
+  let sender: string;
+  let paymasterWallet: string;
 
   beforeEach(async () => {
     [owner, paymaster] = await ethers.getSigners();
@@ -95,7 +101,7 @@ describe("EntryPoint", () => {
     });
 
     it("Reverts if the wallet does not pay the correct prefund", async () => {
-      await sendEth(owner, sender, "0.0015");
+      await sendEth(owner, sender, fp(0.0015));
       const userOp = await wallet.userOperations.sign(
         owner,
         wallet.userOperations.get(sender, { initCode })
@@ -112,7 +118,7 @@ describe("EntryPoint", () => {
         owner,
         wallet.userOperations.get(sender, {
           initCode,
-          callData: encodePassEntryPointCall(test.address),
+          callData: await encodePassEntryPointCall(test.address),
         })
       );
 
@@ -139,7 +145,7 @@ describe("EntryPoint", () => {
         owner,
         wallet.userOperations.get(sender, {
           initCode,
-          callData: encodeFailEntryPointCall(test.address),
+          callData: await encodeFailEntryPointCall(test.address),
         })
       );
 
@@ -155,7 +161,7 @@ describe("EntryPoint", () => {
         wallet.userOperations.get(sender, {
           initCode,
           // use recommended default of 2 GWei for maxPriorityFee
-          maxPriorityFeePerGas: ethers.utils.parseEther("2", "gwei"),
+          maxPriorityFeePerGas: bn(2e9),
         })
       );
 
@@ -207,7 +213,7 @@ describe("EntryPoint", () => {
     });
 
     it("Reverts if paymaster fails to validate user operation", async () => {
-      await sendEth(paymaster, paymasterWallet, "10");
+      await sendEth(paymaster, paymasterWallet, fp(10));
       const userOps = await Promise.all([
         wallet.userOperations.sign(
           paymaster,
@@ -254,7 +260,7 @@ describe("EntryPoint", () => {
     describe("Successful transaction with paymaster", () => {
       beforeEach(async () => {
         await Promise.all([
-          sendEth(paymaster, paymasterWallet, "10"),
+          sendEth(paymaster, paymasterWallet, fp(10)),
           swapEthForToken(
             owner,
             sender,
@@ -348,7 +354,7 @@ describe("EntryPoint", () => {
   describe("addStake", () => {
     it("Should receive Eth stake from paymaster", async () => {
       expect(
-        ...(await getAddressBalances([contracts.EntryPoint.address]))
+        (await getAddressBalances([contracts.EntryPoint.address]))[0]
       ).to.equal(0);
       expect(await entryPoint.getStake(owner.address)).to.deep.equal([
         ethers.constants.Zero,
@@ -359,7 +365,7 @@ describe("EntryPoint", () => {
       await entryPoint.addStake({ value: DEFAULT_REQUIRED_PRE_FUND });
 
       expect(
-        ...(await getAddressBalances([contracts.EntryPoint.address]))
+        (await getAddressBalances([contracts.EntryPoint.address]))[0]
       ).to.equal(DEFAULT_REQUIRED_PRE_FUND);
       expect(await entryPoint.getStake(owner.address)).to.deep.equal([
         DEFAULT_REQUIRED_PRE_FUND,
@@ -432,12 +438,11 @@ describe("EntryPoint", () => {
       await entryPoint.unlockStake();
 
       const [initBalance] = await getAddressBalances([owner.address]);
-      const tx = await entryPoint
-        .withdrawStake(owner.address)
-        .then((tx) => tx.wait());
+      const tx = await entryPoint.withdrawStake(owner.address)
+      const receipt = await tx.wait()
       const [finalBalance] = await getAddressBalances([owner.address]);
       expect(
-        initBalance.sub(transactionFee(tx)).add(DEFAULT_REQUIRED_PRE_FUND)
+        initBalance.sub(transactionFee(receipt)).add(DEFAULT_REQUIRED_PRE_FUND)
       ).to.equal(finalBalance);
       expect(await entryPoint.getStake(owner.address)).to.deep.equal([
         ethers.constants.Zero,
