@@ -140,6 +140,13 @@ export const accountFiatDepositPageSelector = (state) => ({
   accessToken: state.accessToken,
 });
 
+export const accountHoldingsPageSelector = (state) => ({
+  enabled: state.enabled,
+  loading: state.loading,
+  user: state.user,
+  accessToken: state.accessToken,
+});
+
 const defaultState = {
   enabled: false,
   loading: false,

@@ -38,6 +38,10 @@ export const displayUSDC = (balance) => {
   return formatter.format(balanceToString(balance));
 };
 
+export const displayGenericToken = (value, decimal, symbol) => {
+  return `${ethers.utils.formatUnits(ethers.BigNumber.from(value), decimal)} ${symbol}`;
+};
+
 export const signatureCount = (userOp) => {
   const ws =
     userOp.signature !== constants.userOperations.nullCode
