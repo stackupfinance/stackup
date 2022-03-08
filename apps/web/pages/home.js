@@ -185,6 +185,7 @@ export default function Home() {
     router.prefetch(Routes.LOGIN);
     router.prefetch(Routes.ACTIVITY);
     router.prefetch(Routes.RECOVER_APPROVE_REQUEST);
+    router.prefetch(Routes.TOKENS);
   }, [router]);
 
   useEffect(() => {
@@ -261,6 +262,11 @@ export default function Home() {
     logEvent(EVENTS.LOGOUT);
   };
 
+  const onMoreHandler = () => {
+    logEvent(EVENTS.GO_TO_HOLDINGS);
+    router.push(Routes.HOLDINGS);
+  };
+
   const onSearchResultHandler = (result) => {
     selectActivity({
       id: getActivityId(wallet.walletAddress, result.wallet.walletAddress),
@@ -272,7 +278,7 @@ export default function Home() {
 
   const onActivityHandler = (activity) => {
     selectActivity(activity);
-    logEvent(EVENTS.GOT_TO_ACTIVITY_ITEM);
+    logEvent(EVENTS.GO_TO_ACTIVITY_ITEM);
     router.push(Routes.ACTIVITY);
   };
 
@@ -415,6 +421,7 @@ export default function Home() {
                   isAccountLoading={accountLoading}
                   isWalletLoading={initLoad || walletLoading}
                   onLogout={logoutHandler}
+                  onMore={onMoreHandler}
                   walletBalance={balance}
                   walletAddress={wallet?.walletAddress}
                   username={username}

@@ -3,6 +3,7 @@ export * from './activity';
 export * from './apps';
 export * from './fiat';
 export * from './history';
+export * from './holdings';
 export * from './invite';
 export * from './notification';
 export * from './onboard';

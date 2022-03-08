@@ -36,6 +36,7 @@ export const AccountOverview = ({
   username,
   walletCta,
   transactionsContent,
+  onMore = () => {},
 }) => {
   const toast = useToast();
   const buttonSize = useBreakpointValue({ base: 'md', sm: 'lg' });
@@ -52,16 +53,6 @@ export const AccountOverview = ({
     toast({
       title: 'Wallet address copied.',
       status: 'success',
-      position: 'top-right',
-      duration: 5000,
-      isClosable: true,
-    });
-  };
-
-  const onMore = async () => {
-    toast({
-      title: 'Wallet breakdown coming soon.',
-      status: 'info',
       position: 'top-right',
       duration: 5000,
       isClosable: true,

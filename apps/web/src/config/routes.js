@@ -4,6 +4,7 @@ export const Routes = {
   SIGN_UP: '/sign-up',
   WELCOME: '/welcome',
   HOME: '/home',
+  HOLDINGS: '/holdings',
   FIAT_DEPOSIT: '/fiat-deposit',
   EDIT_PROFILE: '/edit-profile',
   UPDATE_EDIT_GUARDIANS: '/update/edit-guardians',
