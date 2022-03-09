@@ -72,13 +72,14 @@ module.exports.getUserSearch = catchAsync(async (req, res) => {
   // For ETH address user input
   if (isValidETHAddress) {
     const getENSFromETHAddress = await ETHprovider.lookupAddress(ETHaddress);
-    const getExistingUser = await userService.getUserByUsername(getENSFromETHAddress || ETHaddress);
+    const getExistingUser = await userService.getUserByUsernameWithWallet(getENSFromETHAddress || ETHaddress);
     // Create a new user if non-existent user
     if (!getExistingUser) {
       const { u, w } = await createUserGenerator(getENSFromETHAddress || ETHaddress, ETHaddress);
       const users = activityGenerator(u, w);
       res.send(users);
     }
+    console.log(getExistingUser);
     const users = activityGenerator(getExistingUser, getExistingUser.wallet);
     res.send(users);
   }
@@ -87,7 +88,7 @@ module.exports.getUserSearch = catchAsync(async (req, res) => {
     // Here ETH address is actually an ENS address
     const addressFromENS = await ETHprovider.resolveName(ETHaddress);
     if (addressFromENS) {
-      const getExistingUser = await userService.getUserByUsername(ETHaddress);
+      const getExistingUser = await userService.getUserByUsernameWithWallet(ETHaddress);
       if (!getExistingUser) {
         const { u, w } = await createUserGenerator(ETHaddress, addressFromENS);
         const users = activityGenerator(u, w);
