@@ -49,6 +49,7 @@
     "crypto-js": "^4.1.1",
     "eth-crypto": "^2.2.0",
     "ethers": "^5.5.4",
+    "scrypt-js": "^3.0.1",
     "solidity-bytes-utils": "^0.8.0"
   }
 }
