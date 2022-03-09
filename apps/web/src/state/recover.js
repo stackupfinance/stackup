@@ -103,7 +103,7 @@ export const useRecoverStore = create(
         set({ loading: true });
 
         try {
-          const { encryptedSigner } = await wallet.proxy.initEncryptedIdentity(password);
+          const { encryptedSigner } = await wallet.proxy.initEncryptedIdentity(password, user.username);
           const newOwner = await wallet.proxy.decryptSigner({ encryptedSigner }, password, user.username).address;
           const [isDeployed, allowance] = await Promise.all([
             wallet.proxy.isCodeDeployed(provider, user.wallet.walletAddress),
@@ -267,7 +267,7 @@ export const useRecoverStore = create(
 
       approveGuardianRequest: async (userWallet, password, options) => {
         const { savedGuardianRequest, user } = get();
-        if (!savedGuardianRequest) return;
+        if (!savedGuardianRequest || !user) return;
 
         const signer = await wallet.proxy.decryptSigner(userWallet, password, user.username);
         if (!signer) {

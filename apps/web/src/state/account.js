@@ -1,7 +1,6 @@
 import create from 'zustand';
 import { persist } from 'zustand/middleware';
 import axios from 'axios';
-import scrypt from 'scrypt-js';
 import { wallet as walletLib } from '@stackupfinance/contracts';
 import { loginMessage } from '../utils/web3';
 import { App } from '../config';
@@ -159,11 +158,10 @@ export const useAccountStore = create(
         set({ loading: true });
 
         try {
-          const newWallet = await walletLib.proxy.initEncryptedIdentity(data.password, data.username);
           const register = await axios.post(`${App.stackup.backendUrl}/v1/auth/register`, 
             {
               username: data.username,
-              wallet: newWallet,
+              wallet: await walletLib.proxy.initEncryptedIdentity(data.password, data.username),
             },
             {
               params: { inviteCode: data.inviteCode },
@@ -201,8 +199,8 @@ export const useAccountStore = create(
 
           const login = await axios.post(`${App.stackup.backendUrl}/v1/auth/login`, {
             username: data.username,
-            signature: await signer.signMessage(loginMessage + timestamp),
-            timestamp: timestamp,
+            signature: await signer.signMessage(`${loginMessage}${timestamp}`),
+            timestamp,
           });
           const { wallet, ...user } = login.data.user;
           const accessToken = login.data.tokens.access;

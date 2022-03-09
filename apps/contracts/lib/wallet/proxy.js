@@ -10,30 +10,31 @@ const walletProxy = require("../contracts/walletProxy");
 const userOperation = require("../constants/userOperations");
 const encodeFunctionData = require("./encodeFunctionData");
 
-module.exports.decryptSigner = async (wallet, password, username) => {
+module.exports.decryptSigner = async (wallet, password, salt) => {
   try {
-    const passwordKey = await generatePasswordKey(password, username)
+    const passwordKey = await generatePasswordKey(password, salt)
     const privateKey = AES.decrypt(wallet.encryptedSigner, Buffer.from(passwordKey).toString('hex')).toString(
       Utf8
     );
     if (!privateKey) return;
     return new ethers.Wallet(privateKey);
   } catch (error) {
-    console.log(error.message);
+    console.error(error.message);
   }
 };
 
-module.exports.reencryptSigner = async (wallet, password, newPassword, username) => {
+module.exports.reencryptSigner = async (wallet, password, newPassword, salt) => {
   try {
-    const passwordKey = await generatePasswordKey(password, username);
+    const passwordKey = await generatePasswordKey(password, salt);
     const privateKey = AES.decrypt(wallet.encryptedSigner, Buffer.from(passwordKey).toString('hex')).toString(
       Utf8
     );
     if (!privateKey) return;
 
-    const newPasswordKey = await generatePasswordKey(newPassword, username);
+    const newPasswordKey = await generatePasswordKey(newPassword, salt);
     return AES.encrypt(privateKey, Buffer.from(newPasswordKey).toString('hex')).toString();
   } catch (error) {
+    console.error(error.message);
   }
 };
 
@@ -49,7 +50,7 @@ const generatePasswordKey = async (password, salt) => {
   }
 };
 
-module.exports.initEncryptedIdentity = async (password, username, opts = {}) => {
+module.exports.initEncryptedIdentity = async (password, salt, opts = {}) => {
   const signer = EthCrypto.createIdentity();
 
   const initImplementation = Wallet.address;
@@ -62,7 +63,7 @@ module.exports.initEncryptedIdentity = async (password, username, opts = {}) => 
     initOwner,
     initGuardians
   );
-  const passwordKey = await generatePasswordKey(password, username);
+  const passwordKey = await generatePasswordKey(password, salt);
   return {
     walletAddress,
     initImplementation,
