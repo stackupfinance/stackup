@@ -90,10 +90,10 @@ module.exports.getUserSearch = catchAsync(async (req, res) => {
       const getExistingUser = await userService.getUserByUsername(ETHaddress);
       if (!getExistingUser) {
         const { u, w } = await createUserGenerator(ETHaddress, addressFromENS);
-        const users = getExistingUser(u, w);
+        const users = activityGenerator(u, w);
         res.send(users);
       }
-      const users = getExistingUser(getExistingUser, getExistingUser.wallet);
+      const users = activityGenerator(getExistingUser, getExistingUser.wallet);
       res.send(users);
     }
     // Return empty array as no ETH address is associated with the ENS address given
@@ -106,19 +106,18 @@ module.exports.getUserSearch = catchAsync(async (req, res) => {
     };
 
     res.send(noUsers);
-  } else {
-    const options = pick(req.query, ['sortBy', 'limit', 'page']);
-    const result = await userService.queryUsers(
-      { username: { $regex: req.query.username, $options: 'i' }, _id: { $ne: userId }, isOnboarded: { $eq: true } },
-      {
-        ...options,
-        projection: 'username wallet _id',
-        populate: 'wallet',
-        populateProjection: 'walletAddress -_id',
-      }
-    );
-    res.send(result);
   }
+  const options = pick(req.query, ['sortBy', 'limit', 'page']);
+  const result = await userService.queryUsers(
+    { username: { $regex: req.query.username, $options: 'i' }, _id: { $ne: userId }, isOnboarded: { $eq: true } },
+    {
+      ...options,
+      projection: 'username wallet _id',
+      populate: 'wallet',
+      populateProjection: 'walletAddress -_id',
+    }
+  );
+  res.send(result);
 });
 
 module.exports.getUserActivities = catchAsync(async (req, res) => {
