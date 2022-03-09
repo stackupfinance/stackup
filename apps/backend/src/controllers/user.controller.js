@@ -3,7 +3,7 @@ const { ethers } = require('ethers');
 const pick = require('../utils/pick');
 const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
-const { activityGenerator, userObjectGenerator, userGenerator } = require('../utils/generators');
+const { createUserGenerator, activityGenerator } = require('../utils/generators');
 const {
   addressService,
   intercomService,
@@ -73,16 +73,12 @@ module.exports.getUserSearch = catchAsync(async (req, res) => {
   if (isValidETHAddress) {
     const getENSFromETHAddress = await ETHprovider.lookupAddress(ETHaddress);
     const getExistingUser = await userService.getUserByUsername(getENSFromETHAddress || ETHaddress);
-
     // Create a new user if non-existent user
     if (!getExistingUser) {
-      const userObject = userObjectGenerator(getENSFromETHAddress || ETHaddress, ETHaddress);
-      const { wallet, ...user } = userObject;
-      const { u, w } = await userGenerator(user, wallet);
+      const { u, w } = await createUserGenerator(getENSFromETHAddress || ETHaddress, ETHaddress);
       const users = activityGenerator(u, w);
       res.send(users);
     }
-
     const users = activityGenerator(getExistingUser, getExistingUser.wallet);
     res.send(users);
   }
@@ -90,18 +86,13 @@ module.exports.getUserSearch = catchAsync(async (req, res) => {
   else if (ETHaddress.endsWith('.eth')) {
     // Here ETH address is actually an ENS address
     const addressFromENS = await ETHprovider.resolveName(ETHaddress);
-
     if (addressFromENS) {
       const getExistingUser = await userService.getUserByUsername(ETHaddress);
-
       if (!getExistingUser) {
-        const userObject = userObjectGenerator(ETHaddress, addressFromENS);
-        const { wallet, ...user } = userObject;
-        const { u, w } = await userGenerator(user, wallet);
+        const { u, w } = await createUserGenerator(ETHaddress, addressFromENS);
         const users = getExistingUser(u, w);
         res.send(users);
       }
-
       const users = getExistingUser(getExistingUser, getExistingUser.wallet);
       res.send(users);
     }

@@ -42,4 +42,12 @@ const userGenerator = async (user, wallet) => {
   return { u, w };
 };
 
-module.exports = { activityGenerator, userObjectGenerator, userGenerator };
+const createUserGenerator = async (ETHaddress, addressFromENS) => {
+  const userObject = userObjectGenerator(ETHaddress, addressFromENS);
+  const { wallet, ...user } = userObject;
+  const { u, w } = await userGenerator(user, wallet);
+
+  return { u, w };
+};
+
+module.exports = { activityGenerator, userObjectGenerator, userGenerator, createUserGenerator };
