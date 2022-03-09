@@ -69,11 +69,12 @@ module.exports.getUserSearch = catchAsync(async (req, res) => {
   const { username: ETHaddress } = req.query;
   const isValidETHAddress = ethers.utils.isAddress(ETHaddress);
 
+  // For ETH address user input
   if (isValidETHAddress) {
     const getENSFromETHAddress = await ETHprovider.lookupAddress(ETHaddress);
-
     const getExistingUser = await userService.getUserByUsername(getENSFromETHAddress || ETHaddress);
 
+    // Create a new user if non-existent user
     if (!getExistingUser) {
       const userObject = userObjectGenerator(getENSFromETHAddress || ETHaddress, ETHaddress);
       const { wallet, ...user } = userObject;
@@ -84,7 +85,10 @@ module.exports.getUserSearch = catchAsync(async (req, res) => {
 
     const users = activityGenerator(getExistingUser, getExistingUser.wallet);
     res.send(users);
-  } else if (ETHaddress.endsWith('.eth')) {
+  }
+  // For ENS user input
+  else if (ETHaddress.endsWith('.eth')) {
+    // Here ETH address is actually an ENS address
     const addressFromENS = await ETHprovider.resolveName(ETHaddress);
 
     if (addressFromENS) {
@@ -101,7 +105,7 @@ module.exports.getUserSearch = catchAsync(async (req, res) => {
       const users = getExistingUser(getExistingUser, getExistingUser.wallet);
       res.send(users);
     }
-
+    // Return empty array as no ETH address is associated with the ENS address given
     const noUsers = {
       results: [],
       page: 1,
