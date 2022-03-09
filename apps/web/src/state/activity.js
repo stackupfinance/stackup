@@ -47,6 +47,8 @@ export const useActivityStore = create(
             },
           );
 
+          console.log(res.data);
+          
           set({
             loading: false,
             activityList: res.data,

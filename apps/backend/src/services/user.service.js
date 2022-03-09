@@ -1,4 +1,5 @@
 const httpStatus = require('http-status');
+const { ethers } = require('ethers');
 const { User, Wallet } = require('../models');
 const ApiError = require('../utils/ApiError');
 const { isBlacklisted } = require('../config/username');
@@ -9,6 +10,9 @@ const { isBlacklisted } = require('../config/username');
  * @returns {Promise<User>}
  */
 const createUser = async (userBody) => {
+  if (ethers.utils.isAddress(userBody.username)) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Username cannot be an ETH address');
+  }
   if (await User.isUsernameTaken(userBody.username)) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Username already taken');
   }
