@@ -35,7 +35,7 @@ export default function Login() {
 
     try {
       await login(data);
-      createEphemeralWallet(data.password, data.username);
+      createEphemeralWallet(data.username, data.password);
       logEvent(EVENTS.LOGIN);
     } catch (error) {
       setLoginError(
