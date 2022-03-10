@@ -99,14 +99,22 @@ export const useWalletStore = create(
         }
       },
 
-      signNewPaymentUserOps: async (userWallet, data, options) => {
-        const signer = await wallet.proxy.decryptSigner(userWallet, data.password, data.username);
-        if (!signer) {
-          throw new Error('Incorrect password');
-        }
+      signNewPaymentUserOps: async (
+        userWallet,
+        username,
+        password,
+        amount,
+        toWalletAddress,
+        options,
+      ) => {
         set({ loading: true });
 
         try {
+          const signer = await wallet.proxy.decryptSigner(userWallet, password, username);
+          if (!signer) {
+            throw new Error('Incorrect password');
+          }
+
           const [isDeployed, allowance] = await Promise.all([
             wallet.proxy.isCodeDeployed(provider, userWallet.walletAddress),
             usdcContract.allowance(userWallet.walletAddress, App.web3.paymaster),
@@ -138,8 +146,8 @@ export const useWalletStore = create(
               nonce: shouldApprove ? nonce + 1 : nonce,
               callData: wallet.encodeFunctionData.ERC20Transfer(
                 App.web3.usdc,
-                data.toWalletAddress,
-                ethers.utils.parseUnits(data.amount, App.web3.usdcUnits),
+                toWalletAddress,
+                ethers.utils.parseUnits(amount, App.web3.usdcUnits),
               ),
             }),
           ])
