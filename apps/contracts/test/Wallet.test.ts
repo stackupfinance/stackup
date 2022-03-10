@@ -1,6 +1,9 @@
-const { expect } = require("chai");
-const { ethers, network } = require("hardhat");
-const {
+import { expect } from 'chai'
+import { ethers, network } from 'hardhat'
+import { Contract, ContractTransaction } from 'ethers'
+import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/dist/src/signer-with-address'
+
+import {
   DEFAULT_REQUIRED_PRE_FUND,
   MOCK_POST_OP_TOKEN_FEE,
   PAYMASTER_FEE,
@@ -14,27 +17,29 @@ const {
   sendEth,
   swapEthForToken,
   transactionFee,
-} = require("../utils/contractHelpers");
+} from './utils/contractHelpers'
+import { fp } from './utils/numbers'
+
 const { wallet, constants, contracts } = require("../lib");
 
 describe("Wallet", () => {
-  let mockEntryPoint;
-  let paymasterUser;
-  let regularUser;
-  let regularGuardian;
-  let anotherRegularGuardian;
-  let newOwner;
+  let mockEntryPoint: SignerWithAddress;
+  let paymasterUser: SignerWithAddress;
+  let regularUser: SignerWithAddress;
+  let regularGuardian: SignerWithAddress;
+  let anotherRegularGuardian: SignerWithAddress;
+  let newOwner: SignerWithAddress;
 
-  let walletImplementation;
-  let test;
+  let walletImplementation: Contract;
+  let test: Contract;
 
-  let paymasterUserWalletProxy;
-  let regularUserWalletProxy;
-  let regularGuardianProxy;
+  let paymasterUserWalletProxy: Contract;
+  let regularUserWalletProxy: Contract;
+  let regularGuardianProxy: Contract;
 
-  let paymasterUserWallet;
-  let regularUserWallet;
-  let regularGuardianWallet;
+  let paymasterUserWallet: Contract;
+  let regularUserWallet: Contract;
+  let regularGuardianWallet: Contract;
 
   beforeEach(async () => {
     [
@@ -98,7 +103,7 @@ describe("Wallet", () => {
   });
 
   describe("upgradeTo", () => {
-    let newWalletImplementation;
+    let newWalletImplementation: Contract;
 
     beforeEach(async () => {
       newWalletImplementation = await ethers
@@ -226,8 +231,8 @@ describe("Wallet", () => {
       const requiredPrefund = await sendEth(
         paymasterUser,
         paymasterUserWallet.address,
-        "0.1"
-      ).then((res) => res.value);
+        fp(0.1)
+      ).then((res: ContractTransaction) => res.value);
       const [entryPointInitBalance, walletInitBalance] =
         await getAddressBalances([
           contracts.EntryPoint.address,
@@ -247,7 +252,7 @@ describe("Wallet", () => {
 
       const tx = await paymasterUserWallet
         .validateUserOp(userOp, requestId, requiredPrefund)
-        .then((res) => res.wait());
+        .then((res: ContractTransaction) => res.wait());
 
       const [entryPointFinalBalance, walletFinalBalance] =
         await getAddressBalances([
@@ -264,8 +269,8 @@ describe("Wallet", () => {
       const balance = await sendEth(
         paymasterUser,
         paymasterUserWallet.address,
-        "0.1"
-      ).then((res) => res.value);
+        fp(0.1)
+      ).then((res: ContractTransaction) => res.value);
 
       const userOp = await wallet.userOperations.sign(
         paymasterUser,
@@ -342,7 +347,7 @@ describe("Wallet", () => {
               ),
             })
           )
-          .then((op) => {
+          .then((op: any) => {
             op.callData = wallet.encodeFunctionData.transferOwner(
               newOwner.address
             );
@@ -402,7 +407,7 @@ describe("Wallet", () => {
                 })
               )
             )
-            .then((op) =>
+            .then((op: any) =>
               wallet.userOperations.signAsGuardian(
                 anotherRegularGuardian,
                 anotherRegularGuardian.address,
@@ -420,7 +425,7 @@ describe("Wallet", () => {
                 ),
               })
             )
-            .then((op) =>
+            .then((op: any) =>
               wallet.userOperations.signAsGuardian(
                 anotherRegularGuardian,
                 anotherRegularGuardian.address,
@@ -542,7 +547,7 @@ describe("Wallet", () => {
           paymasterUserWallet.address,
           ...PAYMASTER_OPTS,
           wallet.userOperations.get(regularUserWallet.address, {
-            callData: encodePassEntryPointCall(test.address),
+            callData: await encodePassEntryPointCall(test.address),
           })
         )
       );

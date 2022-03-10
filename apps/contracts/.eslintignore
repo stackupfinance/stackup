@@ -8,3 +8,5 @@ artifacts
 .gitignore
 .eslintignore
 *.env*
+*.ts
+tsconfig.json

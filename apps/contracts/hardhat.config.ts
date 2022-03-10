@@ -1,13 +1,12 @@
-require("dotenv").config();
-require("@nomiclabs/hardhat-ethers");
-require("@nomiclabs/hardhat-etherscan");
-require("@nomiclabs/hardhat-waffle");
-require("solidity-coverage");
-require("hardhat-contract-sizer");
+import * as dotenv from "dotenv";
+dotenv.config();
 
-/**
- * @type import('hardhat/config').HardhatUserConfig
- */
+import "@nomiclabs/hardhat-ethers";
+import "@nomiclabs/hardhat-etherscan";
+import "@nomiclabs/hardhat-waffle";
+import "solidity-coverage";
+import "hardhat-contract-sizer";
+
 module.exports = {
   solidity: {
     version: "0.8.9",
