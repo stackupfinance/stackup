@@ -8,10 +8,12 @@ export const onboardUseAuthSelector = (state) => ({
 });
 
 export const onboardLoginPageSelector = (state) => ({
+  loading: state.loading,
   createEphemeralWallet: state.createEphemeralWallet,
 });
 
 export const onboardSignUpPageSelector = (state) => ({
+  loading: state.loading,
   createEphemeralWallet: state.createEphemeralWallet,
 });
 
@@ -54,9 +56,15 @@ export const useOnboardStore = create(
       ...defaultState,
 
       createEphemeralWallet: async (username, password) => {
+        set({ loading: true });
+
         try {
-          set({ ephemeralWallet: await wallet.proxy.initEncryptedIdentity(password, username) });
+          set({
+            loading: false,
+            ephemeralWallet: await wallet.proxy.initEncryptedIdentity(password, username),
+          });
         } catch (error) {
+          set({ loading: false });
           throw error;
         }
       },
