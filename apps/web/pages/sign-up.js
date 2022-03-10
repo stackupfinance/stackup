@@ -29,8 +29,10 @@ export default function SignUp() {
     watch,
     formState: { errors },
   } = useForm();
-  const { loading, register: registerAccount } = useAccountStore(accountSignUpPageSelector);
-  const { createEphemeralWallet } = useOnboardStore(onboardSignUpPageSelector);
+  const { loading: accountLoading, register: registerAccount } =
+    useAccountStore(accountSignUpPageSelector);
+  const { loading: onboardLoading, createEphemeralWallet } =
+    useOnboardStore(onboardSignUpPageSelector);
   const { code: inviteCode } = useInviteStore(inviteSignUpPageSelector);
   const [registerError, setRegisterError] = useState('');
 
@@ -43,8 +45,10 @@ export default function SignUp() {
     const { username, password } = data;
 
     try {
-      await registerAccount({ username, password, inviteCode });
-      createEphemeralWallet(password);
+      await Promise.all([
+        registerAccount({ username, password, inviteCode }),
+        createEphemeralWallet(username, password),
+      ]);
       logEvent(EVENTS.SIGN_UP_FINISH);
       router.push(Routes.WELCOME);
     } catch (error) {
@@ -110,7 +114,13 @@ export default function SignUp() {
                     validate: (value) => value === watch('password'),
                   })}
                 />
-                <Button isFullWidth isLoading={loading} colorScheme="blue" size="lg" type="submit">
+                <Button
+                  isFullWidth
+                  isLoading={onboardLoading || accountLoading}
+                  colorScheme="blue"
+                  size="lg"
+                  type="submit"
+                >
                   Next
                 </Button>
               </form>

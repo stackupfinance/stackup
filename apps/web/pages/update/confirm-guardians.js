@@ -103,10 +103,17 @@ function UpdateConfirmGuardians() {
   const onConfirm = async (data) => {
     if (!enabled) return;
 
-    await updateGuardianOps(currentGuardians, Object.values(guardianMap), wallet, data.password, {
-      userId: user.id,
-      accessToken: accessToken.token,
-    });
+    await updateGuardianOps(
+      currentGuardians,
+      Object.values(guardianMap),
+      wallet,
+      user.username,
+      data.password,
+      {
+        userId: user.id,
+        accessToken: accessToken.token,
+      },
+    );
     setIsTransactionLoading(true);
     toast({
       title: 'Update guardians initiated',

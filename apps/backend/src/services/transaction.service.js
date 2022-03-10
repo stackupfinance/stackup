@@ -136,8 +136,8 @@ module.exports.updateTransaction = async (doc, updates) => {
   return doc.save();
 };
 
-module.exports.verifyRecoverAccountUserOps = async (signature, userOps) => {
-  const recoveredAddress = recoverAddressFromLoginSignature(signature);
+module.exports.verifyRecoverAccountUserOps = async (signature, timestamp, userOps) => {
+  const recoveredAddress = recoverAddressFromLoginSignature(signature, timestamp);
   const newOwner = contracts.Wallet.interface.decodeFunctionData('transferOwner', userOps[userOps.length - 1].callData)[0];
 
   if (recoveredAddress !== newOwner) {

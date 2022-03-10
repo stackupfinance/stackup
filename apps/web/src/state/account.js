@@ -169,12 +169,13 @@ export const useAccountStore = create(
             `${App.stackup.backendUrl}/v1/auth/register`,
             {
               username: data.username,
-              wallet: walletLib.proxy.initEncryptedIdentity(data.password),
+              wallet: await walletLib.proxy.initEncryptedIdentity(data.password, data.username),
             },
             {
               params: { inviteCode: data.inviteCode },
             },
           );
+
           const { wallet, ...user } = register.data.user;
           const accessToken = register.data.tokens.access;
           const refreshToken = register.data.tokens.refresh;
@@ -199,12 +200,18 @@ export const useAccountStore = create(
           const lookup = await axios.post(`${App.stackup.backendUrl}/v1/auth/lookup`, {
             username: data.username,
           });
-          const signer = walletLib.proxy.decryptSigner(lookup.data.user.wallet, data.password);
+          const signer = await walletLib.proxy.decryptSigner(
+            lookup.data.user.wallet,
+            data.password,
+            data.username,
+          );
           if (!signer) throw new Error('Incorrect password');
 
+          const timestamp = Date.now();
           const login = await axios.post(`${App.stackup.backendUrl}/v1/auth/login`, {
             username: data.username,
-            signature: await signer.signMessage(loginMessage),
+            signature: await signer.signMessage(`${loginMessage}${timestamp}`),
+            timestamp,
           });
           const { wallet, ...user } = login.data.user;
           const accessToken = login.data.tokens.access;
@@ -343,17 +350,19 @@ export const useAccountStore = create(
       },
 
       updatePassword: async (data) => {
-        const encryptedSigner = walletLib.proxy.reencryptSigner(
-          get().wallet,
-          data.password,
-          data.newPassword,
-        );
-        if (!encryptedSigner) {
-          throw new Error('Incorrect password');
-        }
         set({ loading: true });
 
         try {
+          const encryptedSigner = await walletLib.proxy.reencryptSigner(
+            get().wallet,
+            data.password,
+            data.newPassword,
+            get().user.username,
+          );
+          if (!encryptedSigner) {
+            throw new Error('Incorrect password');
+          }
+
           await axios.patch(
             `${App.stackup.backendUrl}/v1/users/${get().user?.id}/wallet`,
             { encryptedSigner },
@@ -364,6 +373,7 @@ export const useAccountStore = create(
 
           await get().getUser();
         } catch (error) {
+          set({ loading: false });
           throw error;
         }
       },

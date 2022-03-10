@@ -26,6 +26,7 @@ export const ConfirmGuardians = ({ isLoading, onConfirm, guardianMap, email }) =
     formState: { errors },
   } = useForm();
   const [error, setError] = useState('');
+  const [loadingForm, setLoadingForm] = useState(false);
 
   const guardianLength = Object.values(guardianMap).length;
 
@@ -39,10 +40,14 @@ export const ConfirmGuardians = ({ isLoading, onConfirm, guardianMap, email }) =
   };
 
   const onSubmit = async (data) => {
+    setLoadingForm(true);
+
     try {
       await onConfirm(data);
+      setLoadingForm(false);
     } catch (error) {
       setError(error.response?.data?.message || error.message || 'Unknown error, try again later!');
+      setLoadingForm(false);
     }
   };
 
@@ -126,7 +131,13 @@ export const ConfirmGuardians = ({ isLoading, onConfirm, guardianMap, email }) =
                 />
               </InputGroup>
 
-              <Button isFullWidth isLoading={isLoading} colorScheme="blue" size="lg" type="submit">
+              <Button
+                isFullWidth
+                isLoading={loadingForm || isLoading}
+                colorScheme="blue"
+                size="lg"
+                type="submit"
+              >
                 Confirm
               </Button>
             </form>

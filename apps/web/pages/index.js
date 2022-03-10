@@ -20,8 +20,9 @@ export default function Login() {
     handleSubmit,
     formState: { errors },
   } = useForm();
-  const { loading, login } = useAccountStore(accountLoginPageSelector);
-  const { createEphemeralWallet } = useOnboardStore(onboardLoginPageSelector);
+  const { loading: accountLoading, login } = useAccountStore(accountLoginPageSelector);
+  const { loading: onboardLoading, createEphemeralWallet } =
+    useOnboardStore(onboardLoginPageSelector);
   const { clear: clearRecover } = useRecoverStore(recoverLoginPageSelector);
   const [loginError, setLoginError] = useState('');
 
@@ -34,8 +35,7 @@ export default function Login() {
     setLoginError('');
 
     try {
-      await login(data);
-      createEphemeralWallet(data.password);
+      await Promise.all([login(data), createEphemeralWallet(data.username, data.password)]);
       logEvent(EVENTS.LOGIN);
     } catch (error) {
       setLoginError(
@@ -87,7 +87,7 @@ export default function Login() {
                   />
                   <Button
                     isFullWidth
-                    isLoading={loading}
+                    isLoading={onboardLoading || accountLoading}
                     colorScheme="blue"
                     size="lg"
                     type="submit"
@@ -102,7 +102,7 @@ export default function Login() {
               <NextLink href={Routes.RECOVER_LOOKUP} passHref>
                 <Button
                   isFullWidth
-                  isLoading={loading}
+                  isLoading={onboardLoading || accountLoading}
                   as="a"
                   mt="16px"
                   variant="outline"
@@ -118,7 +118,7 @@ export default function Login() {
               <NextLink href={App.featureFlag.whitelist ? Routes.BETA : Routes.SIGN_UP} passHref>
                 <Button
                   isFullWidth
-                  isLoading={loading}
+                  isLoading={onboardLoading || accountLoading}
                   as="a"
                   mt="16px"
                   variant="outline"

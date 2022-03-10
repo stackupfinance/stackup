@@ -10,7 +10,7 @@ const formatter = new Intl.NumberFormat('en-US', {
   maximumFractionDigits: 2,
 });
 
-const loginMessage = 'Welcome to Stackup!';
+const loginMessage = 'Welcome to Stackup!\nSign this message to log into your Stackup account.\nTimestamp: ';
 
 const provider = new ethers.providers.JsonRpcProvider(web3.rpc);
 
@@ -61,7 +61,8 @@ module.exports.withTokenFeeValue = (txReceipt, feeData) => {
 
 module.exports.isWalletDeployed = async (walletAddress) => wallet.proxy.isCodeDeployed(provider, walletAddress);
 
-module.exports.recoverAddressFromLoginSignature = (signature) => ethers.utils.verifyMessage(loginMessage, signature);
+module.exports.recoverAddressFromLoginSignature = (signature, timestamp) =>
+  ethers.utils.verifyMessage(`${loginMessage}${timestamp}`, signature);
 
 module.exports.walletContract = (walletAddress) => contracts.Wallet.getInstance(provider).attach(walletAddress);
 

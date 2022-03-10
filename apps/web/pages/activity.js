@@ -112,10 +112,17 @@ export default function Activity() {
     setPayError('');
 
     try {
-      const userOps = await signNewPaymentUserOps(wallet, data, {
-        userId: user.id,
-        accessToken: accessToken.token,
-      });
+      const userOps = await signNewPaymentUserOps(
+        wallet,
+        user.username,
+        data.password,
+        data.amount,
+        data.toWalletAddress,
+        {
+          userId: user.id,
+          accessToken: accessToken.token,
+        },
+      );
       await sendNewPaymentTransaction(userOps, data.message, {
         userId: user.id,
         accessToken: accessToken.token,

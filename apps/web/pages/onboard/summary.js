@@ -55,7 +55,11 @@ function OnboardSummary() {
   }, [enabled]);
 
   const onConfirmHandler = async (data) => {
-    const ephemeralSigner = walletLib.proxy.decryptSigner(ephemeralWallet, data.password);
+    const ephemeralSigner = await walletLib.proxy.decryptSigner(
+      ephemeralWallet,
+      data.password,
+      user.username,
+    );
     if (!ephemeralSigner) {
       throw new Error('Incorrect password');
     }
@@ -65,7 +69,9 @@ function OnboardSummary() {
     const guardians = guardianMap.defaultGuardian
       ? [defaultGuardian, ...otherGuardians]
       : otherGuardians;
-    await saveEncryptedWallet(walletLib.proxy.initEncryptedIdentity(data.password, { guardians }));
+    await saveEncryptedWallet(
+      await walletLib.proxy.initEncryptedIdentity(data.password, user.username, { guardians }),
+    );
     logEvent(EVENTS.ONBOARD_CONFIRM_SETUP);
     router.push(Routes.HOME);
   };
