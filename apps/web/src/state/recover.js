@@ -279,14 +279,14 @@ export const useRecoverStore = create(
       approveGuardianRequest: async (userWallet, username, password, options) => {
         const { savedGuardianRequest } = get();
         if (!savedGuardianRequest) return;
-
-        const signer = await wallet.proxy.decryptSigner(userWallet, password, username);
-        if (!signer) {
-          throw new Error('Incorrect password');
-        }
         set({ loading: true });
 
         try {
+          const signer = await wallet.proxy.decryptSigner(userWallet, password, username);
+          if (!signer) {
+            throw new Error('Incorrect password');
+          }
+
           const userOperations = await Promise.all(
             savedGuardianRequest.userOperations.map((op) =>
               wallet.userOperations.signAsGuardian(

@@ -164,13 +164,14 @@ export const useWalletStore = create(
       },
 
       setupWalletUserOps: async (userWallet, username, password, options) => {
-        const signer = await wallet.proxy.decryptSigner(userWallet, password, username);
-        if (!signer) {
-          throw new Error('Incorrect password');
-        }
         set({ loading: true });
 
         try {
+          const signer = await wallet.proxy.decryptSigner(userWallet, password, username);
+          if (!signer) {
+            throw new Error('Incorrect password');
+          }
+
           await Promise.all([
             wallet.userOperations.get(userWallet.walletAddress, {
               callGas: constants.userOperations.defaultGas * 2,
@@ -208,16 +209,17 @@ export const useWalletStore = create(
         password,
         options,
       ) => {
-        const signer = await wallet.proxy.decryptSigner(userWallet, password, username);
-        if (!signer) {
-          throw new Error('Incorrect password');
-        }
-        const removeGuardians = currentGuardians.filter((g) => !newGuardians.includes(g));
-        const addGuardians = newGuardians.filter((g) => !currentGuardians.includes(g));
-        if (!removeGuardians.length && !addGuardians.length) return;
         set({ loading: true });
 
         try {
+          const signer = await wallet.proxy.decryptSigner(userWallet, password, username);
+          if (!signer) {
+            throw new Error('Incorrect password');
+          }
+          const removeGuardians = currentGuardians.filter((g) => !newGuardians.includes(g));
+          const addGuardians = newGuardians.filter((g) => !currentGuardians.includes(g));
+          if (!removeGuardians.length && !addGuardians.length) return;
+
           const [isDeployed, allowance] = await Promise.all([
             wallet.proxy.isCodeDeployed(provider, userWallet.walletAddress),
             usdcContract.allowance(userWallet.walletAddress, App.web3.paymaster),
@@ -273,14 +275,14 @@ export const useWalletStore = create(
       },
 
       sendUserOpFromWalletConnect: async (userWallet, username, password, transaction, options) => {
-        const { user } = get();
-        const signer = await wallet.proxy.decryptSigner(userWallet, password, username);
-        if (!signer) {
-          throw new Error('Incorrect password');
-        }
         set({ loading: true });
 
         try {
+          const signer = await wallet.proxy.decryptSigner(userWallet, password, username);
+          if (!signer) {
+            throw new Error('Incorrect password');
+          }
+
           const [isDeployed, allowance] = await Promise.all([
             wallet.proxy.isCodeDeployed(provider, userWallet.walletAddress),
             usdcContract.allowance(userWallet.walletAddress, App.web3.paymaster),
