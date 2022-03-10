@@ -30,9 +30,10 @@ module.exports.decryptSigner = async (wallet, password, salt) => {
       Buffer.from(passwordKey).toString("hex")
     ).toString(Utf8);
     if (!privateKey) return;
+
     return new ethers.Wallet(privateKey);
   } catch (error) {
-    console.error(error.message);
+    console.error(error);
   }
 };
 
@@ -56,7 +57,7 @@ module.exports.reencryptSigner = async (
       Buffer.from(newPasswordKey).toString("hex")
     ).toString();
   } catch (error) {
-    console.error(error.message);
+    console.error(error);
   }
 };
 
