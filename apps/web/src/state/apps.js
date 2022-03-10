@@ -153,12 +153,13 @@ export const useAppsStore = create(
         set({ callRequestQueue: callRequestQueue.slice(0, -1) });
       },
 
-      signMessage: async (wallet, message, password, username) => {
-        const signer = walletLib.proxy.decryptSigner(wallet, password, username);
-        if (!signer) throw new Error('Incorrect password');
+      signMessage: async (wallet, message, username, password) => {
         set({ loading: true });
 
         try {
+          const signer = await walletLib.proxy.decryptSigner(wallet, password, username);
+          if (!signer) throw new Error('Incorrect password');
+
           const sig = await signer.signMessage(ethers.utils.toUtf8String(message));
           set({ loading: false });
           return sig;

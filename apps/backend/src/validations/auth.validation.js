@@ -88,6 +88,7 @@ const recoverConfirm = {
     channelId: Joi.string().required(),
     username: Joi.string().required(),
     signature: Joi.string().required(),
+    timestamp: Joi.number().required(),
     encryptedSigner: Joi.string().required(),
     userOperations: Joi.array().items(userOperation).required().min(1),
   }),

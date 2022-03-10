@@ -51,7 +51,7 @@ function RecoverApproveRequest() {
   passwordRef.current = password;
 
   const approveRequest = async (password) => {
-    await approveGuardianRequest(wallet, password, {
+    await approveGuardianRequest(wallet, user.username, password, {
       accessToken: accessToken.token,
     });
     logEvent(EVENTS.RECOVER_ACCOUNT_GUARDIAN_SIGN_OP);
@@ -128,7 +128,7 @@ function RecoverApproveRequest() {
     if (isWalletDeployed) {
       await approveRequest(data.password);
     } else {
-      await setupWalletUserOps(wallet, data.password, {
+      await setupWalletUserOps(wallet, user.username, data.password, {
         userId: user.id,
         accessToken: accessToken.token,
       });

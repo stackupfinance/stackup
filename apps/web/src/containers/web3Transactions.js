@@ -68,15 +68,21 @@ export const Web3Transactions = ({ children }) => {
       if (payload.current.method === RPC_METHODS.personalSign) {
         connector.current.approveRequest({
           id: payload.current.id,
-          result: await signMessage(wallet, payload.current.params[0], password, user.username),
+          result: await signMessage(wallet, payload.current.params[0], user.username, password),
         });
         logEvent(EVENTS.WALLET_CONNECT_APPROVE_PERSONAL_SIGN);
         removeLastInCallRequestQueue();
       } else if (payload.current.method === RPC_METHODS.ethSendTransaction) {
-        await sendUserOpFromWalletConnect(wallet, password, payload.current.params[0], {
-          userId: user.id,
-          accessToken: accessToken.token,
-        });
+        await sendUserOpFromWalletConnect(
+          wallet,
+          user.username,
+          password,
+          payload.current.params[0],
+          {
+            userId: user.id,
+            accessToken: accessToken.token,
+          },
+        );
         setIsTransactionLoading(true);
         logEvent(EVENTS.WALLET_CONNECT_APPROVE_ETH_SEND_TRANSACTION);
         toast({

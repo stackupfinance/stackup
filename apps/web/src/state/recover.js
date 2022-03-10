@@ -103,8 +103,13 @@ export const useRecoverStore = create(
         set({ loading: true });
 
         try {
-          const { encryptedSigner } = await wallet.proxy.initEncryptedIdentity(password, user.username);
-          const newOwner = await wallet.proxy.decryptSigner({ encryptedSigner }, password, user.username).address;
+          const { encryptedSigner } = await wallet.proxy.initEncryptedIdentity(
+            password,
+            user.username,
+          );
+          const newOwner = await wallet.proxy
+            .decryptSigner({ encryptedSigner }, password, user.username)
+            .then((s) => s.address);
           const [isDeployed, allowance] = await Promise.all([
             wallet.proxy.isCodeDeployed(provider, user.wallet.walletAddress),
             usdcContract.allowance(user.wallet.walletAddress, App.web3.paymaster),
@@ -243,15 +248,21 @@ export const useRecoverStore = create(
         set({ loading: true });
 
         try {
-          const signer = await wallet.proxy.decryptSigner({ encryptedSigner }, password, user.username);
+          const signer = await wallet.proxy.decryptSigner(
+            { encryptedSigner },
+            password,
+            user.username,
+          );
           if (!signer) {
             throw new Error('Incorrect password');
           }
 
+          const timestamp = Date.now();
           await axios.post(`${App.stackup.backendUrl}/v1/auth/recover/confirm`, {
             channelId,
             username: user.username,
-            signature: await signer.signMessage(loginMessage),
+            signature: await signer.signMessage(`${loginMessage}${timestamp}`),
+            timestamp,
             encryptedSigner,
             userOperations,
           });
@@ -265,11 +276,11 @@ export const useRecoverStore = create(
 
       selectGuardianRequest: (savedGuardianRequest) => set({ savedGuardianRequest }),
 
-      approveGuardianRequest: async (userWallet, password, options) => {
-        const { savedGuardianRequest, user } = get();
-        if (!savedGuardianRequest || !user) return;
+      approveGuardianRequest: async (userWallet, username, password, options) => {
+        const { savedGuardianRequest } = get();
+        if (!savedGuardianRequest) return;
 
-        const signer = await wallet.proxy.decryptSigner(userWallet, password, user.username);
+        const signer = await wallet.proxy.decryptSigner(userWallet, password, username);
         if (!signer) {
           throw new Error('Incorrect password');
         }

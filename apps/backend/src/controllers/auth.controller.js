@@ -102,8 +102,8 @@ const recoverVerifyEmail = catchAsync(async (req, res) => {
 });
 
 const recoverConfirm = catchAsync(async (req, res) => {
-  const { signature, userOperations, ...context } = req.body;
-  await transactionService.verifyRecoverAccountUserOps(signature, userOperations);
+  const { signature, timestamp, userOperations, ...context } = req.body;
+  await transactionService.verifyRecoverAccountUserOps(signature, timestamp, userOperations);
 
   const tx = await transactionService.createTransaction(await transactionService.parseUserOperations(userOperations));
   await transactionService.relayTransaction({ transactionId: tx._id, userOperations, context });

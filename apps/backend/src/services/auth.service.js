@@ -10,15 +10,14 @@ const { tokenTypes } = require('../config/tokens');
 const { types } = require('../config/codes');
 const { isWalletDeployed, recoverAddressFromLoginSignature, walletContract } = require('../utils/web3');
 
-
 /**
  * Check if timestamp was generated within the last minute
  * @param {Number} timestamp
  * @returns {Bool}
  */
-const isTimestampExpired = timestamp => {
+const isTimestampExpired = (timestamp) => {
   return Date.now() - timestamp > 60000;
-}
+};
 
 /**
  * Login with username and signature
