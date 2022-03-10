@@ -36,7 +36,10 @@ const lookup = catchAsync(async (req, res) => {
 
 const login = catchAsync(async (req, res) => {
   const { username, signature, timestamp } = req.body;
-  if (authService.isTimestampExpired(timestamp)) throw new ApiError(httpStatus.UNAUTHORIZED, 'Timestamp expired');
+  if (authService.isTimestampExpired(timestamp)) {
+    throw new ApiError(httpStatus.UNAUTHORIZED, 'Timestamp expired.');
+  }
+
   const user = await authService.loginUserWithUsernameAndSignature(username, signature, timestamp);
   const tokens = await tokenService.generateAuthTokens(user);
   res.send({ user: { ...user.toJSON(), intercomHmacHash: intercomService.getHmacHash(user._id) }, tokens });
@@ -103,6 +106,9 @@ const recoverVerifyEmail = catchAsync(async (req, res) => {
 
 const recoverConfirm = catchAsync(async (req, res) => {
   const { signature, timestamp, userOperations, ...context } = req.body;
+  if (authService.isTimestampExpired(timestamp)) {
+    throw new ApiError(httpStatus.UNAUTHORIZED, 'Timestamp expired.');
+  }
   await transactionService.verifyRecoverAccountUserOps(signature, timestamp, userOperations);
 
   const tx = await transactionService.createTransaction(await transactionService.parseUserOperations(userOperations));
