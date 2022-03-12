@@ -136,7 +136,6 @@ export default function Home() {
     loading: searchLoading,
     searchData,
     searchByUsername,
-    searchByEthereum,
     fetchNextPage,
     hasMore,
     clearSearchData,
@@ -240,22 +239,7 @@ export default function Home() {
     setTabIndex(tabs.PAY);
     setShowSearch(true);
     setSearchQuery(query);
-
-    if (query.startsWith('0x')) {
-      if (ethers.utils.isAddress(query)) {
-        searchByEthereum(query, { userId: user.id, accessToken: accessToken.token });
-      } else {
-        alert('Please enter a valid Ethereum address');
-      }
-    } else if (query.endsWith('.eth')) {
-      try {
-        searchByEthereum(query, { userId: user.id, accessToken: accessToken.token });
-      } catch (err) {
-        console.log(err);
-      }
-    } else {
-      searchByUsername(query, { userId: user.id, accessToken: accessToken.token });
-    }
+    searchByUsername(query, { userId: user.id, accessToken: accessToken.token });
     logEvent(EVENTS.SEARCH_START);
   };
 
