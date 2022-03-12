@@ -20,7 +20,7 @@ const activityGenerator = (user) => {
 
 const toUserGenerator = (results) => {
   function changeUsername(username) {
-    return `${username.slice(0, 5)}....${username.slice(username.length - 4, username.length)}`;
+    return `${username.slice(0, 5)}....${username.slice(-5)}`;
   }
 
   return results.map((result) =>
