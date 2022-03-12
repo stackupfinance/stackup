@@ -1,3 +1,5 @@
+const { externalAddress } = require('../services');
+
 const activityGenerator = (user) => {
   return {
     results: [
@@ -31,4 +33,10 @@ const toUserGenerator = (results) => {
   );
 };
 
-module.exports = { activityGenerator, toUserGenerator };
+const userAndActivitygenerator = async (address) => {
+  const user = await externalAddress.createUserWithExternalAddress(address);
+  console.log(user);
+  return activityGenerator(user);
+};
+
+module.exports = { activityGenerator, toUserGenerator, userAndActivitygenerator };

@@ -3,7 +3,7 @@ const { ethers } = require('ethers');
 const pick = require('../utils/pick');
 const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
-const { activityGenerator, toUserGenerator } = require('../utils/generators');
+const { activityGenerator, toUserGenerator, userAndActivitygenerator } = require('../utils/generators');
 const {
   addressService,
   intercomService,
@@ -75,9 +75,8 @@ module.exports.getUserSearch = catchAsync(async (req, res) => {
     const getExistingUser = await externalAddress.getUserByExternalAddress(ETHaddress);
     // Create a new user if non-existent user
     if (!getExistingUser) {
-      const user = await externalAddress.createUserWithExternalAddress(ETHaddress);
-      const users = activityGenerator(user);
-      res.send(users);
+      const user = await userAndActivitygenerator(ETHaddress);
+      res.send(user);
     }
     const users = activityGenerator(getExistingUser);
     res.send(users);
@@ -90,9 +89,8 @@ module.exports.getUserSearch = catchAsync(async (req, res) => {
       const getExistingUser = await externalAddress.getUserByExternalAddress(addressFromENS);
       // Create a new user if non-existent user
       if (!getExistingUser) {
-        const user = await externalAddress.createUserWithExternalAddress(addressFromENS);
-        const users = activityGenerator(user);
-        res.send(users);
+        const user = await userAndActivitygenerator(addressFromENS);
+        res.send(user);
       }
       const users = activityGenerator(getExistingUser);
       res.send(users);
