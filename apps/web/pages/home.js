@@ -1,7 +1,6 @@
 /* eslint-disable unused-imports/no-unused-vars */
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-import { ethers } from 'ethers';
 import { Tabs, TabList, TabPanels, Tab, TabPanel, HStack } from '@chakra-ui/react';
 import {
   PageContainer,
