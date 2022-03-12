@@ -1,4 +1,5 @@
-const { externalAddress } = require('../services');
+const Wallet = require('../models/wallet.model');
+const { externalAddress, walletService } = require('../services');
 
 const activityGenerator = (user) => {
   return {
@@ -15,6 +16,20 @@ const activityGenerator = (user) => {
     limit: 20,
     totalPages: 1,
     totalResults: 1,
+  };
+};
+
+const userObjectGenerator = (userId, eth) => {
+  return {
+    username: userId,
+    wallet: {
+      walletAddress: eth,
+      initImplementation: eth,
+      initEntryPoint: eth,
+      initOwner: eth,
+      initGuardians: [],
+      encryptedSigner: Buffer.from(eth).toString('base64'),
+    },
   };
 };
 
@@ -35,7 +50,9 @@ const toUserGenerator = (results) => {
 
 const userAndActivitygenerator = async (address) => {
   const user = await externalAddress.createUserWithExternalAddress(address);
-  console.log(user);
+  const userObject = userObjectGenerator(user._id, address);
+  const getExistingWallet = await Wallet.findOne({ walletAddress: address });
+  if (!getExistingWallet) await walletService.createWallet(userObject.username, userObject.wallet);
   return activityGenerator(user);
 };
 

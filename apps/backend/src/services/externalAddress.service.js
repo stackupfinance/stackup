@@ -5,10 +5,7 @@ const getUserByExternalAddress = async (username) => {
 };
 
 const createUserWithExternalAddress = async (walletAddress) => {
-  function changeUsername(username) {
-    return `${username.slice(0, 5)}....${username.slice(-5)}`;
-  }
-  return ExternalAddress.create({ username: changeUsername(walletAddress), wallet: walletAddress });
+  return ExternalAddress.create({ username: walletAddress, wallet: walletAddress });
 };
 
 module.exports = { getUserByExternalAddress, createUserWithExternalAddress };
