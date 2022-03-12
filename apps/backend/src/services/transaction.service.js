@@ -156,66 +156,6 @@ module.exports.resolveNewPaymentTransferAddresses = (transaction) => {
 };
 
 module.exports.queryActivity = async (walletAddress) => {
-  // eslint-disable-next-line no-unused-vars
-  const aggregate = await Transaction.aggregate()
-    .match({
-      $and: [
-        { type: { $eq: txType.newPayment } },
-        {
-          $or: [
-            { lineItems: { $elemMatch: { from: { $eq: walletAddress } } } },
-            { lineItems: { $elemMatch: { to: { $eq: walletAddress } } } },
-          ],
-        },
-      ],
-    })
-    .addFields({
-      lastLineItem: { $last: '$lineItems' },
-    })
-    .addFields({
-      addresses: {
-        $cond: {
-          if: { $eq: [{ $strcasecmp: ['$lastLineItem.from', '$lastLineItem.to'] }, 1] },
-          then: { $concat: ['$lastLineItem.to', '-', '$lastLineItem.from'] },
-          else: { $concat: ['$lastLineItem.from', '-', '$lastLineItem.to'] },
-        },
-      },
-      toAddress: {
-        $cond: {
-          if: { $eq: [walletAddress, '$lastLineItem.from'] },
-          then: '$lastLineItem.to',
-          else: '$lastLineItem.from',
-        },
-      },
-    })
-    .group({
-      _id: '$addresses',
-      toAddress: { $last: '$toAddress' },
-      preview: { $last: '$message' },
-      updatedAt: { $last: '$updatedAt' },
-    })
-    .limit(20)
-    .lookup({
-      from: 'wallets',
-      localField: 'toAddress',
-      foreignField: 'walletAddress',
-      as: 'toWallet',
-    })
-    .addFields({
-      toWallet: { $arrayElemAt: ['$toWallet', 0] },
-    });
-  // .lookup({
-  //   from: 'users',
-  //   localField: 'toWallet.user',
-  //   foreignField: '_id',
-  //   as: 'toUser',
-  // })
-  // .addFields({
-  //   toUser: { $arrayElemAt: ['$toUser', 0] },
-  // });
-
-  // console.log(aggregate);
-
   return Transaction.aggregate()
     .match({
       $and: [

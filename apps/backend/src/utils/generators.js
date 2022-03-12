@@ -1,15 +1,12 @@
-const { User } = require('../models');
-const { walletService, userService } = require('../services');
-
-const activityGenerator = (user, wallet) => {
+const activityGenerator = (user) => {
   return {
     results: [
       {
         username: user.username,
         wallet: {
-          walletAddress: wallet.walletAddress,
+          walletAddress: user.wallet,
         },
-        id: user.id,
+        id: user._id,
       },
     ],
     page: 1,
@@ -19,35 +16,12 @@ const activityGenerator = (user, wallet) => {
   };
 };
 
-const userObjectGenerator = (ens, eth) => {
-  return {
-    username: ens,
-    wallet: {
-      walletAddress: eth,
-      initImplementation: eth,
-      initEntryPoint: eth,
-      initOwner: eth,
-      initGuardians: [],
-      encryptedSigner: Buffer.from(eth).toString('base64'),
-    },
-  };
+const toUserGenerator = (results) => {
+  return results.map((result) =>
+    result.toUser.username
+      ? result
+      : { ...result, toUser: { username: result.toUser.walletAddress, walletAddress: result.toUser.walletAddress } }
+  );
 };
 
-const userGenerator = async (user, wallet) => {
-  // Create a dummy user with ETH address
-  const u = await User.create(user);
-  const w = await walletService.createWallet(u.id, wallet);
-  await userService.updateUserById(u.id, { wallet: w.id });
-
-  return { u, w };
-};
-
-const createUserGenerator = async (ETHaddress, addressFromENS) => {
-  const userObject = userObjectGenerator(ETHaddress, addressFromENS);
-  const { wallet, ...user } = userObject;
-  const { u, w } = await userGenerator(user, wallet);
-
-  return { u, w };
-};
-
-module.exports = { activityGenerator, userObjectGenerator, userGenerator, createUserGenerator };
+module.exports = { activityGenerator, toUserGenerator };

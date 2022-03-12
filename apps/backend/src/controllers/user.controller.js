@@ -3,7 +3,7 @@ const { ethers } = require('ethers');
 const pick = require('../utils/pick');
 const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
-const { createUserGenerator, activityGenerator } = require('../utils/generators');
+const { activityGenerator, toUserGenerator } = require('../utils/generators');
 const {
   addressService,
   intercomService,
@@ -13,6 +13,7 @@ const {
   signerService,
   notificationService,
   fiatService,
+  externalAddress,
 } = require('../services');
 const { type } = require('../config/transaction');
 const { ETHprovider } = require('../utils/web3');
@@ -71,16 +72,14 @@ module.exports.getUserSearch = catchAsync(async (req, res) => {
 
   // For ETH address user input
   if (isValidETHAddress) {
-    const getENSFromETHAddress = await ETHprovider.lookupAddress(ETHaddress);
-    const getExistingUser = await userService.getUserByUsernameWithWallet(getENSFromETHAddress || ETHaddress);
+    const getExistingUser = await externalAddress.getUserByExternalAddress(ETHaddress);
     // Create a new user if non-existent user
     if (!getExistingUser) {
-      const { u, w } = await createUserGenerator(getENSFromETHAddress || ETHaddress, ETHaddress);
-      const users = activityGenerator(u, w);
+      const user = await externalAddress.createUserWithExternalAddress(ETHaddress);
+      const users = activityGenerator(user);
       res.send(users);
     }
-    console.log(getExistingUser);
-    const users = activityGenerator(getExistingUser, getExistingUser.wallet);
+    const users = activityGenerator(getExistingUser);
     res.send(users);
   }
   // For ENS user input
@@ -88,13 +87,14 @@ module.exports.getUserSearch = catchAsync(async (req, res) => {
     // Here ETH address is actually an ENS address
     const addressFromENS = await ETHprovider.resolveName(ETHaddress);
     if (addressFromENS) {
-      const getExistingUser = await userService.getUserByUsernameWithWallet(ETHaddress);
+      const getExistingUser = await externalAddress.getUserByExternalAddress(addressFromENS);
+      // Create a new user if non-existent user
       if (!getExistingUser) {
-        const { u, w } = await createUserGenerator(ETHaddress, addressFromENS);
-        const users = activityGenerator(u, w);
+        const user = await externalAddress.createUserWithExternalAddress(addressFromENS);
+        const users = activityGenerator(user);
         res.send(users);
       }
-      const users = activityGenerator(getExistingUser, getExistingUser.wallet);
+      const users = activityGenerator(getExistingUser);
       res.send(users);
     }
     // Return empty array as no ETH address is associated with the ENS address given
@@ -125,10 +125,10 @@ module.exports.getUserActivities = catchAsync(async (req, res) => {
   const { userId } = req.params;
   const user = await userService.getUserById(userId);
   const results = await transactionService.queryActivity(user.wallet.walletAddress);
-  // console.log(results);
+  const updatedResults = toUserGenerator(results);
   // TODO: Implement actual pagination.
   res.send({
-    results,
+    results: updatedResults,
     page: 1,
     limit: 20,
     totalPages: 1,
@@ -146,9 +146,10 @@ module.exports.getUserActivityItems = catchAsync(async (req, res) => {
 
   // TODO: Implement actual pagination.
   const results = await transactionService.queryActivityItems(user, ...addresses);
+  const updatedResults = toUserGenerator(results);
   res.send({
     activityItems: {
-      results,
+      results: updatedResults,
       page: 1,
       limit: 100,
       totalPages: 1,
