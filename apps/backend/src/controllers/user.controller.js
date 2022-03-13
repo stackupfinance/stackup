@@ -3,7 +3,7 @@ const { ethers } = require('ethers');
 const pick = require('../utils/pick');
 const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
-const { activityGenerator, userAndActivitygenerator } = require('../utils/generators');
+const { activityGenerator } = require('../utils/generators');
 const {
   addressService,
   intercomService,
@@ -13,7 +13,6 @@ const {
   signerService,
   notificationService,
   fiatService,
-  externalAddress,
 } = require('../services');
 const { type } = require('../config/transaction');
 const { ETHprovider } = require('../utils/web3');
@@ -72,13 +71,7 @@ module.exports.getUserSearch = catchAsync(async (req, res) => {
 
   // For ETH address user input
   if (isValidETHAddress) {
-    const getExistingUser = await externalAddress.getUserByExternalAddress(ETHaddress);
-    // Create a new user if non-existent user
-    if (!getExistingUser) {
-      const user = await userAndActivitygenerator(ETHaddress);
-      res.send(user);
-    }
-    const users = activityGenerator(getExistingUser);
+    const users = activityGenerator(ETHaddress);
     res.send(users);
   }
   // For ENS user input
@@ -86,13 +79,7 @@ module.exports.getUserSearch = catchAsync(async (req, res) => {
     // Here ETH address is actually an ENS address
     const addressFromENS = await ETHprovider.resolveName(ETHaddress);
     if (addressFromENS) {
-      const getExistingUser = await externalAddress.getUserByExternalAddress(addressFromENS);
-      // Create a new user if non-existent user
-      if (!getExistingUser) {
-        const user = await userAndActivitygenerator(addressFromENS);
-        res.send(user);
-      }
-      const users = activityGenerator(getExistingUser);
+      const users = activityGenerator(addressFromENS);
       res.send(users);
     }
     // Return empty array as no ETH address is associated with the ENS address given

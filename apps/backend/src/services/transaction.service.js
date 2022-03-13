@@ -156,7 +156,7 @@ module.exports.resolveNewPaymentTransferAddresses = (transaction) => {
 };
 
 module.exports.queryActivity = async (walletAddress) => {
-  const activity = await Transaction.aggregate()
+  return Transaction.aggregate()
     .match({
       $and: [
         { type: { $eq: txType.newPayment } },
@@ -204,15 +204,6 @@ module.exports.queryActivity = async (walletAddress) => {
       toWallet: { $arrayElemAt: ['$toWallet', 0] },
     })
     .lookup({
-      from: 'externaladdresses',
-      localField: 'toAddress',
-      foreignField: 'wallet',
-      as: 'toExternalWallet',
-    })
-    .addFields({
-      toExternalWallet: { $arrayElemAt: ['$toExternalWallet', 0] },
-    })
-    .lookup({
       from: 'users',
       localField: 'toWallet.user',
       foreignField: '_id',
@@ -224,29 +215,18 @@ module.exports.queryActivity = async (walletAddress) => {
     .project({
       _id: false,
       id: '$_id',
-      toUser: { username: '$toUser.username', walletAddress: '$toWallet.walletAddress' },
-      toExternalWallet: { username: '$toExternalWallet.username', walletAddress: '$toExternalWallet.wallet' },
+      toUser: {
+        username: { $ifNull: ['$toUser.username', '$toAddress'] },
+        walletAddress: { $ifNull: ['$toWallet.walletAddress', '$toAddress'] },
+      },
       preview: true,
       updatedAt: true,
     })
     .sort('-updatedAt');
-
-  const result = activity.map((item) => {
-    if (item.toUser.username) {
-      // eslint-disable-next-line no-param-reassign
-      delete item.toExternalWallet;
-      return item;
-    }
-    const newItem = { ...item, toUser: { ...item.toExternalWallet } };
-    delete newItem.toExternalWallet;
-    return newItem;
-  });
-
-  return result;
 };
 
 module.exports.queryActivityItems = async (user, address1, address2, opts = { limit: 100, id: undefined }) => {
-  const activity = await Transaction.aggregate()
+  return Transaction.aggregate()
     .match(
       opts.id
         ? { _id: { $eq: opts.id } }
@@ -288,15 +268,6 @@ module.exports.queryActivityItems = async (user, address1, address2, opts = { li
       toWallet: { $arrayElemAt: ['$toWallet', 0] },
     })
     .lookup({
-      from: 'externaladdresses',
-      localField: 'lastLineItem.to',
-      foreignField: 'wallet',
-      as: 'toExternalWallet',
-    })
-    .addFields({
-      toExternalWallet: { $arrayElemAt: ['$toExternalWallet', 0] },
-    })
-    .lookup({
       from: 'users',
       localField: 'fromWallet.user',
       foreignField: '_id',
@@ -317,8 +288,10 @@ module.exports.queryActivityItems = async (user, address1, address2, opts = { li
       id: '$_id',
       isReceiving: true,
       fromUser: { username: '$fromUser.username', walletAddress: '$fromWallet.walletAddress' },
-      toUser: { username: '$toUser.username', walletAddress: '$toWallet.walletAddress' },
-      toExternalWallet: { username: '$toExternalWallet.username', walletAddress: '$toExternalWallet.wallet' },
+      toUser: {
+        username: { $ifNull: ['$toUser.username', '$lastLineItem.to'] },
+        walletAddress: { $ifNull: ['$toWallet.walletAddress', '$lastLineItem.to'] },
+      },
       value: '$lastLineItem.value',
       units: '$lastLineItem.units',
       prefix: '$lastLineItem.prefix',
@@ -327,19 +300,6 @@ module.exports.queryActivityItems = async (user, address1, address2, opts = { li
       status: true,
       updatedAt: true,
     });
-
-  const result = activity.map((item) => {
-    if (item.toUser.username) {
-      // eslint-disable-next-line no-param-reassign
-      delete item.toExternalWallet;
-      return item;
-    }
-    const newItem = { ...item, toUser: { ...item.toExternalWallet } };
-    delete newItem.toExternalWallet;
-    return newItem;
-  });
-
-  return result;
 };
 
 module.exports.queryHistory = async (user, opts = { limit: 100 }) => {
