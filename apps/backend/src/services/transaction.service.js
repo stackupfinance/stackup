@@ -216,7 +216,12 @@ module.exports.queryActivity = async (walletAddress) => {
       _id: false,
       id: '$_id',
       toUser: {
-        username: { $ifNull: ['$toUser.username', '$toAddress'] },
+        username: {
+          $ifNull: [
+            '$toUser.username',
+            { $concat: [{ $substrBytes: ['$toAddress', 0, 5] }, '...', { $substrBytes: ['$toAddress', 35, 5] }] },
+          ],
+        },
         walletAddress: { $ifNull: ['$toWallet.walletAddress', '$toAddress'] },
       },
       preview: true,
@@ -289,7 +294,14 @@ module.exports.queryActivityItems = async (user, address1, address2, opts = { li
       isReceiving: true,
       fromUser: { username: '$fromUser.username', walletAddress: '$fromWallet.walletAddress' },
       toUser: {
-        username: { $ifNull: ['$toUser.username', '$lastLineItem.to'] },
+        username: {
+          $ifNull: [
+            '$toUser.username',
+            {
+              $concat: [{ $substrBytes: ['$lastLineItem.to', 0, 5] }, '...', { $substrBytes: ['$lastLineItem.to', 35, 5] }],
+            },
+          ],
+        },
         walletAddress: { $ifNull: ['$toWallet.walletAddress', '$lastLineItem.to'] },
       },
       value: '$lastLineItem.value',
