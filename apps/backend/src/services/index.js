@@ -1,5 +1,7 @@
 module.exports.addressService = require('./address.service');
+module.exports.alchemyService = require('./alchemy.service');
 module.exports.authService = require('./auth.service');
+module.exports.checkpointService = require('./checkpoint.service');
 module.exports.codeService = require('./code.service');
 module.exports.emailService = require('./email.service');
 module.exports.fiatService = require('./fiat.service');

@@ -1,3 +1,4 @@
+module.exports.Checkpoint = require('./checkpoint.model');
 module.exports.Code = require('./code.model');
 module.exports.Invite = require('./invite.model');
 module.exports.Notification = require('./notification.model');

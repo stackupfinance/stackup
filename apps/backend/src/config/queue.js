@@ -1,4 +1,6 @@
 const types = {
+  checkForBlocks: 'checkForBlocks',
+  parseBlock: 'parseBlock',
   relayTransaction: 'relayTransaction',
 };
 

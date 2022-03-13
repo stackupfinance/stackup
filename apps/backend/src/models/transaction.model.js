@@ -58,6 +58,7 @@ const transactionSchema = mongoose.Schema(
     hash: {
       type: String,
       trim: true,
+      unique: true,
     },
 
     lineItems: [{ ...lineItem }],
