@@ -57,8 +57,6 @@ export const useSearchStore = create(
             },
           );
 
-          console.log(search.data);
-
           set({
             loading: false,
             searchData: search.data,

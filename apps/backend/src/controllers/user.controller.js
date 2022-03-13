@@ -90,10 +90,8 @@ module.exports.getUserSearch = catchAsync(async (req, res) => {
       // Create a new user if non-existent user
       if (!getExistingUser) {
         const user = await userAndActivitygenerator(addressFromENS);
-        console.log(user);
         res.send(user);
       }
-      // console.log(getExistingUser);
       const users = activityGenerator(getExistingUser);
       res.send(users);
     }
