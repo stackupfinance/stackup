@@ -3,7 +3,7 @@ const { ethers } = require('ethers');
 const pick = require('../utils/pick');
 const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
-const { activityGenerator, toUserGenerator, userAndActivitygenerator } = require('../utils/generators');
+const { activityGenerator, userAndActivitygenerator } = require('../utils/generators');
 const {
   addressService,
   intercomService,
@@ -90,8 +90,10 @@ module.exports.getUserSearch = catchAsync(async (req, res) => {
       // Create a new user if non-existent user
       if (!getExistingUser) {
         const user = await userAndActivitygenerator(addressFromENS);
+        console.log(user);
         res.send(user);
       }
+      // console.log(getExistingUser);
       const users = activityGenerator(getExistingUser);
       res.send(users);
     }
@@ -123,10 +125,9 @@ module.exports.getUserActivities = catchAsync(async (req, res) => {
   const { userId } = req.params;
   const user = await userService.getUserById(userId);
   const results = await transactionService.queryActivity(user.wallet.walletAddress);
-  const updatedResults = toUserGenerator(results);
   // TODO: Implement actual pagination.
   res.send({
-    results: updatedResults,
+    results,
     page: 1,
     limit: 20,
     totalPages: 1,
@@ -144,10 +145,10 @@ module.exports.getUserActivityItems = catchAsync(async (req, res) => {
 
   // TODO: Implement actual pagination.
   const results = await transactionService.queryActivityItems(user, ...addresses);
-  const updatedResults = toUserGenerator(results);
+  // console.log(results);
   res.send({
     activityItems: {
-      results: updatedResults,
+      results,
       page: 1,
       limit: 100,
       totalPages: 1,
