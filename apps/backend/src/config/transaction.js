@@ -30,14 +30,14 @@ module.exports.chainId = {
 
 module.exports.erc20TokenMeta = {
   137: {
-    ['0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174'.toLowerCase()]: {
+    '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174': {
       units: 6,
       prefix: '$',
       tokenAddress: '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174',
     },
   },
   80001: {
-    ['0x2058A9D7613eEE744279e3856Ef0eAda5FCbaA7e'.toLowerCase()]: {
+    '0x2058A9D7613eEE744279e3856Ef0eAda5FCbaA7e': {
       units: 6,
       prefix: '$',
       tokenAddress: '0x2058A9D7613eEE744279e3856Ef0eAda5FCbaA7e',

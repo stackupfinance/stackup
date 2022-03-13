@@ -132,7 +132,7 @@ module.exports.parseReceiptsForIncomingTransfers = (chainId, receipts) => {
         hash: receipt.transactionHash,
         lineItems: receipt.logs
           .map((log) => {
-            const tokenMeta = erc20TokenMeta[chainId][log.address.toLowerCase()];
+            const tokenMeta = erc20TokenMeta[chainId][ethers.utils.getAddress(log.address)];
             if (tokenMeta) {
               const pl = contracts.Erc20.interface.parseLog(log);
 
