@@ -1,5 +1,6 @@
 const userService = require('./user.service');
 const { web3 } = require('../config/config');
+const { truncateAddress } = require('../utils/web3');
 
 module.exports.transformHistoryWithName = async (userWalletAddress, history) => {
   const addressMap = { [web3.paymaster]: 'stackup', [userWalletAddress]: 'you' };
@@ -28,8 +29,8 @@ module.exports.transformHistoryWithName = async (userWalletAddress, history) => 
 
                   return {
                     ...li,
-                    from: addressMap[fromAddress] ?? fromAddress,
-                    to: addressMap[toAddress] ?? toAddress,
+                    from: addressMap[fromAddress] ?? truncateAddress(fromAddress),
+                    to: addressMap[toAddress] ?? truncateAddress(toAddress),
                     sideEffect: li.sideEffect
                       ? li.sideEffect
                           .replace(fromAddress, addressMap[fromAddress] ?? fromAddress)

@@ -1,5 +1,6 @@
 /* eslint-disable no-await-in-loop */
 const httpStatus = require('http-status');
+const { ethers } = require('ethers');
 const { contracts, wallet } = require('@stackupfinance/contracts');
 const ApiError = require('../utils/ApiError');
 const { Transaction } = require('../models');
@@ -7,6 +8,7 @@ const queue = require('../queue');
 const { functionSignatures, type: txType, status: txStatus } = require('../config/transaction');
 const { types } = require('../config/queue');
 const { web3 } = require('../config/config');
+const { eventSignatures, erc20TokenMeta } = require('../config/transaction');
 const {
   getChainId,
   recoverAddressFromLoginSignature,
@@ -118,6 +120,50 @@ module.exports.parseUserOperations = async (userOperations) => {
   }
 
   return transaction;
+};
+
+module.exports.parseReceiptsForIncomingTransfers = (chainId, receipts) => {
+  return receipts
+    .map((receipt) => {
+      return {
+        type: txType.newPayment,
+        status: ethers.BigNumber.from(receipt.status).toNumber() === 1 ? txStatus.success : txStatus.failed,
+        chainId,
+        hash: receipt.transactionHash,
+        lineItems: receipt.logs
+          .map((log) => {
+            const tokenMeta = erc20TokenMeta[chainId][ethers.utils.getAddress(log.address)];
+            if (tokenMeta) {
+              const pl = contracts.Erc20.interface.parseLog(log);
+
+              if (pl.signature === eventSignatures.erc20Transfer) {
+                return {
+                  from: pl.args[0],
+                  to: pl.args[1],
+                  value: ethers.BigNumber.from(pl.args[2]).toString(),
+                  ...tokenMeta,
+                };
+              }
+            }
+
+            return undefined;
+          })
+          .filter(Boolean),
+      };
+    })
+    .filter((tx) => Boolean(tx.lineItems.length));
+};
+
+module.exports.indexIncomingTransfers = async (transactions) => {
+  return Transaction.bulkWrite(
+    transactions.map((t) => ({
+      updateOne: {
+        filter: { hash: t.hash },
+        update: { $setOnInsert: { ...t } },
+        upsert: true,
+      },
+    }))
+  );
 };
 
 module.exports.getTransactionById = async (id) => {

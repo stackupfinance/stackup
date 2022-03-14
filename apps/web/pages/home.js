@@ -331,7 +331,7 @@ export default function Home() {
             isLastInList={isLastInSection && isLastBatch}
             key={`history-transaction-${i}-${j}`}
             lineItems={tx.lineItems}
-            fee={tx.fee.value}
+            fee={tx.fee?.value}
             hash={tx.hash}
             status={tx.status}
             timestamp={tx.updatedAt}
