@@ -1,9 +1,9 @@
 import { ethers, network } from 'hardhat'
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
-import { BigNumber, ContractReceipt, ContractTransaction, Contract } from 'ethers'
+import { BigNumber, ContractReceipt, ContractTransaction } from 'ethers'
 
-import { bn, fp } from './numbers'
-import { getInterface, instanceAt } from './contracts'
+import { bn } from './helpers/numbers'
+import { getInterface, instanceAt } from './helpers/contracts'
 import { BigNumberish, Account, toAddress } from './types'
 
 const WETH = "0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270"

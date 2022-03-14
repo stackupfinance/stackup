@@ -1,9 +1,19 @@
+import { Decimal } from 'decimal.js'
 import { BigNumber } from 'ethers'
-import { BigNumberish } from './types'
 
-export const fp = (x: BigNumberish): BigNumber => bn(x).mul(bn(1e18))
+const SCALING_FACTOR = 1e18
 
-export const bn = (x: BigNumberish): BigNumber => {
+export type BigNumberish = string | number | BigNumber
+
+export const decimal = (x: BigNumberish | Decimal): Decimal => new Decimal(x.toString())
+
+export const pct = (x: BigNumberish, pct: BigNumberish): BigNumber => bn(decimal(x).mul(decimal(pct)))
+
+export const fp = (x: number | Decimal): BigNumber => bn(decimal(x).mul(SCALING_FACTOR))
+
+export const maxUint = (e: number): BigNumber => bn(2).pow(e).sub(1)
+
+export const bn = (x: BigNumberish | Decimal): BigNumber => {
   if (BigNumber.isBigNumber(x)) return x
   const stringified = parseScientific(x.toString())
   const integer = stringified.split('.')[0]

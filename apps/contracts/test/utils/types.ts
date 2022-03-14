@@ -1,4 +1,7 @@
+import { ethers } from 'hardhat'
 import { BigNumber } from 'ethers'
+
+export type NAry<T> = T | Array<T>
 
 export type BigNumberish = string | number | BigNumber
 
@@ -8,6 +11,14 @@ export function toAddress(account: Account): string {
   return typeof account === 'string' ? account : account.address
 }
 
-export function toAddresses(accounts: Account[]): string[] {
-  return accounts.map(toAddress)
+export function toAddresses(accounts?: Account[]): string[] {
+  return accounts ? accounts.map(toAddress) : []
+}
+
+export function toArray<T>(nary: NAry<T>): T[] {
+  return Array.isArray(nary) ? nary : [nary]
+}
+
+export function toBytes32(number: BigNumberish): string {
+  return ethers.utils.hexZeroPad(ethers.utils.hexlify(number), 32)
 }
