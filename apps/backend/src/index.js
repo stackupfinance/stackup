@@ -16,9 +16,10 @@ mongoose.connect(config.mongoose.url, config.mongoose.options).then(() => {
 
   queue.start().then(async () => {
     logger.info('Connected to job queue');
+
+    await queue.cancel({ name: types.checkForBlocks });
     if (config.alchemy.appUrl) {
       const chainId = await getChainId();
-      await queue.cancel({ name: types.checkForBlocks });
       await queue
         .create(types.checkForBlocks, { chainId })
         .repeatEvery('10 seconds')
