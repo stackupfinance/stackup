@@ -127,16 +127,35 @@ contract EntryPoint is IEntryPoint, IEntryPointStakeController {
     );
   }
 
-  function getSenderAddress(bytes memory initCode, uint256 salt) external view returns (address) {
-    bytes32 data = keccak256(abi.encodePacked(bytes1(0xff), address(create2Factory), salt, keccak256(initCode)));
+  function getSenderAddress(bytes memory initCode, uint256 salt)
+    external
+    view
+    returns (address)
+  {
+    bytes32 data = keccak256(
+      abi.encodePacked(
+        bytes1(0xff),
+        address(create2Factory),
+        salt,
+        keccak256(initCode)
+      )
+    );
     return address(uint160(uint256(data)));
   }
 
-  function getGasPrice(UserOperation calldata op) external view returns (uint256) {
+  function getGasPrice(UserOperation calldata op)
+    external
+    view
+    returns (uint256)
+  {
     return EntryPointUserOperation._gasPrice(op);
   }
 
-  function getRequiredPrefund(UserOperation calldata op) external view returns (uint256) {
+  function getRequiredPrefund(UserOperation calldata op)
+    external
+    view
+    returns (uint256)
+  {
     return EntryPointUserOperation._requiredPrefund(op);
   }
 }

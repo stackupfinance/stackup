@@ -4,6 +4,7 @@ coverage
 coverage.json
 cache
 artifacts
+contracts/test
 .gitkeep
 .gitignore
 .eslintignore
