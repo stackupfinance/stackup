@@ -20,10 +20,13 @@ const postTransaction = async (userId, transaction, context = {}) => {
         }
       );
       const [ai1, ai2] = await Promise.all([
-        transactionService.queryActivityItems(u1, '', '', { limit: 1, id: transaction._id }).then((r) => r[0]),
-        transactionService.queryActivityItems(u2, '', '', { limit: 1, id: transaction._id }).then((r) => r[0]),
+        u1 && transactionService.queryActivityItems(u1, '', '', { limit: 1, id: transaction._id }).then((r) => r[0]),
+        u2 && transactionService.queryActivityItems(u2, '', '', { limit: 1, id: transaction._id }).then((r) => r[0]),
       ]);
-      await Promise.all([pusherService.pushNewPaymentUpdate(u1._id, ai1), pusherService.pushNewPaymentUpdate(u2._id, ai2)]);
+      await Promise.all([
+        u1 && pusherService.pushNewPaymentUpdate(u1._id, ai1),
+        u2 && pusherService.pushNewPaymentUpdate(u2._id, ai2),
+      ]);
       break;
     }
 
