@@ -18,6 +18,12 @@ module.exports = {
     },
   },
   networks: {
+    hardhat: {
+      forking: {
+        url: process.env.ALCHEMY_NODE || "",
+        blockNumber: 20843638,
+      },
+    },
     mumbai: {
       url: "https://rpc-mumbai.maticvigil.com",
       chainId: 80001,
