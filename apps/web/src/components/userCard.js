@@ -30,7 +30,7 @@ export const UserCard = ({
       <VStack spacing="8px" w="100%" justifyContent="center" alignItems="left">
         <HStack>
           <Skeleton isLoaded={!isLoading}>
-            <Heading fontSize={!preview ? 'lg' : 'sm'}>{username}</Heading>
+            <Heading fontSize={!timestamp ? 'lg' : 'sm'}>{username}</Heading>
           </Skeleton>
 
           <Spacer />

@@ -17,6 +17,20 @@ const {
   signatureCount,
 } = require('../utils/web3');
 
+const aggregateHelpers = {
+  addUserField: (userSelector, fallbackAddress) => {
+    return {
+      username: {
+        $ifNull: [
+          `${userSelector}.username`,
+          { $concat: [{ $substrBytes: [fallbackAddress, 0, 5] }, '...', { $substrBytes: [fallbackAddress, 37, 5] }] },
+        ],
+      },
+      walletAddress: { $ifNull: [`${userSelector}.walletAddress`, fallbackAddress] },
+    };
+  },
+};
+
 module.exports.parseUserOperations = async (userOperations) => {
   let transaction = {};
   for (let i = 0; i < userOperations.length; i += 1) {
@@ -261,7 +275,7 @@ module.exports.queryActivity = async (walletAddress) => {
     .project({
       _id: false,
       id: '$_id',
-      toUser: { username: '$toUser.username', walletAddress: '$toWallet.walletAddress' },
+      toUser: aggregateHelpers.addUserField('$toUser', '$toAddress'),
       preview: true,
       updatedAt: true,
     })
@@ -330,8 +344,8 @@ module.exports.queryActivityItems = async (user, address1, address2, opts = { li
       _id: false,
       id: '$_id',
       isReceiving: true,
-      fromUser: { username: '$fromUser.username', walletAddress: '$fromWallet.walletAddress' },
-      toUser: { username: '$toUser.username', walletAddress: '$toWallet.walletAddress' },
+      fromUser: aggregateHelpers.addUserField('$fromUser', '$lastLineItem.from'),
+      toUser: aggregateHelpers.addUserField('$toUser', '$lastLineItem.to'),
       value: '$lastLineItem.value',
       units: '$lastLineItem.units',
       prefix: '$lastLineItem.prefix',

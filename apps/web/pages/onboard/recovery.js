@@ -43,7 +43,7 @@ function OnboardRecovery() {
   const {
     loading: searchLoading,
     searchData,
-    searchByUsername,
+    searchForAccount,
     fetchNextPage,
     hasMore,
     clearSearchData,
@@ -130,7 +130,7 @@ function OnboardRecovery() {
     if (!enabled) return;
 
     setSearchQuery(query);
-    searchByUsername(query, { userId: user.id, accessToken: accessToken.token });
+    searchForAccount(query, { userId: user.id, accessToken: accessToken.token });
   };
 
   const onSearchClear = () => {

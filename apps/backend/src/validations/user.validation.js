@@ -77,7 +77,7 @@ module.exports.getUserSearch = {
     userId: Joi.string().custom(objectId),
   }),
   query: Joi.object().keys({
-    username: Joi.string().required(),
+    account: Joi.string().required(),
     sortBy: Joi.string(),
     limit: Joi.number().integer(),
     page: Joi.number().integer(),
