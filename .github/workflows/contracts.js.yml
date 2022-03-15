@@ -31,10 +31,3 @@ jobs:
         run: yarn workspace @stackupfinance/contracts run test
         env:
           ALCHEMY_NODE: ${{ secrets.ALCHEMY_NODE }}
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v1
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          files: ./apps/contracts/coverage/coverage-final.json
-          flags: contracts
-          fail_ci_if_error: true

@@ -4,8 +4,8 @@
   "private": true,
   "main": "lib/index.js",
   "scripts": {
-    "test": "NODE_ENV=test hardhat coverage",
-    "test:nocov": "NODE_ENV=test hardhat test",
+    "test": "NODE_ENV=test hardhat test",
+    "test:cov": "NODE_ENV=test hardhat coverage",
     "test:watch": "node testWatcher.js",
     "compile": "hardhat compile",
     "lint": "solhint 'contracts/**/*.sol' && eslint .",
