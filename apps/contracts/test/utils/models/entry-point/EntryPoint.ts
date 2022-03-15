@@ -2,12 +2,12 @@ import { ethers } from 'hardhat'
 import { BigNumber, Contract, ContractTransaction } from 'ethers'
 
 import EntryPointDeployer from './EntryPointDeployer'
+
 import { bn } from '../../helpers/numbers'
+import { UserOp } from '../user/types'
 import { ZERO_ADDRESS } from '../../helpers/constants'
 import { encodeRequestId, encodeWalletValidateOp } from '../../helpers/encoding'
-
-import { UserOp } from '../user/types'
-import { Account, NAry, toArray, toBytes32 } from '../../types'
+import {Account, NAry, TxParams, toArray, toBytes32, toAddress} from '../../types'
 
 export default class EntryPoint {
   instance: Contract
@@ -61,5 +61,30 @@ export default class EntryPoint {
     const totalGas = creationGas.add(validationGas).add(executionGas)
     const gasPrice = await this.getGasPrice(op)
     return totalGas.mul(gasPrice)
+  }
+
+  async getStake(paymaster: Account): Promise<{ value: BigNumber, lockExpiryTime: BigNumber, isLocked: boolean }> {
+    return this.instance.getStake(toAddress(paymaster))
+  }
+
+  async stake(amount: BigNumber, params: TxParams = {}): Promise<ContractTransaction> {
+    return this.with(params).addStake({ value: amount.toString() })
+  }
+
+  async stakeAndLock(amount: BigNumber, params: TxParams = {}): Promise<ContractTransaction> {
+    await this.stake(amount, params)
+    return this.with(params).lockStake()
+  }
+
+  async unlockStake(params: TxParams = {}): Promise<ContractTransaction> {
+    return this.with(params).unlockStake()
+  }
+
+  async unstake(recipient: Account, params: TxParams = {}): Promise<ContractTransaction> {
+    return this.with(params).withdrawStake(toAddress(recipient))
+  }
+
+  with(params: TxParams = {}): Contract {
+    return params.from ? this.instance.connect(params.from) : this.instance
   }
 }

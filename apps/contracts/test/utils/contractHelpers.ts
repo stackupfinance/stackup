@@ -1,5 +1,5 @@
 import { ethers, network } from 'hardhat'
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
+import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/dist/src/signer-with-address'
 import { BigNumber, ContractReceipt, ContractTransaction } from 'ethers'
 
 import { bn } from './helpers/numbers'

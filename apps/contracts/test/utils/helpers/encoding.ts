@@ -1,9 +1,8 @@
 import { ethers } from 'hardhat'
 import { BigNumber, Contract } from 'ethers'
 
-import { deploy, getFactory, getInterface } from './contracts'
-
 import { Signature, UserOp } from '../models/user/types'
+import { deploy, getFactory, getInterface } from './contracts'
 import { Account, BigNumberish, toAddress, toAddresses } from '../types'
 
 export const OWNER_SIGNATURE = 0
@@ -64,9 +63,9 @@ export async function encodeReverterFail(): Promise<string> {
   return reverterInterface.encodeFunctionData('fail', [])
 }
 
-export async function encodeTokenApproval(token: Contract, to: Account, amount: BigNumber): Promise<string> {
+export async function encodeTokenApproval(to: Account, amount: BigNumber): Promise<string> {
   const tokenInterface = await getInterface('ERC20')
-  const args = [toAddress(token), toAddress(to), amount.toString()]
+  const args = [toAddress(to), amount.toString()]
   return tokenInterface.encodeFunctionData('approve', args)
 }
 
