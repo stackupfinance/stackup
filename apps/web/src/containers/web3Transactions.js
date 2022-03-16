@@ -153,7 +153,7 @@ export const Web3Transactions = ({ children }) => {
 
         <Text>
           Check{' '}
-          <Code wordBreak="break-word" wordBreak="break-word" fontWeight="bold" borderRadius="md">
+          <Code wordBreak="break-word" fontWeight="bold" borderRadius="md">
             {session.peerMeta.name}
           </Code>{' '}
           for more details.
