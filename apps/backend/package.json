@@ -38,7 +38,7 @@
     "cors": "^2.8.5",
     "cross-env": "^7.0.3",
     "dotenv": "^16.0.0",
-    "ethers": "^5.6.0",
+    "ethers": "^5.6.1",
     "express": "^4.17.3",
     "express-http-proxy": "^1.6.3",
     "express-mongo-sanitize": "^2.2.0",
