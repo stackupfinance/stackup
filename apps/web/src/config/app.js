@@ -22,5 +22,6 @@ export const App = {
   },
   featureFlag: {
     whitelist: process.env.NEXT_PUBLIC_FEATURE_FLAG_WHITELIST === 'true',
+    alphaBanner: process.env.NEXT_PUBLIC_FEATURE_FLAG_ALPHA_BANNER === 'true',
   },
 };
