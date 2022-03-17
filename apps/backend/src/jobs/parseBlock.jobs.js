@@ -10,6 +10,7 @@ const parseBlock = (queue) => {
     try {
       const { chainId, blockNumber, attempt = 0 } = job.attrs.data;
       const receipts = await alchemyService.getTransactionReceipts(chainId, blockNumber);
+
       if (!receipts && attempt <= 1) {
         queue.schedule('1 seconds', types.parseBlock, { ...job.attrs.data, attempt: attempt + 1 });
       } else if (!receipts) {
