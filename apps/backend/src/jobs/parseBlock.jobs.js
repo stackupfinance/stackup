@@ -7,12 +7,17 @@ const log = (msg) => logger.info(`JOB ${types.parseBlock}: ${msg}`);
 
 const parseBlock = (queue) => {
   queue.define(types.parseBlock, async (job) => {
-    const { chainId, blockNumber } = job.attrs.data;
-    const receipts = await alchemyService.getTransactionReceipts(chainId, blockNumber);
-    const transactions = transactionService.parseReceiptsForIncomingTransfers(chainId, receipts);
+    try {
+      const { chainId, blockNumber } = job.attrs.data;
+      const receipts = await alchemyService.getTransactionReceipts(chainId, blockNumber);
+      const transactions = transactionService.parseReceiptsForIncomingTransfers(chainId, receipts);
 
-    await transactionService.indexIncomingTransfers(transactions);
-    log(`blockNumber: ${blockNumber}, incomingTransfers: ${transactions.length}`);
+      await transactionService.indexIncomingTransfers(transactions);
+      log(`blockNumber: ${blockNumber}, incomingTransfers: ${transactions.length}`);
+    } catch (error) {
+      logger.error(error);
+      throw error;
+    }
   });
 };
 

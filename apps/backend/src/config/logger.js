@@ -1,4 +1,6 @@
 const winston = require('winston');
+const isURL = require('validator/lib/isURL');
+const Sentry = require('winston-transport-sentry-node').default;
 const config = require('./config');
 
 const enumerateErrorFormat = winston.format((info) => {
@@ -20,7 +22,15 @@ const logger = winston.createLogger({
     new winston.transports.Console({
       stderrLevels: ['error'],
     }),
-  ],
+    isURL(config.sentry.dns)
+      ? new Sentry({
+          sentry: {
+            dsn: config.sentry.dns,
+          },
+          level: 'error',
+        })
+      : undefined,
+  ].filter(Boolean),
 });
 
 module.exports = logger;
