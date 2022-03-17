@@ -1,6 +1,6 @@
 const winston = require('winston');
-const isURL = require('validator/lib/isURL');
 const Sentry = require('winston-transport-sentry-node').default;
+const isURL = require('validator/lib/isURL');
 const config = require('./config');
 
 const enumerateErrorFormat = winston.format((info) => {
