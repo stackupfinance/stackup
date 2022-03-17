@@ -56,6 +56,7 @@
     "pusher": "^5.0.1",
     "validator": "^13.7.0",
     "winston": "^3.6.0",
+    "winston-transport-sentry-node": "^2.3.0",
     "xss-clean": "^0.1.1"
   },
   "devDependencies": {
