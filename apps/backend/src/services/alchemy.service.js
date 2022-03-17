@@ -21,5 +21,5 @@ module.exports.getTransactionReceipts = async (chainId, blockNumber) => {
     id: `${chainId}_${blockNumber}`,
   });
 
-  return res.data.result?.receipts;
+  return res.data;
 };

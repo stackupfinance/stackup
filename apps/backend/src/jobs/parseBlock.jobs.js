@@ -9,12 +9,13 @@ const parseBlock = (queue) => {
   queue.define(types.parseBlock, async (job) => {
     try {
       const { chainId, blockNumber, attempt = 0 } = job.attrs.data;
-      const receipts = await alchemyService.getTransactionReceipts(chainId, blockNumber);
+      const data = await alchemyService.getTransactionReceipts(chainId, blockNumber);
+      const receipts = data.result?.receipts;
 
-      if (!receipts && attempt <= 1) {
-        queue.schedule('1 seconds', types.parseBlock, { ...job.attrs.data, attempt: attempt + 1 });
+      if (!receipts && attempt < 1) {
+        queue.now(types.parseBlock, { ...job.attrs.data, attempt: attempt + 1 });
       } else if (!receipts) {
-        throw new Error('receipts not found');
+        throw new Error(`receipts not found: ${JSON.stringify(data)}`);
       } else {
         const transactions = transactionService.parseReceiptsForIncomingTransfers(chainId, receipts);
         await transactionService.indexIncomingTransfers(transactions);
