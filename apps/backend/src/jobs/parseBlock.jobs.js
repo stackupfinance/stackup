@@ -13,7 +13,7 @@ const parseBlock = (queue) => {
       const receipts = data.result?.receipts;
 
       if (!receipts && attempt < 1) {
-        queue.now(types.parseBlock, { ...job.attrs.data, attempt: attempt + 1 });
+        queue.schedule('5 seconds', types.parseBlock, { ...job.attrs.data, attempt: attempt + 1 });
       } else if (!receipts) {
         throw new Error(`receipts not found: ${JSON.stringify(data)}`);
       } else {
