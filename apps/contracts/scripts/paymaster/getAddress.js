@@ -11,6 +11,7 @@ async function main() {
   ];
 
   const paymaster = wallet.proxy.getAddress(...init);
+  console.log("Signer wallet address:", signer.address);
   console.log("Paymaster wallet address:", paymaster);
 }
 
