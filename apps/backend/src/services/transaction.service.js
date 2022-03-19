@@ -148,9 +148,14 @@ module.exports.parseReceiptsForIncomingTransfers = (chainId, receipts) => {
           .map((log) => {
             const tokenMeta = erc20TokenMeta[chainId][ethers.utils.getAddress(log.address)];
             if (tokenMeta) {
-              const pl = contracts.Erc20.interface.parseLog(log);
+              let pl;
+              try {
+                pl = contracts.Erc20.interface.parseLog(log);
+              } catch (error) {
+                return undefined;
+              }
 
-              if (pl.signature === eventSignatures.erc20Transfer) {
+              if (pl?.signature === eventSignatures.erc20Transfer) {
                 return {
                   from: pl.args[0],
                   to: pl.args[1],
