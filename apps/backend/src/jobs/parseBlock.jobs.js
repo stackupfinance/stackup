@@ -6,7 +6,7 @@ const { types } = require('../config/queue');
 
 const MAX_ATTEMPTS = 3;
 const exponentialBackoffDelay = (attempt) => {
-  return `${5 * Math.pow(2, attempt)} seconds`;
+  return `${5 * 2 ** attempt} seconds`;
 };
 const log = (msg) => logger.info(`JOB ${types.parseBlock}: ${msg}`);
 
