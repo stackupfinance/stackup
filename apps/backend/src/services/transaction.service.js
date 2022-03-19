@@ -148,19 +148,20 @@ module.exports.parseReceiptsForIncomingTransfers = (chainId, receipts) => {
           .map((log) => {
             const tokenMeta = erc20TokenMeta[chainId][ethers.utils.getAddress(log.address)];
             if (tokenMeta) {
+              let pl;
               try {
-                const pl = contracts.Erc20.interface.parseLog(log);
-
-                if (pl.signature === eventSignatures.erc20Transfer) {
-                  return {
-                    from: pl.args[0],
-                    to: pl.args[1],
-                    value: ethers.BigNumber.from(pl.args[2]).toString(),
-                    ...tokenMeta,
-                  };
-                }
+                pl = contracts.Erc20.interface.parseLog(log);
               } catch (error) {
                 return undefined;
+              }
+
+              if (pl?.signature === eventSignatures.erc20Transfer) {
+                return {
+                  from: pl.args[0],
+                  to: pl.args[1],
+                  value: ethers.BigNumber.from(pl.args[2]).toString(),
+                  ...tokenMeta,
+                };
               }
             }
 
