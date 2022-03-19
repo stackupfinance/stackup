@@ -29,7 +29,9 @@ const parseBlock = (queue) => {
       }
     } catch (error) {
       if (
-        (error.response?.status === httpStatus.BAD_GATEWAY || error.response?.status === httpStatus.SERVICE_UNAVAILABLE) &&
+        (error.response?.status === httpStatus.BAD_GATEWAY ||
+          error.response?.status === httpStatus.SERVICE_UNAVAILABLE ||
+          error.response?.status === httpStatus.TOO_MANY_REQUESTS) &&
         attempt < MAX_ATTEMPTS
       ) {
         queue.schedule(exponentialBackoffDelay(attempt), types.parseBlock, { ...job.attrs.data, attempt: attempt + 1 });
