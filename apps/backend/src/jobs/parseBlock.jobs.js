@@ -4,6 +4,7 @@ const alchemyService = require('../services/alchemy.service');
 const transactionService = require('../services/transaction.service');
 const { types } = require('../config/queue');
 
+const MAX_ATTEMPTS = 3;
 const log = (msg) => logger.info(`JOB ${types.parseBlock}: ${msg}`);
 
 const parseBlock = (queue) => {
@@ -14,7 +15,7 @@ const parseBlock = (queue) => {
       const data = await alchemyService.getTransactionReceipts(chainId, blockNumber);
       const receipts = data.result?.receipts;
 
-      if (!receipts && attempt < 2) {
+      if (!receipts && attempt < MAX_ATTEMPTS) {
         queue.schedule('5 seconds', types.parseBlock, { ...job.attrs.data, attempt: attempt + 1 });
       } else if (!receipts) {
         throw new Error(`receipts not found: ${JSON.stringify(data)}`);
@@ -24,7 +25,7 @@ const parseBlock = (queue) => {
         log(`blockNumber: ${blockNumber}, incomingTransfers: ${transactions.length}`);
       }
     } catch (error) {
-      if (error.response?.status === httpStatus.BAD_GATEWAY) {
+      if (error.response?.status === httpStatus.BAD_GATEWAY && attempt < MAX_ATTEMPTS) {
         queue.schedule('5 seconds', types.parseBlock, { ...job.attrs.data, attempt: attempt + 1 });
       } else {
         logger.error(error);
