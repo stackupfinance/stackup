@@ -2,6 +2,9 @@ const userService = require('./user.service');
 const { web3 } = require('../config/config');
 const { truncateAddress, resolveEnsName } = require('../utils/web3');
 
+const MAX_USDC_APPROVAL =
+  '$115,792,089,237,316,200,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000.00';
+
 module.exports.addressTypes = {};
 
 module.exports.generateSearchResultForGenericAddress = (address) => {
@@ -72,8 +75,9 @@ module.exports.transformHistoryWithName = async (userWalletAddress, history) => 
                     to: addressMap[toAddress] ?? truncateAddress(toAddress),
                     sideEffect: li.sideEffect
                       ? li.sideEffect
-                          .replace(fromAddress, addressMap[fromAddress] ?? fromAddress)
-                          .replace(toAddress, addressMap[toAddress] ?? toAddress)
+                          .replace(fromAddress, addressMap[fromAddress] ?? truncateAddress(fromAddress))
+                          .replace(toAddress, addressMap[toAddress] ?? truncateAddress(toAddress))
+                          .replace(MAX_USDC_APPROVAL, 'the max value')
                       : undefined,
                   };
                 })
