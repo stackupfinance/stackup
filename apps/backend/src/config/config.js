@@ -24,8 +24,10 @@ const envVarsSchema = Joi.object()
     WEB3_MNEMONIC: Joi.string().required().description('Mnemonic for paymaster signer and relayer'),
     WEB3_PAYMASTER: Joi.string().required().description('Paymaster address for sponsoring gasless transactions'),
     WEB3_RPC: Joi.string().required().description('RPC for the correct network'),
+    WEB3_ETHEREUM_RPC: Joi.string().allow('').description('RPC for ethereum mainnet'),
     WEB3_USDC: Joi.string().required().description('ERC20 token address for USDC'),
     WEB3_USDC_PRICE_FEED: Joi.string().required().description('Chainlink address for USDC price feed'),
+    ALCHEMY_APP_URL: Joi.string().allow('').description('Alchemy app url with key. This is required for indexing blocks'),
     ANALYTICS_URL: Joi.string().required().description('Analytics url for proxying events'),
     INTERCOM_IDENTITY_VERIFICATION_SECRET: Joi.string().default('').description('Intercom identity verification secret'),
     FIAT_WYRE_API_URL: Joi.string().default('').description('Base url for Wyre API'),
@@ -79,8 +81,12 @@ module.exports = {
     mnemonic: envVars.WEB3_MNEMONIC,
     paymaster: envVars.WEB3_PAYMASTER,
     rpc: envVars.WEB3_RPC,
+    ethereumRpc: envVars.WEB3_ETHEREUM_RPC,
     usdc: envVars.WEB3_USDC,
     usdcPriceFeed: envVars.WEB3_USDC_PRICE_FEED,
+  },
+  alchemy: {
+    appUrl: envVars.ALCHEMY_APP_URL,
   },
   analytics: {
     url: envVars.ANALYTICS_URL,

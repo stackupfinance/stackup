@@ -133,7 +133,7 @@ export default function Home() {
   const {
     loading: searchLoading,
     searchData,
-    searchByUsername,
+    searchForAccount,
     fetchNextPage,
     hasMore,
     clearSearchData,
@@ -238,7 +238,7 @@ export default function Home() {
     setTabIndex(tabs.PAY);
     setShowSearch(true);
     setSearchQuery(query);
-    searchByUsername(query, { userId: user.id, accessToken: accessToken.token });
+    searchForAccount(query, { userId: user.id, accessToken: accessToken.token });
     logEvent(EVENTS.SEARCH_START);
   };
 
@@ -331,7 +331,7 @@ export default function Home() {
             isLastInList={isLastInSection && isLastBatch}
             key={`history-transaction-${i}-${j}`}
             lineItems={tx.lineItems}
-            fee={tx.fee.value}
+            fee={tx.fee?.value}
             hash={tx.hash}
             status={tx.status}
             timestamp={tx.updatedAt}

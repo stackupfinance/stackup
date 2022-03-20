@@ -1,6 +1,7 @@
 export * from './accountOverview';
 export * from './activityHeader';
 export * from './addEmail';
+export * from './alphaBanner';
 export * from './appContainer';
 export * from './approveRecovery';
 export * from './apps';

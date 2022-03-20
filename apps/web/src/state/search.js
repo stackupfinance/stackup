@@ -6,7 +6,7 @@ import { App } from '../config';
 export const searchHomePageSelector = (state) => ({
   loading: state.loading,
   searchData: state.searchData,
-  searchByUsername: state.searchByUsername,
+  searchForAccount: state.searchForAccount,
   fetchNextPage: state.fetchNextPage,
   hasMore: state.hasMore,
   clearSearchData: state.clearSearchData,
@@ -19,7 +19,7 @@ export const searchUseAuthSelector = (state) => ({
 export const searchOnboardRecoveryPageSelector = (state) => ({
   loading: state.loading,
   searchData: state.searchData,
-  searchByUsername: state.searchByUsername,
+  searchForAccount: state.searchForAccount,
   fetchNextPage: state.fetchNextPage,
   hasMore: state.hasMore,
   clearSearchData: state.clearSearchData,
@@ -28,7 +28,7 @@ export const searchOnboardRecoveryPageSelector = (state) => ({
 export const searchUpdateEditGuardiansPageSelector = (state) => ({
   loading: state.loading,
   searchData: state.searchData,
-  searchByUsername: state.searchByUsername,
+  searchForAccount: state.searchForAccount,
   fetchNextPage: state.fetchNextPage,
   hasMore: state.hasMore,
   clearSearchData: state.clearSearchData,
@@ -45,14 +45,14 @@ export const useSearchStore = create(
     (set, get) => ({
       ...defaultState,
 
-      searchByUsername: async (username, options = {}) => {
+      searchForAccount: async (account, options = {}) => {
         set({ loading: true });
 
         try {
           const search = await axios.get(
             `${App.stackup.backendUrl}/v1/users/${options.userId}/search`,
             {
-              params: { username, limit: 20, page: 1 },
+              params: { account, limit: 20, page: 1 },
               headers: { Authorization: `Bearer ${options.accessToken}` },
             },
           );
@@ -67,7 +67,7 @@ export const useSearchStore = create(
         }
       },
 
-      fetchNextPage: async (username, options = {}) => {
+      fetchNextPage: async (account, options = {}) => {
         const searchData = get().searchData;
         if (!searchData) return;
 
@@ -75,7 +75,7 @@ export const useSearchStore = create(
           const latest = await axios.get(
             `${App.stackup.backendUrl}/v1/users/${options.userId}/search`,
             {
-              params: { username, limit: searchData.limit, page: searchData.page + 1 },
+              params: { account, limit: searchData.limit, page: searchData.page + 1 },
               headers: { Authorization: `Bearer ${options.accessToken}` },
             },
           );

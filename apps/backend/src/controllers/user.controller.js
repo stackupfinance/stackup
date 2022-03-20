@@ -15,6 +15,7 @@ const {
 const { type } = require('../config/transaction');
 const { createAlchemyWeb3 } = require('@alch/alchemy-web3');
 const tokenList = require('../data/tokenList');
+const { isValidUsername, nameType, getNameType } = require('../config/name');
 
 module.exports.getUser = catchAsync(async (req, res) => {
   const user = await userService.getUserById(req.params.userId);
@@ -79,17 +80,44 @@ module.exports.deleteUserNotification = catchAsync(async (req, res) => {
 
 module.exports.getUserSearch = catchAsync(async (req, res) => {
   const { userId } = req.params;
+  const { account } = req.query;
   const options = pick(req.query, ['sortBy', 'limit', 'page']);
-  const result = await userService.queryUsers(
-    { username: { $regex: req.query.username, $options: 'i' }, _id: { $ne: userId }, isOnboarded: { $eq: true } },
-    {
-      ...options,
-      projection: 'username wallet _id',
-      populate: 'wallet',
-      populateProjection: 'walletAddress -_id',
+
+  switch (getNameType(account)) {
+    case nameType.GENERIC: {
+      const result = addressService.generateSearchResultForGenericAddress(account);
+      res.send(result);
+      break;
     }
-  );
-  res.send(result);
+
+    case nameType.ENS: {
+      const result = await addressService.generateSearchResultForEnsName(account);
+      res.send(result);
+      break;
+    }
+
+    default: {
+      const result = await userService.queryUsers(
+        {
+          username: {
+            // Match nothing if not a valid username.
+            $regex: isValidUsername(req.query.account) ? req.query.account : 'a^',
+            $options: 'i',
+          },
+          _id: { $ne: userId },
+          isOnboarded: { $eq: true },
+        },
+        {
+          ...options,
+          projection: 'username wallet _id',
+          populate: 'wallet',
+          populateProjection: 'walletAddress -_id',
+        }
+      );
+      res.send(result);
+      break;
+    }
+  }
 });
 
 module.exports.getUserActivities = catchAsync(async (req, res) => {

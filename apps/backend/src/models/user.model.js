@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const validator = require('validator');
 const { toJSON, paginate } = require('./plugins');
 const walletService = require('../services/wallet.service');
+const { isValidUsername } = require('../config/name');
 
 const userSchema = mongoose.Schema(
   {
@@ -12,7 +13,7 @@ const userSchema = mongoose.Schema(
       trim: true,
       lowercase: true,
       validate(value) {
-        if (!value.match(/^[a-zA-Z0-9_.-]*$/)) {
+        if (!isValidUsername(value)) {
           throw new Error('Username can only contain alphanumeric characters, periods, underscores and hyphens');
         }
       },
