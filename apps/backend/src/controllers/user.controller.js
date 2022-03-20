@@ -13,6 +13,8 @@ const {
   fiatService,
 } = require('../services');
 const { type } = require('../config/transaction');
+const { createAlchemyWeb3 } = require('@alch/alchemy-web3');
+const tokenList = require('../data/tokenList');
 
 module.exports.getUser = catchAsync(async (req, res) => {
   const user = await userService.getUserById(req.params.userId);
@@ -47,6 +49,20 @@ module.exports.getUserWallet = catchAsync(async (req, res) => {
 module.exports.hydrateUserWalletGuardians = catchAsync(async (req, res) => {
   const { guardians } = req.body;
   res.send({ guardians: await userService.getUsersByWalletAddressAndPopulate(guardians) });
+});
+
+module.exports.getWalletBalances = catchAsync(async (req, res) => {
+  const { userId } = req.params;
+  const user = await userService.getUserById(userId);
+  const walletAddress =  user.wallet.walletAddress;
+  const tokenAddresses = tokenList.tokens.filter(token => token.chainId === parseInt(process.env.CHAIN_ID)).map(token => token.address);
+  // Initialize an alchemy-web3 instance
+  const web3 = createAlchemyWeb3(`${process.env.ALCHEMY_ENDPOINT}${process.env.ALCHEMY_API_KEY}`);
+  const balances = await web3.alchemy.getTokenBalances(
+    walletAddress, 
+    tokenAddresses
+  );
+  res.send(balances);
 });
 
 module.exports.getUserNotifications = catchAsync(async (req, res) => {
