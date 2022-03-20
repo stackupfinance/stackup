@@ -56,6 +56,6 @@ export const signatureCount = (userOp) => {
 };
 
 export const overrideDefaultUserOpGasValues = () => {
-  constants.userOperations.defaults.callGas = constants.userOperations.defaultGas * 2;
+  constants.userOperations.defaults.callGas = constants.userOperations.defaultGas * 3;
   constants.userOperations.defaults.preVerificationGas = 0;
 };
