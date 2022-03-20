@@ -4,6 +4,7 @@ import { useAuth } from '../src/hooks';
 import { AlphaBanner } from '../src/components';
 import { IntercomManager, Web3Transactions } from '../src/containers';
 import { App as AppConfig } from '../src/config';
+import { overrideDefaultUserOpGasValues } from '../src/utils/web3';
 import '../styles.css';
 
 const theme = extendTheme({
@@ -15,6 +16,7 @@ const theme = extendTheme({
 
 function App({ Component, pageProps }) {
   useAuth();
+  overrideDefaultUserOpGasValues();
 
   return (
     <IntercomProvider appId={AppConfig.intercom.appId}>
