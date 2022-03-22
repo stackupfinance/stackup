@@ -2,7 +2,6 @@ import { ethers } from 'hardhat'
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/dist/src/signer-with-address'
 import { BigNumber, Contract, ContractTransaction } from 'ethers'
 
-import EntryPoint from '../entry-point/EntryPoint'
 import { bn } from '../../helpers/numbers'
 import { getSigners } from '../../helpers/signers'
 import { ZERO_ADDRESS } from '../../helpers/constants'
@@ -10,9 +9,9 @@ import { deploy, instanceAt } from '../../helpers/contracts'
 import { assertIndirectEvent } from '../../helpers/asserts'
 import { encodeSignatures, encodeWalletExecute, encodeWalletDeployment, encodeCounterIncrement } from '../../helpers/encoding'
 
+import EntryPoint from '../entry-point/EntryPoint'
 import { Account, toAddress } from '../../types'
 import { UserOp, UserOpParams } from './types'
-
 
 export default class User {
   static OWNER_SIGNATURE = 0

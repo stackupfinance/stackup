@@ -1,15 +1,15 @@
-import {ethers} from 'hardhat'
-import {BigNumber, Contract, ContractTransaction} from 'ethers'
-import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers'
+import { ethers } from 'hardhat'
+import { BigNumber, Contract, ContractTransaction } from 'ethers'
+import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
+
+import { ZERO_BYTES32 } from '../../helpers/constants'
+import { isBigNumberish } from '../../helpers/numbers'
+import { encodeRequestId, encodeSignatures } from '../../helpers/encoding'
 
 import WalletDeployer from './WalletDeployer'
-import {ZERO_BYTES32} from '../../helpers/constants'
-import {encodeRequestId, encodeSignatures} from '../../helpers/encoding'
-
-import {UserOp} from '../user/types'
-import {WalletDeployParams} from './types'
-import {Account, BigNumberish, toAddress, TxParams} from '../../types'
-import {isBigNumberish} from "../../helpers/numbers";
+import { UserOp } from '../user/types'
+import { WalletDeployParams } from './types'
+import { toAddress, Account, BigNumberish, TxParams} from '../../types'
 
 export default class Wallet {
   static OWNER_SIGNATURE = 0
