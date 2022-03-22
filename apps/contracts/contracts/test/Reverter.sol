@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.0;
 
-contract Revert {
+contract Reverter {
   function fail() external pure {
     revert("REVERTED");
   }

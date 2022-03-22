@@ -8,11 +8,14 @@ import { getSigners } from '../../helpers/signers'
 import { ZERO_ADDRESS } from '../../helpers/constants'
 import { deploy, instanceAt } from '../../helpers/contracts'
 import { assertIndirectEvent } from '../../helpers/asserts'
+import { encodeSignatures, encodeWalletExecute, encodeWalletDeployment, encodeCounterIncrement } from '../../helpers/encoding'
+
 import { Account, toAddress } from '../../types'
 import { UserOp, UserOpParams } from './types'
-import { encodeCounterIncrement, encodeOwnerSignature, encodeWalletDeployment, encodeWalletExecute } from '../../helpers/encoding'
+
 
 export default class User {
+  static OWNER_SIGNATURE = 0
   static WALLET_CREATION_GAS = bn(690e3)
   static WALLET_VERIFICATION_GAS = bn(38500)
   static COUNTER_CALL_WITH_VALUE_GAS = bn(35000)
@@ -64,7 +67,7 @@ export default class User {
   async signOp(op: UserOp): Promise<string> {
     const requestId = await this.entryPoint.getRequestId(op)
     const signature = await this.signer.signMessage(ethers.utils.arrayify(requestId))
-    return encodeOwnerSignature({ signer: toAddress(this.signer), signature })
+    return encodeSignatures(User.OWNER_SIGNATURE, { signer: toAddress(this.signer), signature })
   }
 
   async getWalletDeploymentCode(implementation?: Contract): Promise<string> {

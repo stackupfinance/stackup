@@ -11,7 +11,7 @@ export async function getSigner(indexOrAddress: number | string = 0): Promise<Si
   }
 }
 
-export async function getSigners(size?: number): Promise<SignerWithAddress[]> {
+export async function getSigners(size?: number, offset = 0): Promise<SignerWithAddress[]> {
   const signers = await ethers.getSigners()
-  return size ? signers.slice(0, size) : signers
+  return size ? signers.slice(offset, offset + size) : signers
 }
