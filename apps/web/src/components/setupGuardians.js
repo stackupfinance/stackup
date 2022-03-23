@@ -12,7 +12,6 @@ import {
   AccordionButton,
   AccordionPanel,
   AccordionIcon,
-  Link,
   Modal,
   ModalOverlay,
   ModalContent,
@@ -91,12 +90,11 @@ export const SetupGuardians = ({
                 </AccordionButton>
 
                 <AccordionPanel>
-                  Your guardians are a group of wallets that can help recover your account through
-                  majority consensus. You can read more about how it works{' '}
-                  <Link href="#" fontWeight="bold" isExternal>
-                    here
-                  </Link>
-                  .
+                  Your guardians are other wallets that can help recover your account through
+                  majority consent.{' '}
+                  <Text as="span" fontWeight="bold">
+                    You can pick us or anyone you choose!
+                  </Text>
                 </AccordionPanel>
               </AccordionItem>
             </Accordion>

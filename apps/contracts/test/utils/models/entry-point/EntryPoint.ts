@@ -1,13 +1,14 @@
 import { ethers } from 'hardhat'
 import { BigNumber, Contract, ContractTransaction } from 'ethers'
-
-import EntryPointDeployer from './EntryPointDeployer'
+import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/dist/src/signer-with-address'
 
 import { bn } from '../../helpers/numbers'
-import { UserOp } from '../user/types'
 import { ZERO_ADDRESS } from '../../helpers/constants'
 import { encodeRequestId, encodeWalletValidateOp } from '../../helpers/encoding'
-import {Account, NAry, TxParams, toArray, toBytes32, toAddress} from '../../types'
+
+import EntryPointDeployer from './EntryPointDeployer'
+import { UserOp } from '../user/types'
+import { Account, NAry, TxParams, toArray, toBytes32, toAddress } from '../../types'
 
 export default class EntryPoint {
   instance: Contract
@@ -85,6 +86,6 @@ export default class EntryPoint {
   }
 
   with(params: TxParams = {}): Contract {
-    return params.from ? this.instance.connect(params.from) : this.instance
+    return params.from ? this.instance.connect(params.from as SignerWithAddress) : this.instance
   }
 }

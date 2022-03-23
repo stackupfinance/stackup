@@ -3,9 +3,7 @@ import { BigNumber, Contract } from 'ethers'
 
 import { Signature, UserOp } from '../models/user/types'
 import { deploy, getFactory, getInterface } from './contracts'
-import { Account, BigNumberish, toAddress, toAddresses } from '../types'
-
-export const OWNER_SIGNATURE = 0
+import { Account, BigNumberish, NAry, toAddress, toAddresses, toArray } from '../types'
 
 export async function encodeWalletDeployment(entryPoint: Account, owner: Account, guardians?: Account[], implementation?: Contract): Promise<string> {
   if (!implementation) implementation = await deploy('Wallet')
@@ -19,6 +17,12 @@ export async function encodeWalletInit(entryPoint: Account, owner: Account, guar
   const walletInterface = await getInterface('Wallet')
   const args = [toAddress(entryPoint), toAddress(owner), toAddresses(guardians)]
   return walletInterface.encodeFunctionData('initialize', args)
+}
+
+export async function encodeWalletOwnerTransfer(to: Account): Promise<string> {
+  const tokenInterface = await getInterface('Wallet')
+  const args = [toAddress(to)]
+  return tokenInterface.encodeFunctionData('transferOwner', args)
 }
 
 export async function encodeWalletValidateOp(op: UserOp, requestId: string, requiredPrefund: BigNumber): Promise<string> {
@@ -63,18 +67,18 @@ export async function encodeReverterFail(): Promise<string> {
   return reverterInterface.encodeFunctionData('fail', [])
 }
 
-export async function encodeTokenApproval(to: Account, amount: BigNumber): Promise<string> {
+export async function encodeTokenApproval(to: Account, amount: BigNumberish): Promise<string> {
   const tokenInterface = await getInterface('ERC20')
   const args = [toAddress(to), amount.toString()]
   return tokenInterface.encodeFunctionData('approve', args)
 }
 
-export function encodeOwnerSignature(signature: Signature): string {
-  const params = [OWNER_SIGNATURE, [signature]]
+export function encodeSignatures(type: number, signature: NAry<Signature>): string {
+  const params = [type, toArray(signature)]
   return ethers.utils.defaultAbiCoder.encode(['uint8', '(address signer, bytes signature)[]'], params)
 }
 
-export function encodePaymasterSignature(fee: BigNumber, token: Contract, feed: Contract, signature: string): string {
+export function encodePaymasterSignature(fee: BigNumberish, token: Contract, feed: Contract, signature: string): string {
   const params = [fee, toAddress(token), toAddress(feed), signature]
   return ethers.utils.defaultAbiCoder.encode(['uint256', 'address', 'address', 'bytes'], params)
 }
@@ -117,7 +121,7 @@ export function encodeOp(op: UserOp): string {
   )
 }
 
-export function encodePaymasterData(op: UserOp, fee: BigNumber, token: Contract, feed: Contract): string {
+export function encodePaymasterData(op: UserOp, fee: BigNumberish, token: Contract, feed: Contract): string {
   return ethers.utils.keccak256(
     ethers.utils.solidityPack(
       [

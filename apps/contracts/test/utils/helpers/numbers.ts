@@ -5,6 +5,8 @@ const SCALING_FACTOR = 1e18
 
 export type BigNumberish = string | number | BigNumber
 
+export const isBigNumberish = (x: any) => BigNumber.isBigNumber(x) || typeof x === 'number'
+
 export const decimal = (x: BigNumberish | Decimal): Decimal => new Decimal(x.toString())
 
 export const pct = (x: BigNumberish, pct: BigNumberish): BigNumber => bn(decimal(x).mul(decimal(pct)))
