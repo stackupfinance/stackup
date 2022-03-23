@@ -23,8 +23,8 @@ router
   .post(auth(), validate(userValidation.hydrateUserWalletGuardians), userController.hydrateUserWalletGuardians);
 
 router
-  .route('/:userId/wallet/balances')
-  .get(auth(), validate(userValidation.getWalletBalances), userController.getWalletBalances);
+  .route('/:userId/wallet/holdings')
+  .get(auth(), validate(userValidation.getWalletHoldings), userController.getWalletHoldings);
 
 router
   .route('/:userId/notifications')

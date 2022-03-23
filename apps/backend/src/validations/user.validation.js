@@ -59,7 +59,7 @@ module.exports.hydrateUserWalletGuardians = {
   }),
 };
 
-module.exports.getWalletBalances = {
+module.exports.getWalletHoldings = {
   params: Joi.object().keys({
     userId: Joi.string().custom(objectId),
   }),

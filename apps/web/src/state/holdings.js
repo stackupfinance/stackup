@@ -72,12 +72,12 @@ export const useHoldingsStore = create(
             return tokenList;
           }
 
-          const getWalletTokenBalances = async () => {
-            const { data: balances } = await axios.get(
-              `${App.stackup.backendUrl}/v1/users/${options.userId}/wallet/balances`,
+          const getWalletTokenHoldings = async () => {
+            const { data: holdings } = await axios.get(
+              `${App.stackup.backendUrl}/v1/users/${options.userId}/wallet/holdings`,
               { headers: { Authorization: `Bearer ${options.accessToken}` } },
             );
-            return balances;
+            return holdings;
           }
           
           const getWalletMATICBalance = async () => {
@@ -98,7 +98,7 @@ export const useHoldingsStore = create(
             // map of wallet holdings
             const holdings = {};
             const totalValueUSD = 0;
-            const balances = await getWalletTokenBalances();
+            const balances = await getWalletTokenHoldings();
             if (balances && balances.tokenBalances && 
               Array.isArray(balances.tokenBalances) && balances.tokenBalances.length) {
               // normalized token map for quick referencing of held token metadata

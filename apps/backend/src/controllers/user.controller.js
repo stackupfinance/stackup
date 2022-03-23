@@ -53,18 +53,18 @@ module.exports.hydrateUserWalletGuardians = catchAsync(async (req, res) => {
   res.send({ guardians: await userService.getUsersByWalletAddressAndPopulate(guardians) });
 });
 
-module.exports.getWalletBalances = catchAsync(async (req, res) => {
+module.exports.getWalletHoldings = catchAsync(async (req, res) => {
   const { userId } = req.params;
   const user = await userService.getUserById(userId);
   const walletAddress =  user.wallet.walletAddress;
   const tokenAddresses = tokenList.tokens.filter(token => token.chainId === parseInt(process.env.CHAIN_ID)).map(token => token.address);
   // Initialize an alchemy-web3 instance
   const web3 = createAlchemyWeb3(alchemy.appUrl);
-  const balances = await web3.alchemy.getTokenBalances(
+  const holdings = await web3.alchemy.getTokenBalances(
     walletAddress, 
     tokenAddresses
   );
-  res.send(balances);
+  res.send(holdings);
 });
 
 module.exports.getUserNotifications = catchAsync(async (req, res) => {
