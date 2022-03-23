@@ -17,6 +17,7 @@ const { type } = require('../config/transaction');
 const { createAlchemyWeb3 } = require('@alch/alchemy-web3');
 const tokenList = require('../data/tokenList');
 const { isValidUsername, nameType, getNameType } = require('../config/name');
+const { getChainId } = require('../utils/web3');
 
 module.exports.getUser = catchAsync(async (req, res) => {
   const user = await userService.getUserById(req.params.userId);
@@ -55,9 +56,10 @@ module.exports.hydrateUserWalletGuardians = catchAsync(async (req, res) => {
 
 module.exports.getWalletHoldings = catchAsync(async (req, res) => {
   const { userId } = req.params;
+  const chainId = await getChainId();
   const user = await userService.getUserById(userId);
   const walletAddress =  user.wallet.walletAddress;
-  const tokenAddresses = tokenList.tokens.filter(token => token.chainId === parseInt(process.env.CHAIN_ID)).map(token => token.address);
+  const tokenAddresses = tokenList.tokens.filter(token => token.chainId === parseInt(chainId)).map(token => token.address);
   // Initialize an alchemy-web3 instance
   const web3 = createAlchemyWeb3(alchemy.appUrl);
   const holdings = await web3.alchemy.getTokenBalances(

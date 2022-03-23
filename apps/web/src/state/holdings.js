@@ -102,7 +102,7 @@ export const useHoldingsStore = create(
               const tokenMap = {}
               // whitelist of tokens to query for
               const tokenList = await getTokenList();
-
+              
               const tokenListFiltered = tokenList.tokens.filter(token => token.chainId === parseInt(chainId));
 
               // utility map for populating token data
