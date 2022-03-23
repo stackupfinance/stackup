@@ -1,4 +1,5 @@
 const { ethers } = require('ethers');
+const validator = require('validator');
 const { wallet, contracts, constants } = require('@stackupfinance/contracts');
 const { web3 } = require('../config/config');
 const { eventSignatures, status } = require('../config/transaction');
@@ -13,6 +14,9 @@ const formatter = new Intl.NumberFormat('en-US', {
 const loginMessage = 'Welcome to Stackup!\nSign this message to log into your Stackup account.\nTimestamp: ';
 
 const provider = new ethers.providers.JsonRpcProvider(web3.rpc);
+const ethereumProvider = web3.ethereumRpc
+  ? new ethers.providers.JsonRpcProvider(web3.ethereumRpc)
+  : new ethers.providers.AlchemyProvider();
 
 module.exports.defaultPaymasterFee = ethers.BigNumber.from(100000);
 
@@ -89,4 +93,23 @@ module.exports.signatureCount = (userOp) => {
       : [undefined, []];
 
   return ws[1].length;
+};
+
+module.exports.truncateAddress = (address) => {
+  if (!address) return;
+
+  const match = address.match(/^(0x[a-zA-Z0-9]{3})[a-zA-Z0-9]+([a-zA-Z0-9]{4})$/);
+  if (!match) return address;
+
+  return `${match[1]}…${match[2]}`;
+};
+
+module.exports.isEnsName = (name) => {
+  // https://docs.ens.domains/dapp-developer-guide/resolving-names
+  // ENS treats any dot-separated name as a potential ENS name.
+  return validator.isFQDN(name);
+};
+
+module.exports.resolveEnsName = async (name) => {
+  return ethereumProvider.resolveName(name);
 };

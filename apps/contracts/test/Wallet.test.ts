@@ -18,7 +18,7 @@ import {
   swapEthForToken,
   transactionFee,
 } from './utils/contractHelpers'
-import { fp } from './utils/numbers'
+import { fp } from './utils/helpers/numbers'
 
 const { wallet, constants, contracts } = require("../lib");
 

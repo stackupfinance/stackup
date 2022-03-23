@@ -1,5 +1,6 @@
 /* eslint-disable no-await-in-loop */
 const httpStatus = require('http-status');
+const { ethers } = require('ethers');
 const { contracts, wallet } = require('@stackupfinance/contracts');
 const ApiError = require('../utils/ApiError');
 const { Transaction } = require('../models');
@@ -7,6 +8,7 @@ const queue = require('../queue');
 const { functionSignatures, type: txType, status: txStatus } = require('../config/transaction');
 const { types } = require('../config/queue');
 const { web3 } = require('../config/config');
+const { eventSignatures, erc20TokenMeta } = require('../config/transaction');
 const {
   getChainId,
   recoverAddressFromLoginSignature,
@@ -14,6 +16,20 @@ const {
   formatERC20Value,
   signatureCount,
 } = require('../utils/web3');
+
+const aggregateHelpers = {
+  addUserField: (userSelector, fallbackAddress) => {
+    return {
+      username: {
+        $ifNull: [
+          `${userSelector}.username`,
+          { $concat: [{ $substrBytes: [fallbackAddress, 0, 5] }, '...', { $substrBytes: [fallbackAddress, 37, 5] }] },
+        ],
+      },
+      walletAddress: { $ifNull: [`${userSelector}.walletAddress`, fallbackAddress] },
+    };
+  },
+};
 
 module.exports.parseUserOperations = async (userOperations) => {
   let transaction = {};
@@ -120,6 +136,55 @@ module.exports.parseUserOperations = async (userOperations) => {
   return transaction;
 };
 
+module.exports.parseReceiptsForIncomingTransfers = (chainId, receipts) => {
+  return receipts
+    .map((receipt) => {
+      return {
+        type: txType.newPayment,
+        status: ethers.BigNumber.from(receipt.status).toNumber() === 1 ? txStatus.success : txStatus.failed,
+        chainId,
+        hash: receipt.transactionHash,
+        lineItems: receipt.logs
+          .map((log) => {
+            const tokenMeta = erc20TokenMeta[chainId][ethers.utils.getAddress(log.address)];
+            if (tokenMeta) {
+              let pl;
+              try {
+                pl = contracts.Erc20.interface.parseLog(log);
+              } catch (error) {
+                return undefined;
+              }
+
+              if (pl?.signature === eventSignatures.erc20Transfer) {
+                return {
+                  from: pl.args[0],
+                  to: pl.args[1],
+                  value: ethers.BigNumber.from(pl.args[2]).toString(),
+                  ...tokenMeta,
+                };
+              }
+            }
+
+            return undefined;
+          })
+          .filter(Boolean),
+      };
+    })
+    .filter((tx) => Boolean(tx.lineItems.length));
+};
+
+module.exports.indexIncomingTransfers = async (transactions) => {
+  return Transaction.bulkWrite(
+    transactions.map((t) => ({
+      updateOne: {
+        filter: { hash: t.hash },
+        update: { $setOnInsert: { ...t } },
+        upsert: true,
+      },
+    }))
+  );
+};
+
 module.exports.getTransactionById = async (id) => {
   return Transaction.findById(id);
 };
@@ -215,7 +280,7 @@ module.exports.queryActivity = async (walletAddress) => {
     .project({
       _id: false,
       id: '$_id',
-      toUser: { username: '$toUser.username', walletAddress: '$toWallet.walletAddress' },
+      toUser: aggregateHelpers.addUserField('$toUser', '$toAddress'),
       preview: true,
       updatedAt: true,
     })
@@ -284,8 +349,8 @@ module.exports.queryActivityItems = async (user, address1, address2, opts = { li
       _id: false,
       id: '$_id',
       isReceiving: true,
-      fromUser: { username: '$fromUser.username', walletAddress: '$fromWallet.walletAddress' },
-      toUser: { username: '$toUser.username', walletAddress: '$toWallet.walletAddress' },
+      fromUser: aggregateHelpers.addUserField('$fromUser', '$lastLineItem.from'),
+      toUser: aggregateHelpers.addUserField('$toUser', '$lastLineItem.to'),
       value: '$lastLineItem.value',
       units: '$lastLineItem.units',
       prefix: '$lastLineItem.prefix',

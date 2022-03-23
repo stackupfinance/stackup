@@ -3,6 +3,8 @@ const app = require('./app');
 const queue = require('./queue');
 const config = require('./config/config');
 const logger = require('./config/logger');
+const { types } = require('./config/queue');
+const { getChainId } = require('./utils/web3');
 
 let server;
 mongoose.connect(config.mongoose.url, config.mongoose.options).then(() => {
@@ -12,8 +14,18 @@ mongoose.connect(config.mongoose.url, config.mongoose.options).then(() => {
     logger.info(`Listening to port ${config.port}`);
   });
 
-  queue.start().then(() => {
+  queue.start().then(async () => {
     logger.info('Connected to job queue');
+
+    await queue.cancel({ name: types.checkForBlocks });
+    if (config.alchemy.appUrl) {
+      const chainId = await getChainId();
+      await queue
+        .create(types.checkForBlocks, { chainId })
+        .repeatEvery('10 seconds')
+        .unique({ 'data.chainId': chainId })
+        .save();
+    }
   });
 });
 

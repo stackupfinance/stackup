@@ -1,7 +1,7 @@
 const httpStatus = require('http-status');
 const { User, Wallet } = require('../models');
 const ApiError = require('../utils/ApiError');
-const { isBlacklisted } = require('../config/username');
+const { isBlacklisted } = require('../config/name');
 
 /**
  * Create a user
