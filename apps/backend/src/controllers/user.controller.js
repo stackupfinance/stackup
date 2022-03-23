@@ -15,7 +15,7 @@ const {
 const { alchemy } = require('../config/config');
 const { type } = require('../config/transaction');
 const { createAlchemyWeb3 } = require('@alch/alchemy-web3');
-const tokenList = require('../data/tokenList');
+const tokenList = require('../config/tokenList');
 const { isValidUsername, nameType, getNameType } = require('../config/name');
 const { getChainId } = require('../utils/web3');
 
