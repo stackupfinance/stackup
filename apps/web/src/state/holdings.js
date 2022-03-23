@@ -2,7 +2,6 @@ import { App } from '../config';
 import create from 'zustand';
 import { persist } from 'zustand/middleware';
 import axios from 'axios';
-import priceFeedProxies from '../utils/chainlinkDataFeeds';
 import { ethers } from 'ethers';
 import { provider } from '../../src/utils/web3';
 
@@ -31,10 +30,8 @@ export const useHoldingsStore = create(
 
         try {
           // blockchain network information
-          const polygonNetwork = process.env.NEXT_PUBLIC_POLYGON_NETWORK;
           const chainId = process.env.NEXT_PUBLIC_POLYGON_NETWORK_CHAIN_ID;
-          // Chainlink price feed ABI
-          const aggregatorV3InterfaceABI = [{ "inputs": [], "name": "decimals", "outputs": [{ "internalType": "uint8", "name": "", "type": "uint8" }], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "description", "outputs": [{ "internalType": "string", "name": "", "type": "string" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "uint80", "name": "_roundId", "type": "uint80" }], "name": "getRoundData", "outputs": [{ "internalType": "uint80", "name": "roundId", "type": "uint80" }, { "internalType": "int256", "name": "answer", "type": "int256" }, { "internalType": "uint256", "name": "startedAt", "type": "uint256" }, { "internalType": "uint256", "name": "updatedAt", "type": "uint256" }, { "internalType": "uint80", "name": "answeredInRound", "type": "uint80" }], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "latestRoundData", "outputs": [{ "internalType": "uint80", "name": "roundId", "type": "uint80" }, { "internalType": "int256", "name": "answer", "type": "int256" }, { "internalType": "uint256", "name": "startedAt", "type": "uint256" }, { "internalType": "uint256", "name": "updatedAt", "type": "uint256" }, { "internalType": "uint80", "name": "answeredInRound", "type": "uint80" }], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "version", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }];
+          const maticUsdPriceFeedProxy = process.env.NEXT_PUBLIC_MATIC_USD_PRICE_FEED_PROXY;
           
           // get current exchange rates for all tokens
           const getExchangeRates = async (tokens) => {
@@ -82,8 +79,8 @@ export const useHoldingsStore = create(
           
           const getWalletMATICBalance = async () => {
             const maticBalance = await provider.getBalance(options.walletAddress);
-            const exchangeRate = await getExchangeRate(priceFeedProxies.polygon[polygonNetwork].MATIC.address);
-            const convertedBalance = convertToUSDC(maticBalance, exchangeRate, 18, priceFeedProxies.polygon[polygonNetwork].MATIC.decimals);
+            const exchangeRate = await getExchangeRate(maticUsdPriceFeedProxy);
+            const convertedBalance = convertToUSDC(maticBalance, exchangeRate, 18, 8);
             return {
               name: "Polygon",
               symbol: 'MATIC',
