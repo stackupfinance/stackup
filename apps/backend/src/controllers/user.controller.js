@@ -12,6 +12,7 @@ const {
   notificationService,
   fiatService,
 } = require('../services');
+const { alchemy } = require('../config/config');
 const { type } = require('../config/transaction');
 const { createAlchemyWeb3 } = require('@alch/alchemy-web3');
 const tokenList = require('../data/tokenList');
@@ -57,7 +58,7 @@ module.exports.getWalletBalances = catchAsync(async (req, res) => {
   const walletAddress =  user.wallet.walletAddress;
   const tokenAddresses = tokenList.tokens.filter(token => token.chainId === parseInt(process.env.CHAIN_ID)).map(token => token.address);
   // Initialize an alchemy-web3 instance
-  const web3 = createAlchemyWeb3(`${process.env.ALCHEMY_ENDPOINT}${process.env.ALCHEMY_API_KEY}`);
+  const web3 = createAlchemyWeb3(alchemy.appUrl);
   const balances = await web3.alchemy.getTokenBalances(
     walletAddress, 
     tokenAddresses

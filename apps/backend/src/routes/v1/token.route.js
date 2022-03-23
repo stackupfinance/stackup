@@ -7,7 +7,15 @@ const tokenController = require('../../controllers/token.controller');
 const router = express.Router();
 
 router
-  .route('/tokenList')
-  .get(validate(tokenValidation.getTokenList), tokenController.getTokenList);
+  .route('/token-list')
+  .get(auth(), validate(tokenValidation.getTokenList), tokenController.getTokenList);
+
+router
+  .route('/exchange-rates')
+  .post(auth(), validate(tokenValidation.getExchangeRates), tokenController.getExchangeRates);
+
+router
+  .route('/:tokenFeedProxyAddress/exchange-rate')
+  .get(auth(), validate(tokenValidation.getExchangeRate), tokenController.getExchangeRate);
 
 module.exports = router;

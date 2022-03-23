@@ -34,33 +34,29 @@ export const useHoldingsStore = create(
           const polygonNetwork = process.env.NEXT_PUBLIC_POLYGON_NETWORK;
           const chainId = process.env.NEXT_PUBLIC_POLYGON_NETWORK_CHAIN_ID;
           // Chainlink price feed ABI
-          const aggregatorV3InterfaceABI = [{ "inputs": [], "name": "decimals", "outputs": [{ "internalType": "uint8", "name": "", "type": "uint8" }], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "description", "outputs": [{ "internalType": "string", "name": "", "type": "string" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "uint80", "name": "_roundId", "type": "uint80" }], "name": "getRoundData", "outputs": [{ "internalType": "uint80", "name": "roundId", "type": "uint80" }, { "internalType": "int256", "name": "answer", "type": "int256" }, { "internalType": "uint256", "name": "startedAt", "type": "uint256" }, { "internalType": "uint256", "name": "updatedAt", "type": "uint256" }, { "internalType": "uint80", "name": "answeredInRound", "type": "uint80" }], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "latestRoundData", "outputs": [{ "internalType": "uint80", "name": "roundId", "type": "uint80" }, { "internalType": "int256", "name": "answer", "type": "int256" }, { "internalType": "uint256", "name": "startedAt", "type": "uint256" }, { "internalType": "uint256", "name": "updatedAt", "type": "uint256" }, { "internalType": "uint80", "name": "answeredInRound", "type": "uint80" }], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "version", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }]
+          const aggregatorV3InterfaceABI = [{ "inputs": [], "name": "decimals", "outputs": [{ "internalType": "uint8", "name": "", "type": "uint8" }], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "description", "outputs": [{ "internalType": "string", "name": "", "type": "string" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "uint80", "name": "_roundId", "type": "uint80" }], "name": "getRoundData", "outputs": [{ "internalType": "uint80", "name": "roundId", "type": "uint80" }, { "internalType": "int256", "name": "answer", "type": "int256" }, { "internalType": "uint256", "name": "startedAt", "type": "uint256" }, { "internalType": "uint256", "name": "updatedAt", "type": "uint256" }, { "internalType": "uint80", "name": "answeredInRound", "type": "uint80" }], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "latestRoundData", "outputs": [{ "internalType": "uint80", "name": "roundId", "type": "uint80" }, { "internalType": "int256", "name": "answer", "type": "int256" }, { "internalType": "uint256", "name": "startedAt", "type": "uint256" }, { "internalType": "uint256", "name": "updatedAt", "type": "uint256" }, { "internalType": "uint80", "name": "answeredInRound", "type": "uint80" }], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "version", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }];
           
           // get current exchange rates for all tokens
           const getExchangeRates = async (tokens) => {
-            // map of current exchange rates for tokens in wallet
-            const exchangeRateMap = {};
-            const promises = tokens.map(async (token) => {
-              const tokenFeedProxyAddress = priceFeedProxies.polygon[polygonNetwork][token.symbol].address;
-              const tokenFeedProxyDecimals = priceFeedProxies.polygon[polygonNetwork][token.symbol].decimals;
-              const priceFeed = new ethers.Contract(tokenFeedProxyAddress, aggregatorV3InterfaceABI, provider);
-              const roundData = await priceFeed.latestRoundData();
-              const price = roundData.answer;
-              exchangeRateMap[token.symbol] = {
-                price,
-                decimals: tokenFeedProxyDecimals
-              };
+            const { data } = await axios.post(`${App.stackup.backendUrl}/v1/tokens/exchange-rates`,
+              { tokens },
+              { headers: { Authorization: `Bearer ${options.accessToken}` } },
+            );
+            const exchangeRates = {};
+            const keys = Object.keys(data);
+            keys.forEach((key) => {
+              exchangeRates[key] = data[key];
+              exchangeRates[key].price = ethers.BigNumber.from(data[key].price)
             });
-
-            await Promise.all(promises);
-            return exchangeRateMap;
+            return exchangeRates;
           }
 
           // get current exchange rates for a single token
           const getExchangeRate = async (tokenFeedProxyAddress) => {
-            const priceFeed = new ethers.Contract(tokenFeedProxyAddress, aggregatorV3InterfaceABI, provider);
-            const roundData = await priceFeed.latestRoundData();
-            return roundData.answer;
+            const { data: answer } = await axios.get(`${App.stackup.backendUrl}/v1/tokens/${tokenFeedProxyAddress}/exchange-rate`,
+              { headers: { Authorization: `Bearer ${options.accessToken}` } },
+            );
+            return ethers.BigNumber.from(answer);
           }
 
           const convertToUSDC = (value, exchangeRate, valueDecimals, exchangeRateDecimals) => {
@@ -70,7 +66,9 @@ export const useHoldingsStore = create(
           }
 
           const getTokenList = async () => {
-            const { data: tokenList } = await axios.get(`${App.stackup.backendUrl}/v1/tokens/tokenList`);
+            const { data: tokenList } = await axios.get(`${App.stackup.backendUrl}/v1/tokens/token-list`,
+              { headers: { Authorization: `Bearer ${options.accessToken}` } },
+            );
             return tokenList;
           }
 
@@ -107,6 +105,7 @@ export const useHoldingsStore = create(
               const tokenMap = {}
               // whitelist of tokens to query for
               const tokenList = await getTokenList();
+
               const tokenListFiltered = tokenList.tokens.filter(token => token.chainId === parseInt(chainId));
 
               // utility map for populating token data
