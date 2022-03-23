@@ -4,9 +4,13 @@ const alchemyService = require('../services/alchemy.service');
 const transactionService = require('../services/transaction.service');
 const { types } = require('../config/queue');
 
-const MAX_ATTEMPTS = 5;
+const MAX_ATTEMPTS = 10;
+const MAX_DELAY = 600;
+const BASE_DELAY = 5;
 const exponentialBackoffDelay = (attempt) => {
-  return `${5 * 2 ** attempt} seconds`;
+  // This function returns a delay value that starts at 5 seconds
+  // and exponentially increases to a cap of 600 seconds with full jitter.
+  return `${Math.round(Math.random() * Math.min(MAX_DELAY, BASE_DELAY * 2 ** attempt))} seconds`;
 };
 const log = (msg) => logger.info(`JOB ${types.parseBlock}: ${msg}`);
 
