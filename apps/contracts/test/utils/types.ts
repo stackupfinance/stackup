@@ -1,6 +1,5 @@
 import { ethers } from 'hardhat'
 import { BigNumber } from 'ethers'
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/dist/src/signer-with-address'
 
 import { ZERO_ADDRESS } from './helpers/constants'
 
