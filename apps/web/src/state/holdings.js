@@ -3,7 +3,7 @@ import create from 'zustand';
 import { persist } from 'zustand/middleware';
 import axios from 'axios';
 import { ethers } from 'ethers';
-import { provider } from '../../src/utils/web3';
+import { provider, getChainId } from '../../src/utils/web3';
 
 export const holdingsUseAuthSelector = (state) => ({
   clear: state.clear,
@@ -30,7 +30,7 @@ export const useHoldingsStore = create(
 
         try {
           // blockchain network information
-          const chainId = process.env.NEXT_PUBLIC_POLYGON_NETWORK_CHAIN_ID;
+          const chainId = await getChainId();
           const maticUsdPriceFeedProxy = process.env.NEXT_PUBLIC_MATIC_USD_PRICE_FEED_PROXY;
           
           // get current exchange rates for all tokens
@@ -136,6 +136,7 @@ export const useHoldingsStore = create(
                   valueUsdc: convertedBalance
                 };
               });
+
               holdings.totalEquityUsdc = totalValueUSD;
               holdings.tokenList = tokenListFormatted;
               holdings.nftList = [];
