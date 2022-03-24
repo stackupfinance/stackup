@@ -102,11 +102,11 @@ export const useHoldingsStore = create(
               const tokenMap = {}
               // whitelist of tokens to query for
               const tokenList = await getTokenList();
-              
-              const tokenListFiltered = tokenList.tokens.filter(token => token.chainId === parseInt(chainId));
+
+              console.log(`token list :::: ::::: :::: ${JSON.stringify(tokenList)}`);
 
               // utility map for populating token data
-              tokenListFiltered.forEach(token => {
+              tokenList.forEach(token => {
                 tokenMap[token.address] = {
                   "chainId": token.chainId,
                   "address": token.address,
@@ -117,7 +117,7 @@ export const useHoldingsStore = create(
                 };
               });
 
-              const exchangeRateMap = await getExchangeRates(tokenListFiltered);
+              const exchangeRateMap = await getExchangeRates(tokenList);
       
               const tokenListFormatted = balances.tokenBalances.map(token => {
                 const tokenData = tokenMap[token.contractAddress];

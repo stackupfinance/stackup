@@ -60,7 +60,6 @@ module.exports.getWalletHoldings = catchAsync(async (req, res) => {
   const walletAddress =  user.wallet.walletAddress;
   const tokenAddresses = tokenList.tokens.filter(token => token.chainId === parseInt(chainId)).map(token => token.address);
   const holdings = await alchemyService.getTokenBalances(walletAddress, tokenAddresses);
-  console.log(`holdings :::: ${JSON.stringify(holdings)}`)
   res.send(holdings.result);
 });
 
