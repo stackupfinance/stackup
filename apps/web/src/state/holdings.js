@@ -103,8 +103,6 @@ export const useHoldingsStore = create(
               // whitelist of tokens to query for
               const tokenList = await getTokenList();
 
-              console.log(`token list :::: ::::: :::: ${JSON.stringify(tokenList)}`);
-
               // utility map for populating token data
               tokenList.forEach(token => {
                 tokenMap[token.address] = {
