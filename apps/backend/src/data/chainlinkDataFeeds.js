@@ -729,6 +729,16 @@ const priceFeedProxies = {
         "description":"ZRX / USD",
         "decimals":8,
         "address":"0x6EA4d89474d9410939d429B786208c74853A5B47"
+    },
+    "WETH":{
+      "description":"ETH / USD",
+      "decimals":8,
+      "address":"0xF9680D99D6C9589e2a93a78A04A279e509205945"
+    },
+    "WMATIC":{
+      "description":"MATIC / USD",
+      "decimals":8,
+      "address":"0xAB594600376Ec9fD91F8e885dADF0CE036862dE0"
     }
   },
   "80001":{
