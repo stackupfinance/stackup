@@ -12,9 +12,8 @@ const {
   notificationService,
   fiatService,
 } = require('../services');
-const { alchemy } = require('../config/config');
 const { type } = require('../config/transaction');
-const { createAlchemyWeb3 } = require('@alch/alchemy-web3');
+const alchemyService = require('../services/alchemy.service');
 const tokenList = require('../config/tokenList');
 const { isValidUsername, nameType, getNameType } = require('../config/name');
 const { getChainId } = require('../utils/web3');
@@ -60,13 +59,9 @@ module.exports.getWalletHoldings = catchAsync(async (req, res) => {
   const user = await userService.getUserById(userId);
   const walletAddress =  user.wallet.walletAddress;
   const tokenAddresses = tokenList.tokens.filter(token => token.chainId === parseInt(chainId)).map(token => token.address);
-  // Initialize an alchemy-web3 instance
-  const web3 = createAlchemyWeb3(alchemy.appUrl);
-  const holdings = await web3.alchemy.getTokenBalances(
-    walletAddress, 
-    tokenAddresses
-  );
-  res.send(holdings);
+  const holdings = await alchemyService.getTokenBalances(walletAddress, tokenAddresses);
+  console.log(`holdings :::: ${JSON.stringify(holdings)}`)
+  res.send(holdings.result);
 });
 
 module.exports.getUserNotifications = catchAsync(async (req, res) => {
