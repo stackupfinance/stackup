@@ -2,11 +2,7 @@ import { ethers } from 'hardhat'
 import { BigNumber, Contract, ContractTransaction } from 'ethers'
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/dist/src/signer-with-address'
 
-import User from '../user/User'
-import EntryPoint from '../entry-point/EntryPoint'
-
 import { bn } from '../../helpers/numbers'
-import { UserOp } from '../user/types'
 import { getSigner } from '../../helpers/signers'
 import {
   encodeEntryPointLock,
@@ -17,6 +13,10 @@ import {
   encodePaymasterSignature,
   encodeWalletExecute
 } from '../../helpers/encoding'
+
+import User from '../user/User'
+import EntryPoint from '../entry-point/EntryPoint'
+import { UserOp } from '../user/types'
 
 export default class Paymaster extends User {
   static LOCK_CALL_GAS = bn(100e3)

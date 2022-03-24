@@ -89,7 +89,7 @@ export const AccountOverview = ({
               startColor="blue.500"
               endColor="blue.50"
             >
-              Gm, {username} ☀️
+              Gm{username ? `, ${username}` : ''} ☀️
             </Skeleton>
           </Heading>
           <Stat
