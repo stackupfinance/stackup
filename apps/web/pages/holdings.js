@@ -70,7 +70,11 @@ export default function Holdings() {
 
   useEffect(() => {
     if (!enabled) return;
-    fetchHoldings({ userId: user.id, accessToken: accessToken.token, walletAddress: wallet.walletAddress });
+    fetchHoldings({
+      userId: user.id,
+      accessToken: accessToken.token,
+      walletAddress: wallet.walletAddress,
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [enabled]);
 

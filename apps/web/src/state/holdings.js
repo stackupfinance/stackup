@@ -77,8 +77,10 @@ export const useHoldingsStore = create(
           };
 
           const getNativeTokenBalance = async () => {
-            const balance = await provider.getBalance(options.walletAddress);
-            const exchangeRate = await getExchangeRate(App.web3.maticUsdPriceFeedProxy);
+            const [balance, exchangeRate] = await Promise.all([
+              provider.getBalance(options.walletAddress),
+              getExchangeRate(App.web3.usdcPriceFeed),
+            ]);
             const convertedBalance = convertToUSDC(balance, exchangeRate, 18, 8);
             return {
               name: 'Matic',
