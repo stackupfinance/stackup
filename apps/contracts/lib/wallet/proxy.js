@@ -18,7 +18,9 @@ const generatePasswordKey = async (password, salt) => {
     p = 1,
     dkLen = 32;
   const passwordBuffer = new buffer.SlowBuffer(password.normalize("NFKC"));
-  const saltBuffer = new buffer.SlowBuffer(salt.normalize("NFKC"));
+  const saltBuffer = new buffer.SlowBuffer(
+    salt.toLowerCase().normalize("NFKC")
+  );
   return scrypt.scrypt(passwordBuffer, saltBuffer, N, r, p, dkLen);
 };
 
