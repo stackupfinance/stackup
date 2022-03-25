@@ -8,7 +8,7 @@ export const TokenCard = ({
   name,
   logo,
   valueWei,
-  decimal,
+  decimals,
   symbol,
   valueUsdc,
   onClick = () => {},
@@ -41,7 +41,7 @@ export const TokenCard = ({
         <VStack spacing="2px" alignItems="end">
           <Skeleton isLoaded={!isLoading}>
             <Text fontSize="sm" textAlign="right" fontWeight="bold">
-              {displayGenericToken(valueWei, decimal, symbol)}
+              {displayGenericToken(valueWei, decimals, symbol)}
             </Text>
           </Skeleton>
 

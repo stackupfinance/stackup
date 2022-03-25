@@ -40,7 +40,9 @@ export const displayUSDC = (balance) => {
 };
 
 export const displayGenericToken = (value, decimal, symbol) => {
-  return `${ethers.utils.formatUnits(ethers.BigNumber.from(value), decimal)} ${symbol}`;
+  return `${ethers.utils.commify(
+    ethers.utils.formatUnits(ethers.BigNumber.from(value), decimal),
+  )} ${symbol}`;
 };
 
 export const signatureCount = (userOp) => {
