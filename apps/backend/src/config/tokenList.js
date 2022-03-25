@@ -308,7 +308,7 @@ const tokenList = {
       symbol: 'UNI',
       decimals: 18,
       chainId: 1,
-      logoURI: 'ipfs://QmXttGpZrECX5qCyXbBQiqgQNytVGeZW5Anewvh2jc4psg',
+      logoURI: 'https://cryptologos.cc/logos/uniswap-uni-logo.png',
     },
     {
       name: 'USDCoin',
@@ -378,7 +378,7 @@ const tokenList = {
       symbol: 'UNI',
       decimals: 18,
       chainId: 3,
-      logoURI: 'ipfs://QmXttGpZrECX5qCyXbBQiqgQNytVGeZW5Anewvh2jc4psg',
+      logoURI: 'https://cryptologos.cc/logos/uniswap-uni-logo.png',
     },
     {
       name: 'Wrapped Ether',
@@ -413,7 +413,7 @@ const tokenList = {
       symbol: 'UNI',
       decimals: 18,
       chainId: 4,
-      logoURI: 'ipfs://QmXttGpZrECX5qCyXbBQiqgQNytVGeZW5Anewvh2jc4psg',
+      logoURI: 'https://cryptologos.cc/logos/uniswap-uni-logo.png',
     },
     {
       name: 'Wrapped Ether',
@@ -430,7 +430,7 @@ const tokenList = {
       symbol: 'UNI',
       decimals: 18,
       chainId: 5,
-      logoURI: 'ipfs://QmXttGpZrECX5qCyXbBQiqgQNytVGeZW5Anewvh2jc4psg',
+      logoURI: 'https://cryptologos.cc/logos/uniswap-uni-logo.png',
     },
     {
       name: 'Wrapped Ether',
@@ -465,7 +465,7 @@ const tokenList = {
       symbol: 'UNI',
       decimals: 18,
       chainId: 42,
-      logoURI: 'ipfs://QmXttGpZrECX5qCyXbBQiqgQNytVGeZW5Anewvh2jc4psg',
+      logoURI: 'https://cryptologos.cc/logos/uniswap-uni-logo.png',
     },
     {
       name: 'Wrapped Ether',
@@ -724,7 +724,7 @@ const tokenList = {
       symbol: 'UNI',
       decimals: 18,
       chainId: 137,
-      logoURI: 'ipfs://QmXttGpZrECX5qCyXbBQiqgQNytVGeZW5Anewvh2jc4psg',
+      logoURI: 'https://cryptologos.cc/logos/uniswap-uni-logo.png',
     },
     {
       name: 'USDCoin',
