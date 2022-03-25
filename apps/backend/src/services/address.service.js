@@ -45,7 +45,12 @@ module.exports.generateSearchResultForEnsName = async (name) => {
 };
 
 module.exports.transformHistoryWithName = async (userWalletAddress, history) => {
-  const addressMap = { [web3.paymaster]: 'stackup', [userWalletAddress]: 'you' };
+  const addressMap = {
+    [web3.paymaster]: 'stackup',
+    [userWalletAddress]: 'you',
+    // TODO: Move below addresses into a separate map
+    '0x033ad50Bd083de427E9aa63D5778adC8D581eb59': 'Wyre',
+  };
 
   return Promise.all(
     history.map(async (h) => {
