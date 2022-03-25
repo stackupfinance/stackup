@@ -3,7 +3,7 @@ import create from 'zustand';
 import { persist } from 'zustand/middleware';
 import axios from 'axios';
 import { ethers } from 'ethers';
-import { provider, getChainId } from '../../src/utils/web3';
+import { provider } from '../../src/utils/web3';
 
 export const holdingsUseAuthSelector = (state) => ({
   clear: state.clear,
@@ -29,13 +29,9 @@ export const useHoldingsStore = create(
         set({ loading: true });
 
         try {
-          // blockchain network information
-          const chainId = await getChainId();
-          const maticUsdPriceFeedProxy = process.env.NEXT_PUBLIC_MATIC_USD_PRICE_FEED_PROXY;
-          
-          // get current exchange rates for all tokens
           const getExchangeRates = async (tokens) => {
-            const { data } = await axios.post(`${App.stackup.backendUrl}/v1/tokens/exchange-rates`,
+            const { data } = await axios.post(
+              `${App.stackup.backendUrl}/v1/tokens/exchange-rates`,
               { tokens },
               { headers: { Authorization: `Bearer ${options.accessToken}` } },
             );
@@ -43,95 +39,99 @@ export const useHoldingsStore = create(
             const keys = Object.keys(data);
             keys.forEach((key) => {
               exchangeRates[key] = data[key];
-              exchangeRates[key].price = ethers.BigNumber.from(data[key].price)
+              exchangeRates[key].price = ethers.BigNumber.from(data[key].price);
             });
             return exchangeRates;
-          }
+          };
 
-          // get current exchange rates for a single token
           const getExchangeRate = async (tokenFeedProxyAddress) => {
-            const { data: answer } = await axios.get(`${App.stackup.backendUrl}/v1/tokens/${tokenFeedProxyAddress}/exchange-rate`,
+            const { data: answer } = await axios.get(
+              `${App.stackup.backendUrl}/v1/tokens/${tokenFeedProxyAddress}/exchange-rate`,
               { headers: { Authorization: `Bearer ${options.accessToken}` } },
             );
             return ethers.BigNumber.from(answer);
-          }
+          };
 
           const convertToUSDC = (value, exchangeRate, valueDecimals, exchangeRateDecimals) => {
-            const valueUSD = (exchangeRate * (1 / (10 ** exchangeRateDecimals))) * (value * (1 / (10 ** valueDecimals)));
+            const valueUSD =
+              exchangeRate * (1 / 10 ** exchangeRateDecimals) * (value * (1 / 10 ** valueDecimals));
             const valueUSDFixed = parseFloat(valueUSD.toFixed(2) * 1000000);
             return valueUSDFixed;
-          }
+          };
 
           const getTokenList = async () => {
-            const { data: tokenList } = await axios.get(`${App.stackup.backendUrl}/v1/tokens/token-list`,
+            const { data: tokenList } = await axios.get(
+              `${App.stackup.backendUrl}/v1/tokens/token-list`,
               { headers: { Authorization: `Bearer ${options.accessToken}` } },
             );
             return tokenList;
-          }
+          };
 
-          const getWalletTokenHoldings = async () => {
-            const { data: holdings } = await axios.get(
-              `${App.stackup.backendUrl}/v1/users/${options.userId}/wallet/holdings`,
+          const getWalletTokenBalances = async (tokens) => {
+            const { data } = await axios.post(
+              `${App.stackup.backendUrl}/v1/tokens/balances`,
+              { tokenAddresses: tokens.map((token) => token.address) },
               { headers: { Authorization: `Bearer ${options.accessToken}` } },
             );
-            return holdings;
-          }
-          
-          const getWalletMATICBalance = async () => {
-            const maticBalance = await provider.getBalance(options.walletAddress);
-            const exchangeRate = await getExchangeRate(maticUsdPriceFeedProxy);
-            const convertedBalance = convertToUSDC(maticBalance, exchangeRate, 18, 8);
+            return data;
+          };
+
+          const getNativeTokenBalance = async () => {
+            const balance = await provider.getBalance(options.walletAddress);
+            const exchangeRate = await getExchangeRate(App.web3.maticUsdPriceFeedProxy);
+            const convertedBalance = convertToUSDC(balance, exchangeRate, 18, 8);
             return {
-              name: "Polygon",
+              name: 'Matic',
               symbol: 'MATIC',
               decimals: 18,
-              valueWei: maticBalance,
-              logo: "https://assets.coingecko.com/coins/images/4713/thumb/matic-token-icon.png?1624446912",
+              valueWei: balance,
+              logo: 'https://cryptologos.cc/logos/polygon-matic-logo.png',
               valueUsdc: convertedBalance,
             };
-          }
+          };
 
           const hydrateWalletHoldings = async () => {
-            // map of wallet holdings
+            const tokenList = await getTokenList();
             const holdings = {};
+            const tokenMap = {};
             const totalValueUSD = 0;
-            const balances = await getWalletTokenHoldings();
-            if (balances && balances.tokenBalances && 
-              Array.isArray(balances.tokenBalances) && balances.tokenBalances.length) {
-              // normalized token map for quick referencing of held token metadata
-              const tokenMap = {}
-              // whitelist of tokens to query for
-              const tokenList = await getTokenList();
+            const [balances, exchangeRateMap] = await Promise.all([
+              getWalletTokenBalances(tokenList),
+              getExchangeRates(tokenList),
+            ]);
 
-              // utility map for populating token data
-              tokenList.forEach(token => {
+            if (balances?.tokenBalances?.length) {
+              tokenList.forEach((token) => {
                 tokenMap[token.address] = {
-                  "chainId": token.chainId,
-                  "address": token.address,
-                  "name": token.name,
-                  "symbol": token.symbol,
-                  "decimals": token.decimals,
-                  "logoURI": token.logoURI
+                  chainId: token.chainId,
+                  address: token.address,
+                  name: token.name,
+                  symbol: token.symbol,
+                  decimals: token.decimals,
+                  logoURI: token.logoURI,
                 };
               });
 
-              const exchangeRateMap = await getExchangeRates(tokenList);
-      
-              const tokenListFormatted = balances.tokenBalances.map(token => {
+              const tokenListFormatted = balances.tokenBalances.map((token) => {
                 const tokenData = tokenMap[token.contractAddress];
                 const exchangeRate = exchangeRateMap[tokenData.symbol].price;
                 const tokenDecimals = tokenMap[token.contractAddress].decimals;
                 const exchangeRateDecimals = exchangeRateMap[tokenData.symbol].decimals;
-                const convertedBalance = convertToUSDC(token.tokenBalance, exchangeRate, tokenDecimals, exchangeRateDecimals);
+                const convertedBalance = convertToUSDC(
+                  token.tokenBalance,
+                  exchangeRate,
+                  tokenDecimals,
+                  exchangeRateDecimals,
+                );
                 totalValueUSD += convertedBalance;
-                
+
                 return {
                   name: tokenData.name,
                   symbol: tokenData.symbol,
                   decimals: tokenData.decimals,
                   valueWei: token.tokenBalance,
                   logo: tokenData.logoURI,
-                  valueUsdc: convertedBalance
+                  valueUsdc: convertedBalance,
                 };
               });
 
@@ -140,13 +140,12 @@ export const useHoldingsStore = create(
               holdings.nftList = [];
             }
             return holdings;
-          }
+          };
 
-          // get ERC-20 token holdings
-          const holdings = await hydrateWalletHoldings();
-
-          // add MATIC token
-          const maticData = await getWalletMATICBalance();
+          const [holdings, maticData] = await Promise.all([
+            hydrateWalletHoldings(),
+            getNativeTokenBalance(),
+          ]);
           holdings.totalEquityUsdc += maticData.valueUsdc;
           holdings.tokenList.unshift(maticData);
 

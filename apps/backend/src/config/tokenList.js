@@ -2,16 +2,13 @@ const tokenList = {
   name: 'Uniswap Labs List',
   timestamp: '2021-12-22T15:35:53.363Z',
   version: {
-    'major': 3,
-    'minor': 0,
-    'patch': 0
+    major: 3,
+    minor: 0,
+    patch: 0,
   },
   tags: {},
   logoURI: 'ipfs://QmNa8mQkrNKp1WEEeGjFezDmDeodkWRevGFN8JCV7b4Xir',
-  keywords: [
-    'uniswap',
-    'default'
-  ],
+  keywords: ['uniswap', 'default'],
   tokens: [
     {
       chainId: 1,
@@ -19,7 +16,7 @@ const tokenList = {
       name: 'Aave',
       symbol: 'AAVE',
       decimals: 18,
-      logoURI: 'https://assets.coingecko.com/coins/images/12645/thumb/AAVE.png?1601374110'
+      logoURI: 'https://assets.coingecko.com/coins/images/12645/thumb/AAVE.png?1601374110',
     },
     {
       chainId: 1,
@@ -27,7 +24,7 @@ const tokenList = {
       name: 'Amp',
       symbol: 'AMP',
       decimals: 18,
-      logoURI: 'https://assets.coingecko.com/coins/images/12409/thumb/amp-200x200.png?1599625397'
+      logoURI: 'https://assets.coingecko.com/coins/images/12409/thumb/amp-200x200.png?1599625397',
     },
     {
       name: 'Aragon Network Token',
@@ -35,7 +32,8 @@ const tokenList = {
       symbol: 'ANT',
       decimals: 18,
       chainId: 1,
-      logoURI: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x960b236A07cf122663c4303350609A66A7B288C0/logo.png'
+      logoURI:
+        'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x960b236A07cf122663c4303350609A66A7B288C0/logo.png',
     },
     {
       name: 'Balancer',
@@ -43,7 +41,8 @@ const tokenList = {
       symbol: 'BAL',
       decimals: 18,
       chainId: 1,
-      logoURI: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xba100000625a3754423978a60c9317c58a424e3D/logo.png'
+      logoURI:
+        'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xba100000625a3754423978a60c9317c58a424e3D/logo.png',
     },
     {
       chainId: 1,
@@ -51,7 +50,7 @@ const tokenList = {
       name: 'Band Protocol',
       symbol: 'BAND',
       decimals: 18,
-      logoURI: 'https://assets.coingecko.com/coins/images/9545/thumb/band-protocol.png?1568730326'
+      logoURI: 'https://assets.coingecko.com/coins/images/9545/thumb/band-protocol.png?1568730326',
     },
     {
       name: 'Bancor Network Token',
@@ -59,7 +58,8 @@ const tokenList = {
       symbol: 'BNT',
       decimals: 18,
       chainId: 1,
-      logoURI: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x1F573D6Fb3F13d689FF844B4cE37794d79a7FF1C/logo.png'
+      logoURI:
+        'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x1F573D6Fb3F13d689FF844B4cE37794d79a7FF1C/logo.png',
     },
     {
       name: 'Compound',
@@ -67,7 +67,8 @@ const tokenList = {
       symbol: 'COMP',
       decimals: 18,
       chainId: 1,
-      logoURI: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xc00e94Cb662C3520282E6f5717214004A7f26888/logo.png'
+      logoURI:
+        'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xc00e94Cb662C3520282E6f5717214004A7f26888/logo.png',
     },
     {
       name: 'Curve DAO Token',
@@ -75,7 +76,8 @@ const tokenList = {
       symbol: 'CRV',
       decimals: 18,
       chainId: 1,
-      logoURI: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xD533a949740bb3306d119CC777fa900bA034cd52/logo.png'
+      logoURI:
+        'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xD533a949740bb3306d119CC777fa900bA034cd52/logo.png',
     },
     {
       chainId: 1,
@@ -83,7 +85,7 @@ const tokenList = {
       name: 'Civic',
       symbol: 'CVC',
       decimals: 8,
-      logoURI: 'https://assets.coingecko.com/coins/images/788/thumb/civic.png?1547034556'
+      logoURI: 'https://assets.coingecko.com/coins/images/788/thumb/civic.png?1547034556',
     },
     {
       name: 'Dai Stablecoin',
@@ -91,7 +93,8 @@ const tokenList = {
       symbol: 'DAI',
       decimals: 18,
       chainId: 1,
-      logoURI: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x6B175474E89094C44Da98b954EedeAC495271d0F/logo.png'
+      logoURI:
+        'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x6B175474E89094C44Da98b954EedeAC495271d0F/logo.png',
     },
     {
       chainId: 1,
@@ -99,7 +102,7 @@ const tokenList = {
       name: 'district0x',
       symbol: 'DNT',
       decimals: 18,
-      logoURI: 'https://assets.coingecko.com/coins/images/849/thumb/district0x.png?1547223762'
+      logoURI: 'https://assets.coingecko.com/coins/images/849/thumb/district0x.png?1547223762',
     },
     {
       chainId: 1,
@@ -107,7 +110,7 @@ const tokenList = {
       name: 'Ethereum Name Service',
       symbol: 'ENS',
       decimals: 18,
-      logoURI: 'https://assets.coingecko.com/coins/images/19785/thumb/acatxTm8_400x400.jpg?1635850140'
+      logoURI: 'https://assets.coingecko.com/coins/images/19785/thumb/acatxTm8_400x400.jpg?1635850140',
     },
     {
       name: 'Gnosis Token',
@@ -115,7 +118,8 @@ const tokenList = {
       symbol: 'GNO',
       decimals: 18,
       chainId: 1,
-      logoURI: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x6810e776880C02933D47DB1b9fc05908e5386b96/logo.png'
+      logoURI:
+        'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x6810e776880C02933D47DB1b9fc05908e5386b96/logo.png',
     },
     {
       chainId: 1,
@@ -123,7 +127,7 @@ const tokenList = {
       name: 'The Graph',
       symbol: 'GRT',
       decimals: 18,
-      logoURI: 'https://assets.coingecko.com/coins/images/13397/thumb/Graph_Token.png?1608145566'
+      logoURI: 'https://assets.coingecko.com/coins/images/13397/thumb/Graph_Token.png?1608145566',
     },
     {
       chainId: 1,
@@ -131,7 +135,7 @@ const tokenList = {
       name: 'Keep Network',
       symbol: 'KEEP',
       decimals: 18,
-      logoURI: 'https://assets.coingecko.com/coins/images/3373/thumb/IuNzUb5b_400x400.jpg?1589526336'
+      logoURI: 'https://assets.coingecko.com/coins/images/3373/thumb/IuNzUb5b_400x400.jpg?1589526336',
     },
     {
       name: 'Kyber Network Crystal',
@@ -139,7 +143,8 @@ const tokenList = {
       symbol: 'KNC',
       decimals: 18,
       chainId: 1,
-      logoURI: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xdd974D5C2e2928deA5F71b9825b8b646686BD200/logo.png'
+      logoURI:
+        'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xdd974D5C2e2928deA5F71b9825b8b646686BD200/logo.png',
     },
     {
       name: 'ChainLink Token',
@@ -147,7 +152,8 @@ const tokenList = {
       symbol: 'LINK',
       decimals: 18,
       chainId: 1,
-      logoURI: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x514910771AF9Ca656af840dff83E8264EcF986CA/logo.png'
+      logoURI:
+        'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x514910771AF9Ca656af840dff83E8264EcF986CA/logo.png',
     },
     {
       name: 'Loom Network',
@@ -155,7 +161,8 @@ const tokenList = {
       symbol: 'LOOM',
       decimals: 18,
       chainId: 1,
-      logoURI: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xA4e8C3Ec456107eA67d3075bF9e3DF3A75823DB0/logo.png'
+      logoURI:
+        'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xA4e8C3Ec456107eA67d3075bF9e3DF3A75823DB0/logo.png',
     },
     {
       name: 'LoopringCoin V2',
@@ -163,7 +170,8 @@ const tokenList = {
       symbol: 'LRC',
       decimals: 18,
       chainId: 1,
-      logoURI: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xBBbbCA6A901c926F240b89EacB641d8Aec7AEafD/logo.png'
+      logoURI:
+        'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xBBbbCA6A901c926F240b89EacB641d8Aec7AEafD/logo.png',
     },
     {
       chainId: 1,
@@ -171,7 +179,7 @@ const tokenList = {
       name: 'Decentraland',
       symbol: 'MANA',
       decimals: 18,
-      logoURI: 'https://assets.coingecko.com/coins/images/878/thumb/decentraland-mana.png?1550108745'
+      logoURI: 'https://assets.coingecko.com/coins/images/878/thumb/decentraland-mana.png?1550108745',
     },
     {
       chainId: 1,
@@ -179,7 +187,7 @@ const tokenList = {
       name: 'Polygon',
       symbol: 'MATIC',
       decimals: 18,
-      logoURI: 'https://assets.coingecko.com/coins/images/4713/thumb/matic-token-icon.png?1624446912'
+      logoURI: 'https://assets.coingecko.com/coins/images/4713/thumb/matic-token-icon.png?1624446912',
     },
     {
       name: 'Maker',
@@ -187,7 +195,8 @@ const tokenList = {
       symbol: 'MKR',
       decimals: 18,
       chainId: 1,
-      logoURI: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2/logo.png'
+      logoURI:
+        'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2/logo.png',
     },
     {
       chainId: 1,
@@ -195,7 +204,7 @@ const tokenList = {
       name: 'Melon',
       symbol: 'MLN',
       decimals: 18,
-      logoURI: 'https://assets.coingecko.com/coins/images/605/thumb/melon.png?1547034295'
+      logoURI: 'https://assets.coingecko.com/coins/images/605/thumb/melon.png?1547034295',
     },
     {
       name: 'Numeraire',
@@ -203,7 +212,8 @@ const tokenList = {
       symbol: 'NMR',
       decimals: 18,
       chainId: 1,
-      logoURI: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x1776e1F26f98b1A5dF9cD347953a26dd3Cb46671/logo.png'
+      logoURI:
+        'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x1776e1F26f98b1A5dF9cD347953a26dd3Cb46671/logo.png',
     },
     {
       chainId: 1,
@@ -211,7 +221,7 @@ const tokenList = {
       name: 'NuCypher',
       symbol: 'NU',
       decimals: 18,
-      logoURI: 'https://assets.coingecko.com/coins/images/3318/thumb/photo1198982838879365035.jpg?1547037916'
+      logoURI: 'https://assets.coingecko.com/coins/images/3318/thumb/photo1198982838879365035.jpg?1547037916',
     },
     {
       name: 'Orchid',
@@ -219,7 +229,8 @@ const tokenList = {
       symbol: 'OXT',
       decimals: 18,
       chainId: 1,
-      logoURI: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x4575f41308EC1483f3d399aa9a2826d74Da13Deb/logo.png'
+      logoURI:
+        'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x4575f41308EC1483f3d399aa9a2826d74Da13Deb/logo.png',
     },
     {
       name: 'Republic Token',
@@ -227,7 +238,8 @@ const tokenList = {
       symbol: 'REN',
       decimals: 18,
       chainId: 1,
-      logoURI: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x408e41876cCCDC0F92210600ef50372656052a38/logo.png'
+      logoURI:
+        'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x408e41876cCCDC0F92210600ef50372656052a38/logo.png',
     },
     {
       name: 'Reputation Augur v1',
@@ -235,7 +247,8 @@ const tokenList = {
       symbol: 'REP',
       decimals: 18,
       chainId: 1,
-      logoURI: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x1985365e9f78359a9B6AD760e32412f4a445E862/logo.png'
+      logoURI:
+        'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x1985365e9f78359a9B6AD760e32412f4a445E862/logo.png',
     },
     {
       name: 'Reputation Augur v2',
@@ -243,7 +256,8 @@ const tokenList = {
       symbol: 'REPv2',
       decimals: 18,
       chainId: 1,
-      logoURI: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x221657776846890989a759BA2973e427DfF5C9bB/logo.png'
+      logoURI:
+        'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x221657776846890989a759BA2973e427DfF5C9bB/logo.png',
     },
     {
       name: 'Synthetix Network Token',
@@ -251,7 +265,8 @@ const tokenList = {
       symbol: 'SNX',
       decimals: 18,
       chainId: 1,
-      logoURI: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xC011a73ee8576Fb46F5E1c5751cA3B9Fe0af2a6F/logo.png'
+      logoURI:
+        'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xC011a73ee8576Fb46F5E1c5751cA3B9Fe0af2a6F/logo.png',
     },
     {
       name: 'Storj Token',
@@ -259,7 +274,8 @@ const tokenList = {
       symbol: 'STORJ',
       decimals: 8,
       chainId: 1,
-      logoURI: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xB64ef51C888972c908CFacf59B47C1AfBC0Ab8aC/logo.png'
+      logoURI:
+        'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xB64ef51C888972c908CFacf59B47C1AfBC0Ab8aC/logo.png',
     },
     {
       name: 'Synth sUSD',
@@ -267,7 +283,7 @@ const tokenList = {
       symbol: 'sUSD',
       decimals: 18,
       chainId: 1,
-      logoURI: 'https://assets.coingecko.com/coins/images/5013/thumb/sUSD.png?1616150765'
+      logoURI: 'https://assets.coingecko.com/coins/images/5013/thumb/sUSD.png?1616150765',
     },
     {
       chainId: 1,
@@ -275,7 +291,7 @@ const tokenList = {
       name: 'tBTC',
       symbol: 'TBTC',
       decimals: 18,
-      logoURI: 'https://assets.coingecko.com/coins/images/11224/thumb/tBTC.png?1589620754'
+      logoURI: 'https://assets.coingecko.com/coins/images/11224/thumb/tBTC.png?1589620754',
     },
     {
       name: 'UMA Voting Token v1',
@@ -283,7 +299,8 @@ const tokenList = {
       symbol: 'UMA',
       decimals: 18,
       chainId: 1,
-      logoURI: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x04Fa0d235C4abf4BcF4787aF4CF447DE572eF828/logo.png'
+      logoURI:
+        'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x04Fa0d235C4abf4BcF4787aF4CF447DE572eF828/logo.png',
     },
     {
       name: 'Uniswap',
@@ -291,7 +308,7 @@ const tokenList = {
       symbol: 'UNI',
       decimals: 18,
       chainId: 1,
-      logoURI: 'ipfs://QmXttGpZrECX5qCyXbBQiqgQNytVGeZW5Anewvh2jc4psg'
+      logoURI: 'ipfs://QmXttGpZrECX5qCyXbBQiqgQNytVGeZW5Anewvh2jc4psg',
     },
     {
       name: 'USDCoin',
@@ -299,7 +316,8 @@ const tokenList = {
       symbol: 'USDC',
       decimals: 6,
       chainId: 1,
-      logoURI: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/logo.png'
+      logoURI:
+        'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/logo.png',
     },
     {
       name: 'Tether USD',
@@ -307,7 +325,8 @@ const tokenList = {
       symbol: 'USDT',
       decimals: 6,
       chainId: 1,
-      logoURI: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xdAC17F958D2ee523a2206206994597C13D831ec7/logo.png'
+      logoURI:
+        'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xdAC17F958D2ee523a2206206994597C13D831ec7/logo.png',
     },
     {
       name: 'Wrapped BTC',
@@ -315,7 +334,8 @@ const tokenList = {
       symbol: 'WBTC',
       decimals: 8,
       chainId: 1,
-      logoURI: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599/logo.png'
+      logoURI:
+        'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599/logo.png',
     },
     {
       name: 'Wrapped Ether',
@@ -323,7 +343,8 @@ const tokenList = {
       symbol: 'WETH',
       decimals: 18,
       chainId: 1,
-      logoURI: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/logo.png'
+      logoURI:
+        'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/logo.png',
     },
     {
       chainId: 1,
@@ -331,7 +352,7 @@ const tokenList = {
       name: 'yearn finance',
       symbol: 'YFI',
       decimals: 18,
-      logoURI: 'https://assets.coingecko.com/coins/images/11849/thumb/yfi-192x192.png?1598325330'
+      logoURI: 'https://assets.coingecko.com/coins/images/11849/thumb/yfi-192x192.png?1598325330',
     },
     {
       name: '0x Protocol Token',
@@ -339,7 +360,8 @@ const tokenList = {
       symbol: 'ZRX',
       decimals: 18,
       chainId: 1,
-      logoURI: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xE41d2489571d322189246DaFA5ebDe1F4699F498/logo.png'
+      logoURI:
+        'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xE41d2489571d322189246DaFA5ebDe1F4699F498/logo.png',
     },
     {
       name: 'Dai Stablecoin',
@@ -347,7 +369,8 @@ const tokenList = {
       symbol: 'DAI',
       decimals: 18,
       chainId: 3,
-      logoURI: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xaD6D458402F60fD3Bd25163575031ACDce07538D/logo.png'
+      logoURI:
+        'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xaD6D458402F60fD3Bd25163575031ACDce07538D/logo.png',
     },
     {
       name: 'Uniswap',
@@ -355,7 +378,7 @@ const tokenList = {
       symbol: 'UNI',
       decimals: 18,
       chainId: 3,
-      logoURI: 'ipfs://QmXttGpZrECX5qCyXbBQiqgQNytVGeZW5Anewvh2jc4psg'
+      logoURI: 'ipfs://QmXttGpZrECX5qCyXbBQiqgQNytVGeZW5Anewvh2jc4psg',
     },
     {
       name: 'Wrapped Ether',
@@ -363,7 +386,8 @@ const tokenList = {
       symbol: 'WETH',
       decimals: 18,
       chainId: 3,
-      logoURI: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xc778417E063141139Fce010982780140Aa0cD5Ab/logo.png'
+      logoURI:
+        'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xc778417E063141139Fce010982780140Aa0cD5Ab/logo.png',
     },
     {
       name: 'Dai Stablecoin',
@@ -371,7 +395,8 @@ const tokenList = {
       symbol: 'DAI',
       decimals: 18,
       chainId: 4,
-      logoURI: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xc7AD46e0b8a400Bb3C915120d284AafbA8fc4735/logo.png'
+      logoURI:
+        'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xc7AD46e0b8a400Bb3C915120d284AafbA8fc4735/logo.png',
     },
     {
       name: 'Maker',
@@ -379,7 +404,8 @@ const tokenList = {
       symbol: 'MKR',
       decimals: 18,
       chainId: 4,
-      logoURI: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xF9bA5210F91D0474bd1e1DcDAeC4C58E359AaD85/logo.png'
+      logoURI:
+        'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xF9bA5210F91D0474bd1e1DcDAeC4C58E359AaD85/logo.png',
     },
     {
       name: 'Uniswap',
@@ -387,7 +413,7 @@ const tokenList = {
       symbol: 'UNI',
       decimals: 18,
       chainId: 4,
-      logoURI: 'ipfs://QmXttGpZrECX5qCyXbBQiqgQNytVGeZW5Anewvh2jc4psg'
+      logoURI: 'ipfs://QmXttGpZrECX5qCyXbBQiqgQNytVGeZW5Anewvh2jc4psg',
     },
     {
       name: 'Wrapped Ether',
@@ -395,7 +421,8 @@ const tokenList = {
       symbol: 'WETH',
       decimals: 18,
       chainId: 4,
-      logoURI: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xc778417E063141139Fce010982780140Aa0cD5Ab/logo.png'
+      logoURI:
+        'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xc778417E063141139Fce010982780140Aa0cD5Ab/logo.png',
     },
     {
       name: 'Uniswap',
@@ -403,7 +430,7 @@ const tokenList = {
       symbol: 'UNI',
       decimals: 18,
       chainId: 5,
-      logoURI: 'ipfs://QmXttGpZrECX5qCyXbBQiqgQNytVGeZW5Anewvh2jc4psg'
+      logoURI: 'ipfs://QmXttGpZrECX5qCyXbBQiqgQNytVGeZW5Anewvh2jc4psg',
     },
     {
       name: 'Wrapped Ether',
@@ -411,7 +438,8 @@ const tokenList = {
       symbol: 'WETH',
       decimals: 18,
       chainId: 5,
-      logoURI: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6/logo.png'
+      logoURI:
+        'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6/logo.png',
     },
     {
       name: 'Dai Stablecoin',
@@ -419,7 +447,8 @@ const tokenList = {
       symbol: 'DAI',
       decimals: 18,
       chainId: 42,
-      logoURI: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa/logo.png'
+      logoURI:
+        'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa/logo.png',
     },
     {
       name: 'Maker',
@@ -427,7 +456,8 @@ const tokenList = {
       symbol: 'MKR',
       decimals: 18,
       chainId: 42,
-      logoURI: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xAaF64BFCC32d0F15873a02163e7E500671a4ffcD/logo.png'
+      logoURI:
+        'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xAaF64BFCC32d0F15873a02163e7E500671a4ffcD/logo.png',
     },
     {
       name: 'Uniswap',
@@ -435,7 +465,7 @@ const tokenList = {
       symbol: 'UNI',
       decimals: 18,
       chainId: 42,
-      logoURI: 'ipfs://QmXttGpZrECX5qCyXbBQiqgQNytVGeZW5Anewvh2jc4psg'
+      logoURI: 'ipfs://QmXttGpZrECX5qCyXbBQiqgQNytVGeZW5Anewvh2jc4psg',
     },
     {
       name: 'Wrapped Ether',
@@ -443,7 +473,8 @@ const tokenList = {
       symbol: 'WETH',
       decimals: 18,
       chainId: 42,
-      logoURI: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xd0A1E359811322d97991E03f863a0C30C2cF029C/logo.png'
+      logoURI:
+        'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xd0A1E359811322d97991E03f863a0C30C2cF029C/logo.png',
     },
     {
       chainId: 137,
@@ -451,7 +482,7 @@ const tokenList = {
       name: 'Aave',
       symbol: 'AAVE',
       decimals: 18,
-      logoURI: 'https://assets.coingecko.com/coins/images/12645/thumb/AAVE.png?1601374110'
+      logoURI: 'https://assets.coingecko.com/coins/images/12645/thumb/AAVE.png?1601374110',
     },
     {
       chainId: 137,
@@ -459,7 +490,7 @@ const tokenList = {
       name: 'Amp',
       symbol: 'AMP',
       decimals: 18,
-      logoURI: 'https://assets.coingecko.com/coins/images/12409/thumb/amp-200x200.png?1599625397'
+      logoURI: 'https://assets.coingecko.com/coins/images/12409/thumb/amp-200x200.png?1599625397',
     },
     {
       name: 'Balancer',
@@ -467,7 +498,8 @@ const tokenList = {
       symbol: 'BAL',
       decimals: 18,
       chainId: 137,
-      logoURI: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xba100000625a3754423978a60c9317c58a424e3D/logo.png'
+      logoURI:
+        'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xba100000625a3754423978a60c9317c58a424e3D/logo.png',
     },
     {
       chainId: 137,
@@ -475,7 +507,7 @@ const tokenList = {
       name: 'Band Protocol',
       symbol: 'BAND',
       decimals: 18,
-      logoURI: 'https://assets.coingecko.com/coins/images/9545/thumb/band-protocol.png?1568730326'
+      logoURI: 'https://assets.coingecko.com/coins/images/9545/thumb/band-protocol.png?1568730326',
     },
     {
       name: 'Bancor Network Token',
@@ -483,7 +515,8 @@ const tokenList = {
       symbol: 'BNT',
       decimals: 18,
       chainId: 137,
-      logoURI: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x1F573D6Fb3F13d689FF844B4cE37794d79a7FF1C/logo.png'
+      logoURI:
+        'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x1F573D6Fb3F13d689FF844B4cE37794d79a7FF1C/logo.png',
     },
     {
       name: 'Compound',
@@ -491,7 +524,8 @@ const tokenList = {
       symbol: 'COMP',
       decimals: 18,
       chainId: 137,
-      logoURI: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xc00e94Cb662C3520282E6f5717214004A7f26888/logo.png'
+      logoURI:
+        'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xc00e94Cb662C3520282E6f5717214004A7f26888/logo.png',
     },
     {
       name: 'Curve DAO Token',
@@ -499,7 +533,8 @@ const tokenList = {
       symbol: 'CRV',
       decimals: 18,
       chainId: 137,
-      logoURI: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xD533a949740bb3306d119CC777fa900bA034cd52/logo.png'
+      logoURI:
+        'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xD533a949740bb3306d119CC777fa900bA034cd52/logo.png',
     },
     {
       chainId: 137,
@@ -507,7 +542,7 @@ const tokenList = {
       name: 'Civic',
       symbol: 'CVC',
       decimals: 8,
-      logoURI: 'https://assets.coingecko.com/coins/images/788/thumb/civic.png?1547034556'
+      logoURI: 'https://assets.coingecko.com/coins/images/788/thumb/civic.png?1547034556',
     },
     {
       name: 'Dai Stablecoin',
@@ -515,7 +550,8 @@ const tokenList = {
       symbol: 'DAI',
       decimals: 18,
       chainId: 137,
-      logoURI: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x6B175474E89094C44Da98b954EedeAC495271d0F/logo.png'
+      logoURI:
+        'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x6B175474E89094C44Da98b954EedeAC495271d0F/logo.png',
     },
     {
       chainId: 137,
@@ -523,7 +559,7 @@ const tokenList = {
       name: 'Ethereum Name Service',
       symbol: 'ENS',
       decimals: 18,
-      logoURI: 'https://assets.coingecko.com/coins/images/19785/thumb/acatxTm8_400x400.jpg?1635850140'
+      logoURI: 'https://assets.coingecko.com/coins/images/19785/thumb/acatxTm8_400x400.jpg?1635850140',
     },
     {
       name: 'Gnosis Token',
@@ -531,7 +567,8 @@ const tokenList = {
       symbol: 'GNO',
       decimals: 18,
       chainId: 137,
-      logoURI: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x6810e776880C02933D47DB1b9fc05908e5386b96/logo.png'
+      logoURI:
+        'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x6810e776880C02933D47DB1b9fc05908e5386b96/logo.png',
     },
     {
       chainId: 137,
@@ -539,7 +576,7 @@ const tokenList = {
       name: 'The Graph',
       symbol: 'GRT',
       decimals: 18,
-      logoURI: 'https://assets.coingecko.com/coins/images/13397/thumb/Graph_Token.png?1608145566'
+      logoURI: 'https://assets.coingecko.com/coins/images/13397/thumb/Graph_Token.png?1608145566',
     },
     {
       chainId: 137,
@@ -547,7 +584,7 @@ const tokenList = {
       name: 'Keep Network',
       symbol: 'KEEP',
       decimals: 18,
-      logoURI: 'https://assets.coingecko.com/coins/images/3373/thumb/IuNzUb5b_400x400.jpg?1589526336'
+      logoURI: 'https://assets.coingecko.com/coins/images/3373/thumb/IuNzUb5b_400x400.jpg?1589526336',
     },
     {
       name: 'Kyber Network Crystal',
@@ -555,7 +592,8 @@ const tokenList = {
       symbol: 'KNC',
       decimals: 18,
       chainId: 137,
-      logoURI: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xdd974D5C2e2928deA5F71b9825b8b646686BD200/logo.png'
+      logoURI:
+        'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xdd974D5C2e2928deA5F71b9825b8b646686BD200/logo.png',
     },
     {
       name: 'ChainLink Token',
@@ -563,7 +601,8 @@ const tokenList = {
       symbol: 'LINK',
       decimals: 18,
       chainId: 137,
-      logoURI: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x514910771AF9Ca656af840dff83E8264EcF986CA/logo.png'
+      logoURI:
+        'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x514910771AF9Ca656af840dff83E8264EcF986CA/logo.png',
     },
     {
       name: 'Loom Network',
@@ -571,7 +610,8 @@ const tokenList = {
       symbol: 'LOOM',
       decimals: 18,
       chainId: 137,
-      logoURI: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xA4e8C3Ec456107eA67d3075bF9e3DF3A75823DB0/logo.png'
+      logoURI:
+        'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xA4e8C3Ec456107eA67d3075bF9e3DF3A75823DB0/logo.png',
     },
     {
       name: 'LoopringCoin V2',
@@ -579,7 +619,8 @@ const tokenList = {
       symbol: 'LRC',
       decimals: 18,
       chainId: 137,
-      logoURI: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xBBbbCA6A901c926F240b89EacB641d8Aec7AEafD/logo.png'
+      logoURI:
+        'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xBBbbCA6A901c926F240b89EacB641d8Aec7AEafD/logo.png',
     },
     {
       chainId: 137,
@@ -587,7 +628,7 @@ const tokenList = {
       name: 'Decentraland',
       symbol: 'MANA',
       decimals: 18,
-      logoURI: 'https://assets.coingecko.com/coins/images/878/thumb/decentraland-mana.png?1550108745'
+      logoURI: 'https://assets.coingecko.com/coins/images/878/thumb/decentraland-mana.png?1550108745',
     },
     {
       name: 'Maker',
@@ -595,7 +636,8 @@ const tokenList = {
       symbol: 'MKR',
       decimals: 18,
       chainId: 137,
-      logoURI: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2/logo.png'
+      logoURI:
+        'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2/logo.png',
     },
     {
       name: 'Numeraire',
@@ -603,7 +645,8 @@ const tokenList = {
       symbol: 'NMR',
       decimals: 18,
       chainId: 137,
-      logoURI: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x1776e1F26f98b1A5dF9cD347953a26dd3Cb46671/logo.png'
+      logoURI:
+        'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x1776e1F26f98b1A5dF9cD347953a26dd3Cb46671/logo.png',
     },
     {
       name: 'Orchid',
@@ -611,7 +654,8 @@ const tokenList = {
       symbol: 'OXT',
       decimals: 18,
       chainId: 137,
-      logoURI: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x4575f41308EC1483f3d399aa9a2826d74Da13Deb/logo.png'
+      logoURI:
+        'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x4575f41308EC1483f3d399aa9a2826d74Da13Deb/logo.png',
     },
     {
       name: 'Republic Token',
@@ -619,7 +663,8 @@ const tokenList = {
       symbol: 'REN',
       decimals: 18,
       chainId: 137,
-      logoURI: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x408e41876cCCDC0F92210600ef50372656052a38/logo.png'
+      logoURI:
+        'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x408e41876cCCDC0F92210600ef50372656052a38/logo.png',
     },
     {
       name: 'Reputation Augur v2',
@@ -627,7 +672,8 @@ const tokenList = {
       symbol: 'REPv2',
       decimals: 18,
       chainId: 137,
-      logoURI: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x221657776846890989a759BA2973e427DfF5C9bB/logo.png'
+      logoURI:
+        'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x221657776846890989a759BA2973e427DfF5C9bB/logo.png',
     },
     {
       name: 'Synthetix Network Token',
@@ -635,7 +681,8 @@ const tokenList = {
       symbol: 'SNX',
       decimals: 18,
       chainId: 137,
-      logoURI: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xC011a73ee8576Fb46F5E1c5751cA3B9Fe0af2a6F/logo.png'
+      logoURI:
+        'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xC011a73ee8576Fb46F5E1c5751cA3B9Fe0af2a6F/logo.png',
     },
     {
       name: 'Storj Token',
@@ -643,7 +690,8 @@ const tokenList = {
       symbol: 'STORJ',
       decimals: 8,
       chainId: 137,
-      logoURI: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xB64ef51C888972c908CFacf59B47C1AfBC0Ab8aC/logo.png'
+      logoURI:
+        'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xB64ef51C888972c908CFacf59B47C1AfBC0Ab8aC/logo.png',
     },
     {
       name: 'Synth sUSD',
@@ -651,7 +699,7 @@ const tokenList = {
       symbol: 'sUSD',
       decimals: 18,
       chainId: 137,
-      logoURI: 'https://assets.coingecko.com/coins/images/5013/thumb/sUSD.png?1616150765'
+      logoURI: 'https://assets.coingecko.com/coins/images/5013/thumb/sUSD.png?1616150765',
     },
     {
       chainId: 137,
@@ -659,7 +707,7 @@ const tokenList = {
       name: 'tBTC',
       symbol: 'TBTC',
       decimals: 18,
-      logoURI: 'https://assets.coingecko.com/coins/images/11224/thumb/tBTC.png?1589620754'
+      logoURI: 'https://assets.coingecko.com/coins/images/11224/thumb/tBTC.png?1589620754',
     },
     {
       name: 'UMA Voting Token v1',
@@ -667,7 +715,8 @@ const tokenList = {
       symbol: 'UMA',
       decimals: 18,
       chainId: 137,
-      logoURI: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x04Fa0d235C4abf4BcF4787aF4CF447DE572eF828/logo.png'
+      logoURI:
+        'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x04Fa0d235C4abf4BcF4787aF4CF447DE572eF828/logo.png',
     },
     {
       name: 'Uniswap',
@@ -675,7 +724,7 @@ const tokenList = {
       symbol: 'UNI',
       decimals: 18,
       chainId: 137,
-      logoURI: 'ipfs://QmXttGpZrECX5qCyXbBQiqgQNytVGeZW5Anewvh2jc4psg'
+      logoURI: 'ipfs://QmXttGpZrECX5qCyXbBQiqgQNytVGeZW5Anewvh2jc4psg',
     },
     {
       name: 'USDCoin',
@@ -683,7 +732,8 @@ const tokenList = {
       symbol: 'USDC',
       decimals: 6,
       chainId: 137,
-      logoURI: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/logo.png'
+      logoURI:
+        'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/logo.png',
     },
     {
       name: 'Tether USD',
@@ -691,7 +741,8 @@ const tokenList = {
       symbol: 'USDT',
       decimals: 6,
       chainId: 137,
-      logoURI: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xdAC17F958D2ee523a2206206994597C13D831ec7/logo.png'
+      logoURI:
+        'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xdAC17F958D2ee523a2206206994597C13D831ec7/logo.png',
     },
     {
       name: 'Wrapped BTC',
@@ -699,7 +750,8 @@ const tokenList = {
       symbol: 'WBTC',
       decimals: 8,
       chainId: 137,
-      logoURI: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599/logo.png'
+      logoURI:
+        'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599/logo.png',
     },
     {
       name: 'Wrapped Ether',
@@ -707,7 +759,8 @@ const tokenList = {
       symbol: 'WETH',
       decimals: 18,
       chainId: 137,
-      logoURI: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/logo.png'
+      logoURI:
+        'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/logo.png',
     },
     {
       name: 'Wrapped Matic',
@@ -715,7 +768,7 @@ const tokenList = {
       symbol: 'WMATIC',
       decimals: 18,
       chainId: 137,
-      logoURI: 'https://assets.coingecko.com/coins/images/4713/thumb/matic-token-icon.png?1624446912'
+      logoURI: 'https://assets.coingecko.com/coins/images/4713/thumb/matic-token-icon.png?1624446912',
     },
     {
       chainId: 137,
@@ -723,7 +776,7 @@ const tokenList = {
       name: 'yearn finance',
       symbol: 'YFI',
       decimals: 18,
-      logoURI: 'https://assets.coingecko.com/coins/images/11849/thumb/yfi-192x192.png?1598325330'
+      logoURI: 'https://assets.coingecko.com/coins/images/11849/thumb/yfi-192x192.png?1598325330',
     },
     {
       name: '0x Protocol Token',
@@ -731,7 +784,8 @@ const tokenList = {
       symbol: 'ZRX',
       decimals: 18,
       chainId: 137,
-      logoURI: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xE41d2489571d322189246DaFA5ebDe1F4699F498/logo.png'
+      logoURI:
+        'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xE41d2489571d322189246DaFA5ebDe1F4699F498/logo.png',
     },
     {
       name: 'Wrapped Ether',
@@ -739,7 +793,8 @@ const tokenList = {
       symbol: 'WETH',
       decimals: 18,
       chainId: 80001,
-      logoURI: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/logo.png'
+      logoURI:
+        'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/logo.png',
     },
     {
       name: 'Wrapped Matic',
@@ -747,9 +802,9 @@ const tokenList = {
       symbol: 'WMATIC',
       decimals: 18,
       chainId: 80001,
-      logoURI: 'https://assets.coingecko.com/coins/images/4713/thumb/matic-token-icon.png?1624446912'
-    }
-  ]
-}
+      logoURI: 'https://assets.coingecko.com/coins/images/4713/thumb/matic-token-icon.png?1624446912',
+    },
+  ],
+};
 
 module.exports = tokenList;

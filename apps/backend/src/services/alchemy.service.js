@@ -28,10 +28,7 @@ module.exports.getTokenBalances = async (walletAddress, tokenAddresses) => {
   const res = await axios.post(alchemy.appUrl, {
     jsonrpc: '2.0',
     method: 'alchemy_getTokenBalances',
-    params: [
-        walletAddress,
-        tokenAddresses
-    ],
+    params: [walletAddress, tokenAddresses],
     id: `${walletAddress}`,
   });
 

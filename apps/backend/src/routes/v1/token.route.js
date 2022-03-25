@@ -6,13 +6,11 @@ const tokenController = require('../../controllers/token.controller');
 
 const router = express.Router();
 
-router
-  .route('/token-list')
-  .get(auth(), validate(tokenValidation.getTokenList), tokenController.getTokenList);
+router.route('/token-list').get(auth(), validate(tokenValidation.getTokenList), tokenController.getTokenList);
 
-router
-  .route('/exchange-rates')
-  .post(auth(), validate(tokenValidation.getExchangeRates), tokenController.getExchangeRates);
+router.route('/balances').post(auth(), validate(tokenValidation.getTokenBalances), tokenController.getTokenBalances);
+
+router.route('/exchange-rates').post(auth(), validate(tokenValidation.getExchangeRates), tokenController.getExchangeRates);
 
 router
   .route('/:tokenFeedProxyAddress/exchange-rate')

@@ -1,7 +1,11 @@
 const Joi = require('joi');
-const { objectId } = require('./custom.validation');
 
-module.exports.getTokenList = {
+module.exports.getTokenList = {};
+
+module.exports.getTokenBalances = {
+  body: Joi.object().keys({
+    tokenAddresses: Joi.array().items(Joi.string()).required().min(1),
+  }),
 };
 
 module.exports.getExchangeRates = {

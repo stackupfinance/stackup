@@ -59,12 +59,6 @@ module.exports.hydrateUserWalletGuardians = {
   }),
 };
 
-module.exports.getWalletHoldings = {
-  params: Joi.object().keys({
-    userId: Joi.string().custom(objectId),
-  }),
-};
-
 module.exports.getUserNotifications = {
   params: Joi.object().keys({
     userId: Joi.string().custom(objectId),

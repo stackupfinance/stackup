@@ -2,6 +2,7 @@ const { ethers } = require('ethers');
 const validator = require('validator');
 const { wallet, contracts, constants } = require('@stackupfinance/contracts');
 const { web3 } = require('../config/config');
+const { aggregatorV3InterfaceABI } = require('../config/chainlink');
 const { eventSignatures, status } = require('../config/transaction');
 
 const formatter = new Intl.NumberFormat('en-US', {
@@ -112,4 +113,8 @@ module.exports.isEnsName = (name) => {
 
 module.exports.resolveEnsName = async (name) => {
   return ethereumProvider.resolveName(name);
+};
+
+module.exports.getChainLinkPriceFeed = (priceFeedAddress) => {
+  return new ethers.Contract(priceFeedAddress, aggregatorV3InterfaceABI, provider);
 };
