@@ -14,6 +14,7 @@ export const App = {
     paymaster: process.env.NEXT_PUBLIC_WEB3_PAYMASTER || '',
     rpc: process.env.NEXT_PUBLIC_WEB3_RPC || '',
     usdc: process.env.NEXT_PUBLIC_WEB3_USDC || '',
+    usdcPriceFeed: process.env.NEXT_PUBLIC_WEB3_USDC_PRICE_FEED || '',
     usdcUnits: 'mwei',
     nativeSymbol: 'MATIC',
   },

@@ -144,6 +144,7 @@ export const accountHoldingsPageSelector = (state) => ({
   enabled: state.enabled,
   loading: state.loading,
   user: state.user,
+  wallet: state.wallet,
   accessToken: state.accessToken,
 });
 
