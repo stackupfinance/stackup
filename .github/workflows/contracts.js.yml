@@ -29,5 +29,3 @@ jobs:
 
       - name: Test
         run: yarn workspace @stackupfinance/contracts run test
-        env:
-          ALCHEMY_NODE: ${{ secrets.ALCHEMY_NODE }}
