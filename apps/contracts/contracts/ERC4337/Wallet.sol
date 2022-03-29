@@ -31,18 +31,26 @@ contract Wallet is
   using ECDSA for bytes32;
   using WalletUserOperation for UserOperation;
 
-  // This contract is an implementation for WalletProxy.sol.
-  // The following must be followed when updating contract variables:
-  // 1. Order and type of variables cannot change.
-  // 2. New variables must be added last.
-  // 3. Deprecated variables cannot be deleted and should be marked instead.
+  // solhint-disable var-name-mixedcase
+  bytes32 public constant OWNER_ROLE = keccak256("OWNER_ROLE");
+  bytes32 public constant GUARDIAN_ROLE = keccak256("GUARDIAN_ROLE");
+  // solhint-enable var-name-mixedcase
+
   uint256 public nonce;
   address public entryPoint;
-  bytes32 public OWNER_ROLE; // solhint-disable-line var-name-mixedcase
-  bytes32 public GUARDIAN_ROLE; // solhint-disable-line var-name-mixedcase
 
-  /// @custom:oz-upgrades-unsafe-allow constructor
-  constructor() initializer {} // solhint-disable-line no-empty-blocks
+  modifier onlyEntryPoint() {
+    require(msg.sender == entryPoint, "Wallet: Not from EntryPoint");
+    _;
+  }
+
+  /**
+   * @dev Implementation contract to be used for `WalletProxy`.
+   * Marks the implementation contract as initialized in the constructor so it cannot be initialized later on.
+   */
+  constructor() initializer {
+    // solhint-disable-previous-line no-empty-blocks
+  }
 
   function initialize(
     address _entryPoint,
@@ -54,10 +62,15 @@ contract Wallet is
 
     entryPoint = _entryPoint;
 
-    OWNER_ROLE = keccak256("OWNER_ROLE");
-    GUARDIAN_ROLE = keccak256("GUARDIAN_ROLE");
-    _setRoleAdmin(GUARDIAN_ROLE, OWNER_ROLE);
+    // Based on the `AccessControl` module provided by OpenZeppelin: "The `DEFAULT_ADMIN_ROLE` is also its own admin:
+    // it has permission to grant and revoke this role. Extra precautions should be taken to secure accounts that
+    // have been granted it." Simply to avoid using the default admin role, and use `OWNER_ROLE` instead, we
+    // change the admin role of `OWNER_ROLE` to `OWNER_ROLE` instead.
+    _setRoleAdmin(OWNER_ROLE, OWNER_ROLE);
     _grantRole(OWNER_ROLE, _owner);
+
+    // Then we set `OWNER_ROLE` as admin role for `GUARDIAN_ROLE` as well.
+    _setRoleAdmin(GUARDIAN_ROLE, OWNER_ROLE);
     for (uint256 i = 0; i < _guardians.length; i++) {
       _grantRole(GUARDIAN_ROLE, _guardians[i]);
     }
@@ -65,11 +78,6 @@ contract Wallet is
 
   // solhint-disable-next-line no-empty-blocks
   receive() external payable {}
-
-  modifier onlyEntryPoint() {
-    require(msg.sender == entryPoint, "Wallet: Not from EntryPoint");
-    _;
-  }
 
   // solhint-disable-next-line no-empty-blocks
   function _authorizeUpgrade(address) internal view override onlyEntryPoint {}

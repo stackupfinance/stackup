@@ -11,9 +11,9 @@ import { UserOp } from './utils/models/user/types'
 import { bn, fp } from './utils/helpers/numbers'
 import { getSigner } from './utils/helpers/signers'
 import { deploy, instanceAt } from './utils/helpers/contracts'
+import { MAX_UINT256, ZERO_ADDRESS } from './utils/helpers/constants'
 import { advanceTime, currentTimestamp } from './utils/helpers/time'
 import { assertIndirectEvent, assertNoIndirectEvent, assertWithError } from './utils/helpers/asserts'
-import { ADMIN_ROLE, GUARDIAN_ROLE, MAX_UINT256, OWNER_ROLE, ZERO_ADDRESS } from './utils/helpers/constants'
 import { encodeCounterIncrement, encodeReverterFail, encodeTokenApproval, encodeWalletExecute } from './utils/helpers/encoding'
 
 describe('EntryPoint', () => {
@@ -531,23 +531,6 @@ describe('EntryPoint', () => {
 
             const wallet = await instanceAt('Wallet', op.sender)
             expect(await wallet.entryPoint()).to.equal(entryPoint.address)
-          })
-
-          // TODO: AUDIT! This is probably not properly setup
-          it('set ups access control roles', async () => {
-            await entryPoint.handleOps(op)
-
-            const wallet = await instanceAt('Wallet', op.sender)
-            expect(await wallet.getRoleMemberCount(OWNER_ROLE)).to.be.equal(1)
-            expect(await wallet.hasRole(OWNER_ROLE, user.signer.address)).to.be.true
-
-            expect(await wallet.getRoleMemberCount(GUARDIAN_ROLE)).to.be.equal(user.guardians.length)
-            for (const guardian of user.guardians) {
-              expect(await wallet.hasRole(GUARDIAN_ROLE, guardian.address)).to.be.true
-            }
-
-            expect(await wallet.getRoleAdmin(OWNER_ROLE)).to.be.equal(ADMIN_ROLE)
-            expect(await wallet.getRoleAdmin(GUARDIAN_ROLE)).to.be.equal(OWNER_ROLE)
           })
 
           it('uses the nonce of the op as the salt', async () => {

@@ -60,10 +60,8 @@ describe('Wallet', () => {
     })
 
     it('sets up admin roles properly', async () => {
-      // TODO: AUDIT! no admin!
-      expect(await wallet.getRoleAdmin(OWNER_ROLE)).to.be.equal(ADMIN_ROLE)
+      expect(await wallet.getRoleAdmin(OWNER_ROLE)).to.be.equal(OWNER_ROLE)
       expect(await wallet.getRoleAdmin(GUARDIAN_ROLE)).to.be.equal(OWNER_ROLE)
-
       expect(await wallet.getRoleMemberCount(ADMIN_ROLE)).to.be.equal(0)
     })
 
