@@ -595,7 +595,7 @@ describe('Wallet', () => {
     })
   })
 
-  describe.only('validatePaymasterUserOp', () => {
+  describe('validatePaymasterUserOp', () => {
     let op: UserOp, paymaster: Wallet
     let paymasterOwner: SignerWithAddress, paymasterGuardian: SignerWithAddress
 
