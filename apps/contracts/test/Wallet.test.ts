@@ -28,7 +28,7 @@ describe('Wallet', () => {
   let owner: SignerWithAddress, guardian: SignerWithAddress, other: SignerWithAddress
 
   before('setup signers', async () => {
-    [, owner, guardian, other] = await ethers.getSigners();
+    [, owner, guardian, other] = await getSigners()
   })
 
   beforeEach('deploy wallet', async () => {
@@ -595,12 +595,19 @@ describe('Wallet', () => {
     })
   })
 
-  describe('validatePaymasterUserOp', () => {
-    let op: UserOp
+  describe.only('validatePaymasterUserOp', () => {
+    let op: UserOp, paymaster: Wallet
+    let paymasterOwner: SignerWithAddress, paymasterGuardian: SignerWithAddress
+
+    beforeEach('deploy paymaster', async () => {
+      [paymasterOwner, paymasterGuardian] = await getSigners(2, 5)
+      paymaster = await Wallet.create({ owner: paymasterOwner, guardians: [paymasterGuardian] })
+    })
 
     beforeEach('build op', () => {
       // These are required fields the op must have filled in order to allow the wallet decoding properly
-      op = buildOp({ sender: other.address, paymaster: wallet.address, callData: '0xabcdef1111' })
+      // It must have any calldata cause it will check the paymaster allowance is not changing
+      op = buildOp({ sender: wallet.address, paymaster: paymaster.address, callData: '0xabcdef1111' })
     })
 
     context('when a signature is given', () => {
@@ -613,32 +620,32 @@ describe('Wallet', () => {
           feed = await deploy('PriceFeedMock', [18, exchangeRate])
         })
 
-        const signPaymasterData = async (signer = owner) => {
+        const signPaymasterData = async (signer = paymasterOwner) => {
           const data = encodePaymasterData(op, fee, token, feed)
           const signature = await signer.signMessage(ethers.utils.arrayify((data)))
           return encodePaymasterSignature(fee, token, feed, signature)
         }
 
-        context('when the signer is the owner', () => {
+        context('when the signer is the paymaster owner', () => {
           beforeEach('sign op', async () => {
-            op.paymasterData = await signPaymasterData(owner)
+            op.paymasterData = await signPaymasterData(paymasterOwner)
           })
 
-          const itReturnsTheEncodedContext = (maxCost: BigNumberish) => {
+          const itReturnsTheEncodedContext = (maxCost: BigNumberish, expectedFee: BigNumberish = fee) => {
             it('returns the corresponding context', async () => {
-              const context = await wallet.validatePaymasterUserOp(op, maxCost)
+              const context = await paymaster.validatePaymasterUserOp(op, maxCost)
 
               const results = ethers.utils.defaultAbiCoder.decode(['address', 'address', 'uint256', 'uint256'], context)
               expect(results[0]).to.equal(op.sender)
               expect(results[1]).to.equal(token.address)
               expect(results[2]).to.equal(exchangeRate)
-              expect(results[3]).to.equal(fee)
+              expect(results[3]).to.equal(expectedFee)
             })
           }
 
           const itReverts = (maxCost: BigNumberish) => {
             it('reverts', async () => {
-              await expect(wallet.validatePaymasterUserOp(op, maxCost)).to.be.revertedWith('Paymaster: Not approved')
+              await expect(paymaster.validatePaymasterUserOp(op, maxCost)).to.be.revertedWith('Paymaster: Not approved')
             })
           }
 
@@ -647,12 +654,31 @@ describe('Wallet', () => {
             const expectedCost = fee
 
             context('when the tokens were already approved for the paymaster', () => {
-              beforeEach('allow tokens from sender', async () => {
-                await token.connect(other).approve(wallet.address, expectedCost)
+              beforeEach('allow tokens from wallet to paymaster', async () => {
+                const tokenApprovalData = await encodeTokenApproval(op.paymaster, expectedCost)
+                await wallet.executeUserOp(token, tokenApprovalData, { from: wallet.entryPoint })
               })
 
               context('when the allowance is not being affected in the current op', () => {
-                itReturnsTheEncodedContext(maxCost)
+                context('when the op is not calling the token allowance', () => {
+                  beforeEach('set calldata and re-sign', async () => {
+                    op.callData = '0xaabbccdd'
+                    op.paymasterData = await signPaymasterData()
+                  })
+
+                  itReturnsTheEncodedContext(maxCost)
+                })
+
+                context.skip('when the op is calling the token allowance for other user', () => {
+                  // TODO: AUDIT! contracts are not using the spender properly for this check
+
+                  beforeEach('set calldata and re-sign', async () => {
+                    op.callData = await encodeWalletExecute(token, await encodeTokenApproval(other, fp(1)))
+                    op.paymasterData = await signPaymasterData()
+                  })
+
+                  itReturnsTheEncodedContext(maxCost)
+                })
               })
 
               context('when the allowance is being increased in the current op', () => {
@@ -684,7 +710,7 @@ describe('Wallet', () => {
                   const amount = expectedCost
 
                   beforeEach('set calldata and re-sign', async () => {
-                    op.callData = await encodeWalletExecute(token, await encodeTokenApproval(wallet, amount))
+                    op.callData = await encodeWalletExecute(token, await encodeTokenApproval(op.paymaster, amount))
                     op.paymasterData = await signPaymasterData()
                   })
 
@@ -695,7 +721,7 @@ describe('Wallet', () => {
                   const amount = expectedCost.sub(1)
 
                   beforeEach('set calldata and re-sign', async () => {
-                    op.callData = await encodeWalletExecute(token, await encodeTokenApproval(wallet, amount))
+                    op.callData = await encodeWalletExecute(token, await encodeTokenApproval(op.paymaster, amount))
                     op.paymasterData = await signPaymasterData()
                   })
 
@@ -709,19 +735,11 @@ describe('Wallet', () => {
 
                   beforeEach('re-sign op without fees', async () => {
                     const data = encodePaymasterData(op, fee, token, feed)
-                    const signature = await owner.signMessage(ethers.utils.arrayify((data)))
+                    const signature = await paymasterOwner.signMessage(ethers.utils.arrayify((data)))
                     op.paymasterData = encodePaymasterSignature(fee, token, feed, signature)
                   })
 
-                  it('returns the corresponding context', async () => {
-                    const context = await wallet.validatePaymasterUserOp(op, maxCost)
-
-                    const results = ethers.utils.defaultAbiCoder.decode(['address', 'address', 'uint256', 'uint256'], context)
-                    expect(results[0]).to.equal(op.sender)
-                    expect(results[1]).to.equal(token.address)
-                    expect(results[2]).to.equal(exchangeRate)
-                    expect(results[3]).to.equal(fee)
-                  })
+                  itReturnsTheEncodedContext(maxCost, fee)
                 })
 
                 context('when the tokens were not approved in a previous op', () => {
@@ -736,12 +754,31 @@ describe('Wallet', () => {
             const expectedCost = maxCost.mul(exchangeRate).div(fp(1)).add(fee)
 
             context('when the tokens were already approved for the paymaster', () => {
-              beforeEach('allow tokens from sender', async () => {
-                await token.connect(other).approve(wallet.address, expectedCost)
+              beforeEach('allow tokens from wallet to paymaster', async () => {
+                const tokenApprovalData = await encodeTokenApproval(op.paymaster, expectedCost)
+                await wallet.executeUserOp(token, tokenApprovalData, { from: wallet.entryPoint })
               })
 
               context('when the allowance is not being affected in the current op', () => {
-                itReturnsTheEncodedContext(maxCost)
+                context('when the op is not calling the token allowance', () => {
+                  beforeEach('set calldata and re-sign', async () => {
+                    op.callData = '0xaabbccdd'
+                    op.paymasterData = await signPaymasterData()
+                  })
+
+                  itReturnsTheEncodedContext(maxCost)
+                })
+
+                context.skip('when the op is calling the token allowance for other user', () => {
+                  // TODO: AUDIT! contracts are not using the spender properly for this check
+
+                  beforeEach('set calldata and re-sign', async () => {
+                    op.callData = await encodeWalletExecute(token, await encodeTokenApproval(other, fp(1)))
+                    op.paymasterData = await signPaymasterData()
+                  })
+
+                  itReturnsTheEncodedContext(maxCost)
+                })
               })
 
               context('when the allowance is being increased in the current op', () => {
@@ -773,7 +810,7 @@ describe('Wallet', () => {
                   const amount = expectedCost
 
                   beforeEach('set calldata and re-sign', async () => {
-                    op.callData = await encodeWalletExecute(token, await encodeTokenApproval(wallet, amount))
+                    op.callData = await encodeWalletExecute(token, await encodeTokenApproval(op.paymaster, amount))
                     op.paymasterData = await signPaymasterData()
                   })
 
@@ -784,7 +821,7 @@ describe('Wallet', () => {
                   const amount = expectedCost.sub(1)
 
                   beforeEach('set calldata and re-sign', async () => {
-                    op.callData = await encodeWalletExecute(token, await encodeTokenApproval(wallet, amount))
+                    op.callData = await encodeWalletExecute(token, await encodeTokenApproval(op.paymaster, amount))
                     op.paymasterData = await signPaymasterData()
                   })
 
@@ -798,19 +835,11 @@ describe('Wallet', () => {
 
                   beforeEach('re-sign op without fees', async () => {
                     const data = encodePaymasterData(op, fee, token, feed)
-                    const signature = await owner.signMessage(ethers.utils.arrayify((data)))
+                    const signature = await paymasterOwner.signMessage(ethers.utils.arrayify((data)))
                     op.paymasterData = encodePaymasterSignature(fee, token, feed, signature)
                   })
 
-                  it('returns the corresponding context', async () => {
-                    const context = await wallet.validatePaymasterUserOp(op, maxCost)
-
-                    const results = ethers.utils.defaultAbiCoder.decode(['address', 'address', 'uint256', 'uint256'], context)
-                    expect(results[0]).to.equal(op.sender)
-                    expect(results[1]).to.equal(token.address)
-                    expect(results[2]).to.equal(exchangeRate)
-                    expect(results[3]).to.equal(fee)
-                  })
+                  itReturnsTheEncodedContext(maxCost, fee)
                 })
 
                 context('when the tokens were not approved in a previous op', () => {
@@ -821,13 +850,13 @@ describe('Wallet', () => {
           })
         })
 
-        context('when the signer is not the owner', () => {
+        context('when the signer is not the paymaster owner', () => {
           beforeEach('sign op', async () => {
-            op.paymasterData = await signPaymasterData(guardian)
+            op.paymasterData = await signPaymasterData(paymasterGuardian)
           })
 
           it('reverts', async () => {
-            await expect(wallet.validatePaymasterUserOp(op)).to.be.revertedWith('Paymaster: Invalid signature')
+            await expect(paymaster.validatePaymasterUserOp(op)).to.be.revertedWith('Paymaster: Invalid signature')
           })
         })
       })
@@ -838,14 +867,14 @@ describe('Wallet', () => {
         })
 
         it('reverts', async () => {
-          await expect(wallet.validatePaymasterUserOp(op)).to.be.reverted
+          await expect(paymaster.validatePaymasterUserOp(op)).to.be.reverted
         })
       })
     })
 
     context('when no signature is given', () => {
       it('reverts', async () => {
-        await expect(wallet.validatePaymasterUserOp(op)).to.be.reverted
+        await expect(paymaster.validatePaymasterUserOp(op)).to.be.reverted
       })
     })
   })
