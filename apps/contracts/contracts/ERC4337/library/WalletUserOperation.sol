@@ -137,6 +137,7 @@ library WalletUserOperation {
       (address, uint256)
     );
 
+    // TODO: AUDIT! review spender
     return spender == op.paymaster && value >= _requiredTokenFee(op, maxcost);
   }
 

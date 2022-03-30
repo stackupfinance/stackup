@@ -158,6 +158,12 @@ contract Wallet is
       hasRole(OWNER_ROLE, userOp.paymasterSigner()),
       "Paymaster: Invalid signature"
     );
+
+    // Requirements:
+    //  1. Sender allowed enough tokens to the paymaster, and it is either not calling approve or increasing allowance
+    //  2. It is approving the paymaster with enough tokens
+    //  3. Was already approved in previous ops (paymaster fee is set to zero)
+
     require(
       (userOp.requiredTokenIsApproved(maxcost) &&
         userOp.tokenAllowanceRemainsOK(maxcost)) ||
