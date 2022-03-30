@@ -11,4 +11,10 @@ interface IWallet {
     bytes32 requestId,
     uint256 requiredPrefund
   ) external;
+
+  function executeUserOp(
+    address to,
+    uint256 value,
+    bytes calldata data
+  ) external;
 }

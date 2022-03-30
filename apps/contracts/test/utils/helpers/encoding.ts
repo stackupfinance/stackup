@@ -2,14 +2,12 @@ import { ethers } from 'hardhat'
 import { BigNumber, Contract } from 'ethers'
 
 import { Signature, UserOp } from '../models/user/types'
-import { deploy, getFactory, getInterface } from './contracts'
+import { getFactory, getInterface } from './contracts'
 import { Account, BigNumberish, NAry, toAddress, toAddresses, toArray } from '../types'
 
-export async function encodeWalletDeployment(entryPoint: Account, owner: Account, guardians?: Account[], implementation?: Contract): Promise<string> {
-  if (!implementation) implementation = await deploy('Wallet')
-  const initData = await encodeWalletInit(entryPoint, owner, guardians)
-  const proxyFactory = await getFactory('WalletProxy')
-  const deployTx = proxyFactory.getDeployTransaction(implementation.address, initData)
+export async function encodeWalletMockDeployment(verificationReverts = false, payRefund = true): Promise<string> {
+  const walletFactory = await getFactory('WalletMock')
+  const deployTx = walletFactory.getDeployTransaction(verificationReverts, payRefund)
   return (deployTx?.data || '0x').toString()
 }
 
@@ -35,26 +33,6 @@ export async function encodeWalletExecute(to: Account, data = '0x', value?: BigN
   const walletInterface = await getInterface('Wallet')
   const args = [toAddress(to), value ?? 0, data]
   return walletInterface.encodeFunctionData('executeUserOp', args)
-}
-
-export async function encodeEntryPointStake(): Promise<string> {
-  const entryPointInterface = await getInterface('EntryPoint')
-  return entryPointInterface.encodeFunctionData('addStake')
-}
-
-export async function encodeEntryPointLock(): Promise<string> {
-  const entryPointInterface = await getInterface('EntryPoint')
-  return entryPointInterface.encodeFunctionData('lockStake')
-}
-
-export async function encodeEntryPointUnlock(): Promise<string> {
-  const entryPointInterface = await getInterface('EntryPoint')
-  return entryPointInterface.encodeFunctionData('unlockStake')
-}
-
-export async function encodeEntryPointWithdraw(amount: BigNumber): Promise<string> {
-  const entryPointInterface = await getInterface('EntryPoint')
-  return entryPointInterface.encodeFunctionData('withdrawStake', [amount])
 }
 
 export async function encodeCounterIncrement(): Promise<string> {
