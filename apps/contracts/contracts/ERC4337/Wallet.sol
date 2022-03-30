@@ -52,6 +52,12 @@ contract Wallet is
     // solhint-disable-previous-line no-empty-blocks
   }
 
+  /**
+   * @dev Initializes the wallet, this method can only be called only once
+   * @param _entryPoint Address of the entry point to be trusted
+   * @param _owner Address that will be granted with the OWNER_ROLE (admin role)
+   * @param _guardians Addresses that will be granted with the GUARDIANS_ROLE
+   */
   function initialize(
     address _entryPoint,
     address _owner,
@@ -69,20 +75,32 @@ contract Wallet is
     _setRoleAdmin(OWNER_ROLE, OWNER_ROLE);
     _grantRole(OWNER_ROLE, _owner);
 
-    // Then we set `OWNER_ROLE` as admin role for `GUARDIAN_ROLE` as well.
+    // Then we set `OWNER_ROLE` as the admin role for `GUARDIAN_ROLE` as well.
     _setRoleAdmin(GUARDIAN_ROLE, OWNER_ROLE);
     for (uint256 i = 0; i < _guardians.length; i++) {
       _grantRole(GUARDIAN_ROLE, _guardians[i]);
     }
   }
 
-  // solhint-disable-next-line no-empty-blocks
-  receive() external payable {}
+  /**
+   * @dev Allows receiving ETH transfers
+   */
+  receive() external payable {
+    // solhint-disable-previous-line no-empty-blocks
+  }
 
-  // solhint-disable-next-line no-empty-blocks
-  function _authorizeUpgrade(address) internal view override onlyEntryPoint {}
+  /**
+   * @dev Upgrades authorization mechanism triggered by `upgradeTo` and `upgradeToAndCall`
+   * Reverts if the sender is not the entry point
+   */
+  function _authorizeUpgrade(address) internal view override onlyEntryPoint {
+    // solhint-disable-previous-line no-empty-blocks
+  }
 
-  function getCurrentImplementation() public view returns (address) {
+  /**
+   * @dev Tells the address of the current implementation being proxied
+   */
+  function getCurrentImplementation() external view returns (address) {
     return _getImplementation();
   }
 
