@@ -20,8 +20,7 @@ import {
 } from './utils/helpers/encoding'
 
 import Wallet from './utils/models/wallet/Wallet'
-import { BigNumberish } from './utils/types'
-import { buildOp, UserOp } from './utils/models/user/types'
+import { UserOp, BigNumberish, buildOp } from './utils/types'
 
 describe('Wallet', () => {
   let wallet: Wallet

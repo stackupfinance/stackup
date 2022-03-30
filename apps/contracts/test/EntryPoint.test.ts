@@ -12,7 +12,7 @@ import { assertIndirectEvent, assertNoIndirectEvent, assertWithError} from './ut
 import { encodeCounterIncrement, encodeReverterFail, encodeWalletExecute, encodeWalletMockDeployment } from './utils/helpers/encoding'
 
 import EntryPoint from './utils/models/entry-point/EntryPoint'
-import { buildOp, UserOp} from './utils/models/user/types'
+import { UserOp, buildOp } from './utils/types'
 
 describe('EntryPoint', () => {
   let entryPoint: EntryPoint
