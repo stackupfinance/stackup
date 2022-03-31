@@ -45,7 +45,7 @@ export const TokenCard = ({
             </Text>
           </Skeleton>
 
-          <Skeleton isLoaded={!isLoading} w={isLoading && '40px'}>
+          <Skeleton isLoaded={!isLoading} w={isLoading}>
             <Text fontSize="xs" textAlign="right" color="gray.500">
               {displayUSDC(valueUsdc)}
             </Text>
