@@ -14,6 +14,9 @@ import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "@openzeppelin/contracts/utils/cryptography/SignatureChecker.sol";
 import "@openzeppelin/contracts/utils/math/Math.sol";
+
+import "../helpers/Calls.sol";
+
 import {IWallet} from "./interface/IWallet.sol";
 import {PostOpMode, IPaymaster} from "./interface/IPaymaster.sol";
 import {UserOperation} from "./library/UserOperation.sol";
@@ -28,6 +31,8 @@ contract Wallet is
   UUPSUpgradeable,
   AccessControlEnumerableUpgradeable
 {
+  using Calls for address;
+  using Calls for address payable;
   using ECDSA for bytes32;
   using WalletUserOperation for UserOperation;
 
@@ -130,10 +135,11 @@ contract Wallet is
     }
     require(nonce == userOp.nonce, "Wallet: Invalid nonce");
 
-    if (requiredPrefund != 0) {
-      // solhint-disable-next-line avoid-low-level-calls
-      (bool success, ) = entryPoint.call{value: requiredPrefund}("");
-      success;
+    if (requiredPrefund > 0) {
+      payable(entryPoint).sendValue(
+        requiredPrefund,
+        "Wallet: Failed to prefund"
+      );
     }
 
     nonce++;
@@ -144,18 +150,7 @@ contract Wallet is
     uint256 value,
     bytes calldata data
   ) external onlyEntryPoint {
-    // solhint-disable-next-line avoid-low-level-calls
-    (bool success, bytes memory result) = to.call{value: value}(data);
-
-    if (!success) {
-      // solhint-disable-next-line reason-string
-      if (result.length < 68) revert();
-      // solhint-disable-next-line no-inline-assembly
-      assembly {
-        result := add(result, 0x04)
-      }
-      revert(abi.decode(result, (string)));
-    }
+    to.callWithValue(data, value, "Wallet: Execution failed");
   }
 
   function validatePaymasterUserOp(
