@@ -38,15 +38,15 @@ export const TokenCard = ({
 
         <Spacer />
 
-        <VStack spacing="2px" alignItems="end">
+        <VStack spacing="2px" alignItems="flex-end">
           <Skeleton isLoaded={!isLoading}>
-            <Text fontSize="sm" textAlign="right" fontWeight="bold">
+            <Text fontSize="sm" fontWeight="bold">
               {displayGenericToken(valueWei, decimals, symbol)}
             </Text>
           </Skeleton>
 
-          <Skeleton isLoaded={!isLoading} w={isLoading && '40px'}>
-            <Text fontSize="xs" textAlign="right" color="gray.500">
+          <Skeleton isLoaded={!isLoading} w={isLoading}>
+            <Text fontSize="xs" color="gray.500">
               {displayUSDC(valueUsdc)}
             </Text>
           </Skeleton>
