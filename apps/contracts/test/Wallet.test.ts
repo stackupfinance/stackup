@@ -184,23 +184,19 @@ describe('Wallet', () => {
                     })
 
                     context('when the entry point reverts', () => {
-                      // TODO: AUDIT!
-
                       beforeEach('mock entry point', async () => {
                         await wallet.entryPoint.mockReceiveRevert(true)
                       })
 
-                      it.skip('reverts', async () => {
+                      it('reverts', async () => {
                         await expect(wallet.validateUserOp(op, requestId, prefund, { from })).to.be.revertedWith('ENTRY_POINT_RECEIVE_FAILED')
                       })
                     })
                   })
 
                   context('when the wallet does not have funds', () => {
-                    // TODO: AUDIT!
-
-                    it.skip('reverts', async () => {
-                      await expect(wallet.validateUserOp(op, requestId, prefund, { from })).to.be.reverted
+                    it('reverts', async () => {
+                      await expect(wallet.validateUserOp(op, requestId, prefund, { from })).to.be.revertedWith('Address: insufficient balance')
                     })
                   })
                 })
@@ -347,23 +343,19 @@ describe('Wallet', () => {
                           })
 
                           context('when the entry point reverts', () => {
-                            // TODO: AUDIT!
-
                             beforeEach('mock entry point', async () => {
                               await wallet.entryPoint.mockReceiveRevert(true)
                             })
 
-                            it.skip('reverts', async () => {
+                            it('reverts', async () => {
                               await expect(wallet.validateUserOp(op, requestId, prefund, { from })).to.be.revertedWith('ENTRY_POINT_RECEIVE_FAILED')
                             })
                           })
                         })
 
                         context('when the wallet does not have funds', () => {
-                          // TODO: AUDIT!
-
-                          it.skip('reverts', async () => {
-                            await expect(wallet.validateUserOp(op, requestId, prefund, { from })).to.be.reverted
+                          it('reverts', async () => {
+                            await expect(wallet.validateUserOp(op, requestId, prefund, { from })).to.be.revertedWith('Address: insufficient balance')
                           })
                         })
                       })
