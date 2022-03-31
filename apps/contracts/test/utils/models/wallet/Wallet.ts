@@ -7,9 +7,7 @@ import { isBigNumberish } from '../../helpers/numbers'
 import { encodeRequestId, encodeSignatures } from '../../helpers/encoding'
 
 import WalletDeployer from './WalletDeployer'
-import { UserOp } from '../user/types'
-import { WalletDeployParams } from './types'
-import { toAddress, Account, BigNumberish, TxParams} from '../../types'
+import { UserOp, WalletDeployParams, Account, BigNumberish, TxParams, toAddress } from '../../types'
 
 export default class Wallet {
   static OWNER_SIGNATURE = 0

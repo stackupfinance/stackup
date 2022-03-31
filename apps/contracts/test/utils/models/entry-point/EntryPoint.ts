@@ -7,8 +7,7 @@ import { ZERO_ADDRESS } from '../../helpers/constants'
 import { encodeRequestId, encodeWalletValidateOp } from '../../helpers/encoding'
 
 import EntryPointDeployer from './EntryPointDeployer'
-import { UserOp } from '../user/types'
-import { Account, NAry, TxParams, toArray, toBytes32, toAddress } from '../../types'
+import { Account, NAry, TxParams, UserOp, toArray, toBytes32, toAddress } from '../../types'
 
 export default class EntryPoint {
   instance: Contract

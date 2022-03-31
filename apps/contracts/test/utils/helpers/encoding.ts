@@ -1,9 +1,8 @@
 import { ethers } from 'hardhat'
 import { BigNumber, Contract } from 'ethers'
 
-import { Signature, UserOp } from '../models/user/types'
 import { getFactory, getInterface } from './contracts'
-import { Account, BigNumberish, NAry, toAddress, toAddresses, toArray } from '../types'
+import { Signature, UserOp, Account, BigNumberish, NAry, toAddress, toAddresses, toArray } from '../types'
 
 export async function encodeWalletMockDeployment(verificationReverts = false, payRefund = true): Promise<string> {
   const walletFactory = await getFactory('WalletMock')

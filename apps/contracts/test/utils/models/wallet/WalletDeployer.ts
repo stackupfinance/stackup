@@ -1,9 +1,9 @@
-import Wallet from './Wallet'
-import { WalletDeployParams } from './types'
-
 import { getSigner } from '../../helpers/signers'
 import { encodeWalletInit } from '../../helpers/encoding'
 import { deploy, instanceAt } from '../../helpers/contracts'
+
+import Wallet from './Wallet'
+import { WalletDeployParams } from '../../types'
 
 const WalletDeployer = {
   async deploy(params: WalletDeployParams): Promise<Wallet> {

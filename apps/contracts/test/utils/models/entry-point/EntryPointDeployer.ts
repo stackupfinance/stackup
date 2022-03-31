@@ -1,5 +1,6 @@
+import { deploy } from '../../helpers/contracts'
+
 import EntryPoint from './EntryPoint'
-import { deploy } from '../../helpers/contracts';
 
 const EntryPointDeployer = {
   async deploy(): Promise<EntryPoint> {
