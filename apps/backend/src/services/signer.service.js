@@ -1,7 +1,7 @@
 const { ethers } = require('ethers');
 const { wallet, contracts, constants } = require('@stackupfinance/contracts');
 const { web3 } = require('../config/config');
-const { signer, defaultPaymasterFee } = require('../utils/web3');
+const { signer, defaultPaymasterFee, getChainId, getBalance } = require('../utils/web3');
 const { functionSignatures } = require('../config/transaction');
 
 const signUserOpAsGuardian = async (userOperations) => {
@@ -44,8 +44,34 @@ const relayUserOpsToEntryPoint = async (userOperations) => {
   });
 };
 
+const getPublicStats = async () => {
+  const [chainId, relayerBalance, paymasterBalance, paymasterStake] = await Promise.all([
+    getChainId(),
+    getBalance(signer.address),
+    getBalance(web3.paymaster),
+    contracts.EntryPoint.getInstance(signer.provider).getStake(web3.paymaster),
+  ]);
+
+  return {
+    relayer: {
+      balance: {
+        [chainId]: Number.parseFloat(ethers.utils.formatEther(relayerBalance)),
+      },
+    },
+    paymaster: {
+      balance: {
+        [chainId]: Number.parseFloat(ethers.utils.formatEther(paymasterBalance)),
+      },
+      stake: {
+        [chainId]: Number.parseFloat(ethers.utils.formatEther(paymasterStake[0])),
+      },
+    },
+  };
+};
+
 module.exports = {
   signUserOpAsGuardian,
   signUserOpWithPaymaster,
   relayUserOpsToEntryPoint,
+  getPublicStats,
 };

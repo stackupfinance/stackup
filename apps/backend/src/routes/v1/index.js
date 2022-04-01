@@ -3,6 +3,7 @@ const authRoute = require('./auth.route');
 const userRoute = require('./user.route');
 const inviteRoute = require('./invite.route');
 const tokenRoute = require('./token.route');
+const statsRoute = require('./stats.route');
 
 const router = express.Router();
 
@@ -22,6 +23,10 @@ const defaultRoutes = [
   {
     path: '/tokens',
     route: tokenRoute,
+  },
+  {
+    path: '/stats',
+    route: statsRoute,
   },
 ];
 

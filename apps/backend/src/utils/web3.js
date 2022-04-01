@@ -23,6 +23,10 @@ module.exports.defaultPaymasterFee = ethers.BigNumber.from(100000);
 
 module.exports.signer = ethers.Wallet.fromMnemonic(web3.mnemonic).connect(provider);
 
+module.exports.getBalance = async (address) => {
+  return provider.getBalance(address);
+};
+
 module.exports.getChainId = async () => {
   return provider.getNetwork().then((n) => n.chainId);
 };
