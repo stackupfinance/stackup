@@ -4553,10 +4553,10 @@ amdefine@>=0.0.4:
   resolved "https://registry.npmjs.org/amdefine/-/amdefine-1.0.1.tgz"
   integrity sha1-SlKCrBZHKek2Gbz9OtFR+BfOkfU=
 
-amplitude-js@8.17.0:
-  version "8.17.0"
-  resolved "https://registry.yarnpkg.com/amplitude-js/-/amplitude-js-8.17.0.tgz#fa20e28fa3945fd0447cfa2bfadfe5a7b2c71c5f"
-  integrity sha512-9Ovx/15Wt4byNSKpesaTaNnHmwgkV9pn0BfI70qHr0iaPgEAtMV0HdA+Zs6555ODp3pvrmj5JTXDl3/DPLmNRQ==
+amplitude-js@8.18.0:
+  version "8.18.0"
+  resolved "https://registry.yarnpkg.com/amplitude-js/-/amplitude-js-8.18.0.tgz#5c709aa657f3c5dd0a2e9e21a0dec3493d8658e5"
+  integrity sha512-HIg6nQL2zMyGbRCWXEVWLu/r7pkwohWNl4OTDzYbxpP+oFsVncHoYlDXisQPNMlb4tPyWrzcIHtQQKTIC/BeNA==
   dependencies:
     "@amplitude/analytics-connector" "1.0.0"
     "@amplitude/ua-parser-js" "0.7.26"
