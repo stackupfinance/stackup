@@ -2,16 +2,12 @@
 
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/utils/Address.sol";
-
 import "../../ERC4337/interface/IPaymaster.sol";
 import "../../ERC4337/interface/IEntryPoint.sol";
 
 import {PostOpMode} from "../../ERC4337/interface/IPaymaster.sol";
 
 contract PaymasterMock is IPaymaster {
-  using Address for address;
-
   IEntryPointStakeController internal entryPoint;
 
   bool internal mockPayRefund;

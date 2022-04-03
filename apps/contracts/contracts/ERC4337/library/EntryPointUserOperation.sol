@@ -5,6 +5,9 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/utils/math/Math.sol";
+
+import "../../helpers/Calls.sol";
+
 import "../../ERC2470/ISingletonFactory.sol";
 import {IWallet} from "../interface/IWallet.sol";
 import {IPaymaster, PostOpMode} from "../interface/IPaymaster.sol";
@@ -158,29 +161,18 @@ library EntryPointUserOperation {
   }
 
   function execute(UserOperation calldata op) internal {
-    // solhint-disable-next-line avoid-low-level-calls
-    (bool success, bytes memory result) = op.sender.call{gas: op.callGas}(
-      op.callData
+    Calls.callWithGas(
+      op.sender,
+      op.callData,
+      op.callGas,
+      "EntryPoint: Execute failed"
     );
-
-    if (!success) {
-      // solhint-disable-next-line reason-string
-      if (result.length < 68) revert();
-      // solhint-disable-next-line no-inline-assembly
-      assembly {
-        result := add(result, 0x04)
-      }
-      revert(abi.decode(result, (string)));
-    }
   }
 
   function refundUnusedGas(UserOperation calldata op, uint256 actualGasCost)
     internal
   {
-    // solhint-disable-next-line avoid-low-level-calls
-    (bool success, ) = op.sender.call{
-      value: _requiredPrefund(op) - actualGasCost
-    }("");
-    require(success, "EntryPoint: Failed to refund");
+    uint256 refund = _requiredPrefund(op) - actualGasCost;
+    Calls.sendValue(payable(op.sender), refund, "EntryPoint: Failed to refund");
   }
 }

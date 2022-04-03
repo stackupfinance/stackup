@@ -3,12 +3,15 @@
 // SPDX-License-Identifier: agpl-3.0
 pragma solidity ^0.8.0;
 
+import "../helpers/Calls.sol";
+
 import {IEntryPoint, IEntryPointStakeController} from "./interface/IEntryPoint.sol";
 import {Stake} from "./library/Stake.sol";
 import {UserOperation} from "./library/UserOperation.sol";
 import {EntryPointUserOperation} from "./library/EntryPointUserOperation.sol";
 
 contract EntryPoint is IEntryPoint, IEntryPointStakeController {
+  using Calls for address payable;
   using EntryPointUserOperation for UserOperation;
 
   address public immutable create2Factory;
@@ -69,9 +72,7 @@ contract EntryPoint is IEntryPoint, IEntryPointStakeController {
       }
     }
 
-    // solhint-disable-next-line avoid-low-level-calls
-    (bool success, ) = redeemer.call{value: totalGasCost}("");
-    require(success, "EntryPoint: Failed to redeem");
+    redeemer.sendValue(totalGasCost, "EntryPoint: Failed to redeem");
   }
 
   function addStake() external payable {
@@ -101,14 +102,9 @@ contract EntryPoint is IEntryPoint, IEntryPointStakeController {
       "EntryPoint: Stake is locked"
     );
 
-    // solhint-disable-next-line avoid-low-level-calls
-    (bool success, ) = withdrawAddress.call{
-      value: _paymasterStakes[msg.sender].value
-    }("");
-
-    if (success) {
-      _paymasterStakes[msg.sender].value = 0;
-    }
+    uint256 value = _paymasterStakes[msg.sender].value;
+    _paymasterStakes[msg.sender].value = 0;
+    withdrawAddress.sendValue(value, "EntryPoint: Withdraw value failed");
   }
 
   function getStake(address paymaster)
