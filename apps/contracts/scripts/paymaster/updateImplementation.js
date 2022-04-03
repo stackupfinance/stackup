@@ -1,5 +1,5 @@
 const { ethers } = require("hardhat");
-const { contracts, wallet, constants } = require("../../lib");
+const { contracts, wallet, constants } = require("@stackupfinance/walletjs");
 
 async function main() {
   const paymaster = process.env.PAYMASTER;

@@ -1,5 +1,5 @@
 const { ethers } = require('ethers');
-const { wallet, contracts, constants } = require('@stackupfinance/contracts');
+const { wallet, contracts, constants } = require('@stackupfinance/walletjs');
 const { web3 } = require('../config/config');
 const { signer, defaultPaymasterFee, getChainId, getBalance } = require('../utils/web3');
 const { functionSignatures } = require('../config/transaction');

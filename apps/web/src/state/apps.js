@@ -3,7 +3,7 @@ import { persist } from 'zustand/middleware';
 import WalletConnect from '@walletconnect/client';
 import { nanoid } from 'nanoid';
 import { ethers } from 'ethers';
-import { wallet as walletLib } from '@stackupfinance/contracts';
+import { wallet as walletLib } from '@stackupfinance/walletjs';
 import { getChainId } from '../utils/web3';
 
 export const appsUseAuthSelector = (state) => ({

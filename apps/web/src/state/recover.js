@@ -2,7 +2,7 @@ import create from 'zustand';
 import { persist } from 'zustand/middleware';
 import axios from 'axios';
 import { nanoid } from 'nanoid';
-import { wallet, constants } from '@stackupfinance/contracts';
+import { wallet, constants } from '@stackupfinance/walletjs';
 import {
   provider,
   walletContract,

@@ -1,5 +1,5 @@
 import { ethers } from 'ethers';
-import { contracts, constants } from '@stackupfinance/contracts';
+import { contracts, constants } from '@stackupfinance/walletjs';
 import { App } from '../config';
 
 const formatter = new Intl.NumberFormat('en-US', {
