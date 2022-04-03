@@ -1,6 +1,6 @@
 import create from 'zustand';
 import { persist } from 'zustand/middleware';
-import { wallet } from '@stackupfinance/contracts';
+import { wallet } from '@stackupfinance/walletjs';
 import axios from 'axios';
 import { App } from '../config';
 import { provider, walletContract } from '../utils/web3';

@@ -1,5 +1,5 @@
 const { ethers } = require("hardhat");
-const { contracts } = require("../../lib");
+const { contracts } = require("@stackupfinance/walletjs");
 
 async function main() {
   const [signer] = await ethers.getSigners();

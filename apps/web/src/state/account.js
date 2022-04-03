@@ -1,7 +1,7 @@
 import create from 'zustand';
 import { persist } from 'zustand/middleware';
 import axios from 'axios';
-import { wallet as walletLib } from '@stackupfinance/contracts';
+import { wallet as walletLib } from '@stackupfinance/walletjs';
 import { loginMessage } from '../utils/web3';
 import { App } from '../config';
 

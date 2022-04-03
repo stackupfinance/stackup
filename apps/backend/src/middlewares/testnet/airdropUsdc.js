@@ -1,5 +1,5 @@
 const { ethers } = require('ethers');
-const { wallet } = require('@stackupfinance/contracts');
+const { wallet } = require('@stackupfinance/walletjs');
 const { web3, featureFlag } = require('../../config/config');
 const { type } = require('../../config/transaction');
 const { signer } = require('../../utils/web3');
