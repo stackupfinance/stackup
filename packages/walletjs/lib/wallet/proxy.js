@@ -1,24 +1,26 @@
-const { ethers } = require('ethers');
-const EthCrypto = require('eth-crypto');
-const AES = require('crypto-js/aes');
-const scrypt = require('scrypt-js');
-const buffer = require('scrypt-js/thirdparty/buffer');
-require('scrypt-js/thirdparty/setImmediate');
-const Utf8 = require('crypto-js/enc-utf8');
-const SingletonFactory = require('../contracts/singletonFactory');
-const EntryPoint = require('../contracts/entryPoint');
-const Wallet = require('../contracts/wallet');
-const walletProxy = require('../contracts/walletProxy');
-const userOperation = require('../constants/userOperations');
-const encodeFunctionData = require('./encodeFunctionData');
+const { ethers } = require("ethers");
+const EthCrypto = require("eth-crypto");
+const AES = require("crypto-js/aes");
+const scrypt = require("scrypt-js");
+const buffer = require("scrypt-js/thirdparty/buffer");
+require("scrypt-js/thirdparty/setImmediate");
+const Utf8 = require("crypto-js/enc-utf8");
+const SingletonFactory = require("../contracts/singletonFactory");
+const EntryPoint = require("../contracts/entryPoint");
+const Wallet = require("../contracts/wallet");
+const walletProxy = require("../contracts/walletProxy");
+const userOperation = require("../constants/userOperations");
+const encodeFunctionData = require("./encodeFunctionData");
 
 const generatePasswordKey = async (password, salt) => {
   const N = 16384,
     r = 8,
     p = 1,
     dkLen = 32;
-  const passwordBuffer = new buffer.SlowBuffer(password.normalize('NFKC'));
-  const saltBuffer = new buffer.SlowBuffer(salt.toLowerCase().normalize('NFKC'));
+  const passwordBuffer = new buffer.SlowBuffer(password.normalize("NFKC"));
+  const saltBuffer = new buffer.SlowBuffer(
+    salt.toLowerCase().normalize("NFKC")
+  );
   return scrypt.scrypt(passwordBuffer, saltBuffer, N, r, p, dkLen);
 };
 
@@ -27,7 +29,7 @@ module.exports.decryptSigner = async (wallet, password, salt) => {
     const passwordKey = await generatePasswordKey(password, salt);
     const privateKey = AES.decrypt(
       wallet.encryptedSigner,
-      Buffer.from(passwordKey).toString('hex'),
+      Buffer.from(passwordKey).toString("hex")
     ).toString(Utf8);
     if (!privateKey) return;
 
@@ -37,17 +39,25 @@ module.exports.decryptSigner = async (wallet, password, salt) => {
   }
 };
 
-module.exports.reencryptSigner = async (wallet, password, newPassword, salt) => {
+module.exports.reencryptSigner = async (
+  wallet,
+  password,
+  newPassword,
+  salt
+) => {
   try {
     const passwordKey = await generatePasswordKey(password, salt);
     const privateKey = AES.decrypt(
       wallet.encryptedSigner,
-      Buffer.from(passwordKey).toString('hex'),
+      Buffer.from(passwordKey).toString("hex")
     ).toString(Utf8);
     if (!privateKey) return;
 
     const newPasswordKey = await generatePasswordKey(newPassword, salt);
-    return AES.encrypt(privateKey, Buffer.from(newPasswordKey).toString('hex')).toString();
+    return AES.encrypt(
+      privateKey,
+      Buffer.from(newPasswordKey).toString("hex")
+    ).toString();
   } catch (error) {
     console.error(error);
   }
@@ -64,7 +74,7 @@ module.exports.initEncryptedIdentity = async (password, salt, opts = {}) => {
     initImplementation,
     initEntryPoint,
     initOwner,
-    initGuardians,
+    initGuardians
   );
   const passwordKey = await generatePasswordKey(password, salt);
   return {
@@ -75,7 +85,7 @@ module.exports.initEncryptedIdentity = async (password, salt, opts = {}) => {
     initGuardians,
     encryptedSigner: AES.encrypt(
       signer.privateKey,
-      Buffer.from(passwordKey).toString('hex'),
+      Buffer.from(passwordKey).toString("hex")
     ).toString(),
   };
 };
@@ -86,20 +96,35 @@ module.exports.isCodeDeployed = async (provider, walletAddress) => {
   return code !== userOperation.nullCode;
 };
 
-module.exports.getAddress = (initImplementation, initEntryPoint, initOwner, initGuardians) => {
+module.exports.getAddress = (
+  initImplementation,
+  initEntryPoint,
+  initOwner,
+  initGuardians
+) => {
   return ethers.utils.getCreate2Address(
     SingletonFactory.address,
     ethers.utils.formatBytes32String(userOperation.initNonce),
     ethers.utils.keccak256(
-      this.getInitCode(initImplementation, initEntryPoint, initOwner, initGuardians),
-    ),
+      this.getInitCode(
+        initImplementation,
+        initEntryPoint,
+        initOwner,
+        initGuardians
+      )
+    )
   );
 };
 
-module.exports.getInitCode = (initImplementation, initEntryPoint, initOwner, initGuardians) => {
+module.exports.getInitCode = (
+  initImplementation,
+  initEntryPoint,
+  initOwner,
+  initGuardians
+) => {
   return walletProxy.factory.getDeployTransaction(
     initImplementation,
-    encodeFunctionData.initialize(initEntryPoint, initOwner, initGuardians),
+    encodeFunctionData.initialize(initEntryPoint, initOwner, initGuardians)
   ).data;
 };
 

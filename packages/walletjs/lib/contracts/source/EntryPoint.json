@@ -29,7 +29,9 @@
       "type": "function"
     },
     {
-      "inputs": [{ "internalType": "address", "name": "paymaster", "type": "address" }],
+      "inputs": [
+        { "internalType": "address", "name": "paymaster", "type": "address" }
+      ],
       "name": "getStake",
       "outputs": [
         { "internalType": "uint256", "name": "value", "type": "uint256" },

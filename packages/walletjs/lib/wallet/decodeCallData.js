@@ -1,5 +1,5 @@
-const Wallet = require('../contracts/wallet');
-const ERC20 = require('../contracts/erc20');
+const Wallet = require("../contracts/wallet");
+const ERC20 = require("../contracts/erc20");
 
 module.exports.fromUserOperation = (userOp) => {
   return Wallet.interface.parseTransaction({ data: userOp.callData });

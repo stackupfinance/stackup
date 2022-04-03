@@ -1,5 +1,5 @@
-const { ethers } = require('ethers');
-const source = require('./source/ERC20.json');
+const { ethers } = require("ethers");
+const source = require("./source/ERC20.json");
 
 module.exports.interface = new ethers.utils.Interface(source.abi);
 

@@ -171,7 +171,9 @@
       "type": "function"
     },
     {
-      "inputs": [{ "internalType": "uint256", "name": "index", "type": "uint256" }],
+      "inputs": [
+        { "internalType": "uint256", "name": "index", "type": "uint256" }
+      ],
       "name": "getGuardian",
       "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
       "stateMutability": "view",
@@ -185,7 +187,9 @@
       "type": "function"
     },
     {
-      "inputs": [{ "internalType": "uint256", "name": "index", "type": "uint256" }],
+      "inputs": [
+        { "internalType": "uint256", "name": "index", "type": "uint256" }
+      ],
       "name": "getOwner",
       "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
       "stateMutability": "view",
@@ -199,7 +203,9 @@
       "type": "function"
     },
     {
-      "inputs": [{ "internalType": "bytes32", "name": "role", "type": "bytes32" }],
+      "inputs": [
+        { "internalType": "bytes32", "name": "role", "type": "bytes32" }
+      ],
       "name": "getRoleAdmin",
       "outputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
       "stateMutability": "view",
@@ -216,14 +222,18 @@
       "type": "function"
     },
     {
-      "inputs": [{ "internalType": "bytes32", "name": "role", "type": "bytes32" }],
+      "inputs": [
+        { "internalType": "bytes32", "name": "role", "type": "bytes32" }
+      ],
       "name": "getRoleMemberCount",
       "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
       "stateMutability": "view",
       "type": "function"
     },
     {
-      "inputs": [{ "internalType": "address", "name": "guardian", "type": "address" }],
+      "inputs": [
+        { "internalType": "address", "name": "guardian", "type": "address" }
+      ],
       "name": "grantGuardian",
       "outputs": [],
       "stateMutability": "nonpayable",
@@ -314,7 +324,9 @@
       "type": "function"
     },
     {
-      "inputs": [{ "internalType": "address", "name": "guardian", "type": "address" }],
+      "inputs": [
+        { "internalType": "address", "name": "guardian", "type": "address" }
+      ],
       "name": "revokeGuardian",
       "outputs": [],
       "stateMutability": "nonpayable",
@@ -331,14 +343,18 @@
       "type": "function"
     },
     {
-      "inputs": [{ "internalType": "bytes4", "name": "interfaceId", "type": "bytes4" }],
+      "inputs": [
+        { "internalType": "bytes4", "name": "interfaceId", "type": "bytes4" }
+      ],
       "name": "supportsInterface",
       "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
       "stateMutability": "view",
       "type": "function"
     },
     {
-      "inputs": [{ "internalType": "address", "name": "newOwner", "type": "address" }],
+      "inputs": [
+        { "internalType": "address", "name": "newOwner", "type": "address" }
+      ],
       "name": "transferOwner",
       "outputs": [],
       "stateMutability": "nonpayable",
@@ -419,7 +435,9 @@
         { "internalType": "uint256", "name": "maxcost", "type": "uint256" }
       ],
       "name": "validatePaymasterUserOp",
-      "outputs": [{ "internalType": "bytes", "name": "context", "type": "bytes" }],
+      "outputs": [
+        { "internalType": "bytes", "name": "context", "type": "bytes" }
+      ],
       "stateMutability": "view",
       "type": "function"
     },

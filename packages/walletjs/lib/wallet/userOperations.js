@@ -1,19 +1,19 @@
-const { ethers } = require('ethers');
-const EntryPoint = require('../contracts/entryPoint');
-const userOperations = require('../constants/userOperations');
-const message = require('./message');
+const { ethers } = require("ethers");
+const EntryPoint = require("../contracts/entryPoint");
+const userOperations = require("../constants/userOperations");
+const message = require("./message");
 
 module.exports.appendGuardianSignature = (userOp, signedUserOp) => {
   const ws1 =
     userOp.signature !== userOperations.nullCode
       ? ethers.utils.defaultAbiCoder.decode(
-          ['uint8', '(address signer, bytes signature)[]'],
-          userOp.signature,
+          ["uint8", "(address signer, bytes signature)[]"],
+          userOp.signature
         )
       : [undefined, []];
   const ws2 = ethers.utils.defaultAbiCoder.decode(
-    ['uint8', '(address signer, bytes signature)[]'],
-    signedUserOp.signature,
+    ["uint8", "(address signer, bytes signature)[]"],
+    signedUserOp.signature
   );
   const signatureSet = new Set([]);
   const walletSignatureValues = [
@@ -29,8 +29,8 @@ module.exports.appendGuardianSignature = (userOp, signedUserOp) => {
   return {
     ...userOp,
     signature: ethers.utils.defaultAbiCoder.encode(
-      ['uint8', '(address signer, bytes signature)[]'],
-      [1, walletSignatureValues],
+      ["uint8", "(address signer, bytes signature)[]"],
+      [1, walletSignatureValues]
     ),
   };
 };
@@ -52,9 +52,9 @@ module.exports.sign = async (signer, op) => {
           message.requestId(
             op,
             EntryPoint.address,
-            await signer.provider.getNetwork().then((n) => n.chainId),
-          ),
-        ),
+            await signer.provider.getNetwork().then((n) => n.chainId)
+          )
+        )
       ),
     },
   ];
@@ -62,8 +62,8 @@ module.exports.sign = async (signer, op) => {
   return {
     ...op,
     signature: ethers.utils.defaultAbiCoder.encode(
-      ['uint8', '(address signer, bytes signature)[]'],
-      [0, walletSignatureValues],
+      ["uint8", "(address signer, bytes signature)[]"],
+      [0, walletSignatureValues]
     ),
   };
 };
@@ -72,8 +72,8 @@ module.exports.signAsGuardian = async (signer, guardian, op) => {
   const ws =
     op.signature !== userOperations.nullCode
       ? ethers.utils.defaultAbiCoder.decode(
-          ['uint8', '(address signer, bytes signature)[]'],
-          op.signature,
+          ["uint8", "(address signer, bytes signature)[]"],
+          op.signature
         )
       : [undefined, []];
 
@@ -86,9 +86,9 @@ module.exports.signAsGuardian = async (signer, guardian, op) => {
           message.requestId(
             op,
             EntryPoint.address,
-            await signer.provider.getNetwork().then((n) => n.chainId),
-          ),
-        ),
+            await signer.provider.getNetwork().then((n) => n.chainId)
+          )
+        )
       ),
     },
   ];
@@ -96,25 +96,34 @@ module.exports.signAsGuardian = async (signer, guardian, op) => {
   return {
     ...op,
     signature: ethers.utils.defaultAbiCoder.encode(
-      ['uint8', '(address signer, bytes signature)[]'],
-      [1, walletSignatureValues],
+      ["uint8", "(address signer, bytes signature)[]"],
+      [1, walletSignatureValues]
     ),
   };
 };
 
-module.exports.signPaymasterData = async (signer, paymaster, fee, token, priceFeed, op) => {
+module.exports.signPaymasterData = async (
+  signer,
+  paymaster,
+  fee,
+  token,
+  priceFeed,
+  op
+) => {
   const userOp = { ...op, paymaster };
 
   return {
     ...userOp,
     paymasterData: ethers.utils.defaultAbiCoder.encode(
-      ['uint256', 'address', 'address', 'bytes'],
+      ["uint256", "address", "address", "bytes"],
       [
         fee,
         token,
         priceFeed,
-        await signer.signMessage(message.paymasterData(userOp, fee, token, priceFeed)),
-      ],
+        await signer.signMessage(
+          message.paymasterData(userOp, fee, token, priceFeed)
+        ),
+      ]
     ),
   };
 };
