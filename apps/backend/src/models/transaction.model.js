@@ -7,10 +7,12 @@ const lineItem = {
     type: String,
     trim: true,
     required: true,
+    index: true,
   },
   to: {
     type: String,
     trim: true,
+    index: true,
   },
   value: {
     type: String,
