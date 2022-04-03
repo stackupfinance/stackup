@@ -26,7 +26,7 @@ $ yarn install
 
 Next we'll have to setup some app specific environment variables in order to get everything working end to end. See the `README.md` files in the following directories for more details.
 
-- [Contracts](./apps/contracts) - A collection of solidity smart contracts and JS library for interacting with ERC-4337 accounts.
+- [Contracts](./apps/contracts) - A collection of solidity smart contracts for Stackup.
 - [Backend](./apps/backend) - REST API for supporting frontend apps.
 - [Web](./apps/web) - A responsive web frontend.
 
