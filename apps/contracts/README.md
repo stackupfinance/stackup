@@ -1,6 +1,6 @@
 # @stackupfinance/contracts
 
-A collection of solidity smart contracts and JS library for interacting with ERC-4337 accounts.
+A collection of solidity smart contracts for Stackup.
 
 ## App setup
 
@@ -50,20 +50,4 @@ Once you do that you can run the following scripts to stake 1 `MATIC` to the Ent
 
 ```bash
 $ yarn workspace @stackupfinance/contracts run paymaster:mumbai:addStake
-```
-
-## JS library
-
-A library of helper functions for interacting with ERC-4337 accounts.
-
-### Installation
-
-```bash
-yarn add @stackupfinance/contracts
-```
-
-### Usage
-
-```
-TBA
 ```

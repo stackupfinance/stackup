@@ -1,4 +1,4 @@
-name: Contracts
+name: WalletJS
 
 on:
   push:
