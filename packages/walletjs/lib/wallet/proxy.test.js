@@ -25,7 +25,7 @@ describe("Wallet proxy", () => {
   });
 
   describe("decrypting signer", () => {
-    it("returns the signer with the correct password", async () => {
+    it("returns the signer when password is correct", async () => {
       const wallet = await initEncryptedIdentity("password", "salt");
       const signer = await decryptSigner(wallet, "password", "salt");
 
