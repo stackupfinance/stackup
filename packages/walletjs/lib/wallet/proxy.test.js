@@ -9,7 +9,7 @@ const { Wallet, EntryPoint } = require("../contracts");
 const ADDRESS_REGEX = /^0x[a-fA-F0-9]{40}$/;
 
 describe("Wallet proxy", () => {
-  describe("create identity", () => {
+  describe("create initial identity", () => {
     it("has all the correct fields", async () => {
       const wallet = await initEncryptedIdentity("password", "salt", {
         guardians: [ethers.constants.AddressZero],
