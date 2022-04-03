@@ -1,9 +1,6 @@
 const { ethers } = require("ethers");
 const SingletonFactory = require("./singletonFactory");
-const source =
-  process.env.NODE_ENV === "test"
-    ? require("../../artifacts/contracts/ERC4337/Wallet.sol/Wallet.json")
-    : require("./source/Wallet.json");
+const source = require("./source/Wallet.json");
 
 module.exports.deploySalt = ethers.utils.formatBytes32String(0);
 

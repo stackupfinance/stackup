@@ -1,9 +1,6 @@
 const { ethers } = require("ethers");
 const SingletonFactory = require("./singletonFactory");
-const source =
-  process.env.NODE_ENV === "test"
-    ? require("../../artifacts/contracts/ERC4337/EntryPoint.sol/EntryPoint.json")
-    : require("./source/EntryPoint.json");
+const source = require("./source/EntryPoint.json");
 
 module.exports.deploySalt = ethers.utils.formatBytes32String(0);
 
