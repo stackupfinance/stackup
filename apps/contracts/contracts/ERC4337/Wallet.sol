@@ -57,6 +57,12 @@ contract Wallet is
     // solhint-disable-previous-line no-empty-blocks
   }
 
+  /**
+   * @dev Initializes the wallet, this method can only be called only once
+   * @param _entryPoint Address of the entry point to be trusted
+   * @param _owner Address that will be granted with the OWNER_ROLE (admin role)
+   * @param _guardians Addresses that will be granted with the GUARDIANS_ROLE
+   */
   function initialize(
     address _entryPoint,
     address _owner,
@@ -74,7 +80,7 @@ contract Wallet is
     _setRoleAdmin(OWNER_ROLE, OWNER_ROLE);
     _grantRole(OWNER_ROLE, _owner);
 
-    // Then we set `OWNER_ROLE` as admin role for `GUARDIAN_ROLE` as well.
+    // Then we set `OWNER_ROLE` as the admin role for `GUARDIAN_ROLE` as well.
     _setRoleAdmin(GUARDIAN_ROLE, OWNER_ROLE);
     for (uint256 i = 0; i < _guardians.length; i++) {
       require(_owner != _guardians[i], "Wallet: Owner cannot be guardian");
@@ -82,16 +88,34 @@ contract Wallet is
     }
   }
 
-  // solhint-disable-next-line no-empty-blocks
-  receive() external payable {}
+  /**
+   * @dev Allows receiving ETH transfers
+   */
+  receive() external payable {
+    // solhint-disable-previous-line no-empty-blocks
+  }
 
-  // solhint-disable-next-line no-empty-blocks
-  function _authorizeUpgrade(address) internal view override onlyEntryPoint {}
+  /**
+   * @dev Upgrades authorization mechanism triggered by `upgradeTo` and `upgradeToAndCall`
+   * Reverts if the sender is not the entry point
+   */
+  function _authorizeUpgrade(address) internal view override onlyEntryPoint {
+    // solhint-disable-previous-line no-empty-blocks
+  }
 
-  function getCurrentImplementation() public view returns (address) {
+  /**
+   * @dev Tells the address of the current implementation being proxied
+   */
+  function getCurrentImplementation() external view returns (address) {
     return _getImplementation();
   }
 
+  /**
+   * @dev Verifies the operation’s signature, and pays the fee if the wallet considers the operation valid
+   * @param userOp operation to be validated
+   * @param requestId identifier computed as keccak256(op, entryPoint, chainId)
+   * @param requiredPrefund amount to be paid to the entry point in wei, or zero if there is a paymaster involved
+   */
   function validateUserOp(
     UserOperation calldata userOp,
     bytes32 requestId,
@@ -146,6 +170,12 @@ contract Wallet is
     nonce++;
   }
 
+  /**
+   * @dev Executes an operation
+   * @param to address to be called
+   * @param value wei to be sent in the call
+   * @param data calldata to be included in the call
+   */
   function executeUserOp(
     address to,
     uint256 value,
@@ -154,6 +184,12 @@ contract Wallet is
     to.callWithValue(data, value, "Wallet: Execution failed");
   }
 
+  /**
+   * @dev Verifies the paymaster data and pays the fee if the paymaster considers the operation valid
+   * @param userOp operation to be validated
+   * @param maxcost amount to be paid to the entry point in wei
+   * @return context including the payment conditions: sender, token, exchange rate, and fees
+   */
   function validatePaymasterUserOp(
     UserOperation calldata userOp,
     uint256 maxcost
@@ -179,6 +215,12 @@ contract Wallet is
     return userOp.paymasterContext();
   }
 
+  /**
+   * @dev Executes the paymaster's payment conditions
+   * @param mode tells whether the op succeeded, reverted, or if the op succeeded but cause the postOp to revert
+   * @param context payment conditions signed by the paymaster in `validatePaymasterUserOp`
+   * @param actualGasCost amount to be paid to the entry point in wei
+   */
   function postOp(
     PostOpMode mode,
     bytes calldata context,
@@ -203,36 +245,60 @@ contract Wallet is
     );
   }
 
+  /**
+   * @dev Tells how many owners the wallet has
+   */
   function getOwnerCount() external view returns (uint256) {
     return getRoleMemberCount(OWNER_ROLE);
   }
 
+  /**
+   * @dev Tells the address of an owner at a particular index
+   */
   function getOwner(uint256 index) external view returns (address) {
     return getRoleMember(OWNER_ROLE, index);
   }
 
+  /**
+   * @dev Tells how many guardians the wallet has
+   */
   function getGuardianCount() external view returns (uint256) {
     return getRoleMemberCount(GUARDIAN_ROLE);
   }
 
+  /**
+   * @dev Tells the address of a guardian at a particular index
+   */
   function getGuardian(uint256 index) external view returns (address) {
     return getRoleMember(GUARDIAN_ROLE, index);
   }
 
+  /**
+   * @dev Grants guardian permissions to an account
+   */
   function grantGuardian(address guardian) external onlyEntryPoint {
     require(!hasRole(OWNER_ROLE, guardian), "Wallet: Owner cannot be guardian");
     _grantRole(GUARDIAN_ROLE, guardian);
   }
 
+  /**
+   * @dev Revokes guardian permissions to an account
+   */
   function revokeGuardian(address guardian) external onlyEntryPoint {
     _revokeRole(GUARDIAN_ROLE, guardian);
   }
 
+  /**
+   * @dev Transfers owner permissions from the owner at index #0 to another account
+   */
   function transferOwner(address newOwner) external onlyEntryPoint {
     _revokeRole(OWNER_ROLE, getRoleMember(OWNER_ROLE, 0));
     _grantRole(OWNER_ROLE, newOwner);
   }
 
+  /**
+   * @dev Tells whether the signature provided is valid for the provided data
+   */
   function isValidSignature(bytes32 hash, bytes memory signature)
     public
     view
