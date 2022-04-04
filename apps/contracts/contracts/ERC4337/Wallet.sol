@@ -187,7 +187,7 @@ contract Wallet is
    * @dev Verifies the paymaster data and pays the fee if the paymaster considers the operation valid
    * @param userOp operation to be validated
    * @param maxcost amount to be paid to the entry point in wei
-   * @returns context including the payment conditions: sender, token, exchange rate, and fees
+   * @return context including the payment conditions: sender, token, exchange rate, and fees
    */
   function validatePaymasterUserOp(
     UserOperation calldata userOp,
@@ -245,7 +245,7 @@ contract Wallet is
   }
 
   /**
-   * @dev Tells the how many owners the wallet has
+   * @dev Tells how many owners the wallet has
    */
   function getOwnerCount() external view returns (uint256) {
     return getRoleMemberCount(OWNER_ROLE);
@@ -259,7 +259,7 @@ contract Wallet is
   }
 
   /**
-   * @dev Tells the how many guardians the wallet has
+   * @dev Tells how many guardians the wallet has
    */
   function getGuardianCount() external view returns (uint256) {
     return getRoleMemberCount(GUARDIAN_ROLE);
