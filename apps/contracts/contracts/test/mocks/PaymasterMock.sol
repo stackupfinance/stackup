@@ -5,7 +5,7 @@ pragma solidity ^0.8.0;
 import "../../ERC4337/interface/IPaymaster.sol";
 import "../../ERC4337/interface/IEntryPoint.sol";
 
-import {PostOpMode} from "../../ERC4337/interface/IPaymaster.sol";
+import { PostOpMode } from "../../ERC4337/interface/IPaymaster.sol";
 
 contract PaymasterMock is IPaymaster {
   IEntryPointStakeController internal entryPoint;
@@ -34,7 +34,7 @@ contract PaymasterMock is IPaymaster {
   }
 
   function stake() external payable {
-    entryPoint.addStake{value: msg.value}();
+    entryPoint.addStake{ value: msg.value }();
   }
 
   function lock() external {
@@ -49,12 +49,7 @@ contract PaymasterMock is IPaymaster {
     entryPoint.withdrawStake(payable(address(this)));
   }
 
-  function validatePaymasterUserOp(UserOperation calldata, uint256)
-    external
-    view
-    override
-    returns (bytes memory)
-  {
+  function validatePaymasterUserOp(UserOperation calldata, uint256) external view override returns (bytes memory) {
     require(!mockRevertVerification, "PAYMASTER_VERIFICATION_FAILED");
     return new bytes(0);
   }

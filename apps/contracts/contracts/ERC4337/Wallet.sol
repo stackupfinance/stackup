@@ -17,20 +17,13 @@ import "@openzeppelin/contracts/utils/math/Math.sol";
 
 import "../helpers/Calls.sol";
 
-import {IWallet} from "./interface/IWallet.sol";
-import {PostOpMode, IPaymaster} from "./interface/IPaymaster.sol";
-import {UserOperation} from "./library/UserOperation.sol";
-import {WalletUserOperation} from "./library/WalletUserOperation.sol";
-import {WalletSignature, WalletSignatureMode} from "./library/WalletSignature.sol";
+import { IWallet } from "./interface/IWallet.sol";
+import { PostOpMode, IPaymaster } from "./interface/IPaymaster.sol";
+import { UserOperation } from "./library/UserOperation.sol";
+import { WalletUserOperation } from "./library/WalletUserOperation.sol";
+import { WalletSignature, WalletSignatureMode } from "./library/WalletSignature.sol";
 
-contract Wallet is
-  IWallet,
-  IPaymaster,
-  IERC1271,
-  Initializable,
-  UUPSUpgradeable,
-  AccessControlEnumerableUpgradeable
-{
+contract Wallet is IWallet, IPaymaster, IERC1271, Initializable, UUPSUpgradeable, AccessControlEnumerableUpgradeable {
   using Calls for address;
   using Calls for address payable;
   using ECDSA for bytes32;
@@ -125,22 +118,13 @@ contract Wallet is
 
     if (ws.mode == WalletSignatureMode.owner) {
       require(
-        hasRole(
-          OWNER_ROLE,
-          requestId.toEthSignedMessageHash().recover(ws.values[0].signature)
-        ),
+        hasRole(OWNER_ROLE, requestId.toEthSignedMessageHash().recover(ws.values[0].signature)),
         "Wallet: Invalid owner sig"
       );
     } else {
-      require(
-        userOp.isGuardianCallDataOK(requiredPrefund),
-        "Wallet: Invalid guardian action"
-      );
+      require(userOp.isGuardianCallDataOK(requiredPrefund), "Wallet: Invalid guardian action");
 
-      require(
-        ws.values.length >= Math.ceilDiv(getRoleMemberCount(GUARDIAN_ROLE), 2),
-        "Wallet: Insufficient guardians"
-      );
+      require(ws.values.length >= Math.ceilDiv(getRoleMemberCount(GUARDIAN_ROLE), 2), "Wallet: Insufficient guardians");
 
       for (uint256 i = 0; i < ws.values.length; i++) {
         require(
@@ -152,19 +136,13 @@ contract Wallet is
           "Wallet: Invalid guardian sig"
         );
 
-        require(
-          hasRole(GUARDIAN_ROLE, ws.values[i].signer),
-          "Wallet: Not a guardian"
-        );
+        require(hasRole(GUARDIAN_ROLE, ws.values[i].signer), "Wallet: Not a guardian");
       }
     }
     require(nonce == userOp.nonce, "Wallet: Invalid nonce");
 
     if (requiredPrefund > 0) {
-      payable(entryPoint).sendValue(
-        requiredPrefund,
-        "Wallet: Failed to prefund"
-      );
+      payable(entryPoint).sendValue(requiredPrefund, "Wallet: Failed to prefund");
     }
 
     nonce++;
@@ -190,14 +168,12 @@ contract Wallet is
    * @param maxcost amount to be paid to the entry point in wei
    * @return context including the payment conditions: sender, token, exchange rate, and fees
    */
-  function validatePaymasterUserOp(
-    UserOperation calldata userOp,
-    uint256 maxcost
-  ) external view returns (bytes memory context) {
-    require(
-      hasRole(OWNER_ROLE, userOp.paymasterSigner()),
-      "Paymaster: Invalid signature"
-    );
+  function validatePaymasterUserOp(UserOperation calldata userOp, uint256 maxcost)
+    external
+    view
+    returns (bytes memory context)
+  {
+    require(hasRole(OWNER_ROLE, userOp.paymasterSigner()), "Paymaster: Invalid signature");
 
     // Requirements:
     //  1. Sender allowed enough tokens to the paymaster, and it is either not calling approve or increasing allowance
@@ -205,8 +181,7 @@ contract Wallet is
     //  3. Was already approved in previous ops (paymaster fee is set to zero)
 
     require(
-      (userOp.requiredTokenIsApproved(maxcost) &&
-        userOp.tokenAllowanceRemainsOK(maxcost)) ||
+      (userOp.requiredTokenIsApproved(maxcost) && userOp.tokenAllowanceRemainsOK(maxcost)) ||
         userOp.tokenAllowanceWillBeOK(maxcost) ||
         userOp.requiredTokenIsApprovedInPrevOps(),
       "Paymaster: Not approved"
@@ -229,19 +204,16 @@ contract Wallet is
     // Mode not used for this implementation.
     (mode);
 
-    (
-      address sender,
-      address erc20Token,
-      uint256 exchangeRate,
-      uint256 fee
-    ) = abi.decode(context, (address, address, uint256, uint256));
+    (address sender, address erc20Token, uint256 exchangeRate, uint256 fee) = abi.decode(
+      context,
+      (address, address, uint256, uint256)
+    );
     uint256 scaleFactor = 10**IERC20Metadata(erc20Token).decimals();
 
     IERC20(erc20Token).transferFrom(
       sender,
       address(this),
-      ((actualGasCost * exchangeRate * scaleFactor) / (10**18 * scaleFactor)) +
-        fee
+      ((actualGasCost * exchangeRate * scaleFactor) / (10**18 * scaleFactor)) + fee
     );
   }
 
@@ -299,16 +271,8 @@ contract Wallet is
   /**
    * @dev Tells whether the signature provided is valid for the provided data
    */
-  function isValidSignature(bytes32 hash, bytes memory signature)
-    public
-    view
-    returns (bytes4)
-  {
-    require(
-      hasRole(OWNER_ROLE, hash.recover(signature)),
-      "Wallet: Invalid signature"
-    );
-
+  function isValidSignature(bytes32 hash, bytes memory signature) public view returns (bytes4) {
+    require(hasRole(OWNER_ROLE, hash.recover(signature)), "Wallet: Invalid signature");
     return IERC1271.isValidSignature.selector;
   }
 }

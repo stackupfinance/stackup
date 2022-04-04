@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/utils/Address.sol";
 
 import "../../ERC4337/interface/IWallet.sol";
 
-import {UserOperation} from "../../ERC4337/library/UserOperation.sol";
+import { UserOperation } from "../../ERC4337/library/UserOperation.sol";
 
 contract WalletMock is IWallet {
   using Address for address;
@@ -14,11 +14,7 @@ contract WalletMock is IWallet {
   bool internal mockPayRefund;
   bool internal mockRevertVerification;
 
-  event ValidateUserOp(
-    UserOperation op,
-    bytes32 requestId,
-    uint256 requiredPrefund
-  );
+  event ValidateUserOp(UserOperation op, bytes32 requestId, uint256 requiredPrefund);
 
   constructor(bool _mockRevertVerification, bool _mockPayRefund) {
     mockPayRefund = _mockPayRefund;

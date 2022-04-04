@@ -16,10 +16,7 @@ contract SingletonFactory {
    * @param salt Arbitrary value to modify resulting address.
    * @return createdContract Created contract address.
    */
-  function deploy(bytes memory initCode, bytes32 salt)
-    public
-    returns (address payable createdContract)
-  {
+  function deploy(bytes memory initCode, bytes32 salt) public returns (address payable createdContract) {
     // solhint-disable-next-line no-inline-assembly
     assembly {
       createdContract := create2(0, add(initCode, 0x20), mload(initCode), salt)
