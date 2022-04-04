@@ -15,7 +15,5 @@ interface ISingletonFactory {
    * @param _salt Arbitrary value to modify resulting address.
    * @return createdContract Created contract address.
    */
-  function deploy(bytes memory _initCode, bytes32 _salt)
-    external
-    returns (address payable createdContract);
+  function deploy(bytes memory _initCode, bytes32 _salt) external returns (address payable createdContract);
 }

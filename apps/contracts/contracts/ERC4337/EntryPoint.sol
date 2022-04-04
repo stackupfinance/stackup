@@ -5,10 +5,10 @@ pragma solidity ^0.8.0;
 
 import "../helpers/Calls.sol";
 
-import {IEntryPoint, IEntryPointStakeController} from "./interface/IEntryPoint.sol";
-import {Stake} from "./library/Stake.sol";
-import {UserOperation} from "./library/UserOperation.sol";
-import {EntryPointUserOperation} from "./library/EntryPointUserOperation.sol";
+import { IEntryPoint, IEntryPointStakeController } from "./interface/IEntryPoint.sol";
+import { Stake } from "./library/Stake.sol";
+import { UserOperation } from "./library/UserOperation.sol";
+import { EntryPointUserOperation } from "./library/EntryPointUserOperation.sol";
 
 contract EntryPoint is IEntryPoint, IEntryPointStakeController {
   using Calls for address payable;
@@ -24,9 +24,7 @@ contract EntryPoint is IEntryPoint, IEntryPointStakeController {
     create2Factory = _create2Factory;
   }
 
-  function handleOps(UserOperation[] calldata ops, address payable redeemer)
-    external
-  {
+  function handleOps(UserOperation[] calldata ops, address payable redeemer) external {
     uint256 totalGasCost;
     uint256[] memory verificationGas = new uint256[](ops.length);
     bytes[] memory contexts = new bytes[](ops.length);
@@ -40,9 +38,7 @@ contract EntryPoint is IEntryPoint, IEntryPointStakeController {
       }
 
       if (ops[i].hasPaymaster()) {
-        _paymasterStakes[ops[i].paymaster].value = ops[i].verifyPaymasterStake(
-          _paymasterStakes[ops[i].paymaster]
-        );
+        _paymasterStakes[ops[i].paymaster].value = ops[i].verifyPaymasterStake(_paymasterStakes[ops[i].paymaster]);
         contexts[i] = ops[i].validatePaymasterUserOp();
       }
 
@@ -62,11 +58,10 @@ contract EntryPoint is IEntryPoint, IEntryPointStakeController {
 
       if (ops[i].hasPaymaster()) {
         ops[i].paymasterPostOp(contexts[i], ops[i].gasCost(actualGas));
-        _paymasterStakes[ops[i].paymaster].value = ops[i]
-          .finalizePaymasterStake(
-            _paymasterStakes[ops[i].paymaster],
-            ops[i].gasCost(actualGas)
-          );
+        _paymasterStakes[ops[i].paymaster].value = ops[i].finalizePaymasterStake(
+          _paymasterStakes[ops[i].paymaster],
+          ops[i].gasCost(actualGas)
+        );
       } else {
         ops[i].refundUnusedGas(ops[i].gasCost(actualGas));
       }
@@ -86,21 +81,15 @@ contract EntryPoint is IEntryPoint, IEntryPointStakeController {
   }
 
   function unlockStake() external {
-    require(
-      // solhint-disable-next-line not-rely-on-time
-      _paymasterStakes[msg.sender].lockExpiryTime <= block.timestamp,
-      "EntryPoint: Lock not expired"
-    );
+    // solhint-disable-next-line not-rely-on-time
+    require(_paymasterStakes[msg.sender].lockExpiryTime <= block.timestamp, "EntryPoint: Lock not expired");
 
     _paymasterStakes[msg.sender].lockExpiryTime = 0;
     _paymasterStakes[msg.sender].isLocked = false;
   }
 
   function withdrawStake(address payable withdrawAddress) external {
-    require(
-      !_paymasterStakes[msg.sender].isLocked,
-      "EntryPoint: Stake is locked"
-    );
+    require(!_paymasterStakes[msg.sender].isLocked, "EntryPoint: Stake is locked");
 
     uint256 value = _paymasterStakes[msg.sender].value;
     _paymasterStakes[msg.sender].value = 0;
@@ -123,35 +112,16 @@ contract EntryPoint is IEntryPoint, IEntryPointStakeController {
     );
   }
 
-  function getSenderAddress(bytes memory initCode, uint256 salt)
-    external
-    view
-    returns (address)
-  {
-    bytes32 data = keccak256(
-      abi.encodePacked(
-        bytes1(0xff),
-        address(create2Factory),
-        salt,
-        keccak256(initCode)
-      )
-    );
+  function getSenderAddress(bytes memory initCode, uint256 salt) external view returns (address) {
+    bytes32 data = keccak256(abi.encodePacked(bytes1(0xff), address(create2Factory), salt, keccak256(initCode)));
     return address(uint160(uint256(data)));
   }
 
-  function getGasPrice(UserOperation calldata op)
-    external
-    view
-    returns (uint256)
-  {
+  function getGasPrice(UserOperation calldata op) external view returns (uint256) {
     return EntryPointUserOperation._gasPrice(op);
   }
 
-  function getRequiredPrefund(UserOperation calldata op)
-    external
-    view
-    returns (uint256)
-  {
+  function getRequiredPrefund(UserOperation calldata op) external view returns (uint256) {
     return EntryPointUserOperation._requiredPrefund(op);
   }
 }

@@ -3,11 +3,10 @@
 // SPDX-License-Identifier: agpl-3.0
 pragma solidity ^0.8.0;
 
-import {UserOperation} from "../library/UserOperation.sol";
+import { UserOperation } from "../library/UserOperation.sol";
 
 interface IEntryPoint {
-  function handleOps(UserOperation[] calldata ops, address payable redeemer)
-    external;
+  function handleOps(UserOperation[] calldata ops, address payable redeemer) external;
 
   // function simulateWalletValidation(UserOperation calldata userOp)
   //   external

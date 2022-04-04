@@ -21,7 +21,7 @@ library Calls {
     string memory errorMessage
   ) internal {
     require(address(this).balance >= value, "Address: insufficient balance");
-    (bool success, bytes memory returndata) = recipient.call{value: value}("");
+    (bool success, bytes memory returndata) = recipient.call{ value: value }("");
     Address.verifyCallResult(success, returndata, errorMessage);
   }
 
@@ -37,7 +37,7 @@ library Calls {
     string memory errorMessage
   ) internal returns (bytes memory) {
     require(Address.isContract(target), "Address: call to non-contract");
-    (bool success, bytes memory returndata) = target.call{gas: gas}(data);
+    (bool success, bytes memory returndata) = target.call{ gas: gas }(data);
     return Address.verifyCallResult(success, returndata, errorMessage);
   }
 

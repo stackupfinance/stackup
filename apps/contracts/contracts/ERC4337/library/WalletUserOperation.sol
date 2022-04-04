@@ -9,8 +9,8 @@ import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "@openzeppelin/contracts/utils/cryptography/SignatureChecker.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 import "solidity-bytes-utils/contracts/BytesLib.sol";
-import {UserOperation} from "./UserOperation.sol";
-import {WalletSignature, WalletSignatureMode, WalletSignatureValue} from "./WalletSignature.sol";
+import { UserOperation } from "./UserOperation.sol";
+import { WalletSignature, WalletSignatureMode, WalletSignatureValue } from "./WalletSignature.sol";
 
 struct WalletCallData {
   address to;
@@ -28,15 +28,8 @@ struct PaymasterData {
 library WalletUserOperation {
   using ECDSA for bytes32;
 
-  function _decodeWalletCallData(UserOperation calldata op)
-    internal
-    pure
-    returns (WalletCallData memory)
-  {
-    (address to, uint256 value, bytes memory data) = abi.decode(
-      op.callData[4:],
-      (address, uint256, bytes)
-    );
+  function _decodeWalletCallData(UserOperation calldata op) internal pure returns (WalletCallData memory) {
+    (address to, uint256 value, bytes memory data) = abi.decode(op.callData[4:], (address, uint256, bytes));
 
     WalletCallData memory _data;
     _data.to = to;
@@ -45,17 +38,11 @@ library WalletUserOperation {
     return _data;
   }
 
-  function _decodePaymasterData(UserOperation calldata op)
-    internal
-    pure
-    returns (PaymasterData memory)
-  {
-    (
-      uint256 fee,
-      address erc20Token,
-      address dataFeed,
-      bytes memory signature
-    ) = abi.decode(op.paymasterData, (uint256, address, address, bytes));
+  function _decodePaymasterData(UserOperation calldata op) internal pure returns (PaymasterData memory) {
+    (uint256 fee, address erc20Token, address dataFeed, bytes memory signature) = abi.decode(
+      op.paymasterData,
+      (uint256, address, address, bytes)
+    );
 
     PaymasterData memory data;
     data.fee = fee;
@@ -65,89 +52,52 @@ library WalletUserOperation {
     return data;
   }
 
-  function _requiredTokenExchangeRate(UserOperation calldata op)
-    internal
-    view
-    returns (uint256)
-  {
+  function _requiredTokenExchangeRate(UserOperation calldata op) internal view returns (uint256) {
     PaymasterData memory pd = _decodePaymasterData(op);
-    (, int256 price, , , ) = AggregatorV3Interface(pd.dataFeed)
-      .latestRoundData();
+    (, int256 price, , , ) = AggregatorV3Interface(pd.dataFeed).latestRoundData();
 
     // Chainlink datafeeds return either 8 or 18 decimals
     // However tokens like USDC only have 6 decimals
     // We need to return a rate that matches the decimals of the ERC20 token
     return
-      uint256(price) /
-      10 **
-        (AggregatorV3Interface(pd.dataFeed).decimals() -
-          IERC20Metadata(pd.erc20Token).decimals());
+      uint256(price) / 10**(AggregatorV3Interface(pd.dataFeed).decimals() - IERC20Metadata(pd.erc20Token).decimals());
   }
 
-  function _requiredTokenFee(UserOperation calldata op, uint256 maxcost)
-    internal
-    view
-    returns (uint256)
-  {
+  function _requiredTokenFee(UserOperation calldata op, uint256 maxcost) internal view returns (uint256) {
     PaymasterData memory pd = _decodePaymasterData(op);
     uint256 scaleFactor = 10**IERC20Metadata(pd.erc20Token).decimals();
-    uint256 tokenFee = (maxcost *
-      _requiredTokenExchangeRate(op) *
-      scaleFactor) / (10**18 * scaleFactor);
-
+    uint256 tokenFee = (maxcost * _requiredTokenExchangeRate(op) * scaleFactor) / (10**18 * scaleFactor);
     return tokenFee + pd.fee;
   }
 
-  function _isCallingExternalContract(UserOperation calldata op)
-    internal
-    pure
-    returns (bool)
-  {
-    return
-      bytes4(op.callData[:4]) ==
-      bytes4(keccak256(bytes("executeUserOp(address,uint256,bytes)")));
+  function _isCallingExternalContract(UserOperation calldata op) internal pure returns (bool) {
+    return bytes4(op.callData[:4]) == bytes4(keccak256(bytes("executeUserOp(address,uint256,bytes)")));
   }
 
-  function _isCallingTokenApprove(UserOperation calldata op)
-    internal
-    pure
-    returns (bool)
-  {
+  function _isCallingTokenApprove(UserOperation calldata op) internal pure returns (bool) {
     if (!_isCallingExternalContract(op)) return false;
 
     WalletCallData memory wcd = _decodeWalletCallData(op);
     PaymasterData memory pd = _decodePaymasterData(op);
-
     return
       wcd.to == pd.erc20Token &&
-      bytes4(BytesLib.slice(wcd.data, 0, 4)) ==
-      bytes4(keccak256(bytes("approve(address,uint256)")));
+      bytes4(BytesLib.slice(wcd.data, 0, 4)) == bytes4(keccak256(bytes("approve(address,uint256)")));
   }
 
-  function _hasOKTokenApproveValue(UserOperation calldata op, uint256 maxcost)
-    internal
-    view
-    returns (bool)
-  {
+  function _hasOKTokenApproveValue(UserOperation calldata op, uint256 maxcost) internal view returns (bool) {
     if (!_isCallingExternalContract(op)) return false;
 
     WalletCallData memory wcd = _decodeWalletCallData(op);
-    (address spender, uint256 value) = abi.decode(
-      BytesLib.slice(wcd.data, 4, wcd.data.length - 4),
-      (address, uint256)
-    );
-
+    (address spender, uint256 value) = abi.decode(BytesLib.slice(wcd.data, 4, wcd.data.length - 4), (address, uint256));
     // TODO: AUDIT! review spender
     return spender == op.paymaster && value >= _requiredTokenFee(op, maxcost);
   }
 
-  function decodeWalletSignature(UserOperation calldata op)
-    internal
-    pure
-    returns (WalletSignature memory)
-  {
-    (WalletSignatureMode mode, WalletSignatureValue[] memory values) = abi
-      .decode(op.signature, (WalletSignatureMode, WalletSignatureValue[]));
+  function decodeWalletSignature(UserOperation calldata op) internal pure returns (WalletSignature memory) {
+    (WalletSignatureMode mode, WalletSignatureValue[] memory values) = abi.decode(
+      op.signature,
+      (WalletSignatureMode, WalletSignatureValue[])
+    );
 
     WalletSignature memory data;
     data.mode = mode;
@@ -155,11 +105,7 @@ library WalletUserOperation {
     return data;
   }
 
-  function isGuardianCallDataOK(UserOperation calldata op, uint256 maxcost)
-    internal
-    view
-    returns (bool)
-  {
+  function isGuardianCallDataOK(UserOperation calldata op, uint256 maxcost) internal view returns (bool) {
     if (op.callData.length == 0) return false;
 
     // Guardians can only do the following action:
@@ -167,15 +113,10 @@ library WalletUserOperation {
     // 2. Transfer owner for social recovery
     return
       (op.paymasterData.length != 0 && tokenAllowanceWillBeOK(op, maxcost)) ||
-      (bytes4(op.callData[:4]) ==
-        bytes4(keccak256(bytes("transferOwner(address)"))));
+      (bytes4(op.callData[:4]) == bytes4(keccak256(bytes("transferOwner(address)"))));
   }
 
-  function paymasterSigner(UserOperation calldata op)
-    internal
-    pure
-    returns (address)
-  {
+  function paymasterSigner(UserOperation calldata op) internal pure returns (address) {
     PaymasterData memory pd = _decodePaymasterData(op);
     return
       keccak256(
@@ -195,61 +136,30 @@ library WalletUserOperation {
       ).toEthSignedMessageHash().recover(pd.signature);
   }
 
-  function requiredTokenIsApproved(UserOperation calldata op, uint256 maxcost)
-    internal
-    view
-    returns (bool)
-  {
+  function requiredTokenIsApproved(UserOperation calldata op, uint256 maxcost) internal view returns (bool) {
     PaymasterData memory pd = _decodePaymasterData(op);
-
-    return
-      IERC20(pd.erc20Token).allowance(op.sender, address(this)) >=
-      _requiredTokenFee(op, maxcost);
+    return IERC20(pd.erc20Token).allowance(op.sender, address(this)) >= _requiredTokenFee(op, maxcost);
   }
 
-  function tokenAllowanceRemainsOK(UserOperation calldata op, uint256 maxcost)
-    internal
-    view
-    returns (bool)
-  {
+  function tokenAllowanceRemainsOK(UserOperation calldata op, uint256 maxcost) internal view returns (bool) {
     // Is not changing token allowance but if it is make sure value is OK.
     return !_isCallingTokenApprove(op) || _hasOKTokenApproveValue(op, maxcost);
   }
 
-  function tokenAllowanceWillBeOK(UserOperation calldata op, uint256 maxcost)
-    internal
-    view
-    returns (bool)
-  {
+  function tokenAllowanceWillBeOK(UserOperation calldata op, uint256 maxcost) internal view returns (bool) {
     // Is changing token allowance with an OK value.
     return _isCallingTokenApprove(op) && _hasOKTokenApproveValue(op, maxcost);
   }
 
-  function requiredTokenIsApprovedInPrevOps(UserOperation calldata op)
-    internal
-    pure
-    returns (bool)
-  {
+  function requiredTokenIsApprovedInPrevOps(UserOperation calldata op) internal pure returns (bool) {
     // A paymaster fee of 0 means approval and fee collection has
     // already occured within a previous op in the batch.
     PaymasterData memory pd = _decodePaymasterData(op);
-
     return pd.fee == 0;
   }
 
-  function paymasterContext(UserOperation calldata op)
-    internal
-    view
-    returns (bytes memory context)
-  {
+  function paymasterContext(UserOperation calldata op) internal view returns (bytes memory context) {
     PaymasterData memory pd = _decodePaymasterData(op);
-
-    return
-      abi.encode(
-        op.sender,
-        pd.erc20Token,
-        _requiredTokenExchangeRate(op),
-        pd.fee
-      );
+    return abi.encode(op.sender, pd.erc20Token, _requiredTokenExchangeRate(op), pd.fee);
   }
 }
