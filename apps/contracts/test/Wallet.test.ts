@@ -67,6 +67,10 @@ describe('Wallet', () => {
     it('cannot be initialized twice', async () => {
       await expect(wallet.instance.initialize(wallet.entryPoint.address, owner.address, [])).to.be.revertedWith('Initializable: contract is already initialized')
     })
+
+    it('cannot be initialized with the owner as a guardian', async () => {
+      await expect(Wallet.create({ owner, guardians: [owner] })).to.be.revertedWith('Wallet: Owner cannot be guardian')
+    })
   })
 
   describe('validateUserOp', () => {
@@ -1074,7 +1078,7 @@ describe('Wallet', () => {
       })
 
       context('when the new owner is not the address zero', () => {
-        it('transfer ownership to the recipient', async () => {
+        it('transfer ownership to the grantee', async () => {
           await wallet.transferOwner(other, { from })
 
           expect(await wallet.getOwnerCount()).to.be.equal(1)
@@ -1115,9 +1119,9 @@ describe('Wallet', () => {
         from = wallet.entryPoint
       })
 
-      context('when the recipient is not the owner', () => {
-        context('when the recipient was not a guardian yet', () => {
-          it('grants the guardian role to the recipient', async () => {
+      context('when the grantee is not the owner', () => {
+        context('when the grantee was not a guardian yet', () => {
+          it('grants the guardian role to the grantee', async () => {
             await wallet.grantGuardian(other, { from })
 
             expect(await wallet.getGuardianCount()).to.be.equal(2)
@@ -1129,7 +1133,7 @@ describe('Wallet', () => {
           })
         })
 
-        context('when the recipient was already a guardian', () => {
+        context('when the grantee was already a guardian', () => {
           it('does not affect the guardian list', async () => {
             await wallet.grantGuardian(guardian, { from })
 
@@ -1141,7 +1145,7 @@ describe('Wallet', () => {
         })
       })
 
-      context('when the recipient is the owner', () => {
+      context('when the grantee is the owner', () => {
         it('reverts', async () => {
           await expect(wallet.grantGuardian(owner, { from })).to.be.revertedWith('Wallet: Owner cannot be guardian')
         })
@@ -1169,8 +1173,8 @@ describe('Wallet', () => {
         from = wallet.entryPoint
       })
 
-      context('when the recipient was already a guardian', () => {
-        it('revokes the guardian role to the recipient', async () => {
+      context('when the grantee was already a guardian', () => {
+        it('revokes the guardian role to the grantee', async () => {
           await wallet.revokeGuardian(guardian, { from })
 
           expect(await wallet.getGuardianCount()).to.be.equal(0)
@@ -1179,7 +1183,7 @@ describe('Wallet', () => {
         })
       })
 
-      context('when the recipient was not a guardian', () => {
+      context('when the grantee was not a guardian', () => {
         it('does not affect the guardian list', async () => {
           await wallet.revokeGuardian(other, { from })
 

@@ -77,6 +77,7 @@ contract Wallet is
     // Then we set `OWNER_ROLE` as admin role for `GUARDIAN_ROLE` as well.
     _setRoleAdmin(GUARDIAN_ROLE, OWNER_ROLE);
     for (uint256 i = 0; i < _guardians.length; i++) {
+      require(_owner != _guardians[i], "Wallet: Owner cannot be guardian");
       _grantRole(GUARDIAN_ROLE, _guardians[i]);
     }
   }
