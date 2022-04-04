@@ -1,13 +1,15 @@
-// Based on https://eips.ethereum.org/EIPS/eip-4337
+// SPDX-License-Identifier: AGPL-3.0
 
-// SPDX-License-Identifier: agpl-3.0
 pragma solidity ^0.8.0;
 
-import { UserOperation } from "../library/UserOperation.sol";
+import "../UserOperation.sol";
 
+/**
+ * @dev Wallet interface specified in https://eips.ethereum.org/EIPS/eip-4337
+ */
 interface IWallet {
   function validateUserOp(
-    UserOperation calldata userOp,
+    UserOperation calldata op,
     bytes32 requestId,
     uint256 requiredPrefund
   ) external;

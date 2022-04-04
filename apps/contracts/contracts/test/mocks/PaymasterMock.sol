@@ -2,10 +2,8 @@
 
 pragma solidity ^0.8.0;
 
-import "../../ERC4337/interface/IPaymaster.sol";
+import "../../paymaster/IPaymaster.sol";
 import "../../ERC4337/interface/IEntryPoint.sol";
-
-import { PostOpMode } from "../../ERC4337/interface/IPaymaster.sol";
 
 contract PaymasterMock is IPaymaster {
   IEntryPointStakeController internal entryPoint;
