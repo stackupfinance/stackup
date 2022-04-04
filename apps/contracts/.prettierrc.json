@@ -1,8 +1,6 @@
 {
   "bracketSpacing": true,
   "explicitTypes": "always",
-  "newline-before-return": true,
-  "no-var-keyword": true,
   "printWidth": 120,
   "useTabs": false,
   "overrides": [
