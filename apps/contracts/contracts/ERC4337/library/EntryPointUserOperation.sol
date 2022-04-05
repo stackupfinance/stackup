@@ -6,13 +6,12 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/utils/math/Math.sol";
 
+import "./Stake.sol";
+import "../../UserOperation.sol";
 import "../../helpers/Calls.sol";
-
+import "../../wallet/IWallet.sol";
+import "../../paymaster/IPaymaster.sol";
 import "../../ERC2470/ISingletonFactory.sol";
-import { IWallet } from "../interface/IWallet.sol";
-import { IPaymaster, PostOpMode } from "../interface/IPaymaster.sol";
-import { UserOperation } from "./UserOperation.sol";
-import { Stake } from "./Stake.sol";
 
 library EntryPointUserOperation {
   function _gasPrice(UserOperation calldata op) internal view returns (uint256) {

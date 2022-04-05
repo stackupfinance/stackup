@@ -4,9 +4,8 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/utils/Address.sol";
 
-import "../../ERC4337/interface/IWallet.sol";
-
-import { UserOperation } from "../../ERC4337/library/UserOperation.sol";
+import "../../UserOperation.sol";
+import "../../wallet/IWallet.sol";
 
 contract WalletMock is IWallet {
   using Address for address;

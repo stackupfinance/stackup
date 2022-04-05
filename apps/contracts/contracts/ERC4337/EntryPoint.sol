@@ -3,12 +3,11 @@
 // SPDX-License-Identifier: agpl-3.0
 pragma solidity ^0.8.0;
 
+import "./interface/IEntryPoint.sol";
+import "./library/Stake.sol";
+import "./library/EntryPointUserOperation.sol";
 import "../helpers/Calls.sol";
-
-import { IEntryPoint, IEntryPointStakeController } from "./interface/IEntryPoint.sol";
-import { Stake } from "./library/Stake.sol";
-import { UserOperation } from "./library/UserOperation.sol";
-import { EntryPointUserOperation } from "./library/EntryPointUserOperation.sol";
+import "../UserOperation.sol";
 
 contract EntryPoint is IEntryPoint, IEntryPointStakeController {
   using Calls for address payable;

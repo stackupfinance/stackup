@@ -69,7 +69,7 @@ describe('Wallet', () => {
     })
 
     it('cannot be initialized with the owner as a guardian', async () => {
-      await expect(Wallet.create({ owner, guardians: [owner] })).to.be.revertedWith('Wallet: Owner cannot be guardian')
+      await expect(Wallet.create({ owner, guardians: [owner] })).to.be.revertedWith('ACL: Owner cannot be guardian')
     })
   })
 
@@ -583,7 +583,7 @@ describe('Wallet', () => {
       })
 
       it('reverts', async () => {
-        await expect(wallet.validateUserOp(op, ZERO_BYTES32, 0, { from })).to.be.revertedWith('Wallet: Not from EntryPoint')
+        await expect(wallet.validateUserOp(op, ZERO_BYTES32, 0, { from })).to.be.revertedWith('ACL: sender not allowed')
       })
     })
   })
@@ -955,7 +955,7 @@ describe('Wallet', () => {
       })
 
       it('reverts', async () => {
-        await expect(wallet.executeUserOp(ZERO_ADDRESS, '0x', { from })).to.be.revertedWith('Wallet: Not from EntryPoint')
+        await expect(wallet.executeUserOp(ZERO_ADDRESS, '0x', { from })).to.be.revertedWith('ACL: sender not allowed')
       })
     })
   })
@@ -1024,7 +1024,7 @@ describe('Wallet', () => {
       })
 
       it('reverts', async () => {
-        await expect(wallet.postOp(contextData, actualGasCost, { from })).to.be.revertedWith('Wallet: Not from EntryPoint')
+        await expect(wallet.postOp(contextData, actualGasCost, { from })).to.be.revertedWith('ACL: sender not allowed')
       })
     })
   })
@@ -1064,7 +1064,7 @@ describe('Wallet', () => {
       })
 
       it('reverts', async () => {
-        await expect(wallet.isValidSignature(message, signature)).to.be.revertedWith('Wallet: Invalid signature')
+        await expect(wallet.isValidSignature(message, signature)).to.be.revertedWith('ACL: Invalid signature')
       })
     })
   })
@@ -1106,7 +1106,7 @@ describe('Wallet', () => {
       })
 
       it('reverts', async () => {
-        await expect(wallet.transferOwner(other, { from })).to.be.revertedWith('Wallet: Not from EntryPoint')
+        await expect(wallet.transferOwner(other, { from })).to.be.revertedWith('ACL: sender not allowed')
       })
     })
   })
@@ -1147,7 +1147,7 @@ describe('Wallet', () => {
 
       context('when the grantee is the owner', () => {
         it('reverts', async () => {
-          await expect(wallet.grantGuardian(owner, { from })).to.be.revertedWith('Wallet: Owner cannot be guardian')
+          await expect(wallet.grantGuardian(owner, { from })).to.be.revertedWith('ACL: Owner cannot be guardian')
         })
       })
     })
@@ -1160,7 +1160,7 @@ describe('Wallet', () => {
       })
 
       it('reverts', async () => {
-        await expect(wallet.grantGuardian(other, { from })).to.be.revertedWith('Wallet: Not from EntryPoint')
+        await expect(wallet.grantGuardian(other, { from })).to.be.revertedWith('ACL: sender not allowed')
       })
     })
   })
@@ -1203,7 +1203,7 @@ describe('Wallet', () => {
       })
 
       it('reverts', async () => {
-        await expect(wallet.revokeGuardian(other, { from })).to.be.revertedWith('Wallet: Not from EntryPoint')
+        await expect(wallet.revokeGuardian(other, { from })).to.be.revertedWith('ACL: sender not allowed')
       })
     })
   })
@@ -1249,7 +1249,7 @@ describe('Wallet', () => {
       })
 
       it('reverts', async () => {
-        await expect(wallet.upgradeTo(newImplementation, { from })).to.be.revertedWith('Wallet: Not from EntryPoint')
+        await expect(wallet.upgradeTo(newImplementation, { from })).to.be.revertedWith('ACL: sender not allowed')
       })
     })
   })

@@ -2,10 +2,9 @@
 
 pragma solidity ^0.8.0;
 
-import "../../ERC4337/Wallet.sol";
-
-import { PostOpMode } from "../../ERC4337/interface/IPaymaster.sol";
-import { UserOperation } from "../../ERC4337/library/UserOperation.sol";
+import "../../UserOperation.sol";
+import "../../wallet/Wallet.sol";
+import "../../paymaster/IPaymaster.sol";
 
 contract EntryPointMock {
   Wallet public wallet;
