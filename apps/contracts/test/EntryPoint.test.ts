@@ -678,7 +678,7 @@ describe('EntryPoint', () => {
 
       context('when the op does not include an init code', () => {
         it('reverts', async () => {
-          await expect(entryPoint.handleOps(op)).to.be.revertedWith('EntryPoint: No wallet & initCode')
+          await expect(entryPoint.handleOps(op)).to.be.revertedWith('EntryPoint: Wrong init code')
         })
       })
     })
@@ -690,14 +690,12 @@ describe('EntryPoint', () => {
       })
 
       context('when the op includes some init code', () => {
-        // TODO: Audit, this should revert
-
         beforeEach('set init code', async () => {
           op.initCode = '0xaabb'
         })
 
-        it.skip('reverts', async () => {
-          await expect(entryPoint.handleOps(op)).to.be.revertedWith('EntryPoint: No wallet & initCode')
+        it('reverts', async () => {
+          await expect(entryPoint.handleOps(op)).to.be.revertedWith('EntryPoint: Wrong init code')
         })
       })
 

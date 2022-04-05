@@ -1,10 +1,14 @@
-// SPDX-License-Identifier: agpl-3.0
+// SPDX-License-Identifier: AGPL-3.0
 
 pragma solidity ^0.8.0;
 
-import "../../UserOperation.sol";
+import "../UserOperation.sol";
+import "./IEntryPointStaking.sol";
 
-interface IEntryPoint {
+/**
+ * @dev EntryPoint interface specified in https://eips.ethereum.org/EIPS/eip-4337
+ */
+interface IEntryPoint is IEntryPointStaking {
   function handleOps(UserOperation[] calldata ops, address payable redeemer) external;
 
   // function simulateWalletValidation(UserOperation calldata op)
@@ -15,14 +19,4 @@ interface IEntryPoint {
   //   UserOperation calldata op,
   //   uint256 gasUsedByPayForSelfOp
   // ) external view returns (bytes memory context, uint256 gasUsedByPayForOp);
-}
-
-interface IEntryPointStakeController {
-  function addStake() external payable;
-
-  function lockStake() external;
-
-  function unlockStake() external;
-
-  function withdrawStake(address payable withdrawAddress) external;
 }
