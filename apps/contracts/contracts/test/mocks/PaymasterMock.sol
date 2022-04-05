@@ -3,17 +3,17 @@
 pragma solidity ^0.8.0;
 
 import "../../paymaster/IPaymaster.sol";
-import "../../ERC4337/interface/IEntryPoint.sol";
+import "../../entrypoint/IEntryPoint.sol";
 
 contract PaymasterMock is IPaymaster {
-  IEntryPointStakeController internal entryPoint;
+  IEntryPoint internal entryPoint;
 
   bool internal mockPayRefund;
   bool internal mockRevertVerification;
 
   event PostOp(PostOpMode mode, bytes context, uint256 actualGasCost);
 
-  constructor(IEntryPointStakeController _entryPoint) {
+  constructor(IEntryPoint _entryPoint) {
     entryPoint = _entryPoint;
     mockPayRefund = true;
     mockRevertVerification = false;
