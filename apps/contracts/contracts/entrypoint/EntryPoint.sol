@@ -56,8 +56,8 @@ contract EntryPoint is IEntryPoint, Staking {
       verification = verifications[i];
       verification.op = ops[i];
       verification.op.deployWalletIfNecessary(create2Factory);
-      verification.context = verification.op.validatePaymasterIfNecessary(_getStake(verification.op.paymaster));
       verification.op.validateUserOp();
+      verification.context = verification.op.validatePaymasterIfNecessary(_getStake(verification.op.paymaster));
       verification.gas = preValidationGas - gasleft();
     }
   }

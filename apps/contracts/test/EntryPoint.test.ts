@@ -302,35 +302,35 @@ describe('EntryPoint', () => {
         })
 
         context('when the user does not specify any gas fee', () => {
-          context('when the paymaster does have some stake', () => {
-            beforeEach('stake a minimum', async () => {
-              await paymaster.stake({ value: 1 })
+          context('when the user specifies a verification gas value', () => {
+            beforeEach('set verification gas', async () => {
+              op.verificationGas = bn(200e3)
             })
 
-            context('when the paymaster is locked', () => {
-              beforeEach('lock', async () => {
-                await paymaster.lock()
+            context('when the wallet verification succeeds', () => {
+              beforeEach('mock wallet verification', async () => {
+                if (op.initCode != '0x') {
+                  op.initCode = await encodeWalletMockDeployment(false)
+                  op.sender = await entryPoint.getSenderAddress(op)
+                } else {
+                  const wallet = await instanceAt('WalletMock', op.sender)
+                  await wallet.mockVerificationRevert(false)
+                }
               })
 
-              context('when the paymaster verification succeeds', () => {
-                beforeEach('mock paymaster verification', async () => {
-                  await paymaster.mockVerificationRevert(false)
+              context('when the paymaster does have some stake', () => {
+                beforeEach('stake a minimum', async () => {
+                  await paymaster.stake({value: 1})
                 })
 
-                context('when the user specifies a verification gas value', () => {
-                  beforeEach('set verification gas', async () => {
-                    op.verificationGas = bn(200e3)
+                context('when the paymaster is locked', () => {
+                  beforeEach('lock', async () => {
+                    await paymaster.lock()
                   })
 
-                  context('when the wallet verification succeeds', () => {
-                    beforeEach('mock wallet verification', async () => {
-                      if (op.initCode != '0x') {
-                        op.initCode = await encodeWalletMockDeployment(false)
-                        op.sender = await entryPoint.getSenderAddress(op)
-                      } else {
-                        const wallet = await instanceAt('WalletMock', op.sender)
-                        await wallet.mockVerificationRevert(false)
-                      }
+                  context('when the paymaster verification succeeds', () => {
+                    beforeEach('mock paymaster verification', async () => {
+                      await paymaster.mockVerificationRevert(false)
                     })
 
                     itHandleOpsProperlyNeverthelessPaymaster(() => {
@@ -354,51 +354,51 @@ describe('EntryPoint', () => {
                     })
                   })
 
-                  context('when the wallet verification fails', () => {
-                    beforeEach('mock wallet verification', async () => {
-                      if (op.initCode != '0x') {
-                        op.initCode = await encodeWalletMockDeployment(true)
-                        op.sender = await entryPoint.getSenderAddress(op)
-                      } else {
-                        const wallet = await instanceAt('WalletMock', op.sender)
-                        await wallet.mockVerificationRevert(true)
-                      }
+                  context('when the paymaster verification fails', () => {
+                    beforeEach('mock paymaster verification', async () => {
+                      await paymaster.mockVerificationRevert(true)
                     })
 
                     it('reverts', async () => {
-                      await expect(entryPoint.handleOps(op)).to.be.revertedWith('WALLET_VERIFICATION_FAILED')
+                      await expect(entryPoint.handleOps(op)).to.be.revertedWith('PAYMASTER_VERIFICATION_FAILED')
                     })
                   })
                 })
 
-                context('when the user does not specify a verification gas value', () => {
+                context('when the paymaster is not locked', () => {
                   it('reverts', async () => {
-                    await expect(entryPoint.handleOps(op)).to.be.revertedWith('contract call run out of gas')
+                    await expect(entryPoint.handleOps(op)).to.be.revertedWith('EntryPoint: Stake not locked')
                   })
                 })
               })
 
-              context('when the paymaster verification fails', () => {
-                beforeEach('mock paymaster verification', async () => {
-                  await paymaster.mockVerificationRevert(true)
-                })
-
+              context('when the paymaster does not have any stake', () => {
                 it('reverts', async () => {
-                  await expect(entryPoint.handleOps(op)).to.be.revertedWith('PAYMASTER_VERIFICATION_FAILED')
+                  await expect(entryPoint.handleOps(op)).to.be.revertedWith('EntryPoint: Stake not locked')
                 })
               })
             })
 
-            context('when the paymaster is not locked', () => {
+            context('when the wallet verification fails', () => {
+              beforeEach('mock wallet verification', async () => {
+                if (op.initCode != '0x') {
+                  op.initCode = await encodeWalletMockDeployment(true)
+                  op.sender = await entryPoint.getSenderAddress(op)
+                } else {
+                  const wallet = await instanceAt('WalletMock', op.sender)
+                  await wallet.mockVerificationRevert(true)
+                }
+              })
+
               it('reverts', async () => {
-                await expect(entryPoint.handleOps(op)).to.be.revertedWith('EntryPoint: Stake not locked')
+                await expect(entryPoint.handleOps(op)).to.be.revertedWith('WALLET_VERIFICATION_FAILED')
               })
             })
           })
 
-          context('when the paymaster does not have any stake', () => {
+          context('when the user does not specify a verification gas value', () => {
             it('reverts', async () => {
-              await expect(entryPoint.handleOps(op)).to.be.revertedWith('EntryPoint: Stake not locked')
+              await expect(entryPoint.handleOps(op)).to.be.revertedWith('contract call run out of gas')
             })
           })
         })
@@ -411,40 +411,40 @@ describe('EntryPoint', () => {
             op.maxPriorityFeePerGas = op.maxFeePerGas
           })
 
-          context('when the paymaster does have some stake', () => {
-            beforeEach('stake a minimum', async () => {
-              await paymaster.stake({ value: 1 })
+          context('when the user specifies a verification gas value', () => {
+            beforeEach('set verification gas', async () => {
+              op.verificationGas = bn(200e3)
             })
 
-            context('when the paymaster is locked', () => {
-              beforeEach('lock', async () => {
-                await paymaster.lock()
+            context('when the wallet verification succeeds', () => {
+              beforeEach('mock wallet verification', async () => {
+                if (op.initCode != '0x') {
+                  op.initCode = await encodeWalletMockDeployment(false)
+                  op.sender = await entryPoint.getSenderAddress(op)
+                } else {
+                  const wallet = await instanceAt('WalletMock', op.sender)
+                  await wallet.mockVerificationRevert(false)
+                }
               })
 
-              context('when the paymaster stake is enough', () => {
-                beforeEach('stake big amount', async () => {
-                  await paymaster.stake({ value: fp(1) })
+              context('when the paymaster does have some stake', () => {
+                beforeEach('stake a minimum', async () => {
+                  await paymaster.stake({ value: 1 })
                 })
 
-                context('when the paymaster verification succeeds', () => {
-                  beforeEach('mock paymaster verification', async () => {
-                    await paymaster.mockVerificationRevert(false)
+                context('when the paymaster is locked', () => {
+                  beforeEach('lock', async () => {
+                    await paymaster.lock()
                   })
 
-                  context('when the user specifies a verification gas value', () => {
-                    beforeEach('set verification gas', async () => {
-                      op.verificationGas = bn(200e3)
+                  context('when the paymaster stake is enough', () => {
+                    beforeEach('stake big amount', async () => {
+                      await paymaster.stake({ value: fp(1) })
                     })
 
-                    context('when the wallet verification succeeds', () => {
-                      beforeEach('mock wallet verification', async () => {
-                        if (op.initCode != '0x') {
-                          op.initCode = await encodeWalletMockDeployment(false)
-                          op.sender = await entryPoint.getSenderAddress(op)
-                        } else {
-                          const wallet = await instanceAt('WalletMock', op.sender)
-                          await wallet.mockVerificationRevert(false)
-                        }
+                    context('when the paymaster verification succeeds', () => {
+                      beforeEach('mock paymaster verification', async () => {
+                        await paymaster.mockVerificationRevert(false)
                       })
 
                       itHandleOpsProperlyNeverthelessPaymaster(() => {
@@ -469,62 +469,62 @@ describe('EntryPoint', () => {
                       })
                     })
 
-                    context('when the wallet verification fails', () => {
-                      beforeEach('mock wallet verification', async () => {
-                        if (op.initCode != '0x') {
-                          op.initCode = await encodeWalletMockDeployment(true)
-                          op.sender = await entryPoint.getSenderAddress(op)
-                        } else {
-                          const wallet = await instanceAt('WalletMock', op.sender)
-                          await wallet.mockVerificationRevert(true)
-                        }
+                    context('when the paymaster verification fails', () => {
+                      beforeEach('mock paymaster verification', async () => {
+                        await paymaster.mockVerificationRevert(true)
                       })
 
                       it('reverts', async () => {
-                        await expect(entryPoint.handleOps(op)).to.be.revertedWith('WALLET_VERIFICATION_FAILED')
+                        await expect(entryPoint.handleOps(op)).to.be.revertedWith('PAYMASTER_VERIFICATION_FAILED')
                       })
                     })
                   })
 
-                  context('when the user does not specify a verification gas value', () => {
+                  context('when the paymaster stake is not enough', () => {
+                    beforeEach('stake small amount', async () => {
+                      await paymaster.stake({ value: 1 })
+                    })
+
                     it('reverts', async () => {
-                      await expect(entryPoint.handleOps(op)).to.be.revertedWith('contract call run out of gas')
+                      await expect(entryPoint.handleOps(op)).to.be.revertedWith('EntryPoint: Insufficient stake')
                     })
                   })
                 })
 
-                context('when the paymaster verification fails', () => {
-                  beforeEach('mock paymaster verification', async () => {
-                    await paymaster.mockVerificationRevert(true)
-                  })
-
+                context('when the paymaster is not locked', () => {
                   it('reverts', async () => {
-                    await expect(entryPoint.handleOps(op)).to.be.revertedWith('PAYMASTER_VERIFICATION_FAILED')
+                    await expect(entryPoint.handleOps(op)).to.be.revertedWith('EntryPoint: Stake not locked')
                   })
                 })
               })
 
-              context('when the paymaster stake is not enough', () => {
-                beforeEach('stake small amount', async () => {
-                  await paymaster.stake({ value: 1 })
-                })
-
+              context('when the paymaster does not have any stake', () => {
                 it('reverts', async () => {
-                  await expect(entryPoint.handleOps(op)).to.be.revertedWith('EntryPoint: Insufficient stake')
+                  await expect(entryPoint.handleOps(op)).to.be.revertedWith('EntryPoint: Stake not locked')
                 })
               })
             })
 
-            context('when the paymaster is not locked', () => {
+            context('when the wallet verification fails', () => {
+              beforeEach('mock wallet verification', async () => {
+                if (op.initCode != '0x') {
+                  op.initCode = await encodeWalletMockDeployment(true)
+                  op.sender = await entryPoint.getSenderAddress(op)
+                } else {
+                  const wallet = await instanceAt('WalletMock', op.sender)
+                  await wallet.mockVerificationRevert(true)
+                }
+              })
+
               it('reverts', async () => {
-                await expect(entryPoint.handleOps(op)).to.be.revertedWith('EntryPoint: Stake not locked')
+                await expect(entryPoint.handleOps(op)).to.be.revertedWith('WALLET_VERIFICATION_FAILED')
               })
             })
           })
 
-          context('when the paymaster does not have any stake', () => {
+          context('when the user does not specify a verification gas value', () => {
             it('reverts', async () => {
-              await expect(entryPoint.handleOps(op)).to.be.revertedWith('EntryPoint: Stake not locked')
+              await expect(entryPoint.handleOps(op)).to.be.revertedWith('contract call run out of gas')
             })
           })
         })
@@ -537,40 +537,40 @@ describe('EntryPoint', () => {
             op.maxPriorityFeePerGas = 2
           })
 
-          context('when the paymaster does have some stake', () => {
-            beforeEach('stake a minimum', async () => {
-              await paymaster.stake({ value: 1 })
+          context('when the user specifies a verification gas value', () => {
+            beforeEach('set verification gas', async () => {
+              op.verificationGas = bn(200e3)
             })
 
-            context('when the paymaster is locked', () => {
-              beforeEach('lock', async () => {
-                await paymaster.lock()
+            context('when the wallet verification succeeds', () => {
+              beforeEach('mock wallet verification', async () => {
+                if (op.initCode != '0x') {
+                  op.initCode = await encodeWalletMockDeployment(false)
+                  op.sender = await entryPoint.getSenderAddress(op)
+                } else {
+                  const wallet = await instanceAt('WalletMock', op.sender)
+                  await wallet.mockVerificationRevert(false)
+                }
               })
 
-              context('when the paymaster stake is enough', () => {
-                beforeEach('stake big amount', async () => {
-                  await paymaster.stake({ value: fp(1) })
+              context('when the paymaster does have some stake', () => {
+                beforeEach('stake a minimum', async () => {
+                  await paymaster.stake({ value: 1 })
                 })
 
-                context('when the paymaster verification succeeds', () => {
-                  beforeEach('mock paymaster verification', async () => {
-                    await paymaster.mockVerificationRevert(false)
+                context('when the paymaster is locked', () => {
+                  beforeEach('lock', async () => {
+                    await paymaster.lock()
                   })
 
-                  context('when the user specifies a verification gas value', () => {
-                    beforeEach('set verification gas', async () => {
-                      op.verificationGas = bn(200e3)
+                  context('when the paymaster stake is enough', () => {
+                    beforeEach('stake big amount', async () => {
+                      await paymaster.stake({ value: fp(1) })
                     })
 
-                    context('when the wallet verification succeeds', () => {
-                      beforeEach('mock wallet verification', async () => {
-                        if (op.initCode != '0x') {
-                          op.initCode = await encodeWalletMockDeployment(false)
-                          op.sender = await entryPoint.getSenderAddress(op)
-                        } else {
-                          const wallet = await instanceAt('WalletMock', op.sender)
-                          await wallet.mockVerificationRevert(false)
-                        }
+                    context('when the paymaster verification succeeds', () => {
+                      beforeEach('mock paymaster verification', async () => {
+                        await paymaster.mockVerificationRevert(false)
                       })
 
                       itHandleOpsProperlyNeverthelessPaymaster(() => {
@@ -595,62 +595,62 @@ describe('EntryPoint', () => {
                       })
                     })
 
-                    context('when the wallet verification fails', () => {
-                      beforeEach('mock wallet verification', async () => {
-                        if (op.initCode != '0x') {
-                          op.initCode = await encodeWalletMockDeployment(true)
-                          op.sender = await entryPoint.getSenderAddress(op)
-                        } else {
-                          const wallet = await instanceAt('WalletMock', op.sender)
-                          await wallet.mockVerificationRevert(true)
-                        }
+                    context('when the paymaster verification fails', () => {
+                      beforeEach('mock paymaster verification', async () => {
+                        await paymaster.mockVerificationRevert(true)
                       })
 
                       it('reverts', async () => {
-                        await expect(entryPoint.handleOps(op)).to.be.revertedWith('WALLET_VERIFICATION_FAILED')
+                        await expect(entryPoint.handleOps(op)).to.be.revertedWith('PAYMASTER_VERIFICATION_FAILED')
                       })
                     })
                   })
 
-                  context('when the user does not specify a verification gas value', () => {
+                  context('when the paymaster stake is not enough', () => {
+                    beforeEach('stake small amount', async () => {
+                      await paymaster.stake({ value: 1 })
+                    })
+
                     it('reverts', async () => {
-                      await expect(entryPoint.handleOps(op)).to.be.revertedWith('contract call run out of gas')
+                      await expect(entryPoint.handleOps(op)).to.be.revertedWith('EntryPoint: Insufficient stake')
                     })
                   })
                 })
 
-                context('when the paymaster verification fails', () => {
-                  beforeEach('mock paymaster verification', async () => {
-                    await paymaster.mockVerificationRevert(true)
-                  })
-
+                context('when the paymaster is not locked', () => {
                   it('reverts', async () => {
-                    await expect(entryPoint.handleOps(op)).to.be.revertedWith('PAYMASTER_VERIFICATION_FAILED')
+                    await expect(entryPoint.handleOps(op)).to.be.revertedWith('EntryPoint: Stake not locked')
                   })
                 })
               })
 
-              context('when the paymaster stake is not enough', () => {
-                beforeEach('stake small amount', async () => {
-                  await paymaster.stake({ value: 1 })
-                })
-
+              context('when the paymaster does not have any stake', () => {
                 it('reverts', async () => {
-                  await expect(entryPoint.handleOps(op)).to.be.revertedWith('EntryPoint: Insufficient stake')
+                  await expect(entryPoint.handleOps(op)).to.be.revertedWith('EntryPoint: Stake not locked')
                 })
               })
             })
 
-            context('when the paymaster is not locked', () => {
+            context('when the wallet verification fails', () => {
+              beforeEach('mock wallet verification', async () => {
+                if (op.initCode != '0x') {
+                  op.initCode = await encodeWalletMockDeployment(true)
+                  op.sender = await entryPoint.getSenderAddress(op)
+                } else {
+                  const wallet = await instanceAt('WalletMock', op.sender)
+                  await wallet.mockVerificationRevert(true)
+                }
+              })
+
               it('reverts', async () => {
-                await expect(entryPoint.handleOps(op)).to.be.revertedWith('EntryPoint: Stake not locked')
+                await expect(entryPoint.handleOps(op)).to.be.revertedWith('WALLET_VERIFICATION_FAILED')
               })
             })
           })
 
-          context('when the paymaster does not have any stake', () => {
+          context('when the user does not specify a verification gas value', () => {
             it('reverts', async () => {
-              await expect(entryPoint.handleOps(op)).to.be.revertedWith('EntryPoint: Stake not locked')
+              await expect(entryPoint.handleOps(op)).to.be.revertedWith('contract call run out of gas')
             })
           })
         })
