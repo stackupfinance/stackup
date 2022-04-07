@@ -1240,7 +1240,7 @@ describe('Wallet', () => {
           await walletV2.setX(10)
           expect(await walletV2.x()).to.be.equal(10)
 
-          const currentEntryPoint = await walletV2.instance.entryPoint()
+          const currentEntryPoint = await walletV2.entryPoint()
           expect(currentEntryPoint).to.be.equal(previousEntryPoint)
         })
       })
