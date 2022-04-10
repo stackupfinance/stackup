@@ -27,5 +27,5 @@ export const App = {
   },
   openReplay: {
     projectKey: process.env.NEXT_PUBLIC_OPEN_REPLAY_PROJECT_KEY || '',
-  }
+  },
 };
