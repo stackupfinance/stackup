@@ -144,7 +144,7 @@ describe('EntryPoint', () => {
               // TODO: Review this implementation, the user must specify the same fee and priority fee values.
 
               beforeEach('set fees', async () => {
-                op.maxFeePerGas = 1
+                op.maxFeePerGas = 1e9
                 op.maxPriorityFeePerGas = op.maxFeePerGas
               })
 
@@ -207,8 +207,8 @@ describe('EntryPoint', () => {
               // TODO: Review this implementation, the user must specify the same fee and priority fee values.
 
               beforeEach('set fees', async () => {
-                op.maxFeePerGas = 1
-                op.maxPriorityFeePerGas = 2
+                op.maxFeePerGas = 1e9
+                op.maxPriorityFeePerGas = 2e9
               })
 
               context('when the wallet pays the required refund', () => {
@@ -343,6 +343,15 @@ describe('EntryPoint', () => {
                         expect(currentBalance).to.be.equal(previousBalance)
                       })
 
+                      it('does not decrease the paymaster stake', async () => {
+                        const { value: previousStakedBalance } = await entryPoint.getStake(paymaster)
+
+                        await entryPoint.handleOps(op, redeemer)
+
+                        const { value: currentStakedBalance } = await entryPoint.getStake(paymaster)
+                        expect(currentStakedBalance).to.be.equal(previousStakedBalance)
+                      })
+
                       it('does not decreases the wallet balance', async () => {
                         const previousBalance = await ethers.provider.getBalance(op.sender)
 
@@ -407,7 +416,7 @@ describe('EntryPoint', () => {
           // TODO: Review this implementation, the user must specify the same fee and priority fee values.
 
           beforeEach('set fees', async () => {
-            op.maxFeePerGas = 1
+            op.maxFeePerGas = 1e9
             op.maxPriorityFeePerGas = op.maxFeePerGas
           })
 
@@ -456,6 +465,18 @@ describe('EntryPoint', () => {
 
                           const currentRedeemerBalance = await ethers.provider.getBalance(redeemer)
                           assertWithError(currentRedeemerBalance, previousRedeemerBalance.add(expectedRefund), 0.1)
+                        })
+
+                        it('decreases the paymaster stake', async () => {
+                          const expectedRefund = await entryPoint.estimatePrefund(op)
+                          const { value: previousStakedBalance } = await entryPoint.getStake(paymaster)
+                          console.log('previousStakedBalance:', previousStakedBalance.toString())
+
+                          await entryPoint.handleOps(op, redeemer)
+
+                          const { value: currentStakedBalance } = await entryPoint.getStake(paymaster)
+                          console.log('currentStakedBalance:', currentStakedBalance.toString())
+                          assertWithError(currentStakedBalance, previousStakedBalance.sub(expectedRefund), 0.1)
                         })
 
                         it('does not refund the unused gas to the wallet', async () => {
@@ -533,8 +554,8 @@ describe('EntryPoint', () => {
           // TODO: Review this implementation, the user must specify the same fee and priority fee values.
 
           beforeEach('set fees', async () => {
-            op.maxFeePerGas = 1
-            op.maxPriorityFeePerGas = 2
+            op.maxFeePerGas = 1e9
+            op.maxPriorityFeePerGas = 2e9
           })
 
           context('when the paymaster does have some stake', () => {
@@ -582,6 +603,18 @@ describe('EntryPoint', () => {
 
                           const currentRedeemerBalance = await ethers.provider.getBalance(redeemer)
                           assertWithError(currentRedeemerBalance, previousRedeemerBalance.add(expectedRefund), 0.1)
+                        })
+
+                        it('decreases the paymaster stake', async () => {
+                          const expectedRefund = await entryPoint.estimatePrefund(op)
+                          const { value: previousStakedBalance } = await entryPoint.getStake(paymaster)
+                          console.log('previousStakedBalance:', previousStakedBalance.toString())
+
+                          await entryPoint.handleOps(op, redeemer)
+
+                          const { value: currentStakedBalance } = await entryPoint.getStake(paymaster)
+                          console.log('currentStakedBalance:', currentStakedBalance.toString())
+                          assertWithError(currentStakedBalance, previousStakedBalance.sub(expectedRefund), 0.1)
                         })
 
                         it('does not refund the unused gas to the wallet', async () => {
