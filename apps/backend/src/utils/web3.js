@@ -1,6 +1,6 @@
 const { ethers } = require('ethers');
 const validator = require('validator');
-const { wallet, contracts, constants } = require('@stackupfinance/contracts');
+const { wallet, contracts, constants } = require('@stackupfinance/walletjs');
 const { web3 } = require('../config/config');
 const { aggregatorV3InterfaceABI } = require('../config/chainlink');
 const { eventSignatures, status } = require('../config/transaction');

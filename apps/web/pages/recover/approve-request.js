@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/router';
 import { useToast, Text, Link } from '@chakra-ui/react';
-import { wallet as walletLib } from '@stackupfinance/contracts';
+import { wallet as walletLib } from '@stackupfinance/walletjs';
 import {
   Head,
   PageContainer,

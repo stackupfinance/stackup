@@ -1,6 +1,5 @@
-// Based on https://eips.ethereum.org/EIPS/eip-2470
+// SPDX-License-Identifier: AGPL-3.0
 
-// SPDX-License-Identifier: agpl-3.0
 pragma solidity ^0.8.0;
 
 /**
@@ -15,7 +14,5 @@ interface ISingletonFactory {
    * @param _salt Arbitrary value to modify resulting address.
    * @return createdContract Created contract address.
    */
-  function deploy(bytes memory _initCode, bytes32 _salt)
-    external
-    returns (address payable createdContract);
+  function deploy(bytes memory _initCode, bytes32 _salt) external returns (address payable createdContract);
 }

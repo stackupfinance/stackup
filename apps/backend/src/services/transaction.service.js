@@ -1,7 +1,7 @@
 /* eslint-disable no-await-in-loop */
 const httpStatus = require('http-status');
 const { ethers } = require('ethers');
-const { contracts, wallet } = require('@stackupfinance/contracts');
+const { contracts, wallet } = require('@stackupfinance/walletjs');
 const ApiError = require('../utils/ApiError');
 const { Transaction } = require('../models');
 const queue = require('../queue');

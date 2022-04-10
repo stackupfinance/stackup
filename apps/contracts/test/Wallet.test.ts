@@ -67,6 +67,10 @@ describe('Wallet', () => {
     it('cannot be initialized twice', async () => {
       await expect(wallet.instance.initialize(wallet.entryPoint.address, owner.address, [])).to.be.revertedWith('Initializable: contract is already initialized')
     })
+
+    it('cannot be initialized with the owner as a guardian', async () => {
+      await expect(Wallet.create({ owner, guardians: [owner] })).to.be.revertedWith('ACL: Owner cannot be guardian')
+    })
   })
 
   describe('validateUserOp', () => {
@@ -184,23 +188,19 @@ describe('Wallet', () => {
                     })
 
                     context('when the entry point reverts', () => {
-                      // TODO: AUDIT!
-
                       beforeEach('mock entry point', async () => {
                         await wallet.entryPoint.mockReceiveRevert(true)
                       })
 
-                      it.skip('reverts', async () => {
+                      it('reverts', async () => {
                         await expect(wallet.validateUserOp(op, requestId, prefund, { from })).to.be.revertedWith('ENTRY_POINT_RECEIVE_FAILED')
                       })
                     })
                   })
 
                   context('when the wallet does not have funds', () => {
-                    // TODO: AUDIT!
-
-                    it.skip('reverts', async () => {
-                      await expect(wallet.validateUserOp(op, requestId, prefund, { from })).to.be.reverted
+                    it('reverts', async () => {
+                      await expect(wallet.validateUserOp(op, requestId, prefund, { from })).to.be.revertedWith('Address: insufficient balance')
                     })
                   })
                 })
@@ -347,23 +347,19 @@ describe('Wallet', () => {
                           })
 
                           context('when the entry point reverts', () => {
-                            // TODO: AUDIT!
-
                             beforeEach('mock entry point', async () => {
                               await wallet.entryPoint.mockReceiveRevert(true)
                             })
 
-                            it.skip('reverts', async () => {
+                            it('reverts', async () => {
                               await expect(wallet.validateUserOp(op, requestId, prefund, { from })).to.be.revertedWith('ENTRY_POINT_RECEIVE_FAILED')
                             })
                           })
                         })
 
                         context('when the wallet does not have funds', () => {
-                          // TODO: AUDIT!
-
-                          it.skip('reverts', async () => {
-                            await expect(wallet.validateUserOp(op, requestId, prefund, { from })).to.be.reverted
+                          it('reverts', async () => {
+                            await expect(wallet.validateUserOp(op, requestId, prefund, { from })).to.be.revertedWith('Address: insufficient balance')
                           })
                         })
                       })
@@ -587,7 +583,7 @@ describe('Wallet', () => {
       })
 
       it('reverts', async () => {
-        await expect(wallet.validateUserOp(op, ZERO_BYTES32, 0, { from })).to.be.revertedWith('Wallet: Not from EntryPoint')
+        await expect(wallet.validateUserOp(op, ZERO_BYTES32, 0, { from })).to.be.revertedWith('ACL: sender not allowed')
       })
     })
   })
@@ -959,7 +955,7 @@ describe('Wallet', () => {
       })
 
       it('reverts', async () => {
-        await expect(wallet.executeUserOp(ZERO_ADDRESS, '0x', { from })).to.be.revertedWith('Wallet: Not from EntryPoint')
+        await expect(wallet.executeUserOp(ZERO_ADDRESS, '0x', { from })).to.be.revertedWith('ACL: sender not allowed')
       })
     })
   })
@@ -1028,7 +1024,7 @@ describe('Wallet', () => {
       })
 
       it('reverts', async () => {
-        await expect(wallet.postOp(contextData, actualGasCost, { from })).to.be.revertedWith('Wallet: Not from EntryPoint')
+        await expect(wallet.postOp(contextData, actualGasCost, { from })).to.be.revertedWith('ACL: sender not allowed')
       })
     })
   })
@@ -1068,7 +1064,7 @@ describe('Wallet', () => {
       })
 
       it('reverts', async () => {
-        await expect(wallet.isValidSignature(message, signature)).to.be.revertedWith('Wallet: Invalid signature')
+        await expect(wallet.isValidSignature(message, signature)).to.be.revertedWith('ACL: Invalid signature')
       })
     })
   })
@@ -1082,7 +1078,7 @@ describe('Wallet', () => {
       })
 
       context('when the new owner is not the address zero', () => {
-        it('transfer ownership to the recipient', async () => {
+        it('transfer ownership to the grantee', async () => {
           await wallet.transferOwner(other, { from })
 
           expect(await wallet.getOwnerCount()).to.be.equal(1)
@@ -1110,7 +1106,7 @@ describe('Wallet', () => {
       })
 
       it('reverts', async () => {
-        await expect(wallet.transferOwner(other, { from })).to.be.revertedWith('Wallet: Not from EntryPoint')
+        await expect(wallet.transferOwner(other, { from })).to.be.revertedWith('ACL: sender not allowed')
       })
     })
   })
@@ -1123,9 +1119,9 @@ describe('Wallet', () => {
         from = wallet.entryPoint
       })
 
-      context('when the recipient is not the owner', () => {
-        context('when the recipient was not a guardian yet', () => {
-          it('grants the guardian role to the recipient', async () => {
+      context('when the grantee is not the owner', () => {
+        context('when the grantee was not a guardian yet', () => {
+          it('grants the guardian role to the grantee', async () => {
             await wallet.grantGuardian(other, { from })
 
             expect(await wallet.getGuardianCount()).to.be.equal(2)
@@ -1137,7 +1133,7 @@ describe('Wallet', () => {
           })
         })
 
-        context('when the recipient was already a guardian', () => {
+        context('when the grantee was already a guardian', () => {
           it('does not affect the guardian list', async () => {
             await wallet.grantGuardian(guardian, { from })
 
@@ -1149,9 +1145,9 @@ describe('Wallet', () => {
         })
       })
 
-      context('when the recipient is the owner', () => {
+      context('when the grantee is the owner', () => {
         it('reverts', async () => {
-          await expect(wallet.grantGuardian(owner, { from })).to.be.revertedWith('Wallet: Owner cannot be guardian')
+          await expect(wallet.grantGuardian(owner, { from })).to.be.revertedWith('ACL: Owner cannot be guardian')
         })
       })
     })
@@ -1164,7 +1160,7 @@ describe('Wallet', () => {
       })
 
       it('reverts', async () => {
-        await expect(wallet.grantGuardian(other, { from })).to.be.revertedWith('Wallet: Not from EntryPoint')
+        await expect(wallet.grantGuardian(other, { from })).to.be.revertedWith('ACL: sender not allowed')
       })
     })
   })
@@ -1177,8 +1173,8 @@ describe('Wallet', () => {
         from = wallet.entryPoint
       })
 
-      context('when the recipient was already a guardian', () => {
-        it('revokes the guardian role to the recipient', async () => {
+      context('when the grantee was already a guardian', () => {
+        it('revokes the guardian role to the grantee', async () => {
           await wallet.revokeGuardian(guardian, { from })
 
           expect(await wallet.getGuardianCount()).to.be.equal(0)
@@ -1187,7 +1183,7 @@ describe('Wallet', () => {
         })
       })
 
-      context('when the recipient was not a guardian', () => {
+      context('when the grantee was not a guardian', () => {
         it('does not affect the guardian list', async () => {
           await wallet.revokeGuardian(other, { from })
 
@@ -1207,7 +1203,7 @@ describe('Wallet', () => {
       })
 
       it('reverts', async () => {
-        await expect(wallet.revokeGuardian(other, { from })).to.be.revertedWith('Wallet: Not from EntryPoint')
+        await expect(wallet.revokeGuardian(other, { from })).to.be.revertedWith('ACL: sender not allowed')
       })
     })
   })
@@ -1253,7 +1249,7 @@ describe('Wallet', () => {
       })
 
       it('reverts', async () => {
-        await expect(wallet.upgradeTo(newImplementation, { from })).to.be.revertedWith('Wallet: Not from EntryPoint')
+        await expect(wallet.upgradeTo(newImplementation, { from })).to.be.revertedWith('ACL: sender not allowed')
       })
     })
   })

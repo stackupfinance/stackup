@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-import { wallet as walletLib } from '@stackupfinance/contracts';
+import { wallet as walletLib } from '@stackupfinance/walletjs';
 import {
   Head,
   PageContainer,

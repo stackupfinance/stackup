@@ -2,7 +2,7 @@ import create from 'zustand';
 import { persist } from 'zustand/middleware';
 import { ethers } from 'ethers';
 import axios from 'axios';
-import { wallet, constants } from '@stackupfinance/contracts';
+import { wallet, constants } from '@stackupfinance/walletjs';
 import { App } from '../config';
 import {
   provider,

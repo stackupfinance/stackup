@@ -1,6 +1,6 @@
 import create from 'zustand';
 import { persist } from 'zustand/middleware';
-import { wallet } from '@stackupfinance/contracts';
+import { wallet } from '@stackupfinance/walletjs';
 import { App } from '../config';
 
 export const onboardUseAuthSelector = (state) => ({

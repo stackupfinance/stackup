@@ -2,24 +2,18 @@
 
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/utils/Address.sol";
-
-import "../../ERC4337/interface/IPaymaster.sol";
-import "../../ERC4337/interface/IEntryPoint.sol";
-
-import {PostOpMode} from "../../ERC4337/interface/IPaymaster.sol";
+import "../../paymaster/IPaymaster.sol";
+import "../../entrypoint/IEntryPoint.sol";
 
 contract PaymasterMock is IPaymaster {
-  using Address for address;
-
-  IEntryPointStakeController internal entryPoint;
+  IEntryPoint internal entryPoint;
 
   bool internal mockPayRefund;
   bool internal mockRevertVerification;
 
   event PostOp(PostOpMode mode, bytes context, uint256 actualGasCost);
 
-  constructor(IEntryPointStakeController _entryPoint) {
+  constructor(IEntryPoint _entryPoint) {
     entryPoint = _entryPoint;
     mockPayRefund = true;
     mockRevertVerification = false;
@@ -38,7 +32,7 @@ contract PaymasterMock is IPaymaster {
   }
 
   function stake() external payable {
-    entryPoint.addStake{value: msg.value}();
+    entryPoint.addStake{ value: msg.value }();
   }
 
   function lock() external {
@@ -53,12 +47,7 @@ contract PaymasterMock is IPaymaster {
     entryPoint.withdrawStake(payable(address(this)));
   }
 
-  function validatePaymasterUserOp(UserOperation calldata, uint256)
-    external
-    view
-    override
-    returns (bytes memory)
-  {
+  function validatePaymasterUserOp(UserOperation calldata, uint256) external view override returns (bytes memory) {
     require(!mockRevertVerification, "PAYMASTER_VERIFICATION_FAILED");
     return new bytes(0);
   }

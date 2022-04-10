@@ -1,9 +1,8 @@
-// Based on https://eips.ethereum.org/EIPS/eip-4337
+// SPDX-License-Identifier: AGPL-3.0
 
-// SPDX-License-Identifier: agpl-3.0
 pragma solidity ^0.8.0;
 
-import {UserOperation} from "../library/UserOperation.sol";
+import "../UserOperation.sol";
 
 enum PostOpMode {
   opSucceeded, // user op succeeded
@@ -11,11 +10,14 @@ enum PostOpMode {
   postOpReverted // user op succeeded, but caused postOp to revert
 }
 
+/**
+ * @dev Paymaster interface specified in https://eips.ethereum.org/EIPS/eip-4337
+ */
 interface IPaymaster {
-  function validatePaymasterUserOp(
-    UserOperation calldata userOp,
-    uint256 maxcost
-  ) external view returns (bytes memory context);
+  function validatePaymasterUserOp(UserOperation calldata op, uint256 cost)
+    external
+    view
+    returns (bytes memory context);
 
   function postOp(
     PostOpMode mode,
