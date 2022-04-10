@@ -29,13 +29,13 @@ async function benchmark(): Promise<void> {
 }
 
 async function withoutPaymaster(entryPoint: Contract): Promise<void> {
-  console.log('## Without Paymaster ###')
+  console.log('### Without Paymaster ###')
   const [owner, guardian1, guardian2, guardian3, redeemer] = await getSigners()
   const guardians = [guardian1, guardian2, guardian3]
 
   const mock = await deploy('Counter')
   await mock.increment() // change from zero to non-zero
-  const incrementGasCost = await gas(await mock.increment())
+  const incrementGasCost = (await gas(await mock.increment())).sub(21e3)
 
   const createOp = buildOp()
   createOp.initCode = await encodeWalletDeployment(entryPoint, owner, guardians)

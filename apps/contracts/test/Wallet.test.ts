@@ -4,7 +4,7 @@ import { Contract } from 'ethers'
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/dist/src/signer-with-address'
 
 import { bn, fp } from './utils/helpers/numbers'
-import { deploy } from './utils/helpers/contracts'
+import {deploy, instanceAt} from './utils/helpers/contracts'
 import { getSigners } from './utils/helpers/signers'
 import { assertIndirectEvent } from './utils/helpers/asserts'
 import { ADMIN_ROLE, GUARDIAN_ROLE, MAX_UINT256, OWNER_ROLE, ZERO_ADDRESS, ZERO_BYTES32 } from './utils/helpers/constants'
@@ -1227,6 +1227,21 @@ describe('Wallet', () => {
           await wallet.upgradeTo(newImplementation, { from })
 
           expect(await wallet.getCurrentImplementation()).to.be.equal(newImplementation.address)
+        })
+
+        it('works fine with storage layout changes', async () => {
+          const previousEntryPoint = await wallet.instance.entryPoint()
+
+          const v2 = await deploy('WalletV2Mock')
+          await wallet.upgradeTo(v2, { from })
+          const walletV2 = await instanceAt('WalletV2Mock', wallet.address)
+          expect(await wallet.getCurrentImplementation()).to.be.equal(v2.address)
+
+          await walletV2.setX(10)
+          expect(await walletV2.x()).to.be.equal(10)
+
+          const currentEntryPoint = await walletV2.entryPoint()
+          expect(currentEntryPoint).to.be.equal(previousEntryPoint)
         })
       })
 
