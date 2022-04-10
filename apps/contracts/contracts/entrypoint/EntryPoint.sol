@@ -6,9 +6,12 @@ import "@openzeppelin/contracts/utils/Address.sol";
 
 import "./Staking.sol";
 import "./IEntryPoint.sol";
+import "./ISingletonFactory.sol";
 import "./EntryPointHelpers.sol";
-import "../helpers/Calls.sol";
 import "../UserOperation.sol";
+import "../helpers/Calls.sol";
+import "../wallet/IWallet.sol";
+import "../paymaster/IPaymaster.sol";
 
 contract EntryPoint is IEntryPoint, Staking {
   using Calls for address;
@@ -18,8 +21,7 @@ contract EntryPoint is IEntryPoint, Staking {
 
   struct UserOpVerification {
     bytes context;
-    uint256 gas;
-    UserOperation op;
+    uint256 gasUsed;
   }
 
   ISingletonFactory public immutable create2Factory;
@@ -42,48 +44,70 @@ contract EntryPoint is IEntryPoint, Staking {
   }
 
   function handleOps(UserOperation[] calldata ops, address payable redeemer) external {
-    UserOpVerification[] memory verifications = _verifyOps(ops);
-    uint256 totalGasCost = _executeOps(verifications);
+    UserOpVerification[] memory verifications = new UserOpVerification[](ops.length);
+    for (uint256 i = 0; i < ops.length; i++) verifications[i] = _verifyOp(ops[i]);
+
+    uint256 totalGasCost;
+    for (uint256 i = 0; i < ops.length; i++) totalGasCost += _executeOp(ops[i], verifications[i]);
     redeemer.sendValue(totalGasCost, "EntryPoint: Failed to redeem");
   }
 
-  function _verifyOps(UserOperation[] calldata ops) internal returns (UserOpVerification[] memory verifications) {
-    UserOpVerification memory verification;
-    verifications = new UserOpVerification[](ops.length);
+  function _verifyOp(UserOperation calldata op) internal returns (UserOpVerification memory verification) {
+    uint256 preValidationGas = gasleft();
+    _createWalletIfNecessary(op);
+    _validateWallet(op);
+    verification.context = _validatePaymaster(op);
+    verification.gasUsed = preValidationGas - gasleft();
+  }
 
-    for (uint256 i = 0; i < ops.length; i++) {
-      uint256 preValidationGas = gasleft();
-      verification = verifications[i];
-      verification.op = ops[i];
-      verification.op.deployWalletIfNecessary(create2Factory);
-      verification.op.validateUserOp();
-      verification.context = verification.op.validatePaymasterIfNecessary(_getStake(verification.op.paymaster));
-      verification.gas = preValidationGas - gasleft();
+  function _createWalletIfNecessary(UserOperation calldata op) internal {
+    bool hasInitCode = op.hasInitCode();
+    bool isAlreadyDeployed = op.isAlreadyDeployed();
+    require((isAlreadyDeployed && !hasInitCode) || (!isAlreadyDeployed && hasInitCode), "EntryPoint: Wrong init code");
+
+    if (!isAlreadyDeployed) {
+      create2Factory.deploy(op.initCode, bytes32(op.nonce));
     }
   }
 
-  function _executeOps(UserOpVerification[] memory verifications) internal returns (uint256 totalGasCost) {
-    UserOpVerification memory verification;
-    for (uint256 i = 0; i < verifications.length; i++) {
-      verification = verifications[i];
-      uint256 gasCost = _executeOp(verification);
-      uint256 refund = verification.op.requiredPrefund() - gasCost;
-      totalGasCost += gasCost;
+  function _validateWallet(UserOperation calldata op) internal {
+    uint256 requiredPrefund = op.hasPaymaster() ? 0 : op.requiredPrefund();
+    uint256 initBalance = address(this).balance;
+    IWallet(op.sender).validateUserOp{ gas: op.verificationGas }(op, op.requestId(), requiredPrefund);
 
-      if (verification.op.hasPaymaster()) {
-        IPaymaster(verification.op.paymaster).postOp(PostOpMode.opSucceeded, verification.context, gasCost);
-        Stake storage stake = _getStake(verification.op.paymaster);
-        stake.value = stake.value + refund;
-      } else {
-        payable(verification.op.sender).sendValue(refund, "EntryPoint: Failed to refund");
-      }
-    }
+    uint256 actualPrefund = address(this).balance - initBalance;
+    require(actualPrefund >= requiredPrefund, "EntryPoint: incorrect prefund");
   }
 
-  function _executeOp(UserOpVerification memory verification) internal returns (uint256 gasCost) {
+  function _validatePaymaster(UserOperation calldata op) internal returns (bytes memory) {
+    if (!op.hasPaymaster()) return new bytes(0);
+
+    Stake storage stake = _getStake(op.paymaster);
+    require(stake.isLocked, "EntryPoint: Stake not locked");
+    uint256 requiredPrefund = op.requiredPrefund();
+    require(stake.value >= requiredPrefund, "EntryPoint: Insufficient stake");
+    stake.value = stake.value - requiredPrefund;
+
+    return IPaymaster(op.paymaster).validatePaymasterUserOp(op, requiredPrefund);
+  }
+
+  function _executeOp(UserOperation calldata op, UserOpVerification memory verification)
+    internal
+    returns (uint256 totalGasCost)
+  {
     uint256 preExecutionGas = gasleft();
-    verification.op.sender.callWithGas(verification.op.callData, verification.op.callGas, "EntryPoint: Execute failed");
-    uint256 gas = verification.gas + preExecutionGas - gasleft();
-    return gas * verification.op.gasPrice();
+    op.sender.callWithGas(op.callData, op.callGas, "EntryPoint: Execute failed");
+    uint256 totalGasUsed = verification.gasUsed + preExecutionGas - gasleft();
+    totalGasCost = totalGasUsed * op.gasPrice();
+    uint256 refund = op.requiredPrefund() - totalGasCost;
+
+    // TODO: someone has to pay for this call
+    if (op.hasPaymaster()) {
+      IPaymaster(op.paymaster).postOp(PostOpMode.opSucceeded, verification.context, totalGasCost);
+      Stake storage stake = _getStake(op.paymaster);
+      stake.value = stake.value + refund;
+    } else {
+      payable(op.sender).sendValue(refund, "EntryPoint: Failed to refund");
+    }
   }
 }
