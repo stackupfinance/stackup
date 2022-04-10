@@ -1,4 +1,5 @@
 import amplitude from 'amplitude-js';
+import Tracker from '@openreplay/tracker/cjs';
 import { App } from '../config';
 import { isClient } from './environment';
 
@@ -63,3 +64,8 @@ export const EVENTS = {
 export const logEvent = (event) => {
   amplitude.getInstance().logEvent(event);
 };
+
+export const openReplayTracker = new Tracker({
+  projectKey: App.openReplay.projectKey,
+  // __DISABLE_SECURE_MODE: true, // enable this during development mode
+});

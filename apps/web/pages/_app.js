@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { ChakraProvider, extendTheme } from '@chakra-ui/react';
 import { IntercomProvider } from 'react-use-intercom';
 import { useAuth } from '../src/hooks';
@@ -5,6 +6,8 @@ import { AlphaBanner } from '../src/components';
 import { IntercomManager, Web3Transactions } from '../src/containers';
 import { App as AppConfig } from '../src/config';
 import { overrideDefaultUserOpGasValues } from '../src/utils/web3';
+import { openReplayTracker } from '../src/utils/analytics';
+
 import '../styles.css';
 
 const theme = extendTheme({
@@ -15,6 +18,9 @@ const theme = extendTheme({
 });
 
 function App({ Component, pageProps }) {
+  useEffect(() => {
+    openReplayTracker.start();
+  }, []);
   useAuth();
   overrideDefaultUserOpGasValues();
 

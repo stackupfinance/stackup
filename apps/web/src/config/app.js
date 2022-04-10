@@ -25,4 +25,7 @@ export const App = {
     whitelist: process.env.NEXT_PUBLIC_FEATURE_FLAG_WHITELIST === 'true',
     alphaBanner: process.env.NEXT_PUBLIC_FEATURE_FLAG_ALPHA_BANNER === 'true',
   },
+  openReplay: {
+    projectKey: process.env.NEXT_PUBLIC_OPEN_REPLAY_PROJECT_KEY || '',
+  }
 };

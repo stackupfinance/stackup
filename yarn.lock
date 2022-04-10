@@ -3305,6 +3305,13 @@
   dependencies:
     "@octokit/openapi-types" "^11.2.0"
 
+"@openreplay/tracker@^3.5.4":
+  version "3.5.4"
+  resolved "https://registry.yarnpkg.com/@openreplay/tracker/-/tracker-3.5.4.tgz#511d54718e3a0d698a0d707294e2d912e7c87bc5"
+  integrity sha512-MO676sJ8q9AKW5GkvxYbheiZE+cuTQ7uDn0NV+y5Kt1G/7U/czKX0xx1IDTudPUPeqxHtrJ1v/xvYwFAaomqcw==
+  dependencies:
+    error-stack-parser "^2.0.6"
+
 "@openzeppelin/contracts-upgradeable@^4.5.2":
   version "4.5.2"
   resolved "https://registry.yarnpkg.com/@openzeppelin/contracts-upgradeable/-/contracts-upgradeable-4.5.2.tgz#90d9e47bacfd8693bfad0ac8a394645575528d05"
@@ -7476,6 +7483,13 @@ error-ex@^1.2.0, error-ex@^1.3.1:
   integrity sha512-7dFHNmqeFSEt2ZBsCriorKnn3Z2pj+fd9kmI6QoWw4//DL+icEBfc0U7qJCisqrTsKTjw4fNFy2pW9OqStD84g==
   dependencies:
     is-arrayish "^0.2.1"
+
+error-stack-parser@^2.0.6:
+  version "2.0.7"
+  resolved "https://registry.yarnpkg.com/error-stack-parser/-/error-stack-parser-2.0.7.tgz#b0c6e2ce27d0495cf78ad98715e0cad1219abb57"
+  integrity sha512-chLOW0ZGRf4s8raLrDxa5sdkvPec5YdvwbFnqJme4rk0rFajP8mPtrDL1+I+CwrQDCjswDA5sREX7jYQDQs9vA==
+  dependencies:
+    stackframe "^1.1.1"
 
 es-abstract@^1.18.5, es-abstract@^1.19.0, es-abstract@^1.19.1:
   version "1.19.1"
@@ -15488,6 +15502,11 @@ stack-utils@^2.0.3:
   integrity sha512-xrQcmYhOsn/1kX+Vraq+7j4oE2j/6BFscZ0etmYg81xuM8Gq0022Pxb8+IqgOFUIaxHs0KaSb7T1+OegiNrNFA==
   dependencies:
     escape-string-regexp "^2.0.0"
+
+stackframe@^1.1.1:
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/stackframe/-/stackframe-1.2.1.tgz#1033a3473ee67f08e2f2fc8eba6aef4f845124e1"
+  integrity sha512-h88QkzREN/hy8eRdyNhhsO7RSJ5oyTqxxmmn0dzBIMUclZsjpfmrsg81vp8mjjAs2vAZ72nyWxRUwSwmh0e4xg==
 
 stacktrace-parser@^0.1.10:
   version "0.1.10"
