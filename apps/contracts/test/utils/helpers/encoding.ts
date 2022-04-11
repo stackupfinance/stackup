@@ -18,6 +18,12 @@ export async function encodeWalletDeployment(entryPoint: Account, owner: Account
   return (deployTx?.data || '0x').toString()
 }
 
+export async function encodePaymasterInit(entryPoint: Account, owner: Account, guardians?: Account[]): Promise<string> {
+    const paymasterInterface = await getInterface('Paymaster')
+    const args = [toAddress(entryPoint), toAddress(owner), toAddresses(guardians)]
+    return paymasterInterface.encodeFunctionData('initialize', args)
+}
+
 export async function encodeWalletInit(entryPoint: Account, owner: Account, guardians?: Account[]): Promise<string> {
   const walletInterface = await getInterface('Wallet')
   const args = [toAddress(entryPoint), toAddress(owner), toAddresses(guardians)]
