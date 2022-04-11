@@ -92,7 +92,7 @@ export default class Wallet {
   }
 
   async validatePaymasterUserOp(op: UserOp, maxCost: BigNumberish = 0): Promise<string> {
-    return this.instance.validatePaymasterUserOp(op, maxCost)
+    return this.instance.validatePaymasterUserOp(op, ZERO_BYTES32, maxCost)
   }
 
   async validateUserOp(op: UserOp, requestId = ZERO_BYTES32, prefundOrParams: BigNumberish | TxParams = 0, params: TxParams = {}): Promise<ContractTransaction> {

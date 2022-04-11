@@ -53,12 +53,11 @@ contract Paymaster is IPaymaster, UpgradeableACL {
    * @param cost amount to be paid to the entry point in wei
    * @return context including the payment conditions: sender, token, exchange rate, and fees
    */
-  function validatePaymasterUserOp(UserOperation calldata op, uint256 cost)
-    external
-    view
-    override
-    returns (bytes memory context)
-  {
+  function validatePaymasterUserOp(
+    UserOperation calldata op,
+    bytes32, /* requestId */
+    uint256 cost
+  ) external view override returns (bytes memory context) {
     require(isOwner(op.paymasterSigner()), "Paymaster: Invalid signature");
 
     PaymasterData memory paymasterData = op.decodePaymasterData();
