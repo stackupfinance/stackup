@@ -14,10 +14,11 @@ enum PostOpMode {
  * @dev Paymaster interface specified in https://eips.ethereum.org/EIPS/eip-4337
  */
 interface IPaymaster {
-  function validatePaymasterUserOp(UserOperation calldata op, uint256 cost)
-    external
-    view
-    returns (bytes memory context);
+  function validatePaymasterUserOp(
+    UserOperation calldata op,
+    bytes32 requestId,
+    uint256 maxCost
+  ) external view returns (bytes memory context);
 
   function postOp(
     PostOpMode mode,
