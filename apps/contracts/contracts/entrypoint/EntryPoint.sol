@@ -102,24 +102,43 @@ contract EntryPoint is IEntryPoint, Staking {
     returns (uint256 totalGasCost)
   {
     uint256 preExecutionGas = gasleft();
-    op.sender.callWithGas(op.callData, op.callGas, "EntryPoint: Execute failed");
-
-    uint256 gasPrice = op.gasPrice();
-    uint256 requiredPrefund = op.requiredPrefund();
+    // solhint-disable-next-line avoid-low-level-calls
+    (bool success, ) = op.sender.call{ gas: op.callGas }(op.callData);
     uint256 totalGasUsed = verification.gasUsed + GasUsed.since(preExecutionGas);
-    totalGasCost = totalGasUsed * gasPrice;
-    uint256 refund = requiredPrefund.sub(totalGasCost, "EntryPoint: Insufficient refund");
+    totalGasCost = totalGasUsed * op.gasPrice();
+    uint256 refund = op.requiredPrefund().sub(totalGasCost, "EntryPoint: Insufficient refund");
 
     if (op.hasPaymaster()) {
-      IPaymaster(op.paymaster).postOp(PostOpMode.opSucceeded, verification.context, totalGasCost);
-      // Calculate gas cost again including post op and deduct this from the paymaster stake
-      totalGasUsed = verification.gasUsed + GasUsed.since(preExecutionGas);
-      totalGasCost = totalGasUsed * gasPrice;
-      refund = requiredPrefund.sub(totalGasCost, "EntryPoint: Insufficient refund");
-      Stake storage stake = _getStake(op.paymaster);
-      stake.value = stake.value + refund;
+      return _executePostOp(op, verification, preExecutionGas, totalGasCost, success);
     } else {
       payable(op.sender).sendValue(refund, "EntryPoint: Failed to refund");
     }
+  }
+
+  function _executePostOp(
+    UserOperation calldata op,
+    UserOpVerification memory verification,
+    uint256 preExecutionGas,
+    uint256 gasCost,
+    bool success
+  ) internal returns (uint256 actualGasCost) {
+    uint256 gasPrice = op.gasPrice();
+    uint256 requiredPrefund = op.requiredPrefund();
+    PostOpMode mode = success ? PostOpMode.opSucceeded : PostOpMode.opReverted;
+
+    try IPaymaster(op.paymaster).postOp(mode, verification.context, gasCost) {
+      uint256 totalGasUsed = verification.gasUsed + GasUsed.since(preExecutionGas);
+      actualGasCost = totalGasUsed * gasPrice;
+    } catch {
+      uint256 gasUsedIncludingPostOp = verification.gasUsed + GasUsed.since(preExecutionGas);
+      uint256 gasCostIncludingPostOp = gasUsedIncludingPostOp * gasPrice;
+      IPaymaster(op.paymaster).postOp(PostOpMode.postOpReverted, verification.context, gasCostIncludingPostOp);
+      uint256 totalGasUsed = verification.gasUsed + GasUsed.since(preExecutionGas);
+      actualGasCost = totalGasUsed * gasPrice;
+    }
+
+    uint256 refund = requiredPrefund.sub(actualGasCost, "EntryPoint: Insufficient refund");
+    Stake storage stake = _getStake(op.paymaster);
+    stake.value = stake.value + refund;
   }
 }

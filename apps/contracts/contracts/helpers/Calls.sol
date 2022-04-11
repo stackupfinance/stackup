@@ -29,22 +29,6 @@ library Calls {
    * If the call succeeds, it returns the raw returned data.
    * If `target` reverts with a revert reason, it is bubbled up. Otherwise, it reverts with `errorMessage`.
    */
-  function callWithGas(
-    address target,
-    bytes memory data,
-    uint256 gas,
-    string memory errorMessage
-  ) internal returns (bytes memory) {
-    require(Address.isContract(target), "Address: call to non-contract");
-    (bool success, bytes memory returndata) = target.call{ gas: gas }(data);
-    return Address.verifyCallResult(success, returndata, errorMessage);
-  }
-
-  /**
-   * @dev Performs a Solidity function call using a low level `call` with `gas` gas.
-   * If the call succeeds, it returns the raw returned data.
-   * If `target` reverts with a revert reason, it is bubbled up. Otherwise, it reverts with `errorMessage`.
-   */
   function callWithValue(
     address target,
     bytes memory data,

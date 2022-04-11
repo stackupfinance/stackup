@@ -3,12 +3,12 @@ import { ethers } from 'hardhat'
 import { Contract } from 'ethers'
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/dist/src/signer-with-address'
 
-import { bn, fp} from './utils/helpers/numbers'
-import { getSigner} from './utils/helpers/signers'
-import { ZERO_ADDRESS} from './utils/helpers/constants'
-import { deploy, instanceAt} from './utils/helpers/contracts'
-import { advanceTime, currentTimestamp} from './utils/helpers/time'
-import { assertIndirectEvent, assertNoIndirectEvent, assertWithError} from './utils/helpers/asserts'
+import { bn, fp } from './utils/helpers/numbers'
+import { getSigner } from './utils/helpers/signers'
+import { deploy, instanceAt } from './utils/helpers/contracts'
+import { advanceTime, currentTimestamp } from './utils/helpers/time'
+import { assertIndirectEvent, assertNoIndirectEvent, assertWithError } from './utils/helpers/asserts'
+import { POST_OP_MODE_FAIL, POST_OP_MODE_OK, POST_OP_MODE_OP_FAIL, ZERO_ADDRESS } from './utils/helpers/constants'
 import { encodeCounterIncrement, encodeReverterFail, encodeWalletExecute, encodeWalletMockDeployment } from './utils/helpers/encoding'
 
 import EntryPoint from './utils/models/entry-point/EntryPoint'
@@ -30,7 +30,7 @@ describe('EntryPoint', () => {
     })
 
     const itHandleOpsProperly = (itHandlesWalletCreationProperly: Function) => {
-      const itHandleOpsProperlyNeverthelessPaymaster = (itHandlesRefundsProperly: Function) => {
+      const itHandleOpsProperlyNeverthelessPaymaster = (itHandlesRefundsProperly: Function, itHandlesRevertedOpsProperly: Function) => {
         context('when there is some call data', () => {
           let mock: Contract
 
@@ -70,38 +70,26 @@ describe('EntryPoint', () => {
             })
 
             context('when the user does not specify a call gas value', () => {
-              // TODO: Execute fails (revert), user should pay gas anyway
-
               beforeEach('set call gas', async () => {
                 op.callGas = 0
               })
 
-              it.skip('forces to pay gas anyway', async () => {
-                await entryPoint.handleOps(op)
-              })
+              itHandlesRevertedOpsProperly()
             })
           })
 
           context('when the specified call reverts', () => {
-            // TODO: Execute fails (OOG), user should pay gas anyway
-
             beforeEach('set call data', async () => {
               mock = await deploy('Reverter')
               op.callData = await encodeWalletExecute(mock, await encodeReverterFail())
             })
 
-            it.skip('forces to pay gas anyway', async () => {
-              await entryPoint.handleOps(op)
-            })
+            itHandlesRevertedOpsProperly()
           })
         })
 
         context('when there is no call data', () => {
-          // TODO: Execute fails (calling non-contract), user should pay gas anyway
-
-          it.skip('forces to pay gas anyway', async () => {
-            await entryPoint.handleOps(op)
-          })
+          itHandlesRevertedOpsProperly()
         })
       }
 
@@ -136,6 +124,19 @@ describe('EntryPoint', () => {
 
                   const currentBalance = await ethers.provider.getBalance(op.sender)
                   expect(currentBalance).to.be.equal(previousBalance)
+                })
+              }, () => {
+                it('does not to pay gas anyway', async () => {
+                  const previousRedeemerBalance = await ethers.provider.getBalance(redeemer)
+                  const previousPayerBalance = await ethers.provider.getBalance(op.sender)
+
+                  await entryPoint.handleOps(op)
+
+                  const currentRedeemerBalance = await ethers.provider.getBalance(redeemer)
+                  expect(currentRedeemerBalance).to.be.eq(previousRedeemerBalance)
+
+                  const currentPayerBalance = await ethers.provider.getBalance(op.sender)
+                  expect(currentPayerBalance).to.be.eq(previousPayerBalance)
                 })
               })
             })
@@ -181,6 +182,19 @@ describe('EntryPoint', () => {
                     const prefundPaid = currentRedeemerBalance.sub(previousRedeemerBalance)
                     const currentWalletBalance = await ethers.provider.getBalance(op.sender)
                     expect(currentWalletBalance.add(prefundPaid)).to.be.equal(previousWalletBalance)
+                  })
+                }, () => {
+                  it('forces to pay gas anyway', async () => {
+                    const previousRedeemerBalance = await ethers.provider.getBalance(redeemer)
+                    const previousPayerBalance = await ethers.provider.getBalance(op.sender)
+
+                    await entryPoint.handleOps(op)
+
+                    const currentRedeemerBalance = await ethers.provider.getBalance(redeemer)
+                    expect(currentRedeemerBalance).to.be.gt(previousRedeemerBalance)
+
+                    const currentPayerBalance = await ethers.provider.getBalance(op.sender)
+                    expect(currentPayerBalance).to.be.lt(previousPayerBalance)
                   })
                 })
               })
@@ -244,6 +258,19 @@ describe('EntryPoint', () => {
                     const prefundPaid = currentRedeemerBalance.sub(previousRedeemerBalance)
                     const currentWalletBalance = await ethers.provider.getBalance(op.sender)
                     expect(currentWalletBalance.add(prefundPaid)).to.be.equal(previousWalletBalance)
+                  })
+                }, () => {
+                  it('forces to pay gas anyway', async () => {
+                    const previousRedeemerBalance = await ethers.provider.getBalance(redeemer)
+                    const previousPayerBalance = await ethers.provider.getBalance(op.sender)
+
+                    await entryPoint.handleOps(op)
+
+                    const currentRedeemerBalance = await ethers.provider.getBalance(redeemer)
+                    expect(currentRedeemerBalance).to.be.gt(previousRedeemerBalance)
+
+                    const currentPayerBalance = await ethers.provider.getBalance(op.sender)
+                    expect(currentPayerBalance).to.be.lt(previousPayerBalance)
                   })
                 })
               })
@@ -334,32 +361,88 @@ describe('EntryPoint', () => {
                     })
 
                     context('when the verification gas is enough', () => {
-                      itHandleOpsProperlyNeverthelessPaymaster(() => {
-                        it('does not pay to the redeemer', async () => {
-                          const previousBalance = await ethers.provider.getBalance(redeemer)
-
-                          await entryPoint.handleOps(op, redeemer)
-
-                          const currentBalance = await ethers.provider.getBalance(redeemer)
-                          expect(currentBalance).to.be.equal(previousBalance)
+                      context('when the paymaster post op succeeds', () => {
+                        beforeEach('mock paymaster post op', async () => {
+                          await paymaster.mockPostOpRevert(false)
                         })
 
-                        it('does not decrease the paymaster stake', async () => {
-                          const { value: previousStakedBalance } = await entryPoint.getStake(paymaster)
+                        itHandleOpsProperlyNeverthelessPaymaster(() => {
+                          it('does not pay to the redeemer', async () => {
+                            const previousBalance = await ethers.provider.getBalance(redeemer)
 
-                          await entryPoint.handleOps(op, redeemer)
+                            await entryPoint.handleOps(op, redeemer)
 
-                          const { value: currentStakedBalance } = await entryPoint.getStake(paymaster)
-                          expect(currentStakedBalance).to.be.equal(previousStakedBalance)
+                            const currentBalance = await ethers.provider.getBalance(redeemer)
+                            expect(currentBalance).to.be.equal(previousBalance)
+                          })
+
+                          it('does not decrease the paymaster stake', async () => {
+                            const { value: previousStakedBalance } = await entryPoint.getStake(paymaster)
+
+                            await entryPoint.handleOps(op, redeemer)
+
+                            const { value: currentStakedBalance } = await entryPoint.getStake(paymaster)
+                            expect(currentStakedBalance).to.be.equal(previousStakedBalance)
+                          })
+
+                          it('does not decreases the wallet balance', async () => {
+                            const previousBalance = await ethers.provider.getBalance(op.sender)
+
+                            await entryPoint.handleOps(op, redeemer)
+
+                            const currentBalance = await ethers.provider.getBalance(op.sender)
+                            expect(currentBalance).to.be.equal(previousBalance)
+                          })
+
+                          it('calls the paymaster with the succeed mode', async () => {
+                            const tx = await entryPoint.handleOps(op)
+
+                            await assertIndirectEvent(tx, paymaster.interface, 'PostOp', { mode: POST_OP_MODE_OK })
+                          })
+                        }, () => {
+                          it('does not force to pay gas anyway', async () => {
+                            const previousRedeemerBalance = await ethers.provider.getBalance(redeemer)
+                            const previousPayerBalance = await ethers.provider.getBalance(op.sender)
+
+                            await entryPoint.handleOps(op)
+
+                            const currentRedeemerBalance = await ethers.provider.getBalance(redeemer)
+                            expect(currentRedeemerBalance).to.be.eq(previousRedeemerBalance)
+
+                            const currentPayerBalance = await ethers.provider.getBalance(op.sender)
+                            expect(currentPayerBalance).to.be.eq(previousPayerBalance)
+                          })
+
+                          it('calls the paymaster with the reverted mode', async () => {
+                            const tx = await entryPoint.handleOps(op)
+
+                            await assertIndirectEvent(tx, paymaster.interface, 'PostOp', { mode: POST_OP_MODE_FAIL })
+                          })
+                        })
+                      })
+
+                      context('when the paymaster post op fails', () => {
+                        beforeEach('mock paymaster post op', async () => {
+                          await paymaster.mockPostOpRevert(true)
                         })
 
-                        it('does not decreases the wallet balance', async () => {
-                          const previousBalance = await ethers.provider.getBalance(op.sender)
+                        it('does not force to pay gas anyway', async () => {
+                          const previousRedeemerBalance = await ethers.provider.getBalance(redeemer)
+                          const previousPayerBalance = await ethers.provider.getBalance(op.sender)
 
-                          await entryPoint.handleOps(op, redeemer)
+                          await entryPoint.handleOps(op)
 
-                          const currentBalance = await ethers.provider.getBalance(op.sender)
-                          expect(currentBalance).to.be.equal(previousBalance)
+                          const currentRedeemerBalance = await ethers.provider.getBalance(redeemer)
+                          expect(currentRedeemerBalance).to.be.eq(previousRedeemerBalance)
+
+                          const currentPayerBalance = await ethers.provider.getBalance(op.sender)
+                          expect(currentPayerBalance).to.be.eq(previousPayerBalance)
+                        })
+
+                        it('calls the paymaster with the post op reverted mode', async () => {
+                          const tx = await entryPoint.handleOps(op)
+
+                          await assertIndirectEvent(tx, paymaster.interface, 'PostOp', { mode: POST_OP_MODE_OP_FAIL })
                         })
                       })
                     })
@@ -469,35 +552,90 @@ describe('EntryPoint', () => {
                       })
 
                       context('when the verification gas is enough', () => {
+                        context('when the paymaster post op succeeds', () => {
+                          beforeEach('mock paymaster post op', async () => {
+                            await paymaster.mockPostOpRevert(false)
+                          })
 
-                        itHandleOpsProperlyNeverthelessPaymaster(() => {
-                          it('pays the redeemer', async () => {
-                            const expectedRefund = await entryPoint.estimatePrefund(op)
+                          itHandleOpsProperlyNeverthelessPaymaster(() => {
+                            it('pays the redeemer', async () => {
+                              const expectedRefund = await entryPoint.estimatePrefund(op)
+                              const previousRedeemerBalance = await ethers.provider.getBalance(redeemer)
+
+                              await entryPoint.handleOps(op, redeemer)
+
+                              const currentRedeemerBalance = await ethers.provider.getBalance(redeemer)
+                              assertWithError(currentRedeemerBalance, previousRedeemerBalance.add(expectedRefund), 0.1)
+                            })
+
+                            it('decreases the paymaster stake', async () => {
+                              const expectedRefund = await entryPoint.estimatePrefund(op)
+                              const { value: previousStakedBalance } = await entryPoint.getStake(paymaster)
+
+                              await entryPoint.handleOps(op, redeemer)
+
+                              const { value: currentStakedBalance } = await entryPoint.getStake(paymaster)
+                              assertWithError(currentStakedBalance, previousStakedBalance.sub(expectedRefund), 0.1)
+                            })
+
+                            it('does not refund the unused gas to the wallet', async () => {
+                              const previousWalletBalance = await ethers.provider.getBalance(op.sender)
+
+                              await entryPoint.handleOps(op, redeemer)
+
+                              const currentWalletBalance = await ethers.provider.getBalance(op.sender)
+                              expect(currentWalletBalance).to.be.equal(previousWalletBalance)
+                            })
+
+                            it('calls the paymaster with the succeed mode', async () => {
+                              const tx = await entryPoint.handleOps(op)
+
+                              await assertIndirectEvent(tx, paymaster.interface, 'PostOp', { mode: POST_OP_MODE_OK })
+                            })
+                          }, () => {
+                            it('forces to pay gas anyway', async () => {
+                              const previousRedeemerBalance = await ethers.provider.getBalance(redeemer)
+                              const previousPayerBalance = (await entryPoint.getStake(op.paymaster)).value
+
+                              await entryPoint.handleOps(op)
+
+                              const currentRedeemerBalance = await ethers.provider.getBalance(redeemer)
+                              expect(currentRedeemerBalance).to.be.gt(previousRedeemerBalance)
+
+                              const currentPayerBalance = (await entryPoint.getStake(op.paymaster)).value
+                              expect(currentPayerBalance).to.be.lt(previousPayerBalance)
+                            })
+
+                            it('calls the paymaster with the reverted op mode', async () => {
+                              const tx = await entryPoint.handleOps(op)
+
+                              await assertIndirectEvent(tx, paymaster.interface, 'PostOp', { mode: POST_OP_MODE_FAIL })
+                            })
+                          })
+                        })
+
+                        context('when the paymaster post op fails', () => {
+                          beforeEach('mock paymaster post op', async () => {
+                            await paymaster.mockPostOpRevert(true)
+                          })
+
+                          it('forces to pay gas anyway', async () => {
                             const previousRedeemerBalance = await ethers.provider.getBalance(redeemer)
+                            const previousPayerBalance = (await entryPoint.getStake(op.paymaster)).value
 
-                            await entryPoint.handleOps(op, redeemer)
+                            await entryPoint.handleOps(op)
 
                             const currentRedeemerBalance = await ethers.provider.getBalance(redeemer)
-                            assertWithError(currentRedeemerBalance, previousRedeemerBalance.add(expectedRefund), 0.1)
+                            expect(currentRedeemerBalance).to.be.gt(previousRedeemerBalance)
+
+                            const currentPayerBalance = (await entryPoint.getStake(op.paymaster)).value
+                            expect(currentPayerBalance).to.be.lt(previousPayerBalance)
                           })
 
-                          it('decreases the paymaster stake', async () => {
-                            const expectedRefund = await entryPoint.estimatePrefund(op)
-                            const { value: previousStakedBalance } = await entryPoint.getStake(paymaster)
+                          it('calls the paymaster with the post op reverted mode', async () => {
+                            const tx = await entryPoint.handleOps(op)
 
-                            await entryPoint.handleOps(op, redeemer)
-
-                            const { value: currentStakedBalance } = await entryPoint.getStake(paymaster)
-                            assertWithError(currentStakedBalance, previousStakedBalance.sub(expectedRefund), 0.1)
-                          })
-
-                          it('does not refund the unused gas to the wallet', async () => {
-                            const previousWalletBalance = await ethers.provider.getBalance(op.sender)
-
-                            await entryPoint.handleOps(op, redeemer)
-
-                            const currentWalletBalance = await ethers.provider.getBalance(op.sender)
-                            expect(currentWalletBalance).to.be.equal(previousWalletBalance)
+                            await assertIndirectEvent(tx, paymaster.interface, 'PostOp', { mode: POST_OP_MODE_OP_FAIL })
                           })
                         })
                       })
@@ -618,34 +756,91 @@ describe('EntryPoint', () => {
                       })
 
                       context('when the verification gas is not enough', () => {
-                        itHandleOpsProperlyNeverthelessPaymaster(() => {
-                          it('pays the redeemer', async () => {
-                            const expectedRefund = await entryPoint.estimatePrefund(op)
-                            const previousRedeemerBalance = await ethers.provider.getBalance(redeemer)
 
-                            await entryPoint.handleOps(op, redeemer)
+                        context('when the paymaster post op succeeds', () => {
+                          beforeEach('mock paymaster post op', async () => {
+                            await paymaster.mockPostOpRevert(false)
+                          })
+
+                          itHandleOpsProperlyNeverthelessPaymaster(() => {
+                            it('pays the redeemer', async () => {
+                              const expectedRefund = await entryPoint.estimatePrefund(op)
+                              const previousRedeemerBalance = await ethers.provider.getBalance(redeemer)
+
+                              await entryPoint.handleOps(op, redeemer)
+
+                              const currentRedeemerBalance = await ethers.provider.getBalance(redeemer)
+                              assertWithError(currentRedeemerBalance, previousRedeemerBalance.add(expectedRefund), 0.1)
+                            })
+
+                            it('decreases the paymaster stake', async () => {
+                              const expectedRefund = await entryPoint.estimatePrefund(op)
+                              const { value: previousStakedBalance } = await entryPoint.getStake(paymaster)
+
+                              await entryPoint.handleOps(op, redeemer)
+
+                              const { value: currentStakedBalance } = await entryPoint.getStake(paymaster)
+                              assertWithError(currentStakedBalance, previousStakedBalance.sub(expectedRefund), 0.1)
+                            })
+
+                            it('does not refund the unused gas to the wallet', async () => {
+                              const previousWalletBalance = await ethers.provider.getBalance(op.sender)
+
+                              await entryPoint.handleOps(op, redeemer)
+
+                              const currentWalletBalance = await ethers.provider.getBalance(op.sender)
+                              expect(currentWalletBalance).to.be.equal(previousWalletBalance)
+                            })
+
+                            it('calls the paymaster with the succeed mode', async () => {
+                              const tx = await entryPoint.handleOps(op)
+
+                              await assertIndirectEvent(tx, paymaster.interface, 'PostOp', { mode: POST_OP_MODE_OK })
+                            })
+                          }, () => {
+                            it('forces to pay gas anyway', async () => {
+                              const previousRedeemerBalance = await ethers.provider.getBalance(redeemer)
+                              const previousPayerBalance = (await entryPoint.getStake(op.paymaster)).value
+
+                              await entryPoint.handleOps(op)
+
+                              const currentRedeemerBalance = await ethers.provider.getBalance(redeemer)
+                              expect(currentRedeemerBalance).to.be.gt(previousRedeemerBalance)
+
+                              const currentPayerBalance = (await entryPoint.getStake(op.paymaster)).value
+                              expect(currentPayerBalance).to.be.lt(previousPayerBalance)
+                            })
+
+                            it('calls the paymaster with the reverted op mode', async () => {
+                              const tx = await entryPoint.handleOps(op)
+
+                              await assertIndirectEvent(tx, paymaster.interface, 'PostOp', { mode: POST_OP_MODE_FAIL })
+                            })
+                          })
+                        })
+
+                        context('when the paymaster post op fails', () => {
+                          beforeEach('mock paymaster post op', async () => {
+                            await paymaster.mockPostOpRevert(true)
+                          })
+
+                          it('forces to pay gas anyway', async () => {
+                            const previousRedeemerBalance = await ethers.provider.getBalance(redeemer)
+                            const previousPayerBalance = (await entryPoint.getStake(op.paymaster)).value
+
+                            await entryPoint.handleOps(op)
 
                             const currentRedeemerBalance = await ethers.provider.getBalance(redeemer)
-                            assertWithError(currentRedeemerBalance, previousRedeemerBalance.add(expectedRefund), 0.1)
+                            expect(currentRedeemerBalance).to.be.gt(previousRedeemerBalance)
+
+                            const currentPayerBalance = (await entryPoint.getStake(op.paymaster)).value
+                            expect(currentPayerBalance).to.be.lt(previousPayerBalance)
                           })
 
-                          it('decreases the paymaster stake', async () => {
-                            const expectedRefund = await entryPoint.estimatePrefund(op)
-                            const { value: previousStakedBalance } = await entryPoint.getStake(paymaster)
+                          it('calls the paymaster with the post op reverted mode', async () => {
+                            const tx = await entryPoint.handleOps(op)
 
-                            await entryPoint.handleOps(op, redeemer)
-
-                            const { value: currentStakedBalance } = await entryPoint.getStake(paymaster)
-                            assertWithError(currentStakedBalance, previousStakedBalance.sub(expectedRefund), 0.1)
-                          })
-
-                          it('does not refund the unused gas to the wallet', async () => {
-                            const previousWalletBalance = await ethers.provider.getBalance(op.sender)
-
-                            await entryPoint.handleOps(op, redeemer)
-
-                            const currentWalletBalance = await ethers.provider.getBalance(op.sender)
-                            expect(currentWalletBalance).to.be.equal(previousWalletBalance)
+                            await assertIndirectEvent(tx, paymaster.interface, 'PostOp', { mode: POST_OP_MODE_OP_FAIL })
                           })
                         })
                       })
