@@ -103,13 +103,19 @@ contract EntryPoint is IEntryPoint, Staking {
   {
     uint256 preExecutionGas = gasleft();
     op.sender.callWithGas(op.callData, op.callGas, "EntryPoint: Execute failed");
-    uint256 totalGasUsed = verification.gasUsed + GasUsed.since(preExecutionGas);
-    totalGasCost = totalGasUsed * op.gasPrice();
-    uint256 refund = op.requiredPrefund().sub(totalGasCost, "EntryPoint: Insufficient refund");
 
-    // TODO: someone has to pay for this call
+    uint256 gasPrice = op.gasPrice();
+    uint256 requiredPrefund = op.requiredPrefund();
+    uint256 totalGasUsed = verification.gasUsed + GasUsed.since(preExecutionGas);
+    totalGasCost = totalGasUsed * gasPrice;
+    uint256 refund = requiredPrefund.sub(totalGasCost, "EntryPoint: Insufficient refund");
+
     if (op.hasPaymaster()) {
       IPaymaster(op.paymaster).postOp(PostOpMode.opSucceeded, verification.context, totalGasCost);
+      // Calculate gas cost again including post op and deduct this from the paymaster stake
+      totalGasUsed = verification.gasUsed + GasUsed.since(preExecutionGas);
+      totalGasCost = totalGasUsed * gasPrice;
+      refund = requiredPrefund.sub(totalGasCost, "EntryPoint: Insufficient refund");
       Stake storage stake = _getStake(op.paymaster);
       stake.value = stake.value + refund;
     } else {
