@@ -43,6 +43,7 @@ abstract contract UpgradeableACL is IERC1271, Initializable, UUPSUpgradeable, Ac
     // it has permission to grant and revoke this role. Extra precautions should be taken to secure accounts that
     // have been granted it." Simply to avoid using the default admin role, and use `OWNER_ROLE` instead, we
     // change the admin role of `OWNER_ROLE` to `OWNER_ROLE` instead.
+    require(_owner != address(0), "ACL: Owner cannot be zero");
     _setRoleAdmin(OWNER_ROLE, OWNER_ROLE);
     _grantRole(OWNER_ROLE, _owner);
 
@@ -142,6 +143,7 @@ abstract contract UpgradeableACL is IERC1271, Initializable, UUPSUpgradeable, Ac
    * @dev Transfers owner permissions from the owner at index #0 to another account
    */
   function transferOwner(address account) external authenticate {
+    require(account != address(0), "ACL: Owner cannot be zero");
     _revokeRole(OWNER_ROLE, getRoleMember(OWNER_ROLE, 0));
     _grantRole(OWNER_ROLE, account);
   }
