@@ -55,6 +55,10 @@ export default class Paymaster {
     return this.instance.getGuardian(index)
   }
 
+  async getMinGuardiansSignatures(): Promise<BigNumber> {
+    return this.instance.getMinGuardiansSignatures()
+  }
+
   async getRoleMemberCount(role: string): Promise<BigNumber> {
     return this.instance.getRoleMemberCount(role)
   }
