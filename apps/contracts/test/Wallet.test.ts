@@ -178,7 +178,7 @@ describe('Wallet', () => {
                   })
 
                   it('reverts', async () => {
-                    await expect(wallet.validateUserOp(op, requestId, { from })).to.be.revertedWith('Wallet: Invalid owner sig')
+                    await expect(wallet.validateUserOp(op, requestId, { from })).to.be.revertedWith('Wallet: Signer not an owner')
                   })
                 })
               })
@@ -351,7 +351,7 @@ describe('Wallet', () => {
                     })
 
                     it('reverts', async () => {
-                      await expect(wallet.validateUserOp(op, requestId, { from })).to.be.revertedWith('Wallet: Not a guardian')
+                      await expect(wallet.validateUserOp(op, requestId, { from })).to.be.revertedWith('Wallet: Signer not a guardian')
                     })
                   })
                 })
@@ -456,7 +456,7 @@ describe('Wallet', () => {
                       })
 
                       it('reverts', async () => {
-                        await expect(wallet.validateUserOp(op, requestId, { from })).to.be.revertedWith('Wallet: Not a guardian')
+                        await expect(wallet.validateUserOp(op, requestId, { from })).to.be.revertedWith('Wallet: Signer not a guardian')
                       })
                     })
                   })

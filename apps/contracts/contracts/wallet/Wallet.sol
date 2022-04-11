@@ -59,9 +59,9 @@ contract Wallet is IWallet, UpgradeableACL, Paymaster {
   }
 
   function _validateOwnerSignature(WalletSignature memory walletSignature, bytes32 requestId) internal view {
-    bytes memory signature = walletSignature.values[0].signature;
-    address signer = requestId.toEthSignedMessageHash().recover(signature);
-    require(isOwner(signer), "Wallet: Invalid owner sig");
+    WalletSignatureValue memory value = walletSignature.values[0];
+    require(value.isValid(requestId), "Wallet: Invalid owner sig");
+    require(isOwner(value.signer), "Wallet: Signer not an owner");
   }
 
   function _validateGuardiansSignature(
@@ -75,7 +75,7 @@ contract Wallet is IWallet, UpgradeableACL, Paymaster {
     for (uint256 i = 0; i < walletSignature.values.length; i++) {
       WalletSignatureValue memory value = walletSignature.values[i];
       require(value.isValid(requestId), "Wallet: Invalid guardian sig");
-      require(isGuardian(value.signer), "Wallet: Not a guardian");
+      require(isGuardian(value.signer), "Wallet: Signer not a guardian");
     }
   }
 }
