@@ -5,8 +5,14 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 contract TokenMock is ERC20 {
-  constructor(string memory symbol) ERC20(symbol, symbol) {
-    // solhint-disable-previous-line no-empty-blocks
+  uint8 internal _decimals;
+
+  constructor(string memory symbol, uint8 decimals_) ERC20(symbol, symbol) {
+    _decimals = decimals_;
+  }
+
+  function decimals() public view override returns (uint8) {
+    return _decimals;
   }
 
   function mint(address account, uint256 amount) external {

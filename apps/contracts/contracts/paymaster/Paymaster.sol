@@ -4,6 +4,7 @@ pragma solidity ^0.8.0;
 
 import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
+import "@openzeppelin/contracts/utils/math/SafeCast.sol";
 
 import "./IPaymaster.sol";
 import "./PaymasterHelpers.sol";
@@ -85,7 +86,7 @@ contract Paymaster is IPaymaster, UpgradeableACL {
   ) external override authenticate {
     (mode);
     PaymasterContext memory data = context.decodePaymasterContext();
-    uint256 totalCost = _calcTokens(data.token, data.rate, cost) + data.fee;
+    uint256 totalCost = ((cost * data.rate) / 1e18) + data.fee;
     data.token.transferFrom(data.sender, address(this), totalCost);
   }
 
@@ -95,34 +96,25 @@ contract Paymaster is IPaymaster, UpgradeableACL {
    * @param cost to be paid in wei
    */
   function _getTokenFee(PaymasterData memory data, uint256 cost) internal view returns (uint256 rate, uint256 fee) {
-    rate = _getTokenExchangeRate(data.token, data.feed);
-    fee = _calcTokens(data.token, rate, cost) + data.fee;
-  }
-
-  /**
-   * @dev Computes how many tokens must be paid to cover given costs in wei using a specific exchange rate
-   * @param token to use for payment
-   * @param rate wei exchange rate to be used expressed using the token's decimals
-   * @param cost to be paid in wei
-   */
-  function _calcTokens(
-    IERC20Metadata token,
-    uint256 rate,
-    uint256 cost
-  ) internal view returns (uint256) {
-    uint256 scalingFactor = 10**token.decimals();
-    return (cost * rate * scalingFactor) / (1e18 * scalingFactor);
+    uint8 decimals = data.token.decimals();
+    rate = _getTokenExchangeRate(data.feed, decimals);
+    fee = ((cost * rate) / 1e18) + data.fee;
   }
 
   /**
    * @dev Tells the exchange rate for the token/ETH pair expressed in token's decimals
-   * @param token to be queried
    * @param feed Chainlink datafeed
+   * @param tokenDecimals Decimals of the token associated to the price feed
    */
-  function _getTokenExchangeRate(IERC20Metadata token, AggregatorV3Interface feed) internal view returns (uint256) {
-    // TODO: fix
-    (, int256 price, , , ) = feed.latestRoundData();
-    // Chainlink datafeeds return either 8 or 18 decimals
-    return uint256(price) / 10**(feed.decimals() - token.decimals());
+  function _getTokenExchangeRate(AggregatorV3Interface feed, uint8 tokenDecimals) internal view returns (uint256) {
+    (, int256 priceInt, , , ) = feed.latestRoundData();
+    uint256 price = SafeCast.toUint256(priceInt);
+    uint8 feedDecimals = feed.decimals();
+
+    // Chainlink data feeds return either 8 or 18 decimals
+    return
+      tokenDecimals >= feedDecimals
+        ? (price * 10**(tokenDecimals - feedDecimals))
+        : (price / 10**(feedDecimals - tokenDecimals));
   }
 }

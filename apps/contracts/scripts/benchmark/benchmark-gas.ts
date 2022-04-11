@@ -85,7 +85,7 @@ async function withPaymaster(entryPoint: Contract): Promise<void> {
 
   const fee = bn(100000)
   const exchangeRate = fp(2)
-  const token = await deploy('TokenMock', ['USDC'])
+  const token = await deploy('TokenMock', ['USDC', 6])
   const feed = await deploy('PriceFeedMock', [18, exchangeRate])
   const paymaster = await createPaymaster(entryPoint, paymasterOwner)
 
