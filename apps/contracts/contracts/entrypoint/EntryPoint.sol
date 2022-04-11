@@ -11,6 +11,7 @@ import "./ISingletonFactory.sol";
 import "./EntryPointHelpers.sol";
 import "../UserOperation.sol";
 import "../helpers/Calls.sol";
+import "../helpers/GasUsed.sol";
 import "../wallet/IWallet.sol";
 import "../paymaster/IPaymaster.sol";
 
@@ -59,10 +60,10 @@ contract EntryPoint is IEntryPoint, Staking {
     _createWalletIfNecessary(op);
     _validateWallet(op);
 
-    uint256 walletValidationGas = preValidationGas - gasleft();
+    uint256 walletValidationGas = GasUsed.since(preValidationGas);
     uint256 paymasterValidationGas = op.verificationGas.sub(walletValidationGas, "EntryPoint: Verif gas not enough");
     verification.context = _validatePaymaster(op, paymasterValidationGas);
-    verification.gasUsed = preValidationGas - gasleft();
+    verification.gasUsed = GasUsed.since(preValidationGas);
     require(verification.gasUsed <= op.verificationGas, "EntryPoint: Verif gas not enough");
   }
 
@@ -81,7 +82,7 @@ contract EntryPoint is IEntryPoint, Staking {
     uint256 initBalance = address(this).balance;
     IWallet(op.sender).validateUserOp{ gas: op.verificationGas }(op, op.requestId(), requiredPrefund);
 
-    uint256 actualPrefund = address(this).balance - initBalance;
+    uint256 actualPrefund = address(this).balance.sub(initBalance, "EntryPoint: Balance decreased");
     require(actualPrefund >= requiredPrefund, "EntryPoint: incorrect prefund");
   }
 
@@ -91,8 +92,7 @@ contract EntryPoint is IEntryPoint, Staking {
     Stake storage stake = _getStake(op.paymaster);
     require(stake.isLocked, "EntryPoint: Stake not locked");
     uint256 requiredPrefund = op.requiredPrefund();
-    require(stake.value >= requiredPrefund, "EntryPoint: Insufficient stake");
-    stake.value = stake.value - requiredPrefund;
+    stake.value = stake.value.sub(requiredPrefund, "EntryPoint: Insufficient stake");
 
     return IPaymaster(op.paymaster).validatePaymasterUserOp{ gas: validationGas }(op, requiredPrefund);
   }
@@ -103,9 +103,9 @@ contract EntryPoint is IEntryPoint, Staking {
   {
     uint256 preExecutionGas = gasleft();
     op.sender.callWithGas(op.callData, op.callGas, "EntryPoint: Execute failed");
-    uint256 totalGasUsed = verification.gasUsed + preExecutionGas - gasleft();
+    uint256 totalGasUsed = verification.gasUsed + GasUsed.since(preExecutionGas);
     totalGasCost = totalGasUsed * op.gasPrice();
-    uint256 refund = op.requiredPrefund() - totalGasCost;
+    uint256 refund = op.requiredPrefund().sub(totalGasCost, "EntryPoint: Insufficient refund");
 
     // TODO: someone has to pay for this call
     if (op.hasPaymaster()) {
