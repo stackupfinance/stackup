@@ -524,12 +524,10 @@ describe('EntryPoint', () => {
                           it('decreases the paymaster stake', async () => {
                             const expectedRefund = await entryPoint.estimatePrefund(op)
                             const { value: previousStakedBalance } = await entryPoint.getStake(paymaster)
-                            console.log('previousStakedBalance:', previousStakedBalance.toString())
 
                             await entryPoint.handleOps(op, redeemer)
 
                             const { value: currentStakedBalance } = await entryPoint.getStake(paymaster)
-                            console.log('currentStakedBalance:', currentStakedBalance.toString())
                             assertWithError(currentStakedBalance, previousStakedBalance.sub(expectedRefund), 0.1)
                           })
 
@@ -685,12 +683,10 @@ describe('EntryPoint', () => {
                           it('decreases the paymaster stake', async () => {
                             const expectedRefund = await entryPoint.estimatePrefund(op)
                             const { value: previousStakedBalance } = await entryPoint.getStake(paymaster)
-                            console.log('previousStakedBalance:', previousStakedBalance.toString())
 
                             await entryPoint.handleOps(op, redeemer)
 
                             const { value: currentStakedBalance } = await entryPoint.getStake(paymaster)
-                            console.log('currentStakedBalance:', currentStakedBalance.toString())
                             assertWithError(currentStakedBalance, previousStakedBalance.sub(expectedRefund), 0.1)
                           })
 
