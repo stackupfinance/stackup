@@ -410,7 +410,7 @@ describe('Wallet', () => {
                 // TODO: AUDIT! It requires having a prefund greater than zero which doesn't make sense for paymasters
 
                 beforeEach('deploy token', async () => {
-                  token = await deploy('TokenMock', ['USDC'])
+                  token = await deploy('TokenMock', ['DAI', 18])
                 })
 
                 context('when the guardian is approving tokens to the paymaster', () => {
@@ -609,7 +609,7 @@ describe('Wallet', () => {
         const fee = bn(100000), exchangeRate = fp(2)
 
         beforeEach('prepare paymaster data', async () => {
-          token = await deploy('TokenMock', ['USDC'])
+          token = await deploy('TokenMock', ['DAI', 18])
           feed = await deploy('PriceFeedMock', [18, exchangeRate])
         })
 
@@ -965,7 +965,7 @@ describe('Wallet', () => {
     const fee = bn(10), exchangeRate = fp(2), actualGasCost = fp(1)
 
     beforeEach('build context', async () => {
-      token = await deploy('TokenMock', ['USDC'])
+      token = await deploy('TokenMock', ['DAI', 18])
       const params = [other.address, token.address, exchangeRate, fee]
       contextData = ethers.utils.defaultAbiCoder.encode(['address', 'address', 'uint256', 'uint256'], params)
     })
@@ -1247,7 +1247,7 @@ describe('Wallet', () => {
 
       context('when the new implementation is not UUPS-compliant', () => {
         beforeEach('deploy non UUPS-compliant implementation', async () => {
-          newImplementation = await deploy('TokenMock', ['TKN'])
+          newImplementation = await deploy('TokenMock', ['TKN', 18])
         })
 
         it('reverts', async () => {
