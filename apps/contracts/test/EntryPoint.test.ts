@@ -42,7 +42,7 @@ describe('EntryPoint', () => {
 
             context('when the user specifies a call gas value', () => {
               beforeEach('set call gas', async () => {
-                op.callGas = op.initCode == '0x' ? bn(50e3) : bn(700e3)
+                op.callGas = bn(50e3)
               })
 
               itHandlesRefundsProperly()
@@ -112,7 +112,7 @@ describe('EntryPoint', () => {
 
         context('when the user specifies a verification gas value', () => {
           beforeEach('set verification gas', async () => {
-            op.verificationGas = bn(200e3)
+            op.verificationGas = op.initCode == '0x' ? bn(30e3) : bn(650e3)
           })
 
           context('when the wallet verification succeeds', () => {
@@ -304,7 +304,7 @@ describe('EntryPoint', () => {
         context('when the user does not specify any gas fee', () => {
           context('when the user specifies a verification gas value', () => {
             beforeEach('set verification gas', async () => {
-              op.verificationGas = bn(200e3)
+              op.verificationGas = op.initCode == '0x' ? bn(60e3) : bn(650e3)
             })
 
             context('when the wallet verification succeeds', () => {
@@ -333,32 +333,44 @@ describe('EntryPoint', () => {
                       await paymaster.mockVerificationRevert(false)
                     })
 
-                    itHandleOpsProperlyNeverthelessPaymaster(() => {
-                      it('does not pay to the redeemer', async () => {
-                        const previousBalance = await ethers.provider.getBalance(redeemer)
+                    context('when the verification gas is enough', () => {
+                      itHandleOpsProperlyNeverthelessPaymaster(() => {
+                        it('does not pay to the redeemer', async () => {
+                          const previousBalance = await ethers.provider.getBalance(redeemer)
 
-                        await entryPoint.handleOps(op, redeemer)
+                          await entryPoint.handleOps(op, redeemer)
 
-                        const currentBalance = await ethers.provider.getBalance(redeemer)
-                        expect(currentBalance).to.be.equal(previousBalance)
+                          const currentBalance = await ethers.provider.getBalance(redeemer)
+                          expect(currentBalance).to.be.equal(previousBalance)
+                        })
+
+                        it('does not decrease the paymaster stake', async () => {
+                          const { value: previousStakedBalance } = await entryPoint.getStake(paymaster)
+
+                          await entryPoint.handleOps(op, redeemer)
+
+                          const { value: currentStakedBalance } = await entryPoint.getStake(paymaster)
+                          expect(currentStakedBalance).to.be.equal(previousStakedBalance)
+                        })
+
+                        it('does not decreases the wallet balance', async () => {
+                          const previousBalance = await ethers.provider.getBalance(op.sender)
+
+                          await entryPoint.handleOps(op, redeemer)
+
+                          const currentBalance = await ethers.provider.getBalance(op.sender)
+                          expect(currentBalance).to.be.equal(previousBalance)
+                        })
+                      })
+                    })
+
+                    context('when the verification gas is not enough', () => {
+                      beforeEach('set verification gas', async () => {
+                        op.verificationGas = op.initCode == '0x' ? bn(30e3) : bn(580e3)
                       })
 
-                      it('does not decrease the paymaster stake', async () => {
-                        const { value: previousStakedBalance } = await entryPoint.getStake(paymaster)
-
-                        await entryPoint.handleOps(op, redeemer)
-
-                        const { value: currentStakedBalance } = await entryPoint.getStake(paymaster)
-                        expect(currentStakedBalance).to.be.equal(previousStakedBalance)
-                      })
-
-                      it('does not decreases the wallet balance', async () => {
-                        const previousBalance = await ethers.provider.getBalance(op.sender)
-
-                        await entryPoint.handleOps(op, redeemer)
-
-                        const currentBalance = await ethers.provider.getBalance(op.sender)
-                        expect(currentBalance).to.be.equal(previousBalance)
+                      it('reverts', async () => {
+                        await expect(entryPoint.handleOps(op)).to.be.revertedWith('EntryPoint: Verif gas not enough')
                       })
                     })
                   })
@@ -422,7 +434,7 @@ describe('EntryPoint', () => {
 
           context('when the user specifies a verification gas value', () => {
             beforeEach('set verification gas', async () => {
-              op.verificationGas = bn(200e3)
+              op.verificationGas = op.initCode == '0x' ? bn(60e3) : bn(650e3)
             })
 
             context('when the wallet verification succeeds', () => {
@@ -438,7 +450,7 @@ describe('EntryPoint', () => {
 
               context('when the paymaster does have some stake', () => {
                 beforeEach('stake a minimum', async () => {
-                  await paymaster.stake({ value: 1 })
+                  await paymaster.stake({value: 1})
                 })
 
                 context('when the paymaster is locked', () => {
@@ -448,7 +460,7 @@ describe('EntryPoint', () => {
 
                   context('when the paymaster stake is enough', () => {
                     beforeEach('stake big amount', async () => {
-                      await paymaster.stake({ value: fp(1) })
+                      await paymaster.stake({value: fp(1)})
                     })
 
                     context('when the paymaster verification succeeds', () => {
@@ -456,36 +468,49 @@ describe('EntryPoint', () => {
                         await paymaster.mockVerificationRevert(false)
                       })
 
-                      itHandleOpsProperlyNeverthelessPaymaster(() => {
-                        it('pays the redeemer', async () => {
-                          const expectedRefund = await entryPoint.estimatePrefund(op)
-                          const previousRedeemerBalance = await ethers.provider.getBalance(redeemer)
+                      context('when the verification gas is enough', () => {
 
-                          await entryPoint.handleOps(op, redeemer)
+                        itHandleOpsProperlyNeverthelessPaymaster(() => {
+                          it('pays the redeemer', async () => {
+                            const expectedRefund = await entryPoint.estimatePrefund(op)
+                            const previousRedeemerBalance = await ethers.provider.getBalance(redeemer)
 
-                          const currentRedeemerBalance = await ethers.provider.getBalance(redeemer)
-                          assertWithError(currentRedeemerBalance, previousRedeemerBalance.add(expectedRefund), 0.1)
+                            await entryPoint.handleOps(op, redeemer)
+
+                            const currentRedeemerBalance = await ethers.provider.getBalance(redeemer)
+                            assertWithError(currentRedeemerBalance, previousRedeemerBalance.add(expectedRefund), 0.1)
+                          })
+
+                          it('decreases the paymaster stake', async () => {
+                            const expectedRefund = await entryPoint.estimatePrefund(op)
+                            const { value: previousStakedBalance } = await entryPoint.getStake(paymaster)
+                            console.log('previousStakedBalance:', previousStakedBalance.toString())
+
+                            await entryPoint.handleOps(op, redeemer)
+
+                            const { value: currentStakedBalance } = await entryPoint.getStake(paymaster)
+                            console.log('currentStakedBalance:', currentStakedBalance.toString())
+                            assertWithError(currentStakedBalance, previousStakedBalance.sub(expectedRefund), 0.1)
+                          })
+
+                          it('does not refund the unused gas to the wallet', async () => {
+                            const previousWalletBalance = await ethers.provider.getBalance(op.sender)
+
+                            await entryPoint.handleOps(op, redeemer)
+
+                            const currentWalletBalance = await ethers.provider.getBalance(op.sender)
+                            expect(currentWalletBalance).to.be.equal(previousWalletBalance)
+                          })
+                        })
+                      })
+
+                      context('when the verification gas is not enough', () => {
+                        beforeEach('set verification gas', async () => {
+                          op.verificationGas = op.initCode == '0x' ? bn(30e3) : bn(580e3)
                         })
 
-                        it('decreases the paymaster stake', async () => {
-                          const expectedRefund = await entryPoint.estimatePrefund(op)
-                          const { value: previousStakedBalance } = await entryPoint.getStake(paymaster)
-                          console.log('previousStakedBalance:', previousStakedBalance.toString())
-
-                          await entryPoint.handleOps(op, redeemer)
-
-                          const { value: currentStakedBalance } = await entryPoint.getStake(paymaster)
-                          console.log('currentStakedBalance:', currentStakedBalance.toString())
-                          assertWithError(currentStakedBalance, previousStakedBalance.sub(expectedRefund), 0.1)
-                        })
-
-                        it('does not refund the unused gas to the wallet', async () => {
-                          const previousWalletBalance = await ethers.provider.getBalance(op.sender)
-
-                          await entryPoint.handleOps(op, redeemer)
-
-                          const currentWalletBalance = await ethers.provider.getBalance(op.sender)
-                          expect(currentWalletBalance).to.be.equal(previousWalletBalance)
+                        it('reverts', async () => {
+                          await expect(entryPoint.handleOps(op)).to.be.revertedWith('EntryPoint: Verif gas not enough')
                         })
                       })
                     })
@@ -503,7 +528,7 @@ describe('EntryPoint', () => {
 
                   context('when the paymaster stake is not enough', () => {
                     beforeEach('stake small amount', async () => {
-                      await paymaster.stake({ value: 1 })
+                      await paymaster.stake({value: 1})
                     })
 
                     it('reverts', async () => {
@@ -560,7 +585,7 @@ describe('EntryPoint', () => {
 
           context('when the user specifies a verification gas value', () => {
             beforeEach('set verification gas', async () => {
-              op.verificationGas = bn(200e3)
+              op.verificationGas = op.initCode == '0x' ? bn(60e3) : bn(650e3)
             })
 
             context('when the wallet verification succeeds', () => {
@@ -594,36 +619,48 @@ describe('EntryPoint', () => {
                         await paymaster.mockVerificationRevert(false)
                       })
 
-                      itHandleOpsProperlyNeverthelessPaymaster(() => {
-                        it('pays the redeemer', async () => {
-                          const expectedRefund = await entryPoint.estimatePrefund(op)
-                          const previousRedeemerBalance = await ethers.provider.getBalance(redeemer)
+                      context('when the verification gas is not enough', () => {
+                        itHandleOpsProperlyNeverthelessPaymaster(() => {
+                          it('pays the redeemer', async () => {
+                            const expectedRefund = await entryPoint.estimatePrefund(op)
+                            const previousRedeemerBalance = await ethers.provider.getBalance(redeemer)
 
-                          await entryPoint.handleOps(op, redeemer)
+                            await entryPoint.handleOps(op, redeemer)
 
-                          const currentRedeemerBalance = await ethers.provider.getBalance(redeemer)
-                          assertWithError(currentRedeemerBalance, previousRedeemerBalance.add(expectedRefund), 0.1)
+                            const currentRedeemerBalance = await ethers.provider.getBalance(redeemer)
+                            assertWithError(currentRedeemerBalance, previousRedeemerBalance.add(expectedRefund), 0.1)
+                          })
+
+                          it('decreases the paymaster stake', async () => {
+                            const expectedRefund = await entryPoint.estimatePrefund(op)
+                            const { value: previousStakedBalance } = await entryPoint.getStake(paymaster)
+                            console.log('previousStakedBalance:', previousStakedBalance.toString())
+
+                            await entryPoint.handleOps(op, redeemer)
+
+                            const { value: currentStakedBalance } = await entryPoint.getStake(paymaster)
+                            console.log('currentStakedBalance:', currentStakedBalance.toString())
+                            assertWithError(currentStakedBalance, previousStakedBalance.sub(expectedRefund), 0.1)
+                          })
+
+                          it('does not refund the unused gas to the wallet', async () => {
+                            const previousWalletBalance = await ethers.provider.getBalance(op.sender)
+
+                            await entryPoint.handleOps(op, redeemer)
+
+                            const currentWalletBalance = await ethers.provider.getBalance(op.sender)
+                            expect(currentWalletBalance).to.be.equal(previousWalletBalance)
+                          })
+                        })
+                      })
+
+                      context('when the verification gas is not enough', () => {
+                        beforeEach('set verification gas', async () => {
+                          op.verificationGas = op.initCode == '0x' ? bn(30e3) : bn(580e3)
                         })
 
-                        it('decreases the paymaster stake', async () => {
-                          const expectedRefund = await entryPoint.estimatePrefund(op)
-                          const { value: previousStakedBalance } = await entryPoint.getStake(paymaster)
-                          console.log('previousStakedBalance:', previousStakedBalance.toString())
-
-                          await entryPoint.handleOps(op, redeemer)
-
-                          const { value: currentStakedBalance } = await entryPoint.getStake(paymaster)
-                          console.log('currentStakedBalance:', currentStakedBalance.toString())
-                          assertWithError(currentStakedBalance, previousStakedBalance.sub(expectedRefund), 0.1)
-                        })
-
-                        it('does not refund the unused gas to the wallet', async () => {
-                          const previousWalletBalance = await ethers.provider.getBalance(op.sender)
-
-                          await entryPoint.handleOps(op, redeemer)
-
-                          const currentWalletBalance = await ethers.provider.getBalance(op.sender)
-                          expect(currentWalletBalance).to.be.equal(previousWalletBalance)
+                        it('reverts', async () => {
+                          await expect(entryPoint.handleOps(op)).to.be.revertedWith('EntryPoint: Verif gas not enough')
                         })
                       })
                     })

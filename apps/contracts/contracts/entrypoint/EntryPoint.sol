@@ -3,6 +3,7 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/utils/Address.sol";
+import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
 import "./Staking.sol";
 import "./IEntryPoint.sol";
@@ -17,6 +18,7 @@ contract EntryPoint is IEntryPoint, Staking {
   using Calls for address;
   using Calls for address payable;
   using Address for address;
+  using SafeMath for uint256;
   using EntryPointHelpers for UserOperation;
 
   struct UserOpVerification {
@@ -56,8 +58,12 @@ contract EntryPoint is IEntryPoint, Staking {
     uint256 preValidationGas = gasleft();
     _createWalletIfNecessary(op);
     _validateWallet(op);
-    verification.context = _validatePaymaster(op);
+
+    uint256 walletValidationGas = preValidationGas - gasleft();
+    uint256 paymasterValidationGas = op.verificationGas.sub(walletValidationGas, "EntryPoint: Verif gas not enough");
+    verification.context = _validatePaymaster(op, paymasterValidationGas);
     verification.gasUsed = preValidationGas - gasleft();
+    require(verification.gasUsed <= op.verificationGas, "EntryPoint: Verif gas not enough");
   }
 
   function _createWalletIfNecessary(UserOperation calldata op) internal {
@@ -79,7 +85,7 @@ contract EntryPoint is IEntryPoint, Staking {
     require(actualPrefund >= requiredPrefund, "EntryPoint: incorrect prefund");
   }
 
-  function _validatePaymaster(UserOperation calldata op) internal returns (bytes memory) {
+  function _validatePaymaster(UserOperation calldata op, uint256 validationGas) internal returns (bytes memory) {
     if (!op.hasPaymaster()) return new bytes(0);
 
     Stake storage stake = _getStake(op.paymaster);
@@ -88,7 +94,7 @@ contract EntryPoint is IEntryPoint, Staking {
     require(stake.value >= requiredPrefund, "EntryPoint: Insufficient stake");
     stake.value = stake.value - requiredPrefund;
 
-    return IPaymaster(op.paymaster).validatePaymasterUserOp(op, requiredPrefund);
+    return IPaymaster(op.paymaster).validatePaymasterUserOp{ gas: validationGas }(op, requiredPrefund);
   }
 
   function _executeOp(UserOperation calldata op, UserOpVerification memory verification)

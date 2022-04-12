@@ -41,8 +41,8 @@ async function withoutPaymaster(entryPoint: Contract): Promise<void> {
   createOp.initCode = await encodeWalletDeployment(entryPoint, owner, guardians)
   createOp.callData = await encodeWalletExecute(mock, await encodeCounterIncrement())
   createOp.sender = await entryPoint.getSenderAddress(createOp.initCode, createOp.nonce)
-  createOp.callGas = bn(700e3)
-  createOp.verificationGas = bn(200e3)
+  createOp.callGas = bn(50e3)
+  createOp.verificationGas = bn(800e3)
   createOp.maxFeePerGas = 1
   createOp.maxPriorityFeePerGas = 1
   createOp.signature = await signWithOwner(createOp, entryPoint, owner)
@@ -89,15 +89,14 @@ async function withPaymaster(entryPoint: Contract): Promise<void> {
   const feed = await deploy('PriceFeedMock', [18, exchangeRate])
   const paymaster = await createPaymaster(entryPoint, paymasterOwner)
 
-  const createOp = buildOp()
+  const createOp = buildOp({ paymaster })
   createOp.initCode = await encodeWalletDeployment(entryPoint, owner, guardians)
   createOp.callData = await encodeWalletExecute(token, await encodeTokenApproval(paymaster, MAX_UINT256))
   createOp.sender = await entryPoint.getSenderAddress(createOp.initCode, createOp.nonce)
-  createOp.callGas = bn(700e3)
-  createOp.verificationGas = bn(200e3)
-  createOp.maxFeePerGas = 1
-  createOp.maxPriorityFeePerGas = 1
-  createOp.paymaster = paymaster
+  createOp.callGas = bn(50e3)
+  createOp.verificationGas = bn(800e3)
+  createOp.maxFeePerGas = 1e9
+  createOp.maxPriorityFeePerGas = 1e9
   createOp.paymasterData = await signPaymasterData(createOp, fee, token, feed, paymasterOwner)
   createOp.signature = await signWithOwner(createOp, entryPoint, owner)
   await owner.sendTransaction({ to: createOp.sender, value: fp(10) })
@@ -106,26 +105,24 @@ async function withPaymaster(entryPoint: Contract): Promise<void> {
   const createGasCost = await gas(createTx)
   console.log(`- Create: \t${createGasCost} gas`)
 
-  const executeOp = buildOp({ nonce: 1, sender: createOp.sender })
+  const executeOp = buildOp({ nonce: 1, sender: createOp.sender, paymaster })
   executeOp.callData = await encodeWalletExecute(mock, await encodeCounterIncrement())
   executeOp.callGas = bn(50e3)
   executeOp.verificationGas = bn(200e3)
-  executeOp.maxFeePerGas = 1
-  executeOp.maxPriorityFeePerGas = 1
-  executeOp.paymaster = paymaster
+  executeOp.maxFeePerGas = 1e9
+  executeOp.maxPriorityFeePerGas = 1e9
   executeOp.paymasterData = await signPaymasterData(executeOp, fee, token, feed, paymasterOwner)
   executeOp.signature = await signWithOwner(executeOp, entryPoint, owner)
   const executeTx = await entryPoint.handleOps([executeOp], redeemer.address)
   const executeGasCost = await gas(executeTx)
   console.log(`- Execute: \t${executeGasCost.sub(incrementGasCost)} gas`)
 
-  const sendValueOp = buildOp({ nonce: 2, sender: createOp.sender })
+  const sendValueOp = buildOp({ nonce: 2, sender: createOp.sender, paymaster })
   sendValueOp.callData = await encodeWalletExecute(mock, await encodeCounterIncrement(), fp(1))
   sendValueOp.callGas = bn(50e3)
   sendValueOp.verificationGas = bn(200e3)
-  sendValueOp.maxFeePerGas = 1
-  sendValueOp.maxPriorityFeePerGas = 1
-  sendValueOp.paymaster = paymaster
+  sendValueOp.maxFeePerGas = 1e9
+  sendValueOp.maxPriorityFeePerGas = 1e9
   sendValueOp.paymasterData = await signPaymasterData(sendValueOp, fee, token, feed, paymasterOwner)
   sendValueOp.signature = await signWithOwner(sendValueOp, entryPoint, owner)
   const sendValueOpTx = await entryPoint.handleOps([sendValueOp], redeemer.address)
@@ -138,8 +135,8 @@ async function createPaymaster(entryPoint: Contract, paymasterOwner: SignerWithA
   paymasterOp.initCode = await encodeWalletDeployment(entryPoint, paymasterOwner)
   paymasterOp.callData = await encodeWalletExecute(entryPoint, await encodeEntryPointStake(), fp(5))
   paymasterOp.sender = await entryPoint.getSenderAddress(paymasterOp.initCode, paymasterOp.nonce)
-  paymasterOp.callGas = bn(700e3)
-  paymasterOp.verificationGas = bn(200e3)
+  paymasterOp.callGas = bn(100e3)
+  paymasterOp.verificationGas = bn(900e3)
   paymasterOp.maxFeePerGas = 1
   paymasterOp.maxPriorityFeePerGas = 1
   paymasterOp.signature = await signWithOwner(paymasterOp, entryPoint, paymasterOwner)
