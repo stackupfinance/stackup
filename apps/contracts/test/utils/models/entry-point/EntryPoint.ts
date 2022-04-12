@@ -43,6 +43,10 @@ export default class EntryPoint {
     return this.instance.getRequiredPrefund(op)
   }
 
+  async simulateValidation(op: UserOp): Promise<{ preOpGas: BigNumber, prefund: BigNumber }> {
+    return this.instance.callStatic.simulateValidation(op)
+  }
+
   async handleOps(ops: NAry<UserOp>, redeemer?: Account): Promise<ContractTransaction> {
     if (!redeemer) redeemer = ZERO_ADDRESS
     return this.instance.handleOps(toArray(ops), redeemer)
