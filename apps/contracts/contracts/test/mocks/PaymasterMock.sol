@@ -47,7 +47,11 @@ contract PaymasterMock is IPaymaster {
     entryPoint.withdrawStake(payable(address(this)));
   }
 
-  function validatePaymasterUserOp(UserOperation calldata, uint256) external view override returns (bytes memory) {
+  function validatePaymasterUserOp(
+    UserOperation calldata,
+    bytes32,
+    uint256
+  ) external view override returns (bytes memory) {
     require(!mockRevertVerification, "PAYMASTER_VERIFICATION_FAILED");
     return new bytes(0);
   }
