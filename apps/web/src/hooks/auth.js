@@ -28,7 +28,7 @@ import {
   fiatUseAuthSelector,
   useHoldingsStore,
   holdingsUseAuthSelector,
-  accountHomePageSelector
+  accountHomePageSelector,
 } from '../state';
 import { Routes } from '../config';
 import { openReplayTracker } from '../utils/openReplay';
@@ -93,7 +93,9 @@ export const useAuth = () => {
   const onLoginPage = () => location.pathname === Routes.LOGIN;
   const shouldRefresh = () => accessToken && refreshToken && !isExpired(refreshToken.token);
 
-  openReplayTracker.setUserID(user.username);
+  if (user.username) {
+    openReplayTracker.setUserID(user.username);
+  }
 
   useEffect(() => {
     const authCheck = async () => {
