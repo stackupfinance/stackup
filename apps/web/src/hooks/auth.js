@@ -28,10 +28,8 @@ import {
   fiatUseAuthSelector,
   useHoldingsStore,
   holdingsUseAuthSelector,
-  accountHomePageSelector,
 } from '../state';
 import { Routes } from '../config';
-import { openReplayTracker } from '../utils/openReplay';
 
 const REFRESH_INTERVAL_MS = 300000; // 5 minutes
 const initAuthRoutes = new Set([
@@ -82,7 +80,6 @@ export const useAuth = () => {
   const router = useRouter();
   const { wallet, accessToken, refreshToken, refresh, enableAccount } =
     useAccountStore(accountUseAuthSelector);
-  const { user } = useAccountStore(accountHomePageSelector);
   const { initAppSessions } = useAppsStore(appsUseAuthSelector);
   const logout = useLogout();
   const [isFirst, setIsFirst] = useState(true);
@@ -92,10 +89,6 @@ export const useAuth = () => {
   const notOnAuthPage = () => !initAuthRoutes.has(location.pathname);
   const onLoginPage = () => location.pathname === Routes.LOGIN;
   const shouldRefresh = () => accessToken && refreshToken && !isExpired(refreshToken.token);
-
-  if (user.username) {
-    openReplayTracker.setUserID(user.username);
-  }
 
   useEffect(() => {
     const authCheck = async () => {

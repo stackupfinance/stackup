@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { ChakraProvider, extendTheme } from '@chakra-ui/react';
 import { IntercomProvider } from 'react-use-intercom';
-import { useAuth } from '../src/hooks';
+import { useAuth, useOpenReplayTracker } from '../src/hooks';
 import { AlphaBanner } from '../src/components';
 import { IntercomManager, Web3Transactions } from '../src/containers';
 import { App as AppConfig } from '../src/config';
@@ -22,6 +22,7 @@ function App({ Component, pageProps }) {
     openReplayTracker.start();
   }, []);
   useAuth();
+  useOpenReplayTracker();
   overrideDefaultUserOpGasValues();
 
   return (
