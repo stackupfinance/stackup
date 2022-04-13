@@ -19,7 +19,9 @@ export type Signature = {
   signature: string;
 }
 
-export type WalletDeployParams = {
+export type WalletDeployParams = PaymasterDeployParams
+
+export type PaymasterDeployParams = {
   owner?: SignerWithAddress
   guardians?: SignerWithAddress[]
   entryPoint?: Contract
