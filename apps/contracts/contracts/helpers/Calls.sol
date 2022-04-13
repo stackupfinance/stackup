@@ -26,7 +26,7 @@ library Calls {
 
   /**
    * @dev Performs a Solidity function call using a low level `call` with `gas` gas.
-   * It the call succeeds, it returns the raw returned data.
+   * If the call succeeds, it returns the raw returned data.
    * If `target` reverts with a revert reason, it is bubbled up. Otherwise, it reverts with `errorMessage`.
    */
   function callWithGas(
@@ -42,7 +42,7 @@ library Calls {
 
   /**
    * @dev Performs a Solidity function call using a low level `call` with `gas` gas.
-   * It the call succeeds, it returns the raw returned data.
+   * If the call succeeds, it returns the raw returned data.
    * If `target` reverts with a revert reason, it is bubbled up. Otherwise, it reverts with `errorMessage`.
    */
   function callWithValue(
