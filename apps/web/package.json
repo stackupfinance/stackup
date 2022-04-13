@@ -3,10 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev -p 3000",
+    "dev": "next dev -p 8080",
     "build:env": "envsubst < ./.env.production.template > ./.env.production.local",
     "build": "yarn build:env && next build",
-    "start": "next start -p 3000",
+    "start": "next start -p 8080",
     "lint": "next lint",
     "lint:fix": "next lint --fix",
     "prettier": "prettier --check --ignore-path ./.eslintignore '**'",
