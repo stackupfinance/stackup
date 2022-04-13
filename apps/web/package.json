@@ -17,7 +17,7 @@
     "@chakra-ui/react": "1.8.8",
     "@emotion/react": "^11",
     "@emotion/styled": "^11",
-    "@sentry/cli": "^1.74.3",
+    "@sentry/cli": "^2.0.1",
     "@sentry/nextjs": "^6.19.3",
     "@stackupfinance/walletjs": "1.0.0",
     "@walletconnect/client": "^1.7.7",
