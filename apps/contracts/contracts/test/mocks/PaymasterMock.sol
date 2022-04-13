@@ -10,6 +10,7 @@ contract PaymasterMock is IPaymaster {
 
   bool internal mockPayRefund;
   bool internal mockRevertVerification;
+  bool internal mockRevertPostOp;
 
   event PostOp(PostOpMode mode, bytes context, uint256 actualGasCost);
 
@@ -17,6 +18,7 @@ contract PaymasterMock is IPaymaster {
     entryPoint = _entryPoint;
     mockPayRefund = true;
     mockRevertVerification = false;
+    mockRevertPostOp = false;
   }
 
   function mockRefundPayment(bool _mockPayRefund) external {
@@ -25,6 +27,10 @@ contract PaymasterMock is IPaymaster {
 
   function mockVerificationRevert(bool _mockRevertVerification) external {
     mockRevertVerification = _mockRevertVerification;
+  }
+
+  function mockPostOpRevert(bool _mockRevertPostOp) external {
+    mockRevertPostOp = _mockRevertPostOp;
   }
 
   receive() external payable {
@@ -61,6 +67,7 @@ contract PaymasterMock is IPaymaster {
     bytes calldata context,
     uint256 actualGasCost
   ) external override {
+    require(mode == PostOpMode.postOpReverted || !mockRevertPostOp, "PAYMASTER_POST_OP_FAILED");
     emit PostOp(mode, context, actualGasCost);
   }
 }
