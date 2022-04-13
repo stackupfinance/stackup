@@ -4,6 +4,7 @@ pragma solidity ^0.8.0;
 
 import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/math/SafeCast.sol";
 
 import "./IPaymaster.sol";
@@ -12,6 +13,7 @@ import "../UserOperation.sol";
 import "../helpers/UpgradeableACL.sol";
 
 contract Paymaster is IPaymaster, UpgradeableACL {
+  using SafeERC20 for IERC20Metadata;
   using PaymasterHelpers for bytes;
   using PaymasterHelpers for PaymasterData;
   using PaymasterHelpers for UserOperation;
@@ -86,7 +88,7 @@ contract Paymaster is IPaymaster, UpgradeableACL {
     (mode);
     PaymasterContext memory data = context.decodePaymasterContext();
     uint256 totalCost = ((cost * data.rate) / 1e18) + data.fee;
-    data.token.transferFrom(data.sender, address(this), totalCost);
+    if (totalCost > 0) data.token.safeTransferFrom(data.sender, address(this), totalCost);
   }
 
   /**
