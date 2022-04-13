@@ -6,7 +6,7 @@ import { AlphaBanner } from '../src/components';
 import { IntercomManager, Web3Transactions } from '../src/containers';
 import { App as AppConfig } from '../src/config';
 import { overrideDefaultUserOpGasValues } from '../src/utils/web3';
-import { openReplayTracker } from '../src/utils/analytics';
+import { openReplayTracker } from '../src/utils/openReplay';
 
 import '../styles.css';
 
