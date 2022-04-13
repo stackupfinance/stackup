@@ -41,7 +41,6 @@ import { useAuthChannel, useLogout } from '../src/hooks';
 import { txType, getActivityId } from '../src/utils/transaction';
 import { Routes } from '../src/config';
 import { EVENTS, logEvent } from '../src/utils/analytics';
-import { openReplayTracker } from '../src/utils/openReplay';
 
 const tabs = {
   EXPLORE: 0,
@@ -195,7 +194,6 @@ export default function Home() {
       router.push(Routes.ONBOARD_RECOVERY);
       return;
     }
-    openReplayTracker.setUserID(user.username);
     clearOnboardData();
     clearRecover();
     clearUpdate();
