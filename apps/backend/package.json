@@ -27,7 +27,7 @@
     "docker:test": "docker-compose -f docker-compose.yml -f docker-compose.test.yml up"
   },
   "dependencies": {
-    "@sentry/node": "^6.19.1",
+    "@sentry/node": "^6.19.6",
     "@sentry/tracing": "^6.19.6",
     "@stackupfinance/walletjs": "1.0.0",
     "agenda": "^4.2.1",
