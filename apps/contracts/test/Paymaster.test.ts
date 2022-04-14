@@ -561,10 +561,8 @@ describe('Paymaster', () => {
       })
 
       context('when the new owner is the address zero', () => {
-        // TODO: fix
-
-        it.skip('reverts', async () => {
-          await expect(paymaster.transferOwner(ZERO_ADDRESS, { from })).to.be.reverted
+        it('reverts', async () => {
+          await expect(paymaster.transferOwner(ZERO_ADDRESS, { from })).to.be.revertedWith('ACL: Owner cannot be zero')
         })
       })
     })
