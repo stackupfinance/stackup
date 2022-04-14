@@ -66,14 +66,15 @@ contract EntryPoint is IEntryPoint, Staking {
   function _verifyOp(UserOperation calldata op) internal returns (UserOpVerification memory verification) {
     uint256 preValidationGas = gasleft();
     _createWalletIfNecessary(op);
-    _validateWallet(op);
+    bytes32 requestId = op.requestId();
+    _validateWallet(op, requestId);
 
     // Marker used of-chain for opcodes validation
     block.number;
 
     uint256 walletValidationGas = GasUsed.since(preValidationGas);
     uint256 paymasterValidationGas = op.verificationGas.sub(walletValidationGas, "EntryPoint: Verif gas not enough");
-    verification.context = _validatePaymaster(op, paymasterValidationGas);
+    verification.context = _validatePaymaster(op, requestId, paymasterValidationGas);
     verification.gasUsed = GasUsed.since(preValidationGas);
     require(verification.gasUsed <= op.verificationGas, "EntryPoint: Verif gas not enough");
   }
@@ -88,16 +89,20 @@ contract EntryPoint is IEntryPoint, Staking {
     }
   }
 
-  function _validateWallet(UserOperation calldata op) internal {
+  function _validateWallet(UserOperation calldata op, bytes32 requestId) internal {
     uint256 requiredPrefund = op.hasPaymaster() ? 0 : op.requiredPrefund();
     uint256 initBalance = address(this).balance;
-    IWallet(op.sender).validateUserOp{ gas: op.verificationGas }(op, op.requestId(), requiredPrefund);
+    IWallet(op.sender).validateUserOp{ gas: op.verificationGas }(op, requestId, requiredPrefund);
 
     uint256 actualPrefund = address(this).balance.sub(initBalance, "EntryPoint: Balance decreased");
     require(actualPrefund >= requiredPrefund, "EntryPoint: incorrect prefund");
   }
 
-  function _validatePaymaster(UserOperation calldata op, uint256 validationGas) internal returns (bytes memory) {
+  function _validatePaymaster(
+    UserOperation calldata op,
+    bytes32 requestId,
+    uint256 validationGas
+  ) internal returns (bytes memory) {
     if (!op.hasPaymaster()) return new bytes(0);
 
     Stake storage stake = _getStake(op.paymaster);
@@ -105,7 +110,7 @@ contract EntryPoint is IEntryPoint, Staking {
     uint256 requiredPrefund = op.requiredPrefund();
     stake.value = stake.value.sub(requiredPrefund, "EntryPoint: Insufficient stake");
 
-    return IPaymaster(op.paymaster).validatePaymasterUserOp{ gas: validationGas }(op, op.requestId(), requiredPrefund);
+    return IPaymaster(op.paymaster).validatePaymasterUserOp{ gas: validationGas }(op, requestId, requiredPrefund);
   }
 
   function _executeOp(UserOperation calldata op, UserOpVerification memory verification)
