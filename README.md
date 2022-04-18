@@ -11,6 +11,10 @@ We use the following system tools to help run Stackup locally:
 - Node JS `^14`
 - Yarn `~1.22.17`
 - Docker
+- Xcode
+- Android Studio
+
+For Xcode and Android Studio, see [react native environment setup](https://reactnative.dev/docs/environment-setup).
 
 This monorepo uses Yarn workspaces and Lerna to manage it's apps and packages. All commands can be called from the project root.
 
@@ -22,31 +26,47 @@ Run the following command to install and link all the required app dependencies.
 $ yarn install
 ```
 
+If you're planning on running the IOS app.
+
+```
+$ yarn install:ios
+```
+
 ## App setup
 
 Next we'll have to setup some app specific environment variables in order to get everything working end to end. See the `README.md` files in the following directories for more details.
 
 - [Contracts](./apps/contracts) - A collection of solidity smart contracts for Stackup.
 - [Backend](./apps/backend) - REST API for supporting frontend apps.
-- [Web](./apps/web) - A responsive web frontend.
+- [Mobile](./apps/mobile) - A mobile native frontend for IOS and Android.
+- [Web](./apps/web) - **[DEPRECATED]** A responsive web frontend.
 
 ## Running locally
 
 Once all the environment variables are setup we can spin up an end to end instance by running the following commands in separate processes.
 
 ```bash
+# Start MongoDB
 $ yarn dev:dependencies
 ```
 
 ```bash
+# Start backend server
 $ yarn dev:backend
 ```
 
 ```bash
-$ yarn dev:web
+# Start react-native metro server
+$ yarn dev:mobile:start
 ```
 
-If everything is running correctly, you should be able to access Stackup on http://localhost:8080/.
+```bash
+# Run IOS version
+$ yarn dev:mobile:ios
+
+# Run Android version
+$ yarn dev:mobile:android
+```
 
 # License
 

@@ -1,0 +1,9 @@
+.buckconfig
+.bundle
+.gitignore
+.prettierignore
+.ruby-version
+Gemfile
+Gemfile.lock
+android
+ios
