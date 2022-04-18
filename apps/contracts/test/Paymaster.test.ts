@@ -38,6 +38,7 @@ describe('Paymaster', () => {
       expect(await paymaster.getRoleMemberCount(GUARDIAN_ROLE)).to.be.equal(1)
       expect(await paymaster.hasRole(GUARDIAN_ROLE, guardian)).to.be.true
       expect(await paymaster.getGuardian(0)).to.be.equal(guardian.address)
+      expect(await paymaster.getMinGuardiansSignatures()).to.be.equal(1)
     })
 
     it('sets up admin roles properly', async () => {
