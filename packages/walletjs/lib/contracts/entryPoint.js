@@ -2,20 +2,26 @@ const { ethers } = require("ethers");
 const SingletonFactory = require("./singletonFactory");
 const source = require("./source/EntryPoint.json");
 
-module.exports.deploySalt = ethers.utils.formatBytes32String(0);
-
-module.exports.deployInitCode = new ethers.ContractFactory(
+const _deployInitCode = new ethers.ContractFactory(
   source.abi,
   source.bytecode
 ).getDeployTransaction(SingletonFactory.address).data;
 
-module.exports.address = ethers.utils.getCreate2Address(
+const _deploySalt = ethers.utils.formatBytes32String(0);
+
+const _address = ethers.utils.getCreate2Address(
   SingletonFactory.address,
-  this.deploySalt,
-  ethers.utils.keccak256(this.deployInitCode)
+  _deploySalt,
+  ethers.utils.keccak256(_deployInitCode)
 );
+
+module.exports.deploySalt = _deploySalt;
+
+module.exports.deployInitCode = _deployInitCode;
+
+module.exports.address = _address;
 
 module.exports.interface = new ethers.utils.Interface(source.abi);
 
 module.exports.getInstance = (signerOrProvider) =>
-  new ethers.Contract(this.address, source.abi, signerOrProvider);
+  new ethers.Contract(_address, source.abi, signerOrProvider);

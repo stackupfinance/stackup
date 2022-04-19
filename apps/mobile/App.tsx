@@ -1,14 +1,6 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * Generated with the TypeScript template
- * https://github.com/react-native-community/react-native-template-typescript
- *
- * @format
- */
+import './src/utils/shims';
 
-import React from 'react';
+import React, {ReactNode, useState, useEffect} from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -18,75 +10,96 @@ import {
   useColorScheme,
   View,
 } from 'react-native';
-
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+import {wallet} from '@stackupfinance/walletjs';
 
 const Section: React.FC<{
+  children?: ReactNode;
   title: string;
 }> = ({children, title}) => {
-  const isDarkMode = useColorScheme() === 'dark';
   return (
     <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
+      <Text style={[styles.sectionTitle]}>{title}</Text>
+      <Text style={[styles.sectionDescription]}>{children}</Text>
     </View>
   );
 };
 
 const App = () => {
   const isDarkMode = useColorScheme() === 'dark';
+  const [w, setWallet]: [any, any] = useState();
+  const [s1, setSigner1]: [any, any] = useState();
+  const [rs, setReencryptSigner]: [any, any] = useState();
+  const [s2, setSigner2]: [any, any] = useState();
+  const [s3, setSigner3]: [any, any] = useState();
 
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
+  useEffect(() => {
+    (async () => {
+      const _w = await wallet.proxy.initEncryptedIdentity('password', 'salt');
+      setWallet(_w);
+
+      const _s1 = await wallet.proxy.decryptSigner(_w, 'password', 'salt');
+      setSigner1(_s1);
+
+      const _rs = await wallet.proxy.reencryptSigner(
+        _w,
+        'password',
+        'newPassword',
+        'salt',
+      );
+      setReencryptSigner(_rs);
+      const _s2 = await wallet.proxy.decryptSigner(
+        {encryptedSigner: _rs},
+        'newPassword',
+        'salt',
+      );
+      setSigner2(_s2);
+
+      const _s3 = await wallet.proxy.decryptSigner(_w, 'wrongPassword', 'salt');
+      setSigner3(_s3);
+    })();
+  }, []);
 
   return (
-    <SafeAreaView style={backgroundStyle}>
+    <SafeAreaView>
       <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
+      <ScrollView contentInsetAdjustmentBehavior="automatic">
+        <View>
+          <Section title="walletjs: initEncryptedIdentity()">
+            <Text style={[styles.sectionBody]}>{JSON.stringify(w)}</Text>
           </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
+
+          <Section title="walletjs: decryptSigner()">
+            <Text style={[styles.sectionBody]}>{JSON.stringify(s1)}</Text>
           </Section>
-          <Section title="Debug">
-            <DebugInstructions />
+
+          <Section title="walletjs: reencryptSigner()">
+            <Text style={[styles.sectionBody]}>{rs}</Text>
           </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
+
+          <Section title="walletjs: checks">
+            <Text style={[styles.sectionBody]}>
+              wallet.initOwner === signer.address:{' '}
+              {(w?.initOwner === s1?.address).toString()}
+              {'\n'}
+            </Text>
+
+            <Text style={[styles.sectionBody]}>
+              signer1 === signer2:{' '}
+              {(JSON.stringify(s1) === JSON.stringify(s2)).toString()}
+              {'\n'}
+            </Text>
+
+            <Text style={[styles.sectionBody]}>
+              wallet.encryptedSigner !== reencryptSigner:{' '}
+              {(w?.encryptedSigner !== rs).toString()}
+              {'\n'}
+            </Text>
+
+            <Text style={[styles.sectionBody]}>
+              wrong password returns undefined: {(s3 === undefined).toString()}
+              {'\n'}
+            </Text>
           </Section>
-          <LearnMoreLinks />
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -106,6 +119,9 @@ const styles = StyleSheet.create({
     marginTop: 8,
     fontSize: 18,
     fontWeight: '400',
+  },
+  sectionBody: {
+    fontSize: 14,
   },
   highlight: {
     fontWeight: '700',

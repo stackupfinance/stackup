@@ -1,5 +1,4 @@
 const { ethers } = require("ethers");
-const EthCrypto = require("eth-crypto");
 const AES = require("crypto-js/aes");
 const scrypt = require("scrypt-js");
 const buffer = require("scrypt-js/thirdparty/buffer");
@@ -11,6 +10,33 @@ const Wallet = require("../contracts/wallet");
 const walletProxy = require("../contracts/walletProxy");
 const userOperation = require("../constants/userOperations");
 const encodeFunctionData = require("./encodeFunctionData");
+
+const _getInitCode = (
+  initImplementation,
+  initEntryPoint,
+  initOwner,
+  initGuardians
+) => {
+  return walletProxy.factory.getDeployTransaction(
+    initImplementation,
+    encodeFunctionData.initialize(initEntryPoint, initOwner, initGuardians)
+  ).data;
+};
+
+const _getAddress = (
+  initImplementation,
+  initEntryPoint,
+  initOwner,
+  initGuardians
+) => {
+  return ethers.utils.getCreate2Address(
+    SingletonFactory.address,
+    ethers.utils.formatBytes32String(userOperation.initNonce),
+    ethers.utils.keccak256(
+      _getInitCode(initImplementation, initEntryPoint, initOwner, initGuardians)
+    )
+  );
+};
 
 const generatePasswordKey = async (password, salt) => {
   const N = 16384,
@@ -35,7 +61,9 @@ module.exports.decryptSigner = async (wallet, password, salt) => {
 
     return new ethers.Wallet(privateKey);
   } catch (error) {
-    console.error(error);
+    if (error.message !== "Malformed UTF-8 data") {
+      throw error;
+    }
   }
 };
 
@@ -59,18 +87,20 @@ module.exports.reencryptSigner = async (
       Buffer.from(newPasswordKey).toString("hex")
     ).toString();
   } catch (error) {
-    console.error(error);
+    if (error.message !== "Malformed UTF-8 data") {
+      throw error;
+    }
   }
 };
 
 module.exports.initEncryptedIdentity = async (password, salt, opts = {}) => {
-  const signer = EthCrypto.createIdentity();
+  const signer = ethers.Wallet.createRandom();
 
   const initImplementation = Wallet.address;
   const initEntryPoint = EntryPoint.address;
   const initOwner = signer.address;
   const initGuardians = opts.guardians ?? [];
-  const walletAddress = this.getAddress(
+  const walletAddress = _getAddress(
     initImplementation,
     initEntryPoint,
     initOwner,
@@ -96,37 +126,9 @@ module.exports.isCodeDeployed = async (provider, walletAddress) => {
   return code !== userOperation.nullCode;
 };
 
-module.exports.getAddress = (
-  initImplementation,
-  initEntryPoint,
-  initOwner,
-  initGuardians
-) => {
-  return ethers.utils.getCreate2Address(
-    SingletonFactory.address,
-    ethers.utils.formatBytes32String(userOperation.initNonce),
-    ethers.utils.keccak256(
-      this.getInitCode(
-        initImplementation,
-        initEntryPoint,
-        initOwner,
-        initGuardians
-      )
-    )
-  );
-};
+module.exports.getAddress = _getAddress;
 
-module.exports.getInitCode = (
-  initImplementation,
-  initEntryPoint,
-  initOwner,
-  initGuardians
-) => {
-  return walletProxy.factory.getDeployTransaction(
-    initImplementation,
-    encodeFunctionData.initialize(initEntryPoint, initOwner, initGuardians)
-  ).data;
-};
+module.exports.getInitCode = _getInitCode;
 
 module.exports.getNonce = async (provider, walletAddress) => {
   const w = Wallet.getInstance(provider).attach(walletAddress);

@@ -1,21 +1,26 @@
 const { ethers } = require("ethers");
 
-module.exports.defaultGas = 215000;
-module.exports.defaultMaxFee = 50000000000;
-module.exports.defaultMaxPriorityFee = this.defaultMaxFee;
-module.exports.initNonce = 0;
-module.exports.nullCode = "0x";
+const _defaultGas = 215000;
+const _defaultMaxFee = 50000000000;
+const _initNonce = 0;
+const _nullCode = "0x";
+
+module.exports.defaultGas = _defaultGas;
+module.exports.defaultMaxFee = _defaultMaxFee;
+module.exports.defaultMaxPriorityFee = _defaultMaxFee;
+module.exports.initNonce = _initNonce;
+module.exports.nullCode = _nullCode;
 
 module.exports.defaults = {
-  nonce: this.initNonce,
-  initCode: this.nullCode,
-  callData: this.nullCode,
-  callGas: this.defaultGas,
-  verificationGas: this.defaultGas,
-  preVerificationGas: this.defaultGas,
-  maxFeePerGas: this.defaultMaxFee,
-  maxPriorityFeePerGas: this.defaultMaxPriorityFee,
+  nonce: _initNonce,
+  initCode: _nullCode,
+  callData: _nullCode,
+  callGas: _defaultGas,
+  verificationGas: _defaultGas,
+  preVerificationGas: _defaultGas,
+  maxFeePerGas: _defaultMaxFee,
+  maxPriorityFeePerGas: _defaultMaxFee,
   paymaster: ethers.constants.AddressZero,
-  paymasterData: this.nullCode,
-  signature: this.nullCode,
+  paymasterData: _nullCode,
+  signature: _nullCode,
 };
