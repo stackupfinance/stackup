@@ -84,7 +84,7 @@ const App = () => {
             </Text>
 
             <Text style={[styles.sectionBody]}>
-              signer1 === signer2:{' '}
+              reencryptSigner decrypts to same signer:{' '}
               {(JSON.stringify(s1) === JSON.stringify(s2)).toString()}
               {'\n'}
             </Text>
