@@ -48,14 +48,16 @@ export async function encodeWalletExecute(to: Account, data = '0x', value?: BigN
   return walletInterface.encodeFunctionData('executeUserOp', args)
 }
 
-export async function encodeEntryPointStake(): Promise<string> {
-  const entryPointInterface = await getInterface('EntryPoint')
-  return entryPointInterface.encodeFunctionData('addStake')
+export async function encodeEntryPointDeposit(account: Account): Promise<string> {
+  const entryPointInterface = await getInterface('Staking')
+  const args = [toAddress(account)]
+  return entryPointInterface.encodeFunctionData('depositTo', args)
 }
 
-export async function encodeEntryPointLock(): Promise<string> {
-  const entryPointInterface = await getInterface('EntryPoint')
-  return entryPointInterface.encodeFunctionData('lockStake')
+export async function encodeEntryPointStake(unstakeDelaySec: BigNumber): Promise<string> {
+  const entryPointInterface = await getInterface('Staking')
+  const args = [unstakeDelaySec.toString()]
+  return entryPointInterface.encodeFunctionData('addStake', args)
 }
 
 export async function encodeCounterIncrement(): Promise<string> {
