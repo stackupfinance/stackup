@@ -3,23 +3,26 @@
   "version": "1.0.0",
   "private": true,
   "main": "lib/index.js",
+  "types": "types/index.d.ts",
   "scripts": {
     "test": "jest",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "prettier": "prettier --check --ignore-path ./.eslintignore '**'",
-    "prettier:fix": "prettier --write --ignore-path ./.eslintignore '**'"
+    "prettier:fix": "prettier --write --ignore-path ./.eslintignore '**'",
+    "generate:types": "node gentypes.js"
   },
   "devDependencies": {
     "@types/jest": "^27.4.1",
+    "dts-gen": "^0.6.0",
     "eslint": "^8.13.0",
     "eslint-config-prettier": "^8.5.0",
+    "fs-extra": "^10.1.0",
     "jest": "^27.5.1",
     "prettier": "2.6.2"
   },
   "dependencies": {
     "crypto-js": "^4.1.1",
-    "eth-crypto": "^2.2.0",
     "ethers": "^5.6.4",
     "scrypt-js": "^3.0.1"
   }

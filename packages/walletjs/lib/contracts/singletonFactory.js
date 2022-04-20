@@ -29,8 +29,10 @@ const ABI = [
   },
 ];
 
-module.exports.address = "0xce0042B868300000d44A59004Da54A005ffdcf9f";
+const _address = "0xce0042B868300000d44A59004Da54A005ffdcf9f";
+
+module.exports.address = _address;
 
 module.exports.getInstance = (signer) => {
-  return new ethers.Contract(this.address, ABI, signer);
+  return new ethers.Contract(_address, ABI, signer);
 };
