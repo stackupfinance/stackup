@@ -1,6 +1,7 @@
 import './src/utils/shims';
 
-import React, {ReactNode, useState, useEffect} from 'react';
+import React, {ReactNode, useState} from 'react';
+import {ActivityIndicator, Button} from 'react-native';
 import {
   SafeAreaView,
   ScrollView,
@@ -10,7 +11,8 @@ import {
   useColorScheme,
   View,
 } from 'react-native';
-import {wallet} from '@stackupfinance/walletjs';
+// import {wallet} from '@stackupfinance/walletjs';
+import {ethers} from 'ethers';
 
 const Section: React.FC<{
   children?: ReactNode;
@@ -31,40 +33,52 @@ const App = () => {
   const [rs, setReencryptSigner]: [any, any] = useState();
   const [s2, setSigner2]: [any, any] = useState();
   const [s3, setSigner3]: [any, any] = useState();
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    (async () => {
-      const _w = await wallet.proxy.initEncryptedIdentity('password', 'salt');
+  const checkWalletJs = async () => {
+    setLoading(true);
+
+    // NOTE: crypto functions should be wrapped in a setTimeout
+    // to prevent blocking of the UI.
+    setTimeout(async () => {
+      // const _w = await wallet.proxy.initEncryptedIdentity('password', 'salt');
+      // setWallet(_w);
+
+      // const _s1 = await wallet.proxy.decryptSigner(_w, 'password', 'salt');
+      // setSigner1(_s1);
+
+      // const _rs = await wallet.proxy.reencryptSigner(
+      //   _w,
+      //   'password',
+      //   'newPassword',
+      //   'salt',
+      // );
+      // setReencryptSigner(_rs);
+      // const _s2 = await wallet.proxy.decryptSigner(
+      //   {encryptedSigner: _rs},
+      //   'newPassword',
+      //   'salt',
+      // );
+      // setSigner2(_s2);
+
+      // const _s3 = await wallet.proxy.decryptSigner(_w, 'wrongPassword', 'salt');
+      // setSigner3(_s3);
+      const _w = ethers.Wallet.createRandom();
       setWallet(_w);
-
-      const _s1 = await wallet.proxy.decryptSigner(_w, 'password', 'salt');
-      setSigner1(_s1);
-
-      const _rs = await wallet.proxy.reencryptSigner(
-        _w,
-        'password',
-        'newPassword',
-        'salt',
-      );
-      setReencryptSigner(_rs);
-      const _s2 = await wallet.proxy.decryptSigner(
-        {encryptedSigner: _rs},
-        'newPassword',
-        'salt',
-      );
-      setSigner2(_s2);
-
-      const _s3 = await wallet.proxy.decryptSigner(_w, 'wrongPassword', 'salt');
-      setSigner3(_s3);
-    })();
-  }, []);
+      setLoading(false);
+    });
+  };
 
   return (
     <SafeAreaView>
       <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
       <ScrollView contentInsetAdjustmentBehavior="automatic">
         <View>
-          <Section title="walletjs: initEncryptedIdentity()">
+          <Section title="New wallet:">
+            <Text style={[styles.sectionBody]}>{JSON.stringify(w)}</Text>
+          </Section>
+
+          {/* <Section title="walletjs: initEncryptedIdentity()">
             <Text style={[styles.sectionBody]}>{JSON.stringify(w)}</Text>
           </Section>
 
@@ -74,32 +88,41 @@ const App = () => {
 
           <Section title="walletjs: reencryptSigner()">
             <Text style={[styles.sectionBody]}>{rs}</Text>
-          </Section>
+          </Section> */}
 
-          <Section title="walletjs: checks">
-            <Text style={[styles.sectionBody]}>
-              wallet.initOwner === signer.address:{' '}
-              {(w?.initOwner === s1?.address).toString()}
-              {'\n'}
-            </Text>
+          {/* <Section title="walletjs: checks">
+            {w && (
+              <>
+                <Text style={[styles.sectionBody]}>
+                  wallet.initOwner === signer.address:{' '}
+                  {(w?.initOwner === s1?.address).toString()}
+                  {'\n'}
+                </Text>
 
-            <Text style={[styles.sectionBody]}>
-              reencryptSigner decrypts to same signer:{' '}
-              {(JSON.stringify(s1) === JSON.stringify(s2)).toString()}
-              {'\n'}
-            </Text>
+                <Text style={[styles.sectionBody]}>
+                  reencryptSigner decrypts to same signer:{' '}
+                  {(JSON.stringify(s1) === JSON.stringify(s2)).toString()}
+                  {'\n'}
+                </Text>
 
-            <Text style={[styles.sectionBody]}>
-              wallet.encryptedSigner !== reencryptSigner:{' '}
-              {(w?.encryptedSigner !== rs).toString()}
-              {'\n'}
-            </Text>
+                <Text style={[styles.sectionBody]}>
+                  wallet.encryptedSigner !== reencryptSigner:{' '}
+                  {(w?.encryptedSigner !== rs).toString()}
+                  {'\n'}
+                </Text>
 
-            <Text style={[styles.sectionBody]}>
-              wrong password returns undefined: {(s3 === undefined).toString()}
-              {'\n'}
-            </Text>
-          </Section>
+                <Text style={[styles.sectionBody]}>
+                  wrong password returns undefined:{' '}
+                  {(s3 === undefined).toString()}
+                  {'\n'}
+                </Text>
+              </>
+            )}
+          </Section> */}
+
+          {loading && <ActivityIndicator />}
+
+          <Button title="Generate" onPress={checkWalletJs} />
         </View>
       </ScrollView>
     </SafeAreaView>
