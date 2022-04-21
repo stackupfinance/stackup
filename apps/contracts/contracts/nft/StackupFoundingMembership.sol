@@ -13,8 +13,9 @@ contract StackupFoundingMembership is ERC721URIStorage {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
 
-    // Mumbai USDC testnet address
-    address private immutable usdcAddress = 0x2058A9D7613eEE744279e3856Ef0eAda5FCbaA7e;
+    // USDC mainnet address
+    address private immutable usdcAddress = 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;
+
     IERC20 private usdc;
 
     constructor(string memory _name, string memory _symbol) ERC721(_name, _symbol) {
