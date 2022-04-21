@@ -53,7 +53,7 @@ contract StackupFoundingMembership is ERC721URIStorage {
             paymentSucceeded = true;
         }
 
-        require(paymentSucceeded == true);
+        require(paymentSucceeded == true, "Payment was not successful");
 
         _tokenIds.increment();
 
