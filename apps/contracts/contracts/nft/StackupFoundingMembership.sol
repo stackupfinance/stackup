@@ -13,8 +13,8 @@ contract StackupFoundingMembership is ERC721URIStorage {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
 
-    // USDC mainnet address
-    address private immutable usdcAddress = 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;
+    // USDC Polygon mainnet address
+    address private immutable usdcAddress = 0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174;
 
     IERC20 private usdc;
 
