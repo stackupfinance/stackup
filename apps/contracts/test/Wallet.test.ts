@@ -67,7 +67,7 @@ describe('Wallet', () => {
               context('when the given nonce is correct', () => {
                 context('when the op is signed by the owner', () => {
                   beforeEach('sign op', async () => {
-                    op.signature = await wallet.signWithOwner(op, requestId)
+                    op.signature = await wallet.signRequestIdWithOwner(op)
                   })
 
                   const itIncreasesTheWalletNonce = (prefund: BigNumberish) => {
@@ -92,10 +92,9 @@ describe('Wallet', () => {
                       op.preVerificationGas = 49172
                       op.paymaster = guardian.address
                       op.paymasterData = '0xabcd'
+                      op.signature = await wallet.signRequestIdWithOwner(op)
 
                       requestId = await wallet.getRequestId(op)
-                      op.signature = await wallet.signWithOwner(op, requestId)
-
                       await expect(wallet.validateUserOp(op, requestId, prefund, { from })).not.to.be.reverted
                     })
                   }
@@ -178,7 +177,7 @@ describe('Wallet', () => {
                   })
 
                   it('reverts', async () => {
-                    await expect(wallet.validateUserOp(op, requestId, { from })).to.be.revertedWith('Wallet: Signer not an owner')
+                    await expect(wallet.validateUserOp(op, requestId, { from })).to.be.revertedWith('ACL: Signer not an owner')
                   })
                 })
               })
@@ -186,8 +185,7 @@ describe('Wallet', () => {
               context('when the given nonce is not correct', () => {
                 beforeEach('change nonce and sign op', async () => {
                   op.nonce = 10
-                  requestId = await wallet.getRequestId(op)
-                  op.signature = await wallet.signWithOwner(op, requestId)
+                  op.signature = await wallet.signRequestIdWithOwner(op)
                 })
 
                 it('reverts', async () => {
@@ -200,12 +198,11 @@ describe('Wallet', () => {
               const requestId = ZERO_BYTES32
 
               beforeEach('sign op', async () => {
-                const requestId = await wallet.getRequestId(op)
-                op.signature = await wallet.signWithOwner(op, requestId)
+                op.signature = await wallet.signRequestIdWithOwner(op)
               })
 
               it('reverts', async () => {
-                await expect(wallet.validateUserOp(op, requestId, { from })).to.be.revertedWith('Wallet: Invalid owner sig')
+                await expect(wallet.validateUserOp(op, requestId, { from })).to.be.revertedWith('ACL: Invalid owner sig')
               })
             })
           })
@@ -226,7 +223,7 @@ describe('Wallet', () => {
 
                   context('when the op is signed by a guardian', () => {
                     beforeEach('sign op', async () => {
-                      op.signature = await wallet.signWithGuardians(op, requestId)
+                      op.signature = await wallet.signRequestIdWithGuardians(op)
                     })
 
                     context('when the amount of signatures is above the min required', () => {
@@ -251,10 +248,9 @@ describe('Wallet', () => {
                           op.preVerificationGas = 49172
                           op.paymaster = guardian.address
                           op.paymasterData = '0xabcd'
+                          op.signature = await wallet.signRequestIdWithGuardians(op)
 
                           requestId = await wallet.getRequestId(op)
-                          op.signature = await wallet.signWithGuardians(op, requestId)
-
                           await expect(wallet.validateUserOp(op, requestId, prefund, { from })).not.to.be.reverted
                         })
                       }
@@ -351,7 +347,7 @@ describe('Wallet', () => {
                     })
 
                     it('reverts', async () => {
-                      await expect(wallet.validateUserOp(op, requestId, { from })).to.be.revertedWith('Wallet: Signer not a guardian')
+                      await expect(wallet.validateUserOp(op, requestId, { from })).to.be.revertedWith('ACL: Signer not a guardian')
                     })
                   })
                 })
@@ -360,11 +356,11 @@ describe('Wallet', () => {
                   requestId = ZERO_BYTES32
 
                   beforeEach('sign op', async () => {
-                    op.signature = await wallet.signWithGuardians(op, await wallet.getRequestId(op))
+                    op.signature = await wallet.signRequestIdWithGuardians(op)
                   })
 
                   it('reverts', async () => {
-                    await expect(wallet.validateUserOp(op, requestId, { from })).to.be.revertedWith('Wallet: Invalid guardian sig')
+                    await expect(wallet.validateUserOp(op, requestId, { from })).to.be.revertedWith('ACL: Invalid owner sig')
                   })
                 })
               })
@@ -392,7 +388,7 @@ describe('Wallet', () => {
 
                     context('when the op is signed by a guardian', () => {
                       beforeEach('sign op', async () => {
-                        op.signature = await wallet.signWithGuardians(op, requestId)
+                        op.signature = await wallet.signRequestIdWithGuardians(op)
                       })
 
                       context('when the amount of signatures is above the min required', () => {
@@ -414,10 +410,9 @@ describe('Wallet', () => {
                           op.preVerificationGas = 49172
                           op.paymaster = guardian.address
                           op.paymasterData = '0xabcd'
+                          op.signature = await wallet.signRequestIdWithGuardians(op)
 
                           requestId = await wallet.getRequestId(op)
-                          op.signature = await wallet.signWithGuardians(op, requestId)
-
                           await expect(wallet.validateUserOp(op, requestId, { from })).not.to.be.reverted
                         })
 
@@ -456,7 +451,7 @@ describe('Wallet', () => {
                       })
 
                       it('reverts', async () => {
-                        await expect(wallet.validateUserOp(op, requestId, { from })).to.be.revertedWith('Wallet: Signer not a guardian')
+                        await expect(wallet.validateUserOp(op, requestId, { from })).to.be.revertedWith('ACL: Signer not a guardian')
                       })
                     })
                   })
@@ -465,11 +460,11 @@ describe('Wallet', () => {
                     requestId = ZERO_BYTES32
 
                     beforeEach('sign op', async () => {
-                      op.signature = await wallet.signWithGuardians(op, await wallet.getRequestId(op))
+                      op.signature = await wallet.signRequestIdWithGuardians(op)
                     })
 
                     it('reverts', async () => {
-                      await expect(wallet.validateUserOp(op, requestId, { from })).to.be.revertedWith('Wallet: Invalid guardian sig')
+                      await expect(wallet.validateUserOp(op, requestId, { from })).to.be.revertedWith('ACL: Invalid guardian sig')
                     })
                   })
                 })
@@ -482,8 +477,7 @@ describe('Wallet', () => {
                   })
 
                   beforeEach('sign op', async  () => {
-                    requestId = await wallet.getRequestId(op)
-                    op.signature = await wallet.signWithGuardians(op, requestId)
+                    op.signature = await wallet.signRequestIdWithGuardians(op)
                   })
 
                   it('reverts', async () => {
@@ -499,8 +493,7 @@ describe('Wallet', () => {
                 })
 
                 beforeEach('sign op', async  () => {
-                  requestId = await wallet.getRequestId(op)
-                  op.signature = await wallet.signWithGuardians(op, requestId)
+                  op.signature = await wallet.signRequestIdWithGuardians(op)
                 })
 
                 it('reverts', async () => {
@@ -511,8 +504,7 @@ describe('Wallet', () => {
 
             context('when no calldata is given', () => {
               beforeEach('sign op', async () => {
-                requestId = await wallet.getRequestId(op)
-                op.signature = await wallet.signWithGuardians(op, requestId)
+                op.signature = await wallet.signRequestIdWithGuardians(op)
               })
 
               it('reverts', async () => {

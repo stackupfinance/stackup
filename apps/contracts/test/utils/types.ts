@@ -27,6 +27,12 @@ export type PaymasterDeployParams = {
   entryPoint?: Contract
 }
 
+export type PaymasterData = {
+  fee: BigNumberish;
+  token: Contract;
+  feed: Contract;
+}
+
 export type UserOp = {
   sender: string;
   nonce: number;

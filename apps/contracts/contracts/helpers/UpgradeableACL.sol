@@ -5,6 +5,7 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/interfaces/IERC1271.sol";
 import "@openzeppelin/contracts/utils/math/Math.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import "@openzeppelin/contracts/utils/cryptography/SignatureChecker.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/AccessControlEnumerableUpgradeable.sol";
@@ -146,6 +147,24 @@ abstract contract UpgradeableACL is IERC1271, Initializable, UUPSUpgradeable, Ac
     require(account != address(0), "ACL: Owner cannot be zero");
     _revokeRole(OWNER_ROLE, getRoleMember(OWNER_ROLE, 0));
     _grantRole(OWNER_ROLE, account);
+  }
+
+  function _validateOwnerSignature(
+    address signer,
+    bytes32 hash,
+    bytes memory signature
+  ) internal view {
+    require(SignatureChecker.isValidSignatureNow(signer, hash, signature), "ACL: Invalid owner sig");
+    require(isOwner(signer), "ACL: Signer not an owner");
+  }
+
+  function _validateGuardianSignature(
+    address signer,
+    bytes32 hash,
+    bytes memory signature
+  ) internal view {
+    require(SignatureChecker.isValidSignatureNow(signer, hash, signature), "ACL: Invalid owner sig");
+    require(isGuardian(signer), "ACL: Signer not a guardian");
   }
 
   /**
