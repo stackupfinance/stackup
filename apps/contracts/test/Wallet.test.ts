@@ -360,7 +360,7 @@ describe('Wallet', () => {
                   })
 
                   it('reverts', async () => {
-                    await expect(wallet.validateUserOp(op, requestId, { from })).to.be.revertedWith('ACL: Invalid owner sig')
+                    await expect(wallet.validateUserOp(op, requestId, { from })).to.be.revertedWith('ACL: Invalid guardian sig')
                   })
                 })
               })
