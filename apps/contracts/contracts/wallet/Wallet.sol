@@ -69,6 +69,7 @@ contract Wallet is IWallet, UpgradeableACL, Paymaster {
     UserOperation calldata op,
     bytes32 requestId
   ) internal view {
+    require(getGuardiansCount() > 0, "Wallet: No guardians allowed");
     require(op.isGuardianActionAllowed(), "Wallet: Invalid guardian action");
     require(signatureData.values.length >= getMinGuardiansSignatures(), "Wallet: Insufficient guardians");
 

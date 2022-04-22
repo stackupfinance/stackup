@@ -86,7 +86,7 @@ abstract contract UpgradeableACL is IERC1271, Initializable, UUPSUpgradeable, Ac
   /**
    * @dev Tells the how many owners the wallet has
    */
-  function getOwnerCount() external view returns (uint256) {
+  function getOwnersCount() external view returns (uint256) {
     return getRoleMemberCount(OWNER_ROLE);
   }
 
@@ -107,7 +107,7 @@ abstract contract UpgradeableACL is IERC1271, Initializable, UUPSUpgradeable, Ac
   /**
    * @dev Tells the how many guardians the wallet has
    */
-  function getGuardianCount() public view returns (uint256) {
+  function getGuardiansCount() public view returns (uint256) {
     return getRoleMemberCount(GUARDIAN_ROLE);
   }
 
@@ -122,7 +122,7 @@ abstract contract UpgradeableACL is IERC1271, Initializable, UUPSUpgradeable, Ac
    * @dev Tells the min number amount of guardians signatures in order for an op to approved
    */
   function getMinGuardiansSignatures() public view returns (uint256) {
-    return Math.ceilDiv(getGuardianCount(), 2);
+    return Math.ceilDiv(getGuardiansCount(), 2);
   }
 
   /**

@@ -39,12 +39,12 @@ export default class Paymaster {
     return this.instance.getCurrentImplementation()
   }
 
-  async getOwnerCount(): Promise<BigNumber> {
-    return this.instance.getOwnerCount()
+  async getOwnersCount(): Promise<BigNumber> {
+    return this.instance.getOwnersCount()
   }
 
-  async getGuardianCount(): Promise<BigNumber> {
-    return this.instance.getGuardianCount()
+  async getGuardiansCount(): Promise<BigNumber> {
+    return this.instance.getGuardiansCount()
   }
 
   async getOwner(index: number): Promise<string> {
