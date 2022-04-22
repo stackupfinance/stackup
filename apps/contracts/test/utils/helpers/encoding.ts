@@ -54,7 +54,7 @@ export async function encodeEntryPointDeposit(account: Account): Promise<string>
   return entryPointInterface.encodeFunctionData('depositTo', args)
 }
 
-export async function encodeEntryPointStake(unstakeDelaySec: BigNumber): Promise<string> {
+export async function encodeEntryPointStake(unstakeDelaySec: BigNumberish): Promise<string> {
   const entryPointInterface = await getInterface('Staking')
   const args = [unstakeDelaySec.toString()]
   return entryPointInterface.encodeFunctionData('addStake', args)
