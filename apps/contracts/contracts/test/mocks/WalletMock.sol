@@ -6,9 +6,10 @@ import "@openzeppelin/contracts/utils/Address.sol";
 
 import "../../UserOperation.sol";
 import "../../wallet/IWallet.sol";
+import "../../helpers/Calls.sol";
 
 contract WalletMock is IWallet {
-  using Address for address;
+  using Calls for address;
 
   bool internal mockPayRefund;
   bool internal mockRevertVerification;
@@ -38,9 +39,7 @@ contract WalletMock is IWallet {
     uint256 requiredPrefund
   ) external override {
     require(!mockRevertVerification, "WALLET_VERIFICATION_FAILED");
-    if (mockPayRefund) {
-      Address.sendValue(payable(address(msg.sender)), requiredPrefund);
-    }
+    if (mockPayRefund) Address.sendValue(payable(address(msg.sender)), requiredPrefund);
     emit ValidateUserOp(op, requestId, requiredPrefund);
   }
 
@@ -49,6 +48,6 @@ contract WalletMock is IWallet {
     uint256 value,
     bytes calldata data
   ) external override {
-    to.functionCallWithValue(data, value);
+    to.callWithValue(data, value, "WALLET_EXECUTION_FAILED");
   }
 }
