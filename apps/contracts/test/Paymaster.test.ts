@@ -698,8 +698,19 @@ describe('Paymaster', () => {
           expect(await paymaster.getCurrentImplementation()).to.be.equal(newImplementation.address)
         })
 
-        it.skip('works fine with storage layout changes', async () => {
-          // TODO: implement
+        it('works fine with storage layout changes', async () => {
+          const previousEntryPoint = await paymaster.instance.entryPoint()
+
+          const v2 = await deploy('PaymasterV2Mock')
+          await paymaster.upgradeTo(v2, { from })
+          const paymasterV2 = await instanceAt('PaymasterV2Mock', paymaster.address)
+          expect(await paymaster.getCurrentImplementation()).to.be.equal(v2.address)
+
+          await paymasterV2.setX(10)
+          expect(await paymasterV2.x()).to.be.equal(10)
+
+          const currentEntryPoint = await paymasterV2.entryPoint()
+          expect(currentEntryPoint).to.be.equal(previousEntryPoint)
         })
       })
 

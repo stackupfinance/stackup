@@ -118,4 +118,11 @@ contract Paymaster is IPaymaster, UpgradeableACL {
         ? (price * 10**(tokenDecimals - feedDecimals))
         : (price / 10**(feedDecimals - tokenDecimals));
   }
+
+  /**
+   * @dev This empty reserved space is put in place to allow future versions to add new
+   * variables without shifting down storage in the inheritance chain.
+   * See https://docs.openzeppelin.com/contracts/4.x/upgradeable#storage_gaps
+   */
+  uint256[50] private __gap;
 }
