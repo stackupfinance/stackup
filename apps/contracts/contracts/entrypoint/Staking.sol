@@ -56,6 +56,7 @@ contract Staking is IEntryPointStaking {
 
   function canWithdraw(address account) public view returns (bool) {
     Deposit storage deposit = deposits[account];
+    // solhint-disable-next-line not-rely-on-time
     return deposit.unstakeDelaySec == 0 || (isUnstaking(account) && deposit.withdrawTime <= block.timestamp);
   }
 
