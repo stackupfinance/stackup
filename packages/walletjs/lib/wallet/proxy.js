@@ -11,7 +11,14 @@ const walletProxy = require("../contracts/walletProxy");
 const userOperation = require("../constants/userOperations");
 const encodeFunctionData = require("./encodeFunctionData");
 
-const _scryptFn = global.scrypt ?? scrypt.scrypt;
+let _scryptFn;
+// eslint-disable-next-line no-undef
+if (typeof navigator !== "undefined" && navigator.product === "ReactNative") {
+  // Use a shim for scrypt if in React Native environment.
+  _scryptFn = global.scrypt;
+} else {
+  _scryptFn = scrypt.scrypt;
+}
 
 const _getInitCode = (
   initImplementation,
