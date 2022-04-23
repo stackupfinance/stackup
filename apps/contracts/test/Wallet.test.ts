@@ -613,6 +613,31 @@ describe('Wallet', () => {
             })
           })
         })
+
+        context('when the call is only to transfer ETH', () => {
+          const value = fp(1)
+
+          context('when the wallet has funds', () => {
+            beforeEach('transfer funds', async () => {
+              await owner.sendTransaction({ to: wallet.address, value })
+            })
+
+            it('transfers funds', async () => {
+              const previousBalance = await ethers.provider.getBalance(guardian.address)
+
+              await wallet.executeUserOp(guardian, '0x', value, { from })
+
+              const currentBalance = await ethers.provider.getBalance(guardian.address)
+              expect(currentBalance).to.be.equal(previousBalance.add(value))
+            })
+          })
+
+          context('when the wallet does not have funds', () => {
+            it('reverts', async () => {
+              await expect(wallet.executeUserOp(guardian, '0x', value, { from })).to.be.reverted
+            })
+          })
+        })
       })
 
       context('when the call reverts', () => {

@@ -57,14 +57,15 @@ describe('EntryPoint', () => {
 
               it('can handles ETH value', async () => {
                 const value = fp(0.001)
-                await (await getSigner()).sendTransaction({ to: op.sender, value })
-                op.callData = await encodeWalletExecute(mock, await encodeCounterIncrement(), value)
+                const someone = await getSigner(8)
+                await someone.sendTransaction({ to: op.sender, value })
+                op.callData = await encodeWalletExecute(someone, '0x', value)
 
-                const previousCounterBalance = await ethers.provider.getBalance(mock.address)
+                const previousCounterBalance = await ethers.provider.getBalance(someone.address)
 
                 await entryPoint.handleOps(op)
 
-                const currentCounterBalance = await ethers.provider.getBalance(mock.address)
+                const currentCounterBalance = await ethers.provider.getBalance(someone.address)
                 expect(currentCounterBalance).to.be.equal(previousCounterBalance.add(value))
               })
             })
@@ -100,7 +101,7 @@ describe('EntryPoint', () => {
 
         context('when the user specifies a verification gas value', () => {
           beforeEach('set verification gas', async () => {
-            op.verificationGas = op.initCode == '0x' ? bn(30e3) : bn(650e3)
+            op.verificationGas = op.initCode == '0x' ? bn(30e3) : bn(690e3)
           })
 
           context('when the wallet verification succeeds', () => {
@@ -362,7 +363,7 @@ describe('EntryPoint', () => {
         context('when the user does not specify any gas fee', () => {
           context('when the user specifies a verification gas value', () => {
             beforeEach('set verification gas', async () => {
-              op.verificationGas = op.initCode == '0x' ? bn(60e3) : bn(650e3)
+              op.verificationGas = op.initCode == '0x' ? bn(60e3) : bn(690e3)
             })
 
             context('when the wallet verification succeeds', () => {
@@ -489,7 +490,7 @@ describe('EntryPoint', () => {
 
                     context('when the verification gas is not enough', () => {
                       beforeEach('set verification gas', async () => {
-                        op.verificationGas = op.initCode == '0x' ? bn(30e3) : bn(580e3)
+                        op.verificationGas = op.initCode == '0x' ? bn(30e3) : bn(620e3)
                       })
 
                       it('reverts', async () => {
@@ -557,7 +558,7 @@ describe('EntryPoint', () => {
 
           context('when the user specifies a verification gas value', () => {
             beforeEach('set verification gas', async () => {
-              op.verificationGas = op.initCode == '0x' ? bn(60e3) : bn(650e3)
+              op.verificationGas = op.initCode == '0x' ? bn(60e3) : bn(690e3)
             })
 
             context('when the wallet verification succeeds', () => {
@@ -693,7 +694,7 @@ describe('EntryPoint', () => {
 
                       context('when the verification gas is not enough', () => {
                         beforeEach('set verification gas', async () => {
-                          op.verificationGas = op.initCode == '0x' ? bn(30e3) : bn(580e3)
+                          op.verificationGas = op.initCode == '0x' ? bn(30e3) : bn(620e3)
                         })
 
                         it('reverts', async () => {
@@ -772,7 +773,7 @@ describe('EntryPoint', () => {
 
           context('when the user specifies a verification gas value', () => {
             beforeEach('set verification gas', async () => {
-              op.verificationGas = op.initCode == '0x' ? bn(60e3) : bn(650e3)
+              op.verificationGas = op.initCode == '0x' ? bn(60e3) : bn(690e3)
             })
 
             context('when the wallet verification succeeds', () => {
@@ -909,7 +910,7 @@ describe('EntryPoint', () => {
 
                       context('when the verification gas is not enough', () => {
                         beforeEach('set verification gas', async () => {
-                          op.verificationGas = op.initCode == '0x' ? bn(30e3) : bn(580e3)
+                          op.verificationGas = op.initCode == '0x' ? bn(30e3) : bn(620e3)
                         })
 
                         it('reverts', async () => {

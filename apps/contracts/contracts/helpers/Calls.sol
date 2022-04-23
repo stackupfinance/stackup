@@ -25,7 +25,8 @@ library Calls {
   }
 
   /**
-   * @dev Performs a Solidity function call using a low level `call` with `gas` gas.
+   * @dev Performs a Solidity function call using a low level `call` sending `value` wei to `recipient`,
+   * forwarding all available gas and reverting on errors.
    * If the call succeeds, it returns the raw returned data.
    * If `target` reverts with a revert reason, it is bubbled up. Otherwise, it reverts with `errorMessage`.
    */
@@ -34,7 +35,11 @@ library Calls {
     bytes memory data,
     uint256 value,
     string memory errorMessage
-  ) internal returns (bytes memory) {
-    return Address.functionCallWithValue(target, data, value, errorMessage);
+  ) internal {
+    if (data.length == 0) {
+      sendValue(payable(address(target)), value, errorMessage);
+    } else {
+      Address.functionCallWithValue(target, data, value, errorMessage);
+    }
   }
 }

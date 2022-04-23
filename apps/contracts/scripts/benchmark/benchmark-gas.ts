@@ -65,7 +65,7 @@ async function withoutPaymaster(entryPoint: Contract): Promise<void> {
   console.log(`- Execute: \t${executeGasCost.sub(incrementGasCost)} gas`)
 
   const sendValueOp = buildOp({ nonce: 2, sender: createOp.sender })
-  sendValueOp.callData = await encodeWalletExecute(mock, await encodeCounterIncrement(), fp(1))
+  sendValueOp.callData = await encodeWalletExecute(redeemer, '0x', fp(1))
   sendValueOp.callGas = bn(50e3)
   sendValueOp.verificationGas = bn(200e3)
   sendValueOp.maxFeePerGas = 1
@@ -120,7 +120,7 @@ async function withPaymaster(entryPoint: Contract): Promise<void> {
   console.log(`- Execute: \t${executeGasCost.sub(incrementGasCost)} gas`)
 
   const sendValueOp = buildOp({ nonce: 2, sender: createOp.sender, paymaster })
-  sendValueOp.callData = await encodeWalletExecute(mock, await encodeCounterIncrement(), fp(1))
+  sendValueOp.callData = await encodeWalletExecute(redeemer, '0x', fp(1))
   sendValueOp.callGas = bn(50e3)
   sendValueOp.verificationGas = bn(200e3)
   sendValueOp.maxFeePerGas = 1e9
