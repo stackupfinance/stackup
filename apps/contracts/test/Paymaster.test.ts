@@ -27,14 +27,14 @@ describe('Paymaster', () => {
     })
 
     it('sets up owners properly', async () => {
-      expect(await paymaster.getOwnerCount()).to.be.equal(1)
+      expect(await paymaster.getOwnersCount()).to.be.equal(1)
       expect(await paymaster.getRoleMemberCount(OWNER_ROLE)).to.be.equal(1)
       expect(await paymaster.hasRole(OWNER_ROLE, owner)).to.be.true
       expect(await paymaster.getOwner(0)).to.be.equal(owner.address)
     })
 
     it('sets up guardians properly', async () => {
-      expect(await paymaster.getGuardianCount()).to.be.equal(1)
+      expect(await paymaster.getGuardiansCount()).to.be.equal(1)
       expect(await paymaster.getRoleMemberCount(GUARDIAN_ROLE)).to.be.equal(1)
       expect(await paymaster.hasRole(GUARDIAN_ROLE, guardian)).to.be.true
       expect(await paymaster.getGuardian(0)).to.be.equal(guardian.address)
@@ -569,7 +569,7 @@ describe('Paymaster', () => {
         it('transfer ownership to the grantee', async () => {
           await paymaster.transferOwner(other, { from })
 
-          expect(await paymaster.getOwnerCount()).to.be.equal(1)
+          expect(await paymaster.getOwnersCount()).to.be.equal(1)
           expect(await paymaster.getRoleMemberCount(OWNER_ROLE)).to.be.equal(1)
           expect(await paymaster.hasRole(OWNER_ROLE, owner)).to.be.false
           expect(await paymaster.hasRole(OWNER_ROLE, other)).to.be.true
@@ -610,7 +610,7 @@ describe('Paymaster', () => {
           it('grants the guardian role to the grantee', async () => {
             await paymaster.grantGuardian(other, { from })
 
-            expect(await paymaster.getGuardianCount()).to.be.equal(2)
+            expect(await paymaster.getGuardiansCount()).to.be.equal(2)
             expect(await paymaster.getRoleMemberCount(GUARDIAN_ROLE)).to.be.equal(2)
             expect(await paymaster.hasRole(GUARDIAN_ROLE, guardian)).to.be.true
             expect(await paymaster.hasRole(GUARDIAN_ROLE, other)).to.be.true
@@ -623,7 +623,7 @@ describe('Paymaster', () => {
           it('does not affect the guardian list', async () => {
             await paymaster.grantGuardian(guardian, { from })
 
-            expect(await paymaster.getGuardianCount()).to.be.equal(1)
+            expect(await paymaster.getGuardiansCount()).to.be.equal(1)
             expect(await paymaster.getRoleMemberCount(GUARDIAN_ROLE)).to.be.equal(1)
             expect(await paymaster.hasRole(GUARDIAN_ROLE, guardian)).to.be.true
             expect(await paymaster.getGuardian(0)).to.be.equal(guardian.address)
@@ -663,7 +663,7 @@ describe('Paymaster', () => {
         it('revokes the guardian role to the grantee', async () => {
           await paymaster.revokeGuardian(guardian, { from })
 
-          expect(await paymaster.getGuardianCount()).to.be.equal(0)
+          expect(await paymaster.getGuardiansCount()).to.be.equal(0)
           expect(await paymaster.getRoleMemberCount(GUARDIAN_ROLE)).to.be.equal(0)
           expect(await paymaster.hasRole(GUARDIAN_ROLE, guardian)).to.be.false
         })
@@ -673,7 +673,7 @@ describe('Paymaster', () => {
         it('does not affect the guardian list', async () => {
           await paymaster.revokeGuardian(other, { from })
 
-          expect(await paymaster.getGuardianCount()).to.be.equal(1)
+          expect(await paymaster.getGuardiansCount()).to.be.equal(1)
           expect(await paymaster.getRoleMemberCount(GUARDIAN_ROLE)).to.be.equal(1)
           expect(await paymaster.hasRole(GUARDIAN_ROLE, guardian)).to.be.true
           expect(await paymaster.getGuardian(0)).to.be.equal(guardian.address)
