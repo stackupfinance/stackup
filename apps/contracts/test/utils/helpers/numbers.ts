@@ -1,9 +1,9 @@
 import { Decimal } from 'decimal.js'
 import { BigNumber } from 'ethers'
 
-const SCALING_FACTOR = 1e18
+import { BigNumberish } from '../types'
 
-export type BigNumberish = string | number | BigNumber
+const SCALING_FACTOR = 1e18
 
 export const isBigNumberish = (x: any) => BigNumber.isBigNumber(x) || typeof x === 'number'
 

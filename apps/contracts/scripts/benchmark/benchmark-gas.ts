@@ -17,13 +17,15 @@ import {
   encodePaymasterData,
   encodePaymasterSignature,
   encodeTokenApproval,
-  encodeEntryPointLock,
   encodeEntryPointStake,
+  encodeEntryPointDeposit,
 } from '../../test/utils/helpers/encoding'
+
+const UNLOCK_DELAY = 172800 // 2 days
 
 async function benchmark(): Promise<void> {
   const factory = await deploy('SingletonFactory')
-  const entryPoint = await deploy('EntryPoint', [factory.address])
+  const entryPoint = await deploy('EntryPoint', [factory.address, UNLOCK_DELAY])
   await withoutPaymaster(entryPoint)
   await withPaymaster(entryPoint)
 }
@@ -133,8 +135,8 @@ async function withPaymaster(entryPoint: Contract): Promise<void> {
 async function createPaymaster(entryPoint: Contract, paymasterOwner: SignerWithAddress): Promise<string> {
   const paymasterOp = buildOp()
   paymasterOp.initCode = await encodeWalletDeployment(entryPoint, paymasterOwner)
-  paymasterOp.callData = await encodeWalletExecute(entryPoint, await encodeEntryPointStake(), fp(5))
   paymasterOp.sender = await entryPoint.getSenderAddress(paymasterOp.initCode, paymasterOp.nonce)
+  paymasterOp.callData = await encodeWalletExecute(entryPoint, await encodeEntryPointDeposit(paymasterOp.sender), fp(5))
   paymasterOp.callGas = bn(100e3)
   paymasterOp.verificationGas = bn(900e3)
   paymasterOp.maxFeePerGas = 1
@@ -142,7 +144,7 @@ async function createPaymaster(entryPoint: Contract, paymasterOwner: SignerWithA
   paymasterOp.signature = await signWithOwner(paymasterOp, entryPoint, paymasterOwner)
 
   const paymasterLockOp = buildOp({ nonce: 1, sender: paymasterOp.sender })
-  paymasterLockOp.callData = await encodeWalletExecute(entryPoint, await encodeEntryPointLock())
+  paymasterLockOp.callData = await encodeWalletExecute(entryPoint, await encodeEntryPointStake(UNLOCK_DELAY))
   paymasterLockOp.callGas = bn(100e3)
   paymasterLockOp.verificationGas = bn(200e3)
   paymasterLockOp.maxFeePerGas = 1

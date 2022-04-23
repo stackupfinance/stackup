@@ -4,7 +4,7 @@ async function benchmark(): Promise<void> {
   const Proxy = await getArtifact('WalletProxy')
   const Wallet = await getArtifact('Wallet')
   const Paymaster = await getArtifact('Paymaster')
-  const EntryPoint = await getArtifact('EntryPoint')
+  const EntryPoint = await getArtifact('Staking')
 
   console.log(`- Proxy: ${Proxy.deployedBytecode.length / 2} bytes`)
   console.log(`- Wallet: ${Wallet.deployedBytecode.length / 2} bytes`)

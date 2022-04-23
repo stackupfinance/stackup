@@ -1,12 +1,16 @@
+import { BigNumber } from 'ethers'
 import { ethers, network } from 'hardhat'
 
-export async function currentTimestamp(): Promise<number> {
+import { bn } from './numbers'
+import { BigNumberish } from '../types'
+
+export async function currentTimestamp(): Promise<BigNumber> {
   let blockNumber = await ethers.provider.getBlockNumber()
   const prevBlock = await ethers.provider.getBlock(blockNumber)
-  return prevBlock.timestamp
+  return bn(prevBlock.timestamp)
 }
 
-export async function advanceTime(increment: number): Promise<void> {
+export async function advanceTime(increment: BigNumberish): Promise<void> {
   const timestamp = await currentTimestamp()
-  await network.provider.request({ method: 'evm_setNextBlockTimestamp', params: [timestamp + increment] })
+  await network.provider.request({ method: 'evm_setNextBlockTimestamp', params: [timestamp.add(increment).toNumber()] })
 }

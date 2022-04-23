@@ -6,24 +6,20 @@ import { bn } from '../../helpers/numbers'
 import { ZERO_ADDRESS } from '../../helpers/constants'
 import { encodeRequestId, encodeWalletValidateOp } from '../../helpers/encoding'
 
+import Staking from '../staking/Staking'
 import EntryPointDeployer from './EntryPointDeployer'
-import { Account, NAry, TxParams, UserOp, toArray, toBytes32, toAddress } from '../../types'
+import { Account, NAry, TxParams, UserOp, BigNumberish, toArray, toBytes32, toAddress } from '../../types'
 
-export default class EntryPoint {
-  instance: Contract
+export default class EntryPoint extends Staking {
   factory: Contract
 
-  static async create(): Promise<EntryPoint> {
-    return EntryPointDeployer.deploy()
+  static async create(unlockDelay?: BigNumberish): Promise<EntryPoint> {
+    return EntryPointDeployer.deploy(unlockDelay)
   }
 
-  constructor(instance: Contract, factory: Contract) {
-    this.instance = instance
+  constructor(instance: Contract, factory: Contract, unlockDelay: BigNumberish) {
+    super(instance, unlockDelay)
     this.factory = factory
-  }
-
-  get address() {
-    return this.instance.address
   }
 
   async getRequestId(op: UserOp): Promise<string> {
@@ -65,27 +61,6 @@ export default class EntryPoint {
     const totalGas = creationGas.add(validationGas).add(executionGas)
     const gasPrice = await this.getGasPrice(op)
     return totalGas.mul(gasPrice)
-  }
-
-  async getStake(paymaster: Account): Promise<{ value: BigNumber, lockExpiryTime: BigNumber, isLocked: boolean }> {
-    return this.instance.getStake(toAddress(paymaster))
-  }
-
-  async stake(amount: BigNumber, params: TxParams = {}): Promise<ContractTransaction> {
-    return this.with(params).addStake({ value: amount.toString() })
-  }
-
-  async stakeAndLock(amount: BigNumber, params: TxParams = {}): Promise<ContractTransaction> {
-    await this.stake(amount, params)
-    return this.with(params).lockStake()
-  }
-
-  async unlockStake(params: TxParams = {}): Promise<ContractTransaction> {
-    return this.with(params).unlockStake()
-  }
-
-  async unstake(recipient: Account, params: TxParams = {}): Promise<ContractTransaction> {
-    return this.with(params).withdrawStake(toAddress(recipient))
   }
 
   with(params: TxParams = {}): Contract {
