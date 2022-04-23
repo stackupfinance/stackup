@@ -1,4 +1,4 @@
-import './src/utils/shims';
+import './shims';
 
 import React, {ReactNode, useState} from 'react';
 import {ActivityIndicator, Button} from 'react-native';
@@ -11,8 +11,7 @@ import {
   useColorScheme,
   View,
 } from 'react-native';
-// import {wallet} from '@stackupfinance/walletjs';
-import {ethers} from 'ethers';
+import {wallet} from '@stackupfinance/walletjs';
 
 const Section: React.FC<{
   children?: ReactNode;
@@ -41,30 +40,30 @@ const App = () => {
     // NOTE: crypto functions should be wrapped in a setTimeout
     // to prevent blocking of the UI.
     setTimeout(async () => {
-      // const _w = await wallet.proxy.initEncryptedIdentity('password', 'salt');
-      // setWallet(_w);
-
-      // const _s1 = await wallet.proxy.decryptSigner(_w, 'password', 'salt');
-      // setSigner1(_s1);
-
-      // const _rs = await wallet.proxy.reencryptSigner(
-      //   _w,
-      //   'password',
-      //   'newPassword',
-      //   'salt',
-      // );
-      // setReencryptSigner(_rs);
-      // const _s2 = await wallet.proxy.decryptSigner(
-      //   {encryptedSigner: _rs},
-      //   'newPassword',
-      //   'salt',
-      // );
-      // setSigner2(_s2);
-
-      // const _s3 = await wallet.proxy.decryptSigner(_w, 'wrongPassword', 'salt');
-      // setSigner3(_s3);
-      const _w = ethers.Wallet.createRandom();
+      const _w = await wallet.proxy.initEncryptedIdentity('password', 'salt');
       setWallet(_w);
+
+      const _s1 = await wallet.proxy.decryptSigner(_w, 'password', 'salt');
+      setSigner1(_s1);
+
+      const _rs = await wallet.proxy.reencryptSigner(
+        _w,
+        'password',
+        'newPassword',
+        'salt',
+      );
+      setReencryptSigner(_rs);
+
+      const _s2 = await wallet.proxy.decryptSigner(
+        {encryptedSigner: _rs},
+        'newPassword',
+        'salt',
+      );
+      setSigner2(_s2);
+
+      const _s3 = await wallet.proxy.decryptSigner(_w, 'wrongPassword', 'salt');
+      setSigner3(_s3);
+
       setLoading(false);
     });
   };
@@ -74,11 +73,7 @@ const App = () => {
       <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
       <ScrollView contentInsetAdjustmentBehavior="automatic">
         <View>
-          <Section title="New wallet:">
-            <Text style={[styles.sectionBody]}>{JSON.stringify(w)}</Text>
-          </Section>
-
-          {/* <Section title="walletjs: initEncryptedIdentity()">
+          <Section title="walletjs: initEncryptedIdentity()">
             <Text style={[styles.sectionBody]}>{JSON.stringify(w)}</Text>
           </Section>
 
@@ -88,9 +83,9 @@ const App = () => {
 
           <Section title="walletjs: reencryptSigner()">
             <Text style={[styles.sectionBody]}>{rs}</Text>
-          </Section> */}
+          </Section>
 
-          {/* <Section title="walletjs: checks">
+          <Section title="walletjs: checks">
             {w && (
               <>
                 <Text style={[styles.sectionBody]}>
@@ -118,7 +113,7 @@ const App = () => {
                 </Text>
               </>
             )}
-          </Section> */}
+          </Section>
 
           {loading && <ActivityIndicator />}
 

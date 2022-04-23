@@ -1,0 +1,17 @@
+diff --git a/node_modules/react-native-fast-crypto/index.js b/node_modules/react-native-fast-crypto/index.ts
+similarity index 100%
+rename from node_modules/react-native-fast-crypto/index.js
+rename to node_modules/react-native-fast-crypto/index.ts
+diff --git a/node_modules/react-native-fast-crypto/package.json b/node_modules/react-native-fast-crypto/package.json
+index 86ba5fc..4c6631d 100644
+--- a/node_modules/react-native-fast-crypto/package.json
++++ b/node_modules/react-native-fast-crypto/package.json
+@@ -19,7 +19,7 @@
+     "Paul Puey <paul@edge.app>",
+     "William Swanson <william@edge.app>"
+   ],
+-  "main": "index.js",
++  "main": "index.ts",
+   "files": [
+     "/android/build.gradle",
+     "/android/jni/*",
