@@ -8,7 +8,7 @@ import { encodeRequestId, encodeWalletValidateOp } from '../../helpers/encoding'
 
 import Staking from '../staking/Staking'
 import EntryPointDeployer from './EntryPointDeployer'
-import { Account, NAry, TxParams, UserOp, BigNumberish, toArray, toBytes32, toAddress } from '../../types'
+import { Account, NAry, TxParams, UserOp, BigNumberish, toArray, toBytes32 } from '../../types'
 
 export default class EntryPoint extends Staking {
   factory: Contract

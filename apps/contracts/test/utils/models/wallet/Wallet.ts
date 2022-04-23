@@ -27,6 +27,16 @@ export default class Wallet extends Paymaster {
     return encodeRequestId(op, this.entryPoint, network.chainId)
   }
 
+  async signRequestIdWithOwner(op: UserOp, signer?: SignerWithAddress): Promise<string> {
+    const requestId = await this.getRequestId(op)
+    return this.signWithOwner(requestId, signer)
+  }
+
+  async signRequestIdWithGuardians(op: UserOp): Promise<string> {
+    const requestId = await this.getRequestId(op)
+    return this.signWithGuardians(requestId)
+  }
+
   async validateUserOp(op: UserOp, requestId = ZERO_BYTES32, prefundOrParams: BigNumberish | TxParams = 0, params: TxParams = {}): Promise<ContractTransaction> {
     const prefund = isBigNumberish(prefundOrParams) ? prefundOrParams.toString() : 0
     params = (isBigNumberish(prefundOrParams) ? params : prefundOrParams) as TxParams

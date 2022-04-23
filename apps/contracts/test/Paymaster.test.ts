@@ -3,14 +3,14 @@ import { ethers } from 'hardhat'
 import { Contract } from 'ethers'
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/dist/src/signer-with-address'
 
-import {deploy, instanceAt} from './utils/helpers/contracts'
 import { getSigners } from './utils/helpers/signers'
 import { bn, decimal, fp } from './utils/helpers/numbers'
+import { deploy, instanceAt } from './utils/helpers/contracts'
+import { encodePaymasterData, encodeTokenApproval, encodeWalletExecute } from './utils/helpers/encoding'
 import { ADMIN_ROLE, GUARDIAN_ROLE, MAX_UINT256, OWNER_ROLE, ZERO_ADDRESS } from './utils/helpers/constants'
-import { encodePaymasterData, encodePaymasterSignature, encodeTokenApproval, encodeWalletExecute } from './utils/helpers/encoding'
 
 import Paymaster from './utils/models/paymaster/Paymaster'
-import { BigNumberish, UserOp, buildOp } from './utils/types'
+import { BigNumberish, UserOp, PaymasterData, buildOp } from './utils/types'
 
 describe('Paymaster', () => {
   let paymaster: Paymaster, owner: SignerWithAddress, guardian: SignerWithAddress, sender: SignerWithAddress, other: SignerWithAddress
@@ -78,249 +78,266 @@ describe('Paymaster', () => {
 
     context('when a signature is given', () => {
       context('when the signature can be decoded', () => {
-        let token: Contract, feed: Contract
+        let paymasterData: PaymasterData, token: Contract
         const fee = bn(100000), exchangeRate = fp(2)
 
         beforeEach('prepare paymaster data', async () => {
           token = await deploy('TokenMock', ['DAI', 18])
-          feed = await deploy('PriceFeedMock', [18, exchangeRate])
+          const feed = await deploy('PriceFeedMock', [18, exchangeRate])
+          paymasterData = { token, feed, fee }
         })
 
-        const signPaymasterData = async (signer = owner) => {
-          const data = encodePaymasterData(op, fee, token, feed)
-          const signature = await signer.signMessage(ethers.utils.arrayify((data)))
-          return encodePaymasterSignature(fee, token, feed, signature)
-        }
-
-        context('when the signer is the owner', () => {
-          beforeEach('sign op', async () => {
-            op.paymasterData = await signPaymasterData(owner)
-          })
-
-          const itReturnsTheEncodedContext = (maxCost: BigNumberish, expectedFee: BigNumberish = fee) => {
-            it('returns the corresponding context', async () => {
-              const context = await paymaster.validatePaymasterUserOp(op, maxCost)
-
-              const results = ethers.utils.defaultAbiCoder.decode(['address', 'address', 'uint256', 'uint256'], context)
-              expect(results[0]).to.equal(op.sender)
-              expect(results[1]).to.equal(token.address)
-              expect(results[2]).to.equal(exchangeRate)
-              expect(results[3]).to.equal(expectedFee)
-            })
+        context('when encoded as owner', () => {
+          const signPaymasterData = async (signer = owner) => {
+            const signature = await paymaster.signPaymasterRequestWithOwner(op, paymasterData, signer)
+            return encodePaymasterData(paymasterData, signature)
           }
 
-          const itReverts = (maxCost: BigNumberish) => {
+          context('when the signer is the owner', () => {
+            beforeEach('sign op', async () => {
+              op.paymasterData = await signPaymasterData()
+            })
+
+            const itReturnsTheEncodedContext = (maxCost: BigNumberish, expectedFee: BigNumberish = fee) => {
+              it('returns the corresponding context', async () => {
+                const context = await paymaster.validatePaymasterUserOp(op, maxCost)
+
+                const results = ethers.utils.defaultAbiCoder.decode(['address', 'address', 'uint256', 'uint256'], context)
+                expect(results[0]).to.equal(op.sender)
+                expect(results[1]).to.equal(token.address)
+                expect(results[2]).to.equal(exchangeRate)
+                expect(results[3]).to.equal(expectedFee)
+              })
+            }
+
+            const itReverts = (maxCost: BigNumberish) => {
+              it('reverts', async () => {
+                await expect(paymaster.validatePaymasterUserOp(op, maxCost)).to.be.revertedWith('Paymaster: Not approved')
+              })
+            }
+
+            context('when the given max cost is zero', () => {
+              const maxCost = 0
+              const expectedCost = fee
+
+              context('when the tokens were already approved for the paymaster', () => {
+                beforeEach('allow tokens from wallet to paymaster', async () => {
+                  await token.connect(sender).approve(paymaster.address, expectedCost)
+                })
+
+                context('when the allowance is not being affected in the current op', () => {
+                  context('when the op is not calling the token allowance', () => {
+                    beforeEach('set calldata and re-sign', async () => {
+                      op.callData = '0xaabbccdd'
+                      op.paymasterData = await signPaymasterData()
+                    })
+
+                    itReturnsTheEncodedContext(maxCost)
+                  })
+
+                  context.skip('when the op is calling the token allowance for other user', () => {
+                    // TODO: AUDIT! contracts are not using the spender properly for this check
+
+                    beforeEach('set calldata and re-sign', async () => {
+                      op.callData = await encodeWalletExecute(token, await encodeTokenApproval(other, fp(1)))
+                      op.paymasterData = await signPaymasterData()
+                    })
+
+                    itReturnsTheEncodedContext(maxCost)
+                  })
+                })
+
+                context('when the allowance is being increased in the current op', () => {
+                  const amount = expectedCost.add(1)
+
+                  beforeEach('set calldata and re-sign', async () => {
+                    op.callData = await encodeWalletExecute(token, await encodeTokenApproval(op.paymaster, amount))
+                    op.paymasterData = await signPaymasterData()
+                  })
+
+                  itReturnsTheEncodedContext(maxCost)
+                })
+
+                context('when the allowance is being decreased in the current op', () => {
+                  const amount = expectedCost.sub(1)
+
+                  beforeEach('set calldata and re-sign', async () => {
+                    op.callData = await encodeWalletExecute(token, await encodeTokenApproval(op.paymaster, amount))
+                    op.paymasterData = await signPaymasterData()
+                  })
+
+                  itReverts(maxCost)
+                })
+              })
+
+              context('when the tokens were not approved for the paymaster', () => {
+                context('when the tokens are being approved in the current op', () => {
+                  context('when the approved amount is enough', () => {
+                    const amount = expectedCost
+
+                    beforeEach('set calldata and re-sign', async () => {
+                      op.callData = await encodeWalletExecute(token, await encodeTokenApproval(op.paymaster, amount))
+                      op.paymasterData = await signPaymasterData()
+                    })
+
+                    itReturnsTheEncodedContext(maxCost)
+                  })
+
+                  context('when the approved amount is not enough', () => {
+                    const amount = expectedCost.sub(1)
+
+                    beforeEach('set calldata and re-sign', async () => {
+                      op.callData = await encodeWalletExecute(token, await encodeTokenApproval(op.paymaster, amount))
+                      op.paymasterData = await signPaymasterData()
+                    })
+
+                    itReverts(maxCost)
+                  })
+                })
+
+                context('when the tokens are not being approved in the current op', () => {
+                  context('when the tokens were approved in a previous op', () => {
+                    const fee = 0
+
+                    beforeEach('update paymaster data', () => {
+                      paymasterData = { ...paymasterData, fee }
+                    })
+
+                    beforeEach('re-sign op without fees', async () => {
+                      op.paymasterData = await signPaymasterData()
+                    })
+
+                    itReturnsTheEncodedContext(maxCost, fee)
+                  })
+
+                  context('when the tokens were not approved in a previous op', () => {
+                    itReverts(maxCost)
+                  })
+                })
+              })
+            })
+
+            context('when the given max cost is greater than zero', () => {
+              const maxCost = fp(10)
+              const expectedCost = maxCost.mul(exchangeRate).div(fp(1)).add(fee)
+
+              context('when the tokens were already approved for the paymaster', () => {
+                beforeEach('allow tokens from wallet to paymaster', async () => {
+                  await token.connect(sender).approve(paymaster.address, expectedCost)
+                })
+
+                context('when the allowance is not being affected in the current op', () => {
+                  context('when the op is not calling the token allowance', () => {
+                    beforeEach('set calldata and re-sign', async () => {
+                      op.callData = '0xaabbccdd'
+                      op.paymasterData = await signPaymasterData()
+                    })
+
+                    itReturnsTheEncodedContext(maxCost)
+                  })
+
+                  context.skip('when the op is calling the token allowance for other user', () => {
+                    // TODO: AUDIT! contracts are not using the spender properly for this check
+
+                    beforeEach('set calldata and re-sign', async () => {
+                      op.callData = await encodeWalletExecute(token, await encodeTokenApproval(other, fp(1)))
+                      op.paymasterData = await signPaymasterData()
+                    })
+
+                    itReturnsTheEncodedContext(maxCost)
+                  })
+                })
+
+                context('when the allowance is being increased in the current op', () => {
+                  const amount = expectedCost.add(1)
+
+                  beforeEach('set calldata and re-sign', async () => {
+                    op.callData = await encodeWalletExecute(token, await encodeTokenApproval(op.paymaster, amount))
+                    op.paymasterData = await signPaymasterData()
+                  })
+
+                  itReturnsTheEncodedContext(maxCost)
+                })
+
+                context('when the allowance is being decreased in the current op', () => {
+                  const amount = expectedCost.sub(1)
+
+                  beforeEach('set calldata and re-sign', async () => {
+                    op.callData = await encodeWalletExecute(token, await encodeTokenApproval(op.paymaster, amount))
+                    op.paymasterData = await signPaymasterData()
+                  })
+
+                  itReverts(maxCost)
+                })
+              })
+
+              context('when the tokens were not approved for the paymaster', () => {
+                context('when the tokens are being approved in the current op', () => {
+                  context('when the approved amount is enough', () => {
+                    const amount = expectedCost
+
+                    beforeEach('set calldata and re-sign', async () => {
+                      op.callData = await encodeWalletExecute(token, await encodeTokenApproval(op.paymaster, amount))
+                      op.paymasterData = await signPaymasterData()
+                    })
+
+                    itReturnsTheEncodedContext(maxCost)
+                  })
+
+                  context('when the approved amount is not enough', () => {
+                    const amount = expectedCost.sub(1)
+
+                    beforeEach('set calldata and re-sign', async () => {
+                      op.callData = await encodeWalletExecute(token, await encodeTokenApproval(op.paymaster, amount))
+                      op.paymasterData = await signPaymasterData()
+                    })
+
+                    itReverts(maxCost)
+                  })
+                })
+
+                context('when the tokens are not being approved in the current op', () => {
+                  context('when the tokens were approved in a previous op', () => {
+                    const fee = 0
+
+                    beforeEach('update paymaster data', () => {
+                      paymasterData = { ...paymasterData, fee }
+                    })
+
+                    beforeEach('re-sign op without fees', async () => {
+                      op.paymasterData = await signPaymasterData()
+                    })
+
+                    itReturnsTheEncodedContext(maxCost, fee)
+                  })
+
+                  context('when the tokens were not approved in a previous op', () => {
+                    itReverts(maxCost)
+                  })
+                })
+              })
+            })
+          })
+
+          context('when the signer is not the owner', () => {
+            beforeEach('sign op', async () => {
+              const signature = await paymaster.signPaymasterRequestWithOwner(op, paymasterData, guardian)
+              op.paymasterData = encodePaymasterData(paymasterData, signature)
+            })
+
             it('reverts', async () => {
-              await expect(paymaster.validatePaymasterUserOp(op, maxCost)).to.be.revertedWith('Paymaster: Not approved')
-            })
-          }
-
-          context('when the given max cost is zero', () => {
-            const maxCost = 0
-            const expectedCost = fee
-
-            context('when the tokens were already approved for the paymaster', () => {
-              beforeEach('allow tokens from wallet to paymaster', async () => {
-                await token.connect(sender).approve(paymaster.address, expectedCost)
-              })
-
-              context('when the allowance is not being affected in the current op', () => {
-                context('when the op is not calling the token allowance', () => {
-                  beforeEach('set calldata and re-sign', async () => {
-                    op.callData = '0xaabbccdd'
-                    op.paymasterData = await signPaymasterData()
-                  })
-
-                  itReturnsTheEncodedContext(maxCost)
-                })
-
-                context.skip('when the op is calling the token allowance for other user', () => {
-                  // TODO: AUDIT! contracts are not using the spender properly for this check
-
-                  beforeEach('set calldata and re-sign', async () => {
-                    op.callData = await encodeWalletExecute(token, await encodeTokenApproval(other, fp(1)))
-                    op.paymasterData = await signPaymasterData()
-                  })
-
-                  itReturnsTheEncodedContext(maxCost)
-                })
-              })
-
-              context('when the allowance is being increased in the current op', () => {
-                const amount = expectedCost.add(1)
-
-                beforeEach('set calldata and re-sign', async () => {
-                  op.callData = await encodeWalletExecute(token, await encodeTokenApproval(op.paymaster, amount))
-                  op.paymasterData = await signPaymasterData()
-                })
-
-                itReturnsTheEncodedContext(maxCost)
-              })
-
-              context('when the allowance is being decreased in the current op', () => {
-                const amount = expectedCost.sub(1)
-
-                beforeEach('set calldata and re-sign', async () => {
-                  op.callData = await encodeWalletExecute(token, await encodeTokenApproval(op.paymaster, amount))
-                  op.paymasterData = await signPaymasterData()
-                })
-
-                itReverts(maxCost)
-              })
-            })
-
-            context('when the tokens were not approved for the paymaster', () => {
-              context('when the tokens are being approved in the current op', () => {
-                context('when the approved amount is enough', () => {
-                  const amount = expectedCost
-
-                  beforeEach('set calldata and re-sign', async () => {
-                    op.callData = await encodeWalletExecute(token, await encodeTokenApproval(op.paymaster, amount))
-                    op.paymasterData = await signPaymasterData()
-                  })
-
-                  itReturnsTheEncodedContext(maxCost)
-                })
-
-                context('when the approved amount is not enough', () => {
-                  const amount = expectedCost.sub(1)
-
-                  beforeEach('set calldata and re-sign', async () => {
-                    op.callData = await encodeWalletExecute(token, await encodeTokenApproval(op.paymaster, amount))
-                    op.paymasterData = await signPaymasterData()
-                  })
-
-                  itReverts(maxCost)
-                })
-              })
-
-              context('when the tokens are not being approved in the current op', () => {
-                context('when the tokens were approved in a previous op', () => {
-                  const fee = 0
-
-                  beforeEach('re-sign op without fees', async () => {
-                    const data = encodePaymasterData(op, fee, token, feed)
-                    const signature = await owner.signMessage(ethers.utils.arrayify((data)))
-                    op.paymasterData = encodePaymasterSignature(fee, token, feed, signature)
-                  })
-
-                  itReturnsTheEncodedContext(maxCost, fee)
-                })
-
-                context('when the tokens were not approved in a previous op', () => {
-                  itReverts(maxCost)
-                })
-              })
-            })
-          })
-
-          context('when the given max cost is greater than zero', () => {
-            const maxCost = fp(10)
-            const expectedCost = maxCost.mul(exchangeRate).div(fp(1)).add(fee)
-
-            context('when the tokens were already approved for the paymaster', () => {
-              beforeEach('allow tokens from wallet to paymaster', async () => {
-                await token.connect(sender).approve(paymaster.address, expectedCost)
-              })
-
-              context('when the allowance is not being affected in the current op', () => {
-                context('when the op is not calling the token allowance', () => {
-                  beforeEach('set calldata and re-sign', async () => {
-                    op.callData = '0xaabbccdd'
-                    op.paymasterData = await signPaymasterData()
-                  })
-
-                  itReturnsTheEncodedContext(maxCost)
-                })
-
-                context.skip('when the op is calling the token allowance for other user', () => {
-                  // TODO: AUDIT! contracts are not using the spender properly for this check
-
-                  beforeEach('set calldata and re-sign', async () => {
-                    op.callData = await encodeWalletExecute(token, await encodeTokenApproval(other, fp(1)))
-                    op.paymasterData = await signPaymasterData()
-                  })
-
-                  itReturnsTheEncodedContext(maxCost)
-                })
-              })
-
-              context('when the allowance is being increased in the current op', () => {
-                const amount = expectedCost.add(1)
-
-                beforeEach('set calldata and re-sign', async () => {
-                  op.callData = await encodeWalletExecute(token, await encodeTokenApproval(op.paymaster, amount))
-                  op.paymasterData = await signPaymasterData()
-                })
-
-                itReturnsTheEncodedContext(maxCost)
-              })
-
-              context('when the allowance is being decreased in the current op', () => {
-                const amount = expectedCost.sub(1)
-
-                beforeEach('set calldata and re-sign', async () => {
-                  op.callData = await encodeWalletExecute(token, await encodeTokenApproval(op.paymaster, amount))
-                  op.paymasterData = await signPaymasterData()
-                })
-
-                itReverts(maxCost)
-              })
-            })
-
-            context('when the tokens were not approved for the paymaster', () => {
-              context('when the tokens are being approved in the current op', () => {
-                context('when the approved amount is enough', () => {
-                  const amount = expectedCost
-
-                  beforeEach('set calldata and re-sign', async () => {
-                    op.callData = await encodeWalletExecute(token, await encodeTokenApproval(op.paymaster, amount))
-                    op.paymasterData = await signPaymasterData()
-                  })
-
-                  itReturnsTheEncodedContext(maxCost)
-                })
-
-                context('when the approved amount is not enough', () => {
-                  const amount = expectedCost.sub(1)
-
-                  beforeEach('set calldata and re-sign', async () => {
-                    op.callData = await encodeWalletExecute(token, await encodeTokenApproval(op.paymaster, amount))
-                    op.paymasterData = await signPaymasterData()
-                  })
-
-                  itReverts(maxCost)
-                })
-              })
-
-              context('when the tokens are not being approved in the current op', () => {
-                context('when the tokens were approved in a previous op', () => {
-                  const fee = 0
-
-                  beforeEach('re-sign op without fees', async () => {
-                    const data = encodePaymasterData(op, fee, token, feed)
-                    const signature = await owner.signMessage(ethers.utils.arrayify((data)))
-                    op.paymasterData = encodePaymasterSignature(fee, token, feed, signature)
-                  })
-
-                  itReturnsTheEncodedContext(maxCost, fee)
-                })
-
-                context('when the tokens were not approved in a previous op', () => {
-                  itReverts(maxCost)
-                })
-              })
+              await expect(paymaster.validatePaymasterUserOp(op)).to.be.revertedWith('ACL: Signer not an owner')
             })
           })
         })
 
-        context('when the signer is not the owner', () => {
-          beforeEach('sign op', async () => {
-            op.paymasterData = await signPaymasterData(guardian)
+        context('when encoded as guardians', () => {
+          beforeEach('sign as guardians', async () => {
+            op.paymasterData = await paymaster.signPaymasterRequestWithGuardians(op, paymasterData)
           })
 
           it('reverts', async () => {
-            await expect(paymaster.validatePaymasterUserOp(op)).to.be.revertedWith('Paymaster: Invalid signature')
+            await expect(paymaster.validatePaymasterUserOp(op)).to.be.revertedWith('Paymaster: Cannot sign guardian')
           })
         })
       })
@@ -431,9 +448,9 @@ describe('Paymaster', () => {
         await token.connect(owner).approve(paymaster.address, MAX_UINT256)
 
         const baseFee = bn(FEE.mul(10**tokenDecimals))
-        const data = encodePaymasterData(op, baseFee, token, feed)
-        const signature = await owner.signMessage(ethers.utils.arrayify((data)))
-        op.paymasterData = encodePaymasterSignature(baseFee, token, feed, signature)
+        const paymasterData = { fee: baseFee, token, feed }
+        const signature = await paymaster.signPaymasterRequestWithOwner(op, paymasterData)
+        op.paymasterData = encodePaymasterData(paymasterData, signature)
 
         const context = await paymaster.validatePaymasterUserOp(op, COST)
         const results = ethers.utils.defaultAbiCoder.decode(['address', 'address', 'uint256', 'uint256'], context)

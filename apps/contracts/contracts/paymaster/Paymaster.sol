@@ -5,15 +5,19 @@ pragma solidity ^0.8.0;
 import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "@openzeppelin/contracts/utils/math/SafeCast.sol";
 
 import "./IPaymaster.sol";
 import "./PaymasterHelpers.sol";
 import "../UserOperation.sol";
+import "../helpers/Signatures.sol";
 import "../helpers/UpgradeableACL.sol";
 
 contract Paymaster is IPaymaster, UpgradeableACL {
+  using ECDSA for bytes32;
   using SafeERC20 for IERC20Metadata;
+  using Signatures for UserOperation;
   using PaymasterHelpers for bytes;
   using PaymasterHelpers for PaymasterData;
   using PaymasterHelpers for UserOperation;
@@ -60,7 +64,11 @@ contract Paymaster is IPaymaster, UpgradeableACL {
     bytes32, /* requestId */
     uint256 cost
   ) external view override returns (bytes memory context) {
-    require(isOwner(op.paymasterSigner()), "Paymaster: Invalid signature");
+    SignatureData memory signatureData = op.decodePaymasterSignature();
+    require(signatureData.mode == SignatureMode.owner, "Paymaster: Cannot sign guardian");
+
+    SignatureValue memory signatureValue = signatureData.values[0];
+    _validateOwnerSignature(signatureValue.signer, op.encodePaymasterRequest(), signatureValue.signature);
 
     PaymasterData memory paymasterData = op.decodePaymasterData();
     (uint256 rate, uint256 tokenFee) = _getTokenFee(paymasterData, cost);
