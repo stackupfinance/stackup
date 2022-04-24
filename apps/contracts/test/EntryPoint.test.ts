@@ -118,13 +118,11 @@ describe('EntryPoint', () => {
                   expect(currentBalance).to.be.equal(previousBalance)
                 })
 
-                it.skip('simulates the validations correctly', async () => {
-                  //TODO: Fix, these are failing in a weird way :/
-
+                it('simulates the validations correctly', async () => {
                   const { preOpGas, prefund } = await entryPoint.simulateValidation(op)
 
                   expect(prefund).to.be.equal(0)
-                  expect(preOpGas.lt(op.verificationGas)).to.be.true
+                  expect(preOpGas.lt(bn(op.verificationGas).add(op.preVerificationGas))).to.be.true
                 });
 
                 it('does not decreases the wallet balance', async () => {
@@ -148,12 +146,17 @@ describe('EntryPoint', () => {
                   const currentPayerBalance = await ethers.provider.getBalance(op.sender)
                   expect(currentPayerBalance).to.be.eq(previousPayerBalance)
                 })
+
+                it('simulates the validations correctly', async () => {
+                  const { preOpGas, prefund } = await entryPoint.simulateValidation(op)
+
+                  expect(prefund).to.be.equal(0)
+                  expect(preOpGas.lt(bn(op.verificationGas).add(op.preVerificationGas))).to.be.true
+                })
               })
             })
 
             context('when the user does not want to use a priority fee', () => {
-              // TODO: Review this implementation, the user must specify the same fee and priority fee values.
-
               beforeEach('set fees', async () => {
                 op.maxFeePerGas = 1e9
                 op.maxPriorityFeePerGas = op.maxFeePerGas
@@ -182,15 +185,10 @@ describe('EntryPoint', () => {
                     assertWithError(currentRedeemerBalance, previousRedeemerBalance.add(expectedRefund), 0.1)
                   })
 
-                  it.skip('simulates the validations correctly', async () => {
-                    //TODO: Fix, these are failing in a weird way :/
+                  it('simulates the validations correctly', async () => {
+                    const { preOpGas } = await entryPoint.simulateValidation(op)
 
-                    const expectedRefund = await entryPoint.estimatePrefund(op)
-
-                    const { preOpGas, prefund } = await entryPoint.simulateValidation(op)
-
-                    expect(prefund).to.be.equal(expectedRefund)
-                    expect(preOpGas.lt(op.verificationGas)).to.be.true
+                    expect(preOpGas.lt(bn(op.verificationGas).add(op.preVerificationGas))).to.be.true
                   });
 
                   it('refunds the unused gas to the wallet', async () => {
@@ -217,6 +215,12 @@ describe('EntryPoint', () => {
                     const currentPayerBalance = await ethers.provider.getBalance(op.sender)
                     expect(currentPayerBalance).to.be.lt(previousPayerBalance)
                   })
+
+                  it('simulates the validations correctly', async () => {
+                    const { preOpGas } = await entryPoint.simulateValidation(op)
+
+                    expect(preOpGas.lt(bn(op.verificationGas).add(op.preVerificationGas))).to.be.true
+                  })
                 })
               })
 
@@ -239,8 +243,6 @@ describe('EntryPoint', () => {
             })
 
             context('when the user wants to use a priority fee', () => {
-              // TODO: Review this implementation, the user must specify the same fee and priority fee values.
-
               beforeEach('set fees', async () => {
                 op.maxFeePerGas = 1e9
                 op.maxPriorityFeePerGas = 2e9
@@ -269,15 +271,10 @@ describe('EntryPoint', () => {
                     assertWithError(currentRedeemerBalance, previousRedeemerBalance.add(expectedRefund), 0.1)
                   })
 
-                  it.skip('simulates the validations correctly', async () => {
-                    //TODO: Fix, these are failing in a weird way :/
+                  it('simulates the validations correctly', async () => {
+                    const { preOpGas } = await entryPoint.simulateValidation(op)
 
-                    const expectedRefund = await entryPoint.estimatePrefund(op)
-
-                    const { preOpGas, prefund } = await entryPoint.simulateValidation(op)
-
-                    expect(prefund).to.be.equal(expectedRefund)
-                    expect(preOpGas.lt(op.verificationGas)).to.be.true
+                    expect(preOpGas.lt(bn(op.verificationGas).add(op.preVerificationGas))).to.be.true
                   });
 
                   it('refunds the unused gas to the wallet', async () => {
@@ -303,6 +300,12 @@ describe('EntryPoint', () => {
 
                     const currentPayerBalance = await ethers.provider.getBalance(op.sender)
                     expect(currentPayerBalance).to.be.lt(previousPayerBalance)
+                  })
+
+                  it('simulates the validations correctly', async () => {
+                    const { preOpGas } = await entryPoint.simulateValidation(op)
+
+                    expect(preOpGas.lt(bn(op.verificationGas).add(op.preVerificationGas))).to.be.true
                   })
                 })
               })
@@ -431,6 +434,13 @@ describe('EntryPoint', () => {
 
                             await assertIndirectEvent(tx, paymaster.interface, 'PostOp', { mode: POST_OP_MODE_OK })
                           })
+
+                          it('simulates the validations correctly', async () => {
+                            const { preOpGas, prefund } = await entryPoint.simulateValidation(op)
+
+                            expect(prefund).to.be.equal(0)
+                            expect(preOpGas.lt(bn(op.verificationGas).add(op.preVerificationGas))).to.be.true
+                          })
                         }, () => {
                           it('does not force to pay gas anyway', async () => {
                             const previousRedeemerBalance = await ethers.provider.getBalance(redeemer)
@@ -449,6 +459,13 @@ describe('EntryPoint', () => {
                             const tx = await entryPoint.handleOps(op)
 
                             await assertIndirectEvent(tx, paymaster.interface, 'PostOp', { mode: POST_OP_MODE_FAIL })
+                          })
+
+                          it('simulates the validations correctly', async () => {
+                            const { preOpGas, prefund } = await entryPoint.simulateValidation(op)
+
+                            expect(prefund).to.be.equal(0)
+                            expect(preOpGas.lt(bn(op.verificationGas).add(op.preVerificationGas))).to.be.true
                           })
                         })
                       })
@@ -477,13 +494,11 @@ describe('EntryPoint', () => {
                           await assertIndirectEvent(tx, paymaster.interface, 'PostOp', { mode: POST_OP_MODE_OP_FAIL })
                         })
 
-                        it.skip('simulates the validations correctly', async () => {
-                          //TODO: Fix, these are failing in a weird way :/
-
+                        it('simulates the validations correctly', async () => {
                           const { preOpGas, prefund } = await entryPoint.simulateValidation(op)
 
                           expect(prefund).to.be.eq(0)
-                          expect(preOpGas.lt(op.verificationGas)).to.be.true
+                          expect(preOpGas.lt(bn(op.verificationGas).add(op.preVerificationGas))).to.be.true
                         })
                       })
                     })
@@ -549,8 +564,6 @@ describe('EntryPoint', () => {
         })
 
         context('when the user does not want to use a priority fee', () => {
-          // TODO: Review this implementation, the user must specify the same fee and priority fee values.
-
           beforeEach('set fees', async () => {
             op.maxFeePerGas = 1e9
             op.maxPriorityFeePerGas = op.maxFeePerGas
@@ -633,6 +646,12 @@ describe('EntryPoint', () => {
 
                               await assertIndirectEvent(tx, paymaster.interface, 'PostOp', { mode: POST_OP_MODE_OK })
                             })
+
+                            it('simulates the validations correctly', async () => {
+                              const { preOpGas, prefund } = await entryPoint.simulateValidation(op)
+
+                              expect(preOpGas.lt(bn(op.verificationGas).add(op.preVerificationGas))).to.be.true
+                            })
                           }, () => {
                             it('forces to pay gas anyway', async () => {
                               const previousRedeemerBalance = await ethers.provider.getBalance(redeemer)
@@ -651,6 +670,12 @@ describe('EntryPoint', () => {
                               const tx = await entryPoint.handleOps(op)
 
                               await assertIndirectEvent(tx, paymaster.interface, 'PostOp', { mode: POST_OP_MODE_FAIL })
+                            })
+
+                            it('simulates the validations correctly', async () => {
+                              const { preOpGas } = await entryPoint.simulateValidation(op)
+
+                              expect(preOpGas.lt(bn(op.verificationGas).add(op.preVerificationGas))).to.be.true
                             })
                           })
                         })
@@ -679,15 +704,10 @@ describe('EntryPoint', () => {
                             await assertIndirectEvent(tx, paymaster.interface, 'PostOp', { mode: POST_OP_MODE_OP_FAIL })
                           })
 
-                          it.skip('simulates the validations correctly', async () => {
-                            //TODO: Fix, these are failing in a weird way :/
+                          it('simulates the validations correctly', async () => {
+                            const { preOpGas } = await entryPoint.simulateValidation(op)
 
-                            const expectedRefund = await entryPoint.estimatePrefund(op)
-
-                            const { preOpGas, prefund } = await entryPoint.simulateValidation(op)
-
-                            expect(prefund).to.be.equal(expectedRefund)
-                            expect(preOpGas.lt(op.verificationGas)).to.be.true
+                            expect(preOpGas.lt(bn(op.verificationGas).add(op.preVerificationGas))).to.be.true
                           })
                         })
                       })
@@ -764,8 +784,6 @@ describe('EntryPoint', () => {
         })
 
         context('when the user wants to use a priority fee', () => {
-          // TODO: Review this implementation, the user must specify the same fee and priority fee values.
-
           beforeEach('set fees', async () => {
             op.maxFeePerGas = 1e9
             op.maxPriorityFeePerGas = 2e9
@@ -849,6 +867,12 @@ describe('EntryPoint', () => {
 
                               await assertIndirectEvent(tx, paymaster.interface, 'PostOp', { mode: POST_OP_MODE_OK })
                             })
+
+                            it('simulates the validations correctly', async () => {
+                              const { preOpGas } = await entryPoint.simulateValidation(op)
+
+                              expect(preOpGas.lt(bn(op.verificationGas).add(op.preVerificationGas))).to.be.true
+                            })
                           }, () => {
                             it('forces to pay gas anyway', async () => {
                               const previousRedeemerBalance = await ethers.provider.getBalance(redeemer)
@@ -867,6 +891,12 @@ describe('EntryPoint', () => {
                               const tx = await entryPoint.handleOps(op)
 
                               await assertIndirectEvent(tx, paymaster.interface, 'PostOp', { mode: POST_OP_MODE_FAIL })
+                            })
+
+                            it('simulates the validations correctly', async () => {
+                              const { preOpGas } = await entryPoint.simulateValidation(op)
+
+                              expect(preOpGas.lt(bn(op.verificationGas).add(op.preVerificationGas))).to.be.true
                             })
                           })
                         })
@@ -895,15 +925,10 @@ describe('EntryPoint', () => {
                             await assertIndirectEvent(tx, paymaster.interface, 'PostOp', { mode: POST_OP_MODE_OP_FAIL })
                           })
 
-                          it.skip('simulates the validations correctly', async () => {
-                            //TODO: Fix, these are failing in a weird way :/
+                          it('simulates the validations correctly', async () => {
+                            const { preOpGas } = await entryPoint.simulateValidation(op)
 
-                            const expectedRefund = await entryPoint.estimatePrefund(op)
-
-                            const { preOpGas, prefund } = await entryPoint.simulateValidation(op)
-
-                            expect(prefund).to.be.equal(expectedRefund)
-                            expect(preOpGas.lt(op.verificationGas)).to.be.true
+                            expect(preOpGas.lt(bn(op.verificationGas).add(op.preVerificationGas))).to.be.true
                           })
                         })
                       })

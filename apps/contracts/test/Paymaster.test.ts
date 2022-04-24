@@ -6,8 +6,8 @@ import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/dist/src/signer-wit
 import { getSigners } from './utils/helpers/signers'
 import { bn, decimal, fp } from './utils/helpers/numbers'
 import { deploy, instanceAt } from './utils/helpers/contracts'
-import { encodePaymasterData, encodeTokenApproval, encodeWalletExecute } from './utils/helpers/encoding'
 import { ADMIN_ROLE, GUARDIAN_ROLE, MAX_UINT256, OWNER_ROLE, ZERO_ADDRESS } from './utils/helpers/constants'
+import { encodePaymasterContext, encodePaymasterData, encodeTokenApproval, encodeWalletExecute } from './utils/helpers/encoding'
 
 import Paymaster from './utils/models/paymaster/Paymaster'
 import { BigNumberish, UserOp, PaymasterData, buildOp } from './utils/types'
@@ -366,8 +366,7 @@ describe('Paymaster', () => {
 
     beforeEach('build context', async () => {
       token = await deploy('TokenMock', ['DAI', 18])
-      const params = [sender.address, token.address, exchangeRate, fee]
-      contextData = ethers.utils.defaultAbiCoder.encode(['address', 'address', 'uint256', 'uint256'], params)
+      contextData = encodePaymasterContext(sender, token, exchangeRate, fee)
     })
 
     context('when the sender is the entry point', () => {
