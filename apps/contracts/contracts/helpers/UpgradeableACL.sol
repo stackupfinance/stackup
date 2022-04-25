@@ -5,6 +5,7 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/interfaces/IERC1271.sol";
 import "@openzeppelin/contracts/utils/math/Math.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import "@openzeppelin/contracts/utils/cryptography/SignatureChecker.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/AccessControlEnumerableUpgradeable.sol";
@@ -85,7 +86,7 @@ abstract contract UpgradeableACL is IERC1271, Initializable, UUPSUpgradeable, Ac
   /**
    * @dev Tells the how many owners the wallet has
    */
-  function getOwnerCount() external view returns (uint256) {
+  function getOwnersCount() external view returns (uint256) {
     return getRoleMemberCount(OWNER_ROLE);
   }
 
@@ -106,7 +107,7 @@ abstract contract UpgradeableACL is IERC1271, Initializable, UUPSUpgradeable, Ac
   /**
    * @dev Tells the how many guardians the wallet has
    */
-  function getGuardianCount() public view returns (uint256) {
+  function getGuardiansCount() public view returns (uint256) {
     return getRoleMemberCount(GUARDIAN_ROLE);
   }
 
@@ -121,7 +122,7 @@ abstract contract UpgradeableACL is IERC1271, Initializable, UUPSUpgradeable, Ac
    * @dev Tells the min number amount of guardians signatures in order for an op to approved
    */
   function getMinGuardiansSignatures() public view returns (uint256) {
-    return Math.ceilDiv(getGuardianCount(), 2);
+    return Math.ceilDiv(getGuardiansCount(), 2);
   }
 
   /**
@@ -148,6 +149,24 @@ abstract contract UpgradeableACL is IERC1271, Initializable, UUPSUpgradeable, Ac
     _grantRole(OWNER_ROLE, account);
   }
 
+  function _validateOwnerSignature(
+    address signer,
+    bytes32 hash,
+    bytes memory signature
+  ) internal view {
+    require(SignatureChecker.isValidSignatureNow(signer, hash, signature), "ACL: Invalid owner sig");
+    require(isOwner(signer), "ACL: Signer not an owner");
+  }
+
+  function _validateGuardianSignature(
+    address signer,
+    bytes32 hash,
+    bytes memory signature
+  ) internal view {
+    require(SignatureChecker.isValidSignatureNow(signer, hash, signature), "ACL: Invalid guardian sig");
+    require(isGuardian(signer), "ACL: Signer not a guardian");
+  }
+
   /**
    * @dev Upgrades authorization mechanism triggered by `upgradeTo` and `upgradeToAndCall`
    * Reverts if the sender is not the entry point
@@ -155,4 +174,11 @@ abstract contract UpgradeableACL is IERC1271, Initializable, UUPSUpgradeable, Ac
   function _authorizeUpgrade(address) internal view override authenticate {
     // solhint-disable-previous-line no-empty-blocks
   }
+
+  /**
+   * @dev This empty reserved space is put in place to allow future versions to add new
+   * variables without shifting down storage in the inheritance chain.
+   * See https://docs.openzeppelin.com/contracts/4.x/upgradeable#storage_gaps
+   */
+  uint256[50] private __gap;
 }

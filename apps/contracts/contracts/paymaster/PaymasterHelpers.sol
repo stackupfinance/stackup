@@ -126,9 +126,9 @@ library PaymasterHelpers {
   }
 
   /**
-   * @dev Recover the paymaster signer
+   * @dev Encodes the request the paymaster should have signed for
    */
-  function paymasterSigner(UserOperation calldata op) internal pure returns (address) {
+  function encodePaymasterRequest(UserOperation calldata op) internal pure returns (bytes32) {
     PaymasterData memory pd = decodePaymasterData(op);
     return
       keccak256(
@@ -145,6 +145,6 @@ library PaymasterHelpers {
           op.paymaster,
           keccak256(abi.encodePacked(pd.fee, pd.token, pd.feed))
         )
-      ).toEthSignedMessageHash().recover(pd.signature);
+      ).toEthSignedMessageHash();
   }
 }

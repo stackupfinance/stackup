@@ -4,10 +4,10 @@ import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
 
 import { ZERO_BYTES32 } from '../../helpers/constants'
 import { isBigNumberish } from '../../helpers/numbers'
-import { encodeSignatures } from '../../helpers/encoding'
+import { encodePaymasterRequest, encodeSignatures } from '../../helpers/encoding'
 
 import PaymasterDeployer from './PaymasterDeployer'
-import { UserOp, PaymasterDeployParams, Account, BigNumberish, TxParams, toAddress } from '../../types'
+import { UserOp, PaymasterDeployParams, Account, BigNumberish, TxParams, PaymasterData, toAddress } from '../../types'
 
 export default class Paymaster {
   static OWNER_SIGNATURE = 0
@@ -39,12 +39,12 @@ export default class Paymaster {
     return this.instance.getCurrentImplementation()
   }
 
-  async getOwnerCount(): Promise<BigNumber> {
-    return this.instance.getOwnerCount()
+  async getOwnersCount(): Promise<BigNumber> {
+    return this.instance.getOwnersCount()
   }
 
-  async getGuardianCount(): Promise<BigNumber> {
-    return this.instance.getGuardianCount()
+  async getGuardiansCount(): Promise<BigNumber> {
+    return this.instance.getGuardiansCount()
   }
 
   async getOwner(index: number): Promise<string> {
@@ -75,14 +75,24 @@ export default class Paymaster {
     return this.instance.isValidSignature(message, signature)
   }
 
-  async signWithOwner(op: UserOp, requestId: string): Promise<string> {
-    const signature = await this.owner.signMessage(ethers.utils.arrayify(requestId))
-    return encodeSignatures(Paymaster.OWNER_SIGNATURE, { signer: this.owner.address, signature })
+  async signPaymasterRequestWithOwner(op: UserOp, paymasterData: PaymasterData, signer?: SignerWithAddress): Promise<string> {
+    const paymasterRequest = encodePaymasterRequest(op, paymasterData)
+    return await this.signWithOwner(paymasterRequest, signer);
   }
 
-  async signWithGuardians(op: UserOp, requestId: string): Promise<string> {
+  async signPaymasterRequestWithGuardians(op: UserOp, paymasterData: PaymasterData): Promise<string> {
+    const paymasterRequest = encodePaymasterRequest(op, paymasterData)
+    return await this.signWithGuardians(paymasterRequest);
+  }
+
+  async signWithOwner(data: string, signer?: SignerWithAddress): Promise<string> {
+    const signature = await (signer ?? this.owner).signMessage(ethers.utils.arrayify(data))
+    return encodeSignatures(Paymaster.OWNER_SIGNATURE, {signer: (signer ?? this.owner).address, signature})
+  }
+
+  async signWithGuardians(data: string): Promise<string> {
     return encodeSignatures(Paymaster.GUARDIANS_SIGNATURE, await Promise.all(this.guardians.map(async guardian => {
-      return { signer: guardian.address, signature: await guardian.signMessage(ethers.utils.arrayify(requestId)) }
+      return { signer: guardian.address, signature: await guardian.signMessage(ethers.utils.arrayify(data)) }
     })))
   }
 

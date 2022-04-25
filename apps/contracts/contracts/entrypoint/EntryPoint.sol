@@ -29,7 +29,7 @@ contract EntryPoint is IEntryPoint, Staking {
 
   ISingletonFactory public immutable create2Factory;
 
-  constructor(ISingletonFactory _create2Factory) {
+  constructor(ISingletonFactory _create2Factory, uint32 _unstakeDelaySec) Staking(_unstakeDelaySec) {
     create2Factory = _create2Factory;
   }
 
@@ -95,7 +95,7 @@ contract EntryPoint is IEntryPoint, Staking {
     IWallet(op.sender).validateUserOp{ gas: op.verificationGas }(op, requestId, requiredPrefund);
 
     uint256 actualPrefund = address(this).balance.sub(initBalance, "EntryPoint: Balance decreased");
-    require(actualPrefund >= requiredPrefund, "EntryPoint: incorrect prefund");
+    require(actualPrefund >= requiredPrefund, "EntryPoint: Incorrect prefund");
   }
 
   function _validatePaymaster(
@@ -105,10 +105,9 @@ contract EntryPoint is IEntryPoint, Staking {
   ) internal returns (bytes memory) {
     if (!op.hasPaymaster()) return new bytes(0);
 
-    Stake storage stake = _getStake(op.paymaster);
-    require(stake.isLocked, "EntryPoint: Stake not locked");
+    require(isStaked(op.paymaster), "EntryPoint: Deposit not staked");
     uint256 requiredPrefund = op.requiredPrefund();
-    stake.value = stake.value.sub(requiredPrefund, "EntryPoint: Insufficient stake");
+    _decreaseStake(op.paymaster, requiredPrefund);
 
     return IPaymaster(op.paymaster).validatePaymasterUserOp{ gas: validationGas }(op, requestId, requiredPrefund);
   }
@@ -154,7 +153,6 @@ contract EntryPoint is IEntryPoint, Staking {
     }
 
     uint256 refund = requiredPrefund.sub(actualGasCost, "EntryPoint: Insufficient refund");
-    Stake storage stake = _getStake(op.paymaster);
-    stake.value = stake.value + refund;
+    _increaseStake(op.paymaster, refund);
   }
 }

@@ -1,12 +1,10 @@
 import { expect } from 'chai'
 import { ethers } from 'hardhat'
 import { Contract } from 'ethers'
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/dist/src/signer-with-address'
 
 import { bn, fp } from './utils/helpers/numbers'
 import { getSigner } from './utils/helpers/signers'
 import { deploy, instanceAt } from './utils/helpers/contracts'
-import { advanceTime, currentTimestamp } from './utils/helpers/time'
 import { assertIndirectEvent, assertNoIndirectEvent, assertWithError } from './utils/helpers/asserts'
 import { POST_OP_MODE_FAIL, POST_OP_MODE_OK, POST_OP_MODE_OP_FAIL, ZERO_ADDRESS } from './utils/helpers/constants'
 import { encodeCounterIncrement, encodeReverterFail, encodeWalletExecute, encodeWalletMockDeployment } from './utils/helpers/encoding'
@@ -17,8 +15,10 @@ import { UserOp, buildOp } from './utils/types'
 describe('EntryPoint', () => {
   let entryPoint: EntryPoint
 
+  const UNLOCK_DELAY = 172800 // 2 days
+
   beforeEach('deploy entry point', async () => {
-    entryPoint = await EntryPoint.create()
+    entryPoint = await EntryPoint.create(UNLOCK_DELAY)
   })
 
   describe('handleOps', () => {
@@ -57,14 +57,15 @@ describe('EntryPoint', () => {
 
               it('can handles ETH value', async () => {
                 const value = fp(0.001)
-                await (await getSigner()).sendTransaction({ to: op.sender, value })
-                op.callData = await encodeWalletExecute(mock, await encodeCounterIncrement(), value)
+                const someone = await getSigner(8)
+                await someone.sendTransaction({ to: op.sender, value })
+                op.callData = await encodeWalletExecute(someone, '0x', value)
 
-                const previousCounterBalance = await ethers.provider.getBalance(mock.address)
+                const previousCounterBalance = await ethers.provider.getBalance(someone.address)
 
                 await entryPoint.handleOps(op)
 
-                const currentCounterBalance = await ethers.provider.getBalance(mock.address)
+                const currentCounterBalance = await ethers.provider.getBalance(someone.address)
                 expect(currentCounterBalance).to.be.equal(previousCounterBalance.add(value))
               })
             })
@@ -100,7 +101,7 @@ describe('EntryPoint', () => {
 
         context('when the user specifies a verification gas value', () => {
           beforeEach('set verification gas', async () => {
-            op.verificationGas = op.initCode == '0x' ? bn(30e3) : bn(650e3)
+            op.verificationGas = op.initCode == '0x' ? bn(30e3) : bn(690e3)
           })
 
           context('when the wallet verification succeeds', () => {
@@ -118,7 +119,7 @@ describe('EntryPoint', () => {
                 })
 
                 it.skip('simulates the validations correctly', async () => {
-                  //TODO: Fix, this are failing in a weird way :/
+                  //TODO: Fix, these are failing in a weird way :/
 
                   const { preOpGas, prefund } = await entryPoint.simulateValidation(op)
 
@@ -182,7 +183,7 @@ describe('EntryPoint', () => {
                   })
 
                   it.skip('simulates the validations correctly', async () => {
-                    //TODO: Fix, this are failing in a weird way :/
+                    //TODO: Fix, these are failing in a weird way :/
 
                     const expectedRefund = await entryPoint.estimatePrefund(op)
 
@@ -232,7 +233,7 @@ describe('EntryPoint', () => {
                 })
 
                 it('reverts', async () => {
-                  await expect(entryPoint.handleOps(op)).to.be.revertedWith('EntryPoint: incorrect prefund')
+                  await expect(entryPoint.handleOps(op)).to.be.revertedWith('EntryPoint: Incorrect prefund')
                 })
               })
             })
@@ -269,7 +270,7 @@ describe('EntryPoint', () => {
                   })
 
                   it.skip('simulates the validations correctly', async () => {
-                    //TODO: Fix, this are failing in a weird way :/
+                    //TODO: Fix, these are failing in a weird way :/
 
                     const expectedRefund = await entryPoint.estimatePrefund(op)
 
@@ -319,7 +320,7 @@ describe('EntryPoint', () => {
                 })
 
                 it('reverts', async () => {
-                  await expect(entryPoint.handleOps(op)).to.be.revertedWith('EntryPoint: incorrect prefund')
+                  await expect(entryPoint.handleOps(op)).to.be.revertedWith('EntryPoint: Incorrect prefund')
                 })
               })
             })
@@ -353,7 +354,7 @@ describe('EntryPoint', () => {
         let paymaster: Contract
 
         beforeEach('create paymaster', async () => {
-          paymaster = await deploy('PaymasterMock', [entryPoint.address])
+          paymaster = await deploy('PaymasterMock', [entryPoint.address, UNLOCK_DELAY])
           op.paymaster = paymaster.address
           op.preVerificationGas = bn(2e6)
           await (await getSigner()).sendTransaction({ to: op.paymaster, value: fp(10) })
@@ -362,7 +363,7 @@ describe('EntryPoint', () => {
         context('when the user does not specify any gas fee', () => {
           context('when the user specifies a verification gas value', () => {
             beforeEach('set verification gas', async () => {
-              op.verificationGas = op.initCode == '0x' ? bn(60e3) : bn(650e3)
+              op.verificationGas = op.initCode == '0x' ? bn(60e3) : bn(690e3)
             })
 
             context('when the wallet verification succeeds', () => {
@@ -376,14 +377,14 @@ describe('EntryPoint', () => {
                 }
               })
 
-              context('when the paymaster does have some stake', () => {
-                beforeEach('stake a minimum', async () => {
-                  await paymaster.stake({value: 1})
+              context('when the paymaster does have some deposits', () => {
+                beforeEach('deposit', async () => {
+                  await paymaster.deposit({ value: 1 })
                 })
 
-                context('when the paymaster is locked', () => {
-                  beforeEach('lock', async () => {
-                    await paymaster.lock()
+                context('when the paymaster is staked', () => {
+                  beforeEach('stake', async () => {
+                    await paymaster.stake()
                   })
 
                   context('when the paymaster verification succeeds', () => {
@@ -408,11 +409,11 @@ describe('EntryPoint', () => {
                           })
 
                           it('does not decrease the paymaster stake', async () => {
-                            const { value: previousStakedBalance } = await entryPoint.getStake(paymaster)
+                            const previousStakedBalance = await entryPoint.balanceOf(paymaster)
 
                             await entryPoint.handleOps(op, redeemer)
 
-                            const { value: currentStakedBalance } = await entryPoint.getStake(paymaster)
+                            const currentStakedBalance = await entryPoint.balanceOf(paymaster)
                             expect(currentStakedBalance).to.be.equal(previousStakedBalance)
                           })
 
@@ -477,7 +478,7 @@ describe('EntryPoint', () => {
                         })
 
                         it.skip('simulates the validations correctly', async () => {
-                          //TODO: Fix, this are failing in a weird way :/
+                          //TODO: Fix, these are failing in a weird way :/
 
                           const { preOpGas, prefund } = await entryPoint.simulateValidation(op)
 
@@ -489,7 +490,7 @@ describe('EntryPoint', () => {
 
                     context('when the verification gas is not enough', () => {
                       beforeEach('set verification gas', async () => {
-                        op.verificationGas = op.initCode == '0x' ? bn(30e3) : bn(580e3)
+                        op.verificationGas = op.initCode == '0x' ? bn(30e3) : bn(620e3)
                       })
 
                       it('reverts', async () => {
@@ -509,16 +510,16 @@ describe('EntryPoint', () => {
                   })
                 })
 
-                context('when the paymaster is not locked', () => {
+                context('when the paymaster is not staked', () => {
                   it('reverts', async () => {
-                    await expect(entryPoint.handleOps(op)).to.be.revertedWith('EntryPoint: Stake not locked')
+                    await expect(entryPoint.handleOps(op)).to.be.revertedWith('EntryPoint: Deposit not staked')
                   })
                 })
               })
 
-              context('when the paymaster does not have any stake', () => {
+              context('when the paymaster does not have any deposits', () => {
                 it('reverts', async () => {
-                  await expect(entryPoint.handleOps(op)).to.be.revertedWith('EntryPoint: Stake not locked')
+                  await expect(entryPoint.handleOps(op)).to.be.revertedWith('EntryPoint: Deposit not staked')
                 })
               })
             })
@@ -557,7 +558,7 @@ describe('EntryPoint', () => {
 
           context('when the user specifies a verification gas value', () => {
             beforeEach('set verification gas', async () => {
-              op.verificationGas = op.initCode == '0x' ? bn(60e3) : bn(650e3)
+              op.verificationGas = op.initCode == '0x' ? bn(60e3) : bn(690e3)
             })
 
             context('when the wallet verification succeeds', () => {
@@ -571,14 +572,14 @@ describe('EntryPoint', () => {
                 }
               })
 
-              context('when the paymaster does have some stake', () => {
-                beforeEach('stake a minimum', async () => {
-                  await paymaster.stake({value: 1})
+              context('when the paymaster does have some deposits', () => {
+                beforeEach('deposit a minimum', async () => {
+                  await paymaster.deposit({value: 1})
                 })
 
-                context('when the paymaster is locked', () => {
-                  beforeEach('lock', async () => {
-                    await paymaster.lock()
+                context('when the paymaster is staked', () => {
+                  beforeEach('stake', async () => {
+                    await paymaster.stake()
                   })
 
                   context('when the paymaster stake is enough', () => {
@@ -610,11 +611,11 @@ describe('EntryPoint', () => {
 
                             it('decreases the paymaster stake', async () => {
                               const expectedRefund = await entryPoint.estimatePrefund(op)
-                              const { value: previousStakedBalance } = await entryPoint.getStake(paymaster)
+                              const previousStakedBalance = await entryPoint.balanceOf(paymaster)
 
                               await entryPoint.handleOps(op, redeemer)
 
-                              const { value: currentStakedBalance } = await entryPoint.getStake(paymaster)
+                              const currentStakedBalance = await entryPoint.balanceOf(paymaster)
                               assertWithError(currentStakedBalance, previousStakedBalance.sub(expectedRefund), 0.1)
                             })
 
@@ -635,14 +636,14 @@ describe('EntryPoint', () => {
                           }, () => {
                             it('forces to pay gas anyway', async () => {
                               const previousRedeemerBalance = await ethers.provider.getBalance(redeemer)
-                              const previousPayerBalance = (await entryPoint.getStake(op.paymaster)).value
+                              const previousPayerBalance = await entryPoint.balanceOf(op.paymaster)
 
                               await entryPoint.handleOps(op)
 
                               const currentRedeemerBalance = await ethers.provider.getBalance(redeemer)
                               expect(currentRedeemerBalance).to.be.gt(previousRedeemerBalance)
 
-                              const currentPayerBalance = (await entryPoint.getStake(op.paymaster)).value
+                              const currentPayerBalance = await entryPoint.balanceOf(op.paymaster)
                               expect(currentPayerBalance).to.be.lt(previousPayerBalance)
                             })
 
@@ -661,14 +662,14 @@ describe('EntryPoint', () => {
 
                           it('forces to pay gas anyway', async () => {
                             const previousRedeemerBalance = await ethers.provider.getBalance(redeemer)
-                            const previousPayerBalance = (await entryPoint.getStake(op.paymaster)).value
+                            const previousPayerBalance = await entryPoint.balanceOf(op.paymaster)
 
                             await entryPoint.handleOps(op)
 
                             const currentRedeemerBalance = await ethers.provider.getBalance(redeemer)
                             expect(currentRedeemerBalance).to.be.gt(previousRedeemerBalance)
 
-                            const currentPayerBalance = (await entryPoint.getStake(op.paymaster)).value
+                            const currentPayerBalance = await entryPoint.balanceOf(op.paymaster)
                             expect(currentPayerBalance).to.be.lt(previousPayerBalance)
                           })
 
@@ -679,7 +680,7 @@ describe('EntryPoint', () => {
                           })
 
                           it.skip('simulates the validations correctly', async () => {
-                            //TODO: Fix, this are failing in a weird way :/
+                            //TODO: Fix, these are failing in a weird way :/
 
                             const expectedRefund = await entryPoint.estimatePrefund(op)
 
@@ -693,7 +694,7 @@ describe('EntryPoint', () => {
 
                       context('when the verification gas is not enough', () => {
                         beforeEach('set verification gas', async () => {
-                          op.verificationGas = op.initCode == '0x' ? bn(30e3) : bn(580e3)
+                          op.verificationGas = op.initCode == '0x' ? bn(30e3) : bn(620e3)
                         })
 
                         it('reverts', async () => {
@@ -714,26 +715,26 @@ describe('EntryPoint', () => {
                   })
 
                   context('when the paymaster stake is not enough', () => {
-                    beforeEach('stake small amount', async () => {
-                      await paymaster.stake({value: 1})
+                    beforeEach('deposit small amount', async () => {
+                      await paymaster.deposit({ value: 1 })
                     })
 
                     it('reverts', async () => {
-                      await expect(entryPoint.handleOps(op)).to.be.revertedWith('EntryPoint: Insufficient stake')
+                      await expect(entryPoint.handleOps(op)).to.be.revertedWith('Staking: Insufficient stake')
                     })
                   })
                 })
 
-                context('when the paymaster is not locked', () => {
+                context('when the paymaster is not staked', () => {
                   it('reverts', async () => {
-                    await expect(entryPoint.handleOps(op)).to.be.revertedWith('EntryPoint: Stake not locked')
+                    await expect(entryPoint.handleOps(op)).to.be.revertedWith('EntryPoint: Deposit not staked')
                   })
                 })
               })
 
-              context('when the paymaster does not have any stake', () => {
+              context('when the paymaster does not have any deposits', () => {
                 it('reverts', async () => {
-                  await expect(entryPoint.handleOps(op)).to.be.revertedWith('EntryPoint: Stake not locked')
+                  await expect(entryPoint.handleOps(op)).to.be.revertedWith('EntryPoint: Deposit not staked')
                 })
               })
             })
@@ -772,7 +773,7 @@ describe('EntryPoint', () => {
 
           context('when the user specifies a verification gas value', () => {
             beforeEach('set verification gas', async () => {
-              op.verificationGas = op.initCode == '0x' ? bn(60e3) : bn(650e3)
+              op.verificationGas = op.initCode == '0x' ? bn(60e3) : bn(690e3)
             })
 
             context('when the wallet verification succeeds', () => {
@@ -786,19 +787,19 @@ describe('EntryPoint', () => {
                 }
               })
 
-              context('when the paymaster does have some stake', () => {
-                beforeEach('stake a minimum', async () => {
-                  await paymaster.stake({ value: 1 })
+              context('when the paymaster does have some deposits', () => {
+                beforeEach('deposit a minimum', async () => {
+                  await paymaster.deposit({ value: 1 })
                 })
 
-                context('when the paymaster is locked', () => {
-                  beforeEach('lock', async () => {
-                    await paymaster.lock()
+                context('when the paymaster is staked', () => {
+                  beforeEach('stake', async () => {
+                    await paymaster.stake()
                   })
 
-                  context('when the paymaster stake is enough', () => {
-                    beforeEach('stake big amount', async () => {
-                      await paymaster.stake({ value: fp(1) })
+                  context('when the paymaster deposit is enough', () => {
+                    beforeEach('deposit big amount', async () => {
+                      await paymaster.deposit({ value: fp(1) })
                     })
 
                     context('when the paymaster verification succeeds', () => {
@@ -826,11 +827,11 @@ describe('EntryPoint', () => {
 
                             it('decreases the paymaster stake', async () => {
                               const expectedRefund = await entryPoint.estimatePrefund(op)
-                              const { value: previousStakedBalance } = await entryPoint.getStake(paymaster)
+                              const previousStakedBalance = await entryPoint.balanceOf(paymaster)
 
                               await entryPoint.handleOps(op, redeemer)
 
-                              const { value: currentStakedBalance } = await entryPoint.getStake(paymaster)
+                              const currentStakedBalance = await entryPoint.balanceOf(paymaster)
                               assertWithError(currentStakedBalance, previousStakedBalance.sub(expectedRefund), 0.1)
                             })
 
@@ -851,14 +852,14 @@ describe('EntryPoint', () => {
                           }, () => {
                             it('forces to pay gas anyway', async () => {
                               const previousRedeemerBalance = await ethers.provider.getBalance(redeemer)
-                              const previousPayerBalance = (await entryPoint.getStake(op.paymaster)).value
+                              const previousPayerBalance = await entryPoint.balanceOf(op.paymaster)
 
                               await entryPoint.handleOps(op)
 
                               const currentRedeemerBalance = await ethers.provider.getBalance(redeemer)
                               expect(currentRedeemerBalance).to.be.gt(previousRedeemerBalance)
 
-                              const currentPayerBalance = (await entryPoint.getStake(op.paymaster)).value
+                              const currentPayerBalance = await entryPoint.balanceOf(op.paymaster)
                               expect(currentPayerBalance).to.be.lt(previousPayerBalance)
                             })
 
@@ -877,14 +878,14 @@ describe('EntryPoint', () => {
 
                           it('forces to pay gas anyway', async () => {
                             const previousRedeemerBalance = await ethers.provider.getBalance(redeemer)
-                            const previousPayerBalance = (await entryPoint.getStake(op.paymaster)).value
+                            const previousPayerBalance = await entryPoint.balanceOf(op.paymaster)
 
                             await entryPoint.handleOps(op)
 
                             const currentRedeemerBalance = await ethers.provider.getBalance(redeemer)
                             expect(currentRedeemerBalance).to.be.gt(previousRedeemerBalance)
 
-                            const currentPayerBalance = (await entryPoint.getStake(op.paymaster)).value
+                            const currentPayerBalance = await entryPoint.balanceOf(op.paymaster)
                             expect(currentPayerBalance).to.be.lt(previousPayerBalance)
                           })
 
@@ -895,7 +896,7 @@ describe('EntryPoint', () => {
                           })
 
                           it.skip('simulates the validations correctly', async () => {
-                            //TODO: Fix, this are failing in a weird way :/
+                            //TODO: Fix, these are failing in a weird way :/
 
                             const expectedRefund = await entryPoint.estimatePrefund(op)
 
@@ -909,7 +910,7 @@ describe('EntryPoint', () => {
 
                       context('when the verification gas is not enough', () => {
                         beforeEach('set verification gas', async () => {
-                          op.verificationGas = op.initCode == '0x' ? bn(30e3) : bn(580e3)
+                          op.verificationGas = op.initCode == '0x' ? bn(30e3) : bn(620e3)
                         })
 
                         it('reverts', async () => {
@@ -929,27 +930,27 @@ describe('EntryPoint', () => {
                     })
                   })
 
-                  context('when the paymaster stake is not enough', () => {
-                    beforeEach('stake small amount', async () => {
-                      await paymaster.stake({ value: 1 })
+                  context('when the paymaster deposit is not enough', () => {
+                    beforeEach('deposit small amount', async () => {
+                      await paymaster.deposit({ value: 1 })
                     })
 
                     it('reverts', async () => {
-                      await expect(entryPoint.handleOps(op)).to.be.revertedWith('EntryPoint: Insufficient stake')
+                      await expect(entryPoint.handleOps(op)).to.be.revertedWith('Staking: Insufficient stake')
                     })
                   })
                 })
 
-                context('when the paymaster is not locked', () => {
+                context('when the paymaster is not staked', () => {
                   it('reverts', async () => {
-                    await expect(entryPoint.handleOps(op)).to.be.revertedWith('EntryPoint: Stake not locked')
+                    await expect(entryPoint.handleOps(op)).to.be.revertedWith('EntryPoint: Deposit not staked')
                   })
                 })
               })
 
-              context('when the paymaster does not have any stake', () => {
+              context('when the paymaster does not have any deposits', () => {
                 it('reverts', async () => {
-                  await expect(entryPoint.handleOps(op)).to.be.revertedWith('EntryPoint: Stake not locked')
+                  await expect(entryPoint.handleOps(op)).to.be.revertedWith('EntryPoint: Deposit not staked')
                 })
               })
             })
@@ -1029,112 +1030,6 @@ describe('EntryPoint', () => {
 
             await assertNoIndirectEvent(tx, entryPoint.factory.interface, 'Deployed')
           })
-        })
-      })
-    })
-  })
-
-  describe('staking', () => {
-    const amount = fp(1)
-    let paymaster: SignerWithAddress
-
-    const LOCK_EXPIRY_PERIOD = 172800 // 2 days
-
-    beforeEach('load paymaster', async () => {
-      paymaster = await getSigner()
-    })
-
-    // TODO: add more scenarios
-
-    describe('addStake', () => {
-      it('transfers ETH from the paymaster', async () => {
-        const previousBalance = await ethers.provider.getBalance(paymaster.address)
-        const { value: previousStake } = await entryPoint.getStake(paymaster)
-
-        await entryPoint.stake(amount, { from: paymaster })
-
-        const currentBalance = await ethers.provider.getBalance(paymaster.address)
-        expect(currentBalance).to.be.lt(previousBalance.sub(amount))
-
-        const { value: currentStake, lockExpiryTime, isLocked } = await entryPoint.getStake(paymaster)
-        expect(currentStake).to.be.equal(previousStake.add(amount))
-        expect(lockExpiryTime).to.be.equal(0)
-        expect(isLocked).to.be.false
-      })
-    })
-
-    describe('lockStake', () => {
-      it('locks the staked ETH of the paymaster', async () => {
-        const { value: previousStake } = await entryPoint.getStake(paymaster)
-
-        await entryPoint.stakeAndLock(amount, { from: paymaster })
-
-        const { value: currentStake, lockExpiryTime, isLocked } = await entryPoint.getStake(paymaster)
-        expect(currentStake).to.be.equal(previousStake.add(amount))
-        expect(lockExpiryTime).to.be.equal(LOCK_EXPIRY_PERIOD + (await currentTimestamp()))
-        expect(isLocked).to.be.true
-      })
-    })
-
-    describe('unlockStake', () => {
-      beforeEach('stake and lock', async () => {
-        await entryPoint.stakeAndLock(amount, { from: paymaster })
-      })
-
-      context('when the lock expiry time has passed', () => {
-        beforeEach('advance time', async () => {
-          await advanceTime(LOCK_EXPIRY_PERIOD)
-        })
-
-        it('unlocks the stake of the paymaster', async () => {
-          const { value: previousStake } = await entryPoint.getStake(paymaster)
-
-          await entryPoint.unlockStake();
-
-          const { value: currentStake, lockExpiryTime, isLocked } = await entryPoint.getStake(paymaster)
-          expect(currentStake).to.be.equal(previousStake)
-          expect(lockExpiryTime).to.be.equal(0)
-          expect(isLocked).to.be.false
-        })
-      })
-
-      context('when the lock expiry time has not passed', () => {
-        it('reverts', async () => {
-          await expect(entryPoint.unlockStake()).to.be.revertedWith('EntryPoint: Lock not expired')
-        })
-      })
-    })
-
-    describe('unstake', () => {
-      const recipient = ZERO_ADDRESS
-
-      context('when the stake is not locked', () => {
-        beforeEach('stake', async () => {
-          await entryPoint.stake(amount, { from: paymaster })
-        })
-
-        it('withdraws unlocked stake to the given address', async () => {
-          const previousBalance = await ethers.provider.getBalance(recipient)
-
-          await entryPoint.unstake(ZERO_ADDRESS)
-
-          const currentBalance = await ethers.provider.getBalance(recipient)
-          expect(currentBalance).to.be.equal(previousBalance.add(amount))
-
-          const { value: currentStake, lockExpiryTime, isLocked } = await entryPoint.getStake(paymaster)
-          expect(currentStake).to.be.equal(0)
-          expect(lockExpiryTime).to.be.equal(0)
-          expect(isLocked).to.be.false
-        })
-      })
-
-      context('when the stake is locked', () => {
-        beforeEach('stake and lock', async () => {
-          await entryPoint.stakeAndLock(amount, { from: paymaster })
-        })
-
-        it('reverts', async () => {
-          await expect(entryPoint.unstake(recipient)).to.be.revertedWith('EntryPoint: Stake is locked')
         })
       })
     })

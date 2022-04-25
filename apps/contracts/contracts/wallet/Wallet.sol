@@ -8,6 +8,7 @@ import "./IWallet.sol";
 import "./WalletHelpers.sol";
 import "../UserOperation.sol";
 import "../helpers/Calls.sol";
+import "../helpers/Signatures.sol";
 import "../helpers/UpgradeableACL.sol";
 import "../paymaster/Paymaster.sol";
 import "../paymaster/PaymasterHelpers.sol";
@@ -16,8 +17,8 @@ contract Wallet is IWallet, UpgradeableACL, Paymaster {
   using ECDSA for bytes32;
   using Calls for address;
   using Calls for address payable;
+  using Signatures for UserOperation;
   using WalletHelpers for UserOperation;
-  using WalletHelpers for WalletSignatureValue;
 
   uint256 public nonce;
 
@@ -48,34 +49,33 @@ contract Wallet is IWallet, UpgradeableACL, Paymaster {
   ) external override authenticate {
     require(nonce++ == op.nonce, "Wallet: Invalid nonce");
 
-    WalletSignature memory walletSignature = op.decodeWalletSignature();
-    walletSignature.mode == WalletSignatureMode.owner
-      ? _validateOwnerSignature(walletSignature, requestId)
-      : _validateGuardiansSignature(walletSignature, op, requestId);
+    SignatureData memory signatureData = op.decodeSignature();
+    signatureData.mode == SignatureMode.owner
+      ? _validateOwnerSignature(signatureData, requestId)
+      : _validateGuardiansSignature(signatureData, op, requestId);
 
     if (requiredPrefund > 0) {
       payable(entryPoint).sendValue(requiredPrefund, "Wallet: Failed to prefund");
     }
   }
 
-  function _validateOwnerSignature(WalletSignature memory walletSignature, bytes32 requestId) internal view {
-    WalletSignatureValue memory value = walletSignature.values[0];
-    require(value.isValid(requestId), "Wallet: Invalid owner sig");
-    require(isOwner(value.signer), "Wallet: Signer not an owner");
+  function _validateOwnerSignature(SignatureData memory signatureData, bytes32 requestId) internal view {
+    SignatureValue memory value = signatureData.values[0];
+    _validateOwnerSignature(value.signer, requestId.toEthSignedMessageHash(), value.signature);
   }
 
   function _validateGuardiansSignature(
-    WalletSignature memory walletSignature,
+    SignatureData memory signatureData,
     UserOperation calldata op,
     bytes32 requestId
   ) internal view {
+    require(getGuardiansCount() > 0, "Wallet: No guardians allowed");
     require(op.isGuardianActionAllowed(), "Wallet: Invalid guardian action");
-    require(walletSignature.values.length >= getMinGuardiansSignatures(), "Wallet: Insufficient guardians");
+    require(signatureData.values.length >= getMinGuardiansSignatures(), "Wallet: Insufficient guardians");
 
-    for (uint256 i = 0; i < walletSignature.values.length; i++) {
-      WalletSignatureValue memory value = walletSignature.values[i];
-      require(value.isValid(requestId), "Wallet: Invalid guardian sig");
-      require(isGuardian(value.signer), "Wallet: Signer not a guardian");
+    for (uint256 i = 0; i < signatureData.values.length; i++) {
+      SignatureValue memory value = signatureData.values[i];
+      _validateGuardianSignature(value.signer, requestId.toEthSignedMessageHash(), value.signature);
     }
   }
 }

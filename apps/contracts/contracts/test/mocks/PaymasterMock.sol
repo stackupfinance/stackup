@@ -7,6 +7,7 @@ import "../../entrypoint/IEntryPoint.sol";
 
 contract PaymasterMock is IPaymaster {
   IEntryPoint internal entryPoint;
+  uint32 internal unstakeDelaySec;
 
   bool internal mockPayRefund;
   bool internal mockRevertVerification;
@@ -14,8 +15,9 @@ contract PaymasterMock is IPaymaster {
 
   event PostOp(PostOpMode mode, bytes context, uint256 actualGasCost);
 
-  constructor(IEntryPoint _entryPoint) {
+  constructor(IEntryPoint _entryPoint, uint32 _unstakeDelaySec) {
     entryPoint = _entryPoint;
+    unstakeDelaySec = _unstakeDelaySec;
     mockPayRefund = true;
     mockRevertVerification = false;
     mockRevertPostOp = false;
@@ -37,19 +39,19 @@ contract PaymasterMock is IPaymaster {
     // solhint-disable-previous-line no-empty-blocks
   }
 
-  function stake() external payable {
-    entryPoint.addStake{ value: msg.value }();
+  function deposit() external payable {
+    entryPoint.depositTo{ value: msg.value }(address(this));
   }
 
-  function lock() external {
-    entryPoint.lockStake();
+  function stake() external payable {
+    entryPoint.addStake{ value: msg.value }(unstakeDelaySec);
   }
 
   function unlock() external {
     entryPoint.unlockStake();
   }
 
-  function unstake() external {
+  function withdraw() external {
     entryPoint.withdrawStake(payable(address(this)));
   }
 

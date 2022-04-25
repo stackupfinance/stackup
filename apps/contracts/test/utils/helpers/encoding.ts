@@ -1,8 +1,8 @@
 import { ethers } from 'hardhat'
-import { BigNumber, Contract } from 'ethers'
+import { BigNumber } from 'ethers'
 
 import { deploy, getFactory, getInterface } from './contracts'
-import { Signature, UserOp, Account, BigNumberish, NAry, toAddress, toAddresses, toArray } from '../types'
+import { Signature, UserOp, PaymasterData, Account, BigNumberish, NAry, toAddress, toAddresses, toArray } from '../types'
 
 export async function encodeWalletMockDeployment(verificationReverts = false, payRefund = true): Promise<string> {
   const walletFactory = await getFactory('WalletMock')
@@ -48,14 +48,16 @@ export async function encodeWalletExecute(to: Account, data = '0x', value?: BigN
   return walletInterface.encodeFunctionData('executeUserOp', args)
 }
 
-export async function encodeEntryPointStake(): Promise<string> {
-  const entryPointInterface = await getInterface('EntryPoint')
-  return entryPointInterface.encodeFunctionData('addStake')
+export async function encodeEntryPointDeposit(account: Account): Promise<string> {
+  const entryPointInterface = await getInterface('Staking')
+  const args = [toAddress(account)]
+  return entryPointInterface.encodeFunctionData('depositTo', args)
 }
 
-export async function encodeEntryPointLock(): Promise<string> {
-  const entryPointInterface = await getInterface('EntryPoint')
-  return entryPointInterface.encodeFunctionData('lockStake')
+export async function encodeEntryPointStake(unstakeDelaySec: BigNumberish): Promise<string> {
+  const entryPointInterface = await getInterface('Staking')
+  const args = [unstakeDelaySec.toString()]
+  return entryPointInterface.encodeFunctionData('addStake', args)
 }
 
 export async function encodeCounterIncrement(): Promise<string> {
@@ -79,8 +81,8 @@ export function encodeSignatures(type: number, signature: NAry<Signature>): stri
   return ethers.utils.defaultAbiCoder.encode(['uint8', '(address signer, bytes signature)[]'], params)
 }
 
-export function encodePaymasterSignature(fee: BigNumberish, token: Contract, feed: Contract, signature: string): string {
-  const params = [fee, toAddress(token), toAddress(feed), signature]
+export function encodePaymasterData(paymasterData: PaymasterData, signature: string): string {
+  const params = [paymasterData.fee, toAddress(paymasterData.token), toAddress(paymasterData.feed), signature]
   return ethers.utils.defaultAbiCoder.encode(['uint256', 'address', 'address', 'bytes'], params)
 }
 
@@ -122,7 +124,7 @@ export function encodeOp(op: UserOp): string {
   )
 }
 
-export function encodePaymasterData(op: UserOp, fee: BigNumberish, token: Contract, feed: Contract): string {
+export function encodePaymasterRequest(op: UserOp, paymasterData: PaymasterData): string {
   return ethers.utils.keccak256(
     ethers.utils.solidityPack(
       [
@@ -152,7 +154,7 @@ export function encodePaymasterData(op: UserOp, fee: BigNumberish, token: Contra
         ethers.utils.keccak256(
           ethers.utils.solidityPack(
             ['uint256', 'address', 'address'],
-            [fee.toString(), toAddress(token), toAddress(feed)]
+            [paymasterData.fee.toString(), toAddress(paymasterData.token), toAddress(paymasterData.feed)]
           )
         ),
       ]
