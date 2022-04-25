@@ -10,6 +10,7 @@ import { assertIndirectEvent } from './utils/helpers/asserts'
 import { ZERO_ADDRESS, ZERO_BYTES32 } from './utils/helpers/constants'
 import {
   encodeCounterIncrement,
+  encodePaymasterData,
   encodeReverterFail,
   encodeSignatures,
   encodeTokenApproval,
@@ -366,10 +367,8 @@ describe('Wallet', () => {
                   })
                 })
 
-                context.skip('when the guardian is approving tokens', () => {
+                context('when the guardian is approving tokens', () => {
                   let token: Contract
-
-                  // TODO: AUDIT! It requires having a prefund greater than zero which doesn't make sense for paymasters
 
                   beforeEach('deploy token', async () => {
                     token = await deploy('TokenMock', ['DAI', 18])
@@ -377,103 +376,119 @@ describe('Wallet', () => {
 
                   context('when the guardian is approving tokens to the paymaster', () => {
                     beforeEach('set calldata', async  () => {
-                      op.paymasterData = '0xabcd'
                       op.paymaster = wallet.address
                       op.callData = await encodeWalletExecute(token, await encodeTokenApproval(wallet, fp(10)))
                     })
 
-                    context('when the signed request ID matches the one given', () => {
-                      beforeEach('compute request ID', async () => {
-                        requestId = await wallet.getRequestId(op)
+                    context('when the token being approved matches the token fee used by the paymaster', () => {
+                      beforeEach('set calldata', async  () => {
+                        op.paymasterData = encodePaymasterData({ token, feed: token, fee: 0 }, '0x')
                       })
 
-                      context('when the op is signed by a guardian', () => {
+                      context('when the signed request ID matches the one given', () => {
+                        beforeEach('compute request ID', async () => {
+                          requestId = await wallet.getRequestId(op)
+                        })
+
+                        context('when the op is signed by a guardian', () => {
+                          beforeEach('sign op', async () => {
+                            op.signature = await wallet.signRequestIdWithGuardians(op)
+                          })
+
+                          context('when the amount of signatures is above the min required', () => {
+                            it('increases the wallet nonce', async () => {
+                              const previousNonce = await wallet.nonce()
+
+                              await wallet.validateUserOp(op, requestId, { from })
+
+                              expect(await wallet.nonce()).to.be.equal(previousNonce.add(1))
+                            })
+
+                            it('ignores any other op data', async () => {
+                              op.maxFeePerGas = 123123
+                              op.maxPriorityFeePerGas = 72834579
+                              op.initCode = '0x2222'
+                              op.sender = other.address
+                              op.callGas = 123
+                              op.verificationGas = 4
+                              op.preVerificationGas = 49172
+                              op.signature = await wallet.signRequestIdWithGuardians(op)
+
+                              requestId = await wallet.getRequestId(op)
+                              await expect(wallet.validateUserOp(op, requestId, { from })).not.to.be.reverted
+                            })
+
+                            it('does not transfer any funds to the entry point', async () => {
+                              const previousWalletBalance = await ethers.provider.getBalance(wallet.address)
+                              const previousEntryPointBalance = await ethers.provider.getBalance(wallet.entryPoint.address)
+
+                              await wallet.validateUserOp(op, requestId, { from })
+
+                              const currentWalletBalance = await ethers.provider.getBalance(wallet.address)
+                              expect(currentWalletBalance).to.be.equal(previousWalletBalance)
+
+                              const currentEntryPointBalance = await ethers.provider.getBalance(wallet.entryPoint.address)
+                              expect(currentEntryPointBalance).to.be.equal(previousEntryPointBalance)
+                            })
+                          })
+
+                          context('when the amount of signatures is below the min required', () => {
+                            beforeEach('add guardians', async () => {
+                              const [guardian2, guardian3, guardian4] = await getSigners(3, 4)
+                              await wallet.grantGuardian(guardian2, { from })
+                              await wallet.grantGuardian(guardian3, { from })
+                              await wallet.grantGuardian(guardian4, { from })
+                            })
+
+                            it('reverts', async () => {
+                              await expect(wallet.validateUserOp(op, requestId, { from })).to.be.revertedWith('Wallet: Insufficient guardians')
+                            })
+                          })
+                        })
+
+                        context('when the op is signed by someone else', () => {
+                          beforeEach('sign op', async () => {
+                            const signature = await other.signMessage(ethers.utils.arrayify(requestId))
+                            op.signature = encodeSignatures(type, { signer: other.address, signature })
+                          })
+
+                          it('reverts', async () => {
+                            await expect(wallet.validateUserOp(op, requestId, { from })).to.be.revertedWith('ACL: Signer not a guardian')
+                          })
+                        })
+                      })
+
+                      context('when the signed request ID does not match the one given', () => {
+                        requestId = ZERO_BYTES32
+
                         beforeEach('sign op', async () => {
                           op.signature = await wallet.signRequestIdWithGuardians(op)
                         })
 
-                        context('when the amount of signatures is above the min required', () => {
-                          it('increases the wallet nonce', async () => {
-                            const previousNonce = await wallet.nonce()
-
-                            await wallet.validateUserOp(op, requestId, { from })
-
-                            expect(await wallet.nonce()).to.be.equal(previousNonce.add(1))
-                          })
-
-                          it('ignores any other op data', async () => {
-                            op.maxFeePerGas = 123123
-                            op.maxPriorityFeePerGas = 72834579
-                            op.initCode = '0x2222'
-                            op.sender = other.address
-                            op.callGas = 123
-                            op.verificationGas = 4
-                            op.preVerificationGas = 49172
-                            op.paymaster = guardian.address
-                            op.paymasterData = '0xabcd'
-                            op.signature = await wallet.signRequestIdWithGuardians(op)
-
-                            requestId = await wallet.getRequestId(op)
-                            await expect(wallet.validateUserOp(op, requestId, { from })).not.to.be.reverted
-                          })
-
-                          it('does not transfer any funds to the entry point', async () => {
-                            const previousWalletBalance = await ethers.provider.getBalance(wallet.address)
-                            const previousEntryPointBalance = await ethers.provider.getBalance(wallet.entryPoint.address)
-
-                            await wallet.validateUserOp(op, requestId, { from })
-
-                            const currentWalletBalance = await ethers.provider.getBalance(wallet.address)
-                            expect(currentWalletBalance).to.be.equal(previousWalletBalance)
-
-                            const currentEntryPointBalance = await ethers.provider.getBalance(wallet.entryPoint.address)
-                            expect(currentEntryPointBalance).to.be.equal(previousEntryPointBalance)
-                          })
-                        })
-
-                        context('when the amount of signatures is below the min required', () => {
-                          beforeEach('add guardians', async () => {
-                            const [guardian2, guardian3, guardian4] = await getSigners(3, 4)
-                            await wallet.grantGuardian(guardian2, { from })
-                            await wallet.grantGuardian(guardian3, { from })
-                            await wallet.grantGuardian(guardian4, { from })
-                          })
-
-                          it('reverts', async () => {
-                            await expect(wallet.validateUserOp(op, requestId, { from })).to.be.revertedWith('Wallet: Insufficient guardians')
-                          })
-                        })
-                      })
-
-                      context('when the op is signed by someone else', () => {
-                        beforeEach('sign op', async () => {
-                          const signature = await other.signMessage(ethers.utils.arrayify(requestId))
-                          op.signature = encodeSignatures(type, { signer: other.address, signature })
-                        })
-
                         it('reverts', async () => {
-                          await expect(wallet.validateUserOp(op, requestId, { from })).to.be.revertedWith('ACL: Signer not a guardian')
+                          await expect(wallet.validateUserOp(op, requestId, { from })).to.be.revertedWith('ACL: Invalid guardian sig')
                         })
                       })
                     })
 
-                    context('when the signed request ID does not match the one given', () => {
-                      requestId = ZERO_BYTES32
+                    context('when the token being approved does not match the token fee used by the paymaster', () => {
+                      beforeEach('set paymaster data', async  () => {
+                        const anotherToken = await deploy('TokenMock', ['DAI', 18])
+                        op.paymasterData = encodePaymasterData({ token: anotherToken, feed: token, fee: 0 }, '0x')
+                      })
 
-                      beforeEach('sign op', async () => {
+                      beforeEach('sign op', async  () => {
                         op.signature = await wallet.signRequestIdWithGuardians(op)
                       })
 
                       it('reverts', async () => {
-                        await expect(wallet.validateUserOp(op, requestId, { from })).to.be.revertedWith('ACL: Invalid guardian sig')
+                        await expect(wallet.validateUserOp(op, requestId, { from })).to.be.revertedWith('Invalid guardian action')
                       })
                     })
                   })
 
                   context('when the guardian is approving tokens to someone else', () => {
                     beforeEach('set calldata', async  () => {
-                      op.paymasterData = '0xabcd'
-                      op.paymaster = wallet.address
                       op.callData = await encodeWalletExecute(token, await encodeTokenApproval(guardian, fp(10)))
                     })
 
