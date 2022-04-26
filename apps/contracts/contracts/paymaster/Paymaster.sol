@@ -72,8 +72,7 @@ contract Paymaster is IPaymaster, UpgradeableACL {
 
     PaymasterData memory paymasterData = op.decodePaymasterData();
     (uint256 rate, uint256 tokenFee) = _getTokenFee(paymasterData, cost);
-    bool enoughBalance = paymasterData.fee == 0 || paymasterData.token.balanceOf(op.sender) >= tokenFee;
-    require(enoughBalance, "Paymaster: Not enough balance");
+    require(paymasterData.token.balanceOf(op.sender) >= tokenFee, "Paymaster: Not enough balance");
 
     return op.paymasterContext(paymasterData, rate);
   }
@@ -91,19 +90,38 @@ contract Paymaster is IPaymaster, UpgradeableACL {
   ) external override authenticate {
     (mode);
     PaymasterContext memory data = context.decodePaymasterContext();
-    uint256 totalCost = ((cost * data.rate) / 1e18) + data.fee;
+    uint256 totalCost = _calcTokenFee(data.mode, data.rate, cost, data.fee);
     if (totalCost > 0) data.token.safeTransferFrom(data.sender, address(this), totalCost);
   }
 
   /**
-   * @dev Computes the total token fees to be paid to cover given costs in wei
+   * @dev Gets the rate and total token fees to be paid to cover given costs in wei
    * @param data paymaster information
    * @param cost to be paid in wei
    */
   function _getTokenFee(PaymasterData memory data, uint256 cost) internal view returns (uint256 rate, uint256 fee) {
     uint8 decimals = data.token.decimals();
     rate = _getTokenExchangeRate(data.feed, decimals);
-    fee = ((cost * rate) / 1e18) + data.fee;
+    fee = _calcTokenFee(data.mode, rate, cost, data.fee);
+  }
+
+  /**
+   * @dev Calculates the total token fees to be paid to cover given costs in wei
+   * @param mode paymaster mode info
+   * @param rate exchange rate for the token/ETH pair expressed in token's decimals
+   * @param cost to be paid in wei
+   * @param fee paymaster's flat fee to be paid
+   */
+  function _calcTokenFee(
+    PaymasterMode mode,
+    uint256 rate,
+    uint256 cost,
+    uint256 fee
+  ) internal pure returns (uint256) {
+    if (mode == PaymasterMode.FREE) return 0;
+    if (mode == PaymasterMode.FEE_ONLY) return fee;
+    if (mode == PaymasterMode.GAS_ONLY) return (cost * rate) / 1e18;
+    return ((cost * rate) / 1e18) + fee;
   }
 
   /**

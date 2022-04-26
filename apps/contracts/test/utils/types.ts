@@ -28,6 +28,7 @@ export type PaymasterDeployParams = {
 }
 
 export type PaymasterData = {
+  mode: number;
   fee: BigNumberish;
   token: Contract;
   feed: Contract;
