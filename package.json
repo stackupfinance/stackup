@@ -9,6 +9,7 @@
     "node": "^14"
   },
   "scripts": {
+    "postinstall": "yarn workspace @stackupfinance/mobile run patch-package --exclude 'nothing'",
     "install:ios": "cd apps/mobile/ios && pod install && cd - || cd -",
     "test": "lerna run test --stream",
     "lint": "lerna run lint --stream",
@@ -33,7 +34,8 @@
     ],
     "nohoist": [
       "**/react-native",
-      "**/react-native/**"
+      "**/react-native/**",
+      "**/react-native-fast-crypto"
     ]
   },
   "devDependencies": {
