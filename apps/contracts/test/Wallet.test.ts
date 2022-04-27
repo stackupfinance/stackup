@@ -382,7 +382,7 @@ describe('Wallet', () => {
 
                     context('when the token being approved matches the token fee used by the paymaster', () => {
                       beforeEach('set calldata', async  () => {
-                        op.paymasterData = encodePaymasterData({ token, feed: token, fee: 0 }, '0x')
+                        op.paymasterData = encodePaymasterData({ token, feed: token, mode: 0, fee: 0 }, '0x')
                       })
 
                       context('when the signed request ID matches the one given', () => {
@@ -474,7 +474,7 @@ describe('Wallet', () => {
                     context('when the token being approved does not match the token fee used by the paymaster', () => {
                       beforeEach('set paymaster data', async  () => {
                         const anotherToken = await deploy('TokenMock', ['DAI', 18])
-                        op.paymasterData = encodePaymasterData({ token: anotherToken, feed: token, fee: 0 }, '0x')
+                        op.paymasterData = encodePaymasterData({ token: anotherToken, feed: token, mode: 0, fee: 0 }, '0x')
                       })
 
                       beforeEach('sign op', async  () => {
