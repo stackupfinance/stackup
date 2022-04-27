@@ -35,7 +35,7 @@
     "react-hook-form": "^7.30.0",
     "react-icons": "^4.3.1",
     "react-infinite-scroll-component": "^6.1.0",
-    "react-jwt": "^1.1.4",
+    "react-jwt": "^1.1.5",
     "react-use-intercom": "^1.5.1",
     "zustand": "^3.7.2",
     "zxcvbn": "^4.4.2"
