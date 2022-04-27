@@ -72,12 +72,8 @@ contract Paymaster is IPaymaster, UpgradeableACL {
 
     PaymasterData memory paymasterData = op.decodePaymasterData();
     (uint256 rate, uint256 tokenFee) = _getTokenFee(paymasterData, cost);
-    require(
-      (op.isTokenAllowanceEnough(paymasterData, tokenFee) && op.tokenAllowanceRemainsOK(paymasterData, tokenFee)) ||
-        op.tokenAllowanceWillBeOK(paymasterData, tokenFee) ||
-        paymasterData.isRequiredTokenApprovedInPrevOps(),
-      "Paymaster: Not approved"
-    );
+    bool enoughBalance = paymasterData.fee == 0 || paymasterData.token.balanceOf(op.sender) >= tokenFee;
+    require(enoughBalance, "Paymaster: Not enough balance");
 
     return op.paymasterContext(paymasterData, rate);
   }

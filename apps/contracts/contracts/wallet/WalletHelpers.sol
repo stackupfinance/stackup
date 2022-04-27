@@ -5,7 +5,6 @@ pragma solidity ^0.8.0;
 import "../UserOperation.sol";
 import "../helpers/Calldata.sol";
 import "../paymaster/PaymasterHelpers.sol";
-import "../paymaster/Paymaster.sol";
 
 struct WalletCallData {
   address to;
@@ -15,7 +14,6 @@ struct WalletCallData {
 
 library WalletHelpers {
   using Calldata for bytes;
-  using PaymasterHelpers for bytes;
   using PaymasterHelpers for UserOperation;
 
   /**
