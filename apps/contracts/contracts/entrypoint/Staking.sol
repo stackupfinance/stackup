@@ -68,6 +68,7 @@ contract Staking is IEntryPointStaking {
   function addStake(uint32 _unstakeDelaySec) external payable override {
     Deposit storage deposit = deposits[msg.sender];
     require(_unstakeDelaySec >= unstakeDelaySec, "Staking: Low unstake delay");
+    require(_unstakeDelaySec >= deposit.unstakeDelaySec, "Staking: Decreasing unstake time");
 
     deposit.amount = deposit.amount + msg.value;
     deposit.unstakeDelaySec = _unstakeDelaySec;
