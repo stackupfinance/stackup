@@ -22,7 +22,7 @@
     "@stackupfinance/walletjs": "1.0.0",
     "@walletconnect/client": "^1.7.8",
     "amplitude-js": "8.18.1",
-    "axios": "^0.27.1",
+    "axios": "^0.27.2",
     "date-fns": "^2.28.0",
     "ethers": "^5.6.4",
     "framer-motion": "6.3.2",
