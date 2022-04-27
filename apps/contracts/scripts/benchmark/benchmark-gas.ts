@@ -15,7 +15,8 @@ import {
   encodeTokenApproval,
   encodeEntryPointStake,
   encodeEntryPointDeposit,
-  encodePaymasterRequest, encodePaymasterData,
+  encodePaymasterRequest,
+  encodePaymasterData,
 } from '../../test/utils/helpers/encoding'
 
 import Wallet from '../../test/utils/models/wallet/Wallet'
@@ -89,7 +90,7 @@ async function withPaymaster(entryPoint: Contract): Promise<void> {
   const exchangeRate = fp(2)
   const token = await deploy('TokenMock', ['USDC', 6])
   const feed = await deploy('PriceFeedMock', [18, exchangeRate])
-  const paymasterData = { fee, token, feed }
+  const paymasterData = { fee, token, feed, mode: 0 }
   const paymaster = await createPaymaster(entryPoint, paymasterOwner)
 
   const createOp = buildOp({ paymaster })
