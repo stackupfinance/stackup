@@ -28,7 +28,7 @@
   },
   "dependencies": {
     "@sentry/node": "^6.19.6",
-    "@sentry/tracing": "^6.19.6",
+    "@sentry/tracing": "^6.19.7",
     "@stackupfinance/walletjs": "1.0.0",
     "agenda": "^4.2.1",
     "agendash": "^3.1.0",
