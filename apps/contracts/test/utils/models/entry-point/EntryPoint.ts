@@ -3,6 +3,7 @@ import { BigNumber, Contract, ContractTransaction } from 'ethers'
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/dist/src/signer-with-address'
 
 import { bn } from '../../helpers/numbers'
+import { getSigner } from '../../helpers/signers'
 import { ZERO_ADDRESS } from '../../helpers/constants'
 import { encodeRequestId, encodeWalletValidateOp } from '../../helpers/encoding'
 
@@ -40,7 +41,7 @@ export default class EntryPoint extends Staking {
   }
 
   async simulateValidation(op: UserOp): Promise<{ preOpGas: BigNumber, prefund: BigNumber }> {
-    return this.instance.callStatic.simulateValidation(op)
+    return this.instance.connect(await getSigner(ZERO_ADDRESS)).callStatic.simulateValidation(op)
   }
 
   async handleOps(ops: NAry<UserOp>, redeemer?: Account): Promise<ContractTransaction> {

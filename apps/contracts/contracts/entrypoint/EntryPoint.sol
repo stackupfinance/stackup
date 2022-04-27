@@ -47,11 +47,11 @@ contract EntryPoint is IEntryPoint, Staking {
   }
 
   function simulateValidation(UserOperation calldata op) external returns (uint256 preOpGas, uint256 prefund) {
-    require(msg.sender == address(0), "EntryPoint: Caller not zero");
     uint256 preGas = gasleft();
     _verifyOp(op);
     preOpGas = GasUsed.since(preGas) + op.preVerificationGas;
     prefund = op.requiredPrefund();
+    require(msg.sender == address(0), "EntryPoint: Caller not zero");
   }
 
   function handleOps(UserOperation[] calldata ops, address payable redeemer) external {
@@ -70,7 +70,8 @@ contract EntryPoint is IEntryPoint, Staking {
     _validateWallet(op, requestId);
 
     // Marker used of-chain for opcodes validation
-    block.number;
+    uint256 marker = block.number;
+    (marker);
 
     uint256 walletValidationGas = GasUsed.since(preValidationGas);
     uint256 paymasterValidationGas = op.verificationGas.sub(walletValidationGas, "EntryPoint: Verif gas not enough");

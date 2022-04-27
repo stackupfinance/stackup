@@ -1,5 +1,5 @@
 import { ethers } from 'hardhat'
-import { BigNumber } from 'ethers'
+import { BigNumber, Contract } from 'ethers'
 
 import { deploy, getFactory, getInterface } from './contracts'
 import { Signature, UserOp, PaymasterData, Account, BigNumberish, NAry, toAddress, toAddresses, toArray } from '../types'
@@ -79,6 +79,11 @@ export async function encodeTokenApproval(to: Account, amount: BigNumberish): Pr
 export function encodeSignatures(type: number, signature: NAry<Signature>): string {
   const params = [type, toArray(signature)]
   return ethers.utils.defaultAbiCoder.encode(['uint8', '(address signer, bytes signature)[]'], params)
+}
+
+export function encodePaymasterContext(sender: Account, token: Contract, rate: BigNumberish, fee: BigNumberish): string {
+  const params = [toAddress(sender), toAddress(token), rate.toString(), fee.toString()]
+  return ethers.utils.defaultAbiCoder.encode(['address', 'address', 'uint256', 'uint256'], params)
 }
 
 export function encodePaymasterData(paymasterData: PaymasterData, signature: string): string {
