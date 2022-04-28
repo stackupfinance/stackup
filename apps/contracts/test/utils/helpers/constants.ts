@@ -13,3 +13,8 @@ export const GUARDIAN_ROLE = ethers.utils.solidityKeccak256(['string'], ['GUARDI
 export const POST_OP_MODE_OK = 0
 export const POST_OP_MODE_FAIL = 1
 export const POST_OP_MODE_OP_FAIL = 2
+
+export const PAYMASTER_MODE_FULL = 0
+export const PAYMASTER_MODE_FEE_ONLY = 1
+export const PAYMASTER_MODE_GAS_ONLY = 2
+export const PAYMASTER_MODE_FREE = 3

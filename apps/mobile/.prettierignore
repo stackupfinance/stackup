@@ -7,3 +7,4 @@ Gemfile
 Gemfile.lock
 android
 ios
+*.patch

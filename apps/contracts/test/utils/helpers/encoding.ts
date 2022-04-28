@@ -1,5 +1,5 @@
 import { ethers } from 'hardhat'
-import { BigNumber } from 'ethers'
+import { BigNumber, Contract } from 'ethers'
 
 import { deploy, getFactory, getInterface } from './contracts'
 import { Signature, UserOp, PaymasterData, Account, BigNumberish, NAry, toAddress, toAddresses, toArray } from '../types'
@@ -81,9 +81,14 @@ export function encodeSignatures(type: number, signature: NAry<Signature>): stri
   return ethers.utils.defaultAbiCoder.encode(['uint8', '(address signer, bytes signature)[]'], params)
 }
 
+export function encodePaymasterContext(sender: Account, mode: number, token: Contract, rate: BigNumberish, fee: BigNumberish): string {
+  const params = [toAddress(sender), mode, toAddress(token), rate.toString(), fee.toString()]
+  return ethers.utils.defaultAbiCoder.encode(['address', 'uint8', 'address', 'uint256', 'uint256'], params)
+}
+
 export function encodePaymasterData(paymasterData: PaymasterData, signature: string): string {
-  const params = [paymasterData.fee, toAddress(paymasterData.token), toAddress(paymasterData.feed), signature]
-  return ethers.utils.defaultAbiCoder.encode(['uint256', 'address', 'address', 'bytes'], params)
+  const params = [paymasterData.fee, paymasterData.mode, toAddress(paymasterData.token), toAddress(paymasterData.feed), signature]
+  return ethers.utils.defaultAbiCoder.encode(['uint256', 'uint8', 'address', 'address', 'bytes'], params)
 }
 
 export function encodeRequestId(op: UserOp, entryPoint: Account, chainId: number): string {

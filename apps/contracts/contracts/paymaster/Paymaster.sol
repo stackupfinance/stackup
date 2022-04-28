@@ -51,10 +51,7 @@ contract Paymaster is IPaymaster, UpgradeableACL {
   }
 
   /**
-   * @dev Verifies the paymaster data and pays the fee if the paymaster considers the operation valid, options are:
-   * 1. Sender allowed enough tokens to the paymaster, and it is either not calling approve or increasing allowance
-   * 2. It is approving the paymaster with enough tokens
-   * 3. Was already approved in previous ops (paymaster fee is set to zero)
+   * @dev Verifies the paymaster data and pays the fee if the paymaster considers the operation valid
    * @param op operation to be validated
    * @param cost amount to be paid to the entry point in wei
    * @return context including the payment conditions: sender, token, exchange rate, and fees
@@ -71,13 +68,10 @@ contract Paymaster is IPaymaster, UpgradeableACL {
     _validateOwnerSignature(signatureValue.signer, op.encodePaymasterRequest(), signatureValue.signature);
 
     PaymasterData memory paymasterData = op.decodePaymasterData();
-    (uint256 rate, uint256 tokenFee) = _getTokenFee(paymasterData, cost);
-    require(
-      (op.isTokenAllowanceEnough(paymasterData, tokenFee) && op.tokenAllowanceRemainsOK(paymasterData, tokenFee)) ||
-        op.tokenAllowanceWillBeOK(paymasterData, tokenFee) ||
-        paymasterData.isRequiredTokenApprovedInPrevOps(),
-      "Paymaster: Not approved"
-    );
+    uint8 decimals = paymasterData.token.decimals();
+    uint256 rate = _getTokenExchangeRate(paymasterData.feed, decimals);
+    uint256 totalTokenFee = _calcTotalTokenFee(paymasterData.mode, rate, cost, paymasterData.fee);
+    require(paymasterData.token.balanceOf(op.sender) >= totalTokenFee, "Paymaster: Not enough balance");
 
     return op.paymasterContext(paymasterData, rate);
   }
@@ -95,19 +89,27 @@ contract Paymaster is IPaymaster, UpgradeableACL {
   ) external override authenticate {
     (mode);
     PaymasterContext memory data = context.decodePaymasterContext();
-    uint256 totalCost = ((cost * data.rate) / 1e18) + data.fee;
-    if (totalCost > 0) data.token.safeTransferFrom(data.sender, address(this), totalCost);
+    uint256 totalTokenFee = _calcTotalTokenFee(data.mode, data.rate, cost, data.fee);
+    if (totalTokenFee > 0) data.token.safeTransferFrom(data.sender, address(this), totalTokenFee);
   }
 
   /**
-   * @dev Computes the total token fees to be paid to cover given costs in wei
-   * @param data paymaster information
+   * @dev Calculates the total token fees to be paid to cover given costs in wei
+   * @param mode paymaster mode info
+   * @param rate exchange rate for the token/ETH pair expressed in token's decimals
    * @param cost to be paid in wei
+   * @param fee paymaster's flat fee to be paid
    */
-  function _getTokenFee(PaymasterData memory data, uint256 cost) internal view returns (uint256 rate, uint256 fee) {
-    uint8 decimals = data.token.decimals();
-    rate = _getTokenExchangeRate(data.feed, decimals);
-    fee = ((cost * rate) / 1e18) + data.fee;
+  function _calcTotalTokenFee(
+    PaymasterMode mode,
+    uint256 rate,
+    uint256 cost,
+    uint256 fee
+  ) internal pure returns (uint256) {
+    if (mode == PaymasterMode.FREE) return 0;
+    if (mode == PaymasterMode.FEE_ONLY) return fee;
+    if (mode == PaymasterMode.GAS_ONLY) return (cost * rate) / 1e18;
+    return ((cost * rate) / 1e18) + fee;
   }
 
   /**

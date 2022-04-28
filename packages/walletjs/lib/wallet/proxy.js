@@ -11,6 +11,15 @@ const walletProxy = require("../contracts/walletProxy");
 const userOperation = require("../constants/userOperations");
 const encodeFunctionData = require("./encodeFunctionData");
 
+let _scryptFn;
+// eslint-disable-next-line no-undef
+if (typeof navigator !== "undefined" && navigator.product === "ReactNative") {
+  // Use a shim for scrypt if in React Native environment.
+  _scryptFn = global.scrypt;
+} else {
+  _scryptFn = scrypt.scrypt;
+}
+
 const _getInitCode = (
   initImplementation,
   initEntryPoint,
@@ -47,7 +56,7 @@ const generatePasswordKey = async (password, salt) => {
   const saltBuffer = new buffer.SlowBuffer(
     salt.toLowerCase().normalize("NFKC")
   );
-  return scrypt.scrypt(passwordBuffer, saltBuffer, N, r, p, dkLen);
+  return _scryptFn(passwordBuffer, saltBuffer, N, r, p, dkLen);
 };
 
 module.exports.decryptSigner = async (wallet, password, salt) => {
@@ -94,7 +103,7 @@ module.exports.reencryptSigner = async (
 };
 
 module.exports.initEncryptedIdentity = async (password, salt, opts = {}) => {
-  const signer = ethers.Wallet.createRandom();
+  const signer = new ethers.Wallet(ethers.utils.randomBytes(32));
 
   const initImplementation = Wallet.address;
   const initEntryPoint = EntryPoint.address;
