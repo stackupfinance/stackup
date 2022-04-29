@@ -16,6 +16,7 @@ const {
   formatERC20Value,
   signatureCount,
 } = require('../utils/web3');
+const { v4: uuidv4 } = require('uuid');
 
 const aggregateHelpers = {
   addUserField: (userSelector, fallbackAddress) => {
@@ -190,6 +191,7 @@ module.exports.getTransactionById = async (id) => {
 };
 
 module.exports.createTransaction = async (transaction, message) => {
+  if (!transaction.hash) transaction.hash = `PENDING_RELAY_${uuidv4()}`;
   return Transaction.create({
     message,
     ...transaction,
