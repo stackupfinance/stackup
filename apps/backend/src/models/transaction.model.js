@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
+const { nanoid } = require('nanoid');
 const { toJSON, paginate } = require('./plugins');
 const { status, chainId, type } = require('../config/transaction');
-const { nanoid } = require('nanoid');
 
 const lineItem = {
   from: {
