@@ -2,7 +2,6 @@
 const httpStatus = require('http-status');
 const { ethers } = require('ethers');
 const { contracts, wallet } = require('@stackupfinance/walletjs');
-const { v4: uuidv4 } = require('uuid');
 const ApiError = require('../utils/ApiError');
 const { Transaction } = require('../models');
 const queue = require('../queue');
@@ -191,7 +190,6 @@ module.exports.getTransactionById = async (id) => {
 };
 
 module.exports.createTransaction = async (transaction, message) => {
-  if (!transaction.hash) transaction.hash = `PENDING_RELAY_${uuidv4()}`;
   return Transaction.create({
     message,
     ...transaction,

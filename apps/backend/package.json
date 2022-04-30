@@ -54,7 +54,6 @@
     "passport": "^0.5.2",
     "passport-jwt": "^4.0.0",
     "pusher": "^5.0.1",
-    "uuid": "^8.3.2",
     "validator": "^13.7.0",
     "winston": "^3.7.2",
     "winston-transport-sentry-node": "^2.3.0",
