@@ -62,7 +62,7 @@ const transactionSchema = mongoose.Schema(
       type: String,
       trim: true,
       unique: true,
-      default: () => `PENDING_RELAY_${nanoid()}`,    
+      default: () => `PENDING_RELAY_${nanoid()}`,
     },
 
     lineItems: [{ ...lineItem }],
