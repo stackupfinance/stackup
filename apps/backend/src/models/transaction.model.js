@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { nanoid } = require('nanoid');
 const { toJSON, paginate } = require('./plugins');
 const { status, chainId, type } = require('../config/transaction');
 
@@ -61,6 +62,7 @@ const transactionSchema = mongoose.Schema(
       type: String,
       trim: true,
       unique: true,
+      default: () => `PENDING_RELAY_${nanoid()}`,
     },
 
     lineItems: [{ ...lineItem }],
