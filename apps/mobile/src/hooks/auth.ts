@@ -21,7 +21,8 @@ export const useLogout = (): UseLogoutHook => {
 
 export const useAuth = (): UseAuthHook => {
   const logout = useLogout();
-  const {accessToken, refreshToken, refresh} = useAuthStoreAuthSelector();
+  const {accessToken, refreshToken, refresh, hasHydrated} =
+    useAuthStoreAuthSelector();
   const [isReady, setIsReady] = useState<boolean>(false);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
@@ -30,21 +31,23 @@ export const useAuth = (): UseAuthHook => {
   const shouldRefresh = accessToken && refreshToken && !isExpired(refreshToken);
 
   useEffect(() => {
-    const authCheck = async () => {
-      if (isNotAuthenticated) {
-        await logout();
-        setIsAuthenticated(false);
-      } else {
-        isInitialCheck && (await refresh());
-        setIsAuthenticated(true);
-      }
+    if (hasHydrated) {
+      const authCheck = async () => {
+        if (isNotAuthenticated) {
+          await logout();
+          setIsAuthenticated(false);
+        } else {
+          isInitialCheck && (await refresh());
+          setIsAuthenticated(true);
+        }
 
-      setIsReady(true);
-    };
+        setIsReady(true);
+      };
 
-    authCheck();
+      authCheck();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [refreshToken]);
+  }, [hasHydrated, refreshToken]);
 
   useEffect(() => {
     const interval = setInterval(async () => {
