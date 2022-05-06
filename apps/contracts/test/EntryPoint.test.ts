@@ -348,7 +348,7 @@ describe('EntryPoint', () => {
 
         context('when the user does not specify a verification gas value', () => {
           it('reverts', async () => {
-            await expect(entryPoint.handleOps(op)).to.be.revertedWith('contract call run out of gas')
+            await expect(entryPoint.handleOps(op)).to.be.revertedWith('FailedOp')
           })
         })
       })
@@ -558,7 +558,7 @@ describe('EntryPoint', () => {
 
           context('when the user does not specify a verification gas value', () => {
             it('reverts', async () => {
-              await expect(entryPoint.handleOps(op)).to.be.revertedWith('contract call run out of gas')
+              await expect(entryPoint.handleOps(op)).to.be.revertedWith('FailedOp')
             })
           })
         })
@@ -778,7 +778,7 @@ describe('EntryPoint', () => {
 
           context('when the user does not specify a verification gas value', () => {
             it('reverts', async () => {
-              await expect(entryPoint.handleOps(op)).to.be.revertedWith('contract call run out of gas')
+              await expect(entryPoint.handleOps(op)).to.be.revertedWith('FailedOp')
             })
           })
         })
@@ -791,7 +791,7 @@ describe('EntryPoint', () => {
 
           context('when the user specifies a verification gas value', () => {
             beforeEach('set verification gas', async () => {
-              op.verificationGas = op.initCode == '0x' ? bn(60e3) : bn(690e3)
+              op.verificationGas = op.initCode == '0x' ? bn(60e3) : bn(700e3)
             })
 
             context('when the wallet verification succeeds', () => {
@@ -999,7 +999,7 @@ describe('EntryPoint', () => {
 
           context('when the user does not specify a verification gas value', () => {
             it('reverts', async () => {
-              await expect(entryPoint.handleOps(op)).to.be.revertedWith('contract call run out of gas')
+              await expect(entryPoint.handleOps(op)).to.be.revertedWith('FailedOp')
             })
           })
         })
