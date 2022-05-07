@@ -8,9 +8,9 @@ import { WalletDeployParams } from '../../types'
 const WalletDeployer = {
   async deploy(params: WalletDeployParams): Promise<Wallet> {
     const entryPoint = params.entryPoint ?? (await deploy('EntryPointMock'))
-    const implementation = await deploy('Wallet')
+    const implementation = await deploy('Wallet', [entryPoint.address])
     const owner = params.owner ?? await getSigner()
-    const initialization = await encodeWalletInit(entryPoint, owner, params.guardians)
+    const initialization = await encodeWalletInit(owner, params.guardians)
 
     const proxy = await deploy('WalletProxy', [implementation.address, initialization])
     const instance = await instanceAt('Wallet', proxy.address)

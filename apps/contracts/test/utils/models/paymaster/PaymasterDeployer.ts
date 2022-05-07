@@ -8,9 +8,9 @@ import { PaymasterDeployParams } from '../../types'
 const PaymasterDeployer = {
   async deploy(params: PaymasterDeployParams): Promise<Paymaster> {
     const entryPoint = params.entryPoint ?? (await deploy('EntryPointMock'))
-    const implementation = await deploy('Paymaster')
+    const implementation = await deploy('Paymaster', [entryPoint.address])
     const owner = params.owner ?? await getSigner()
-    const initialization = await encodePaymasterInit(entryPoint, owner, params.guardians)
+    const initialization = await encodePaymasterInit(owner, params.guardians)
 
     const proxy = await deploy('ERC1967Proxy', [implementation.address, initialization])
     const instance = await instanceAt('Paymaster', proxy.address)

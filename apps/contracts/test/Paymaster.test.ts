@@ -58,7 +58,12 @@ describe('Paymaster', () => {
     })
 
     it('cannot be initialized twice', async () => {
-      await expect(paymaster.instance.initialize(paymaster.entryPoint.address, owner.address, [])).to.be.revertedWith('Initializable: contract is already initialized')
+      await expect(paymaster.instance.initialize(owner.address, [])).to.be.revertedWith('Initializable: contract is already initialized')
+    })
+
+    it('cannot initialize the implementation', async () => {
+      const implementation = await instanceAt('Paymaster', await paymaster.getCurrentImplementation())
+      await expect(implementation.initialize(owner.address, [])).to.be.revertedWith('Initializable: contract is already initialized')
     })
 
     it('cannot be initialized with the owner as a guardian', async () => {
@@ -815,7 +820,7 @@ describe('Paymaster', () => {
 
       context('when the new implementation is UUPS-compliant', () => {
         beforeEach('deploy new UUPS-compliant implementation', async () => {
-          newImplementation = await deploy('Wallet')
+          newImplementation = await deploy('Paymaster', [paymaster.entryPoint.address])
         })
 
         it('upgrades to the new implementation', async () => {
@@ -827,7 +832,7 @@ describe('Paymaster', () => {
         it('works fine with storage layout changes', async () => {
           const previousEntryPoint = await paymaster.instance.entryPoint()
 
-          const v2 = await deploy('PaymasterV2Mock')
+          const v2 = await deploy('PaymasterV2Mock', [paymaster.entryPoint.address])
           await paymaster.upgradeTo(v2, { from })
           const paymasterV2 = await instanceAt('PaymasterV2Mock', paymaster.address)
           expect(await paymaster.getCurrentImplementation()).to.be.equal(v2.address)
