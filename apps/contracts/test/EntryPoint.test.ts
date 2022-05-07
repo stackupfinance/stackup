@@ -5,7 +5,7 @@ import { Contract } from 'ethers'
 import { bn, fp } from './utils/helpers/numbers'
 import { getSigner } from './utils/helpers/signers'
 import { deploy, instanceAt } from './utils/helpers/contracts'
-import { assertIndirectEvent, assertNoIndirectEvent, assertWithError } from './utils/helpers/asserts'
+import {assertEvent, assertIndirectEvent, assertNoIndirectEvent, assertWithError} from './utils/helpers/asserts'
 import { POST_OP_MODE_FAIL, POST_OP_MODE_OK, POST_OP_MODE_OP_FAIL, ZERO_ADDRESS } from './utils/helpers/constants'
 import { encodeCounterIncrement, encodeReverterFail, encodeWalletExecute, encodeWalletMockDeployment } from './utils/helpers/encoding'
 
@@ -68,6 +68,17 @@ describe('EntryPoint', () => {
                 const currentCounterBalance = await ethers.provider.getBalance(someone.address)
                 expect(currentCounterBalance).to.be.equal(previousCounterBalance.add(value))
               })
+
+              it('emits a UserOperationExecuted event', async () => {
+                const receipt = await entryPoint.handleOps(op)
+
+                await assertEvent(receipt, 'UserOperationExecuted', {
+                  sender: op.sender,
+                  paymaster: op.paymaster,
+                  requestId: await entryPoint.getRequestId(op),
+                  success: true
+                })
+              })
             })
 
             context('when the user does not specify a call gas value', () => {
@@ -76,6 +87,17 @@ describe('EntryPoint', () => {
               })
 
               itHandlesRevertedOpsProperly()
+
+              it('emits a UserOperationExecuted event', async () => {
+                const receipt = await entryPoint.handleOps(op)
+
+                await assertEvent(receipt, 'UserOperationExecuted', {
+                  sender: op.sender,
+                  paymaster: op.paymaster,
+                  requestId: await entryPoint.getRequestId(op),
+                  success: false,
+                })
+              })
             })
           })
 
@@ -86,11 +108,33 @@ describe('EntryPoint', () => {
             })
 
             itHandlesRevertedOpsProperly()
+
+            it('emits a UserOperationExecuted event', async () => {
+              const receipt = await entryPoint.handleOps(op)
+
+              await assertEvent(receipt, 'UserOperationExecuted', {
+                sender: op.sender,
+                paymaster: op.paymaster,
+                requestId: await entryPoint.getRequestId(op),
+                success: false,
+              })
+            })
           })
         })
 
         context('when there is no call data', () => {
           itHandlesRevertedOpsProperly()
+
+          it('emits a UserOperationExecuted event', async () => {
+            const receipt = await entryPoint.handleOps(op)
+
+            await assertEvent(receipt, 'UserOperationExecuted', {
+              sender: op.sender,
+              paymaster: op.paymaster,
+              requestId: await entryPoint.getRequestId(op),
+              success: false,
+            })
+          })
         })
       }
 
