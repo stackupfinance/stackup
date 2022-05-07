@@ -3,6 +3,7 @@
  */
 
 import {AppRegistry} from 'react-native';
+import './shims';
 import App from './App';
 import {name as appName} from './app.json';
 

@@ -35,7 +35,12 @@
     "nohoist": [
       "**/react-native",
       "**/react-native/**",
-      "**/react-native-fast-crypto"
+      "**/react-native-fast-crypto",
+      "**/@react-navigation/**",
+      "**/react-native-safe-area-context",
+      "**/react-native-screens",
+      "**/native-base",
+      "**/react-native-svg"
     ]
   },
   "devDependencies": {
