@@ -27,7 +27,6 @@ library Calls {
   /**
    * @dev Performs a Solidity function call using a low level `call` sending `value` wei to `recipient`,
    * forwarding all available gas and reverting on errors.
-   * If the call succeeds, it returns the raw returned data.
    * If `target` reverts with a revert reason, it is bubbled up. Otherwise, it reverts with `errorMessage`.
    */
   function callWithValue(
