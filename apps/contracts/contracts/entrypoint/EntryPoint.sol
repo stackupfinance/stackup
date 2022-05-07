@@ -28,6 +28,14 @@ contract EntryPoint is IEntryPoint, Staking {
     uint256 gasUsed;
   }
 
+  event UserOperationExecuted(
+    address indexed sender,
+    address indexed paymaster,
+    bytes32 requestId,
+    bool success,
+    bytes result
+  );
+
   ISingletonFactory public immutable create2Factory;
 
   constructor(ISingletonFactory _create2Factory, uint32 _unstakeDelaySec) Staking(_unstakeDelaySec) {
@@ -145,14 +153,16 @@ contract EntryPoint is IEntryPoint, Staking {
   ) internal returns (uint256 totalGasCost) {
     uint256 preExecutionGas = gasleft();
     // solhint-disable-next-line avoid-low-level-calls
-    (bool success, ) = op.sender.call{ gas: op.callGas }(op.callData);
+    (bool success, bytes memory result) = op.sender.call{ gas: op.callGas }(op.callData);
+    emit UserOperationExecuted(op.sender, op.paymaster, op.requestId(), success, result);
+
     uint256 totalGasUsed = verification.gasUsed + GasUsed.since(preExecutionGas);
     totalGasCost = totalGasUsed * op.gasPrice();
-    uint256 refund = op.requiredPrefund().sub(totalGasCost, opIndex, "EntryPoint: Insufficient refund");
 
     if (op.hasPaymaster()) {
       return _executePostOp(opIndex, op, verification, preExecutionGas, totalGasCost, success);
     } else {
+      uint256 refund = op.requiredPrefund().sub(totalGasCost, opIndex, "EntryPoint: Insufficient refund");
       payable(op.sender).sendValue(refund, "EntryPoint: Failed to refund");
     }
   }

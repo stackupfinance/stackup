@@ -101,7 +101,7 @@ describe('EntryPoint', () => {
 
         context('when the user specifies a verification gas value', () => {
           beforeEach('set verification gas', async () => {
-            op.verificationGas = op.initCode == '0x' ? bn(30e3) : bn(690e3)
+            op.verificationGas = op.initCode == '0x' ? bn(35e3) : bn(690e3)
           })
 
           context('when the wallet verification succeeds', () => {
