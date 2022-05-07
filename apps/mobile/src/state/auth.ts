@@ -1,4 +1,6 @@
 import create from 'zustand';
+import {persist, devtools} from 'zustand/middleware';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface AuthState {
   loading: boolean;
@@ -7,6 +9,8 @@ interface AuthState {
   login: () => Promise<void>;
   refresh: () => Promise<void>;
   logout: () => Promise<void>;
+  hasHydrated: boolean;
+  setHasHydrated: (flag: boolean) => void;
 }
 
 // TODO: Remove after backend integration.
@@ -19,40 +23,68 @@ function mockDelay(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-const useAuthStore = create<AuthState>()(set => ({
-  loading: false,
-  accessToken: undefined,
-  refreshToken: undefined,
+const STORE_NAME = 'stackup-auth-store';
+const useAuthStore = create<AuthState>()(
+  devtools(
+    persist(
+      set => ({
+        loading: false,
+        accessToken: undefined,
+        refreshToken: undefined,
 
-  login: async () => {
-    // TODO: Implement actual login.
-    set({loading: true});
-    await mockDelay(500);
-    set({
-      accessToken: MOCK_ACCESS_TOKEN,
-      refreshToken: MOCK_REFRESH_TOKEN,
-      loading: false,
-    });
-  },
+        login: async () => {
+          // TODO: Implement actual login.
+          set({loading: true});
+          await mockDelay(500);
+          set({
+            accessToken: MOCK_ACCESS_TOKEN,
+            refreshToken: MOCK_REFRESH_TOKEN,
+            loading: false,
+          });
+        },
 
-  refresh: async () => {
-    // TODO: Implement actual refresh.
-    set({loading: true});
-    await mockDelay(500);
-    set({
-      accessToken: MOCK_ACCESS_TOKEN,
-      refreshToken: MOCK_REFRESH_TOKEN,
-      loading: false,
-    });
-  },
+        refresh: async () => {
+          // TODO: Implement actual refresh.
+          set({loading: true});
+          await mockDelay(500);
+          set({
+            accessToken: MOCK_ACCESS_TOKEN,
+            refreshToken: MOCK_REFRESH_TOKEN,
+            loading: false,
+          });
+        },
 
-  logout: async () => {
-    // TODO: Implement actual logout.
-    set({loading: true});
-    await mockDelay(500);
-    set({accessToken: undefined, refreshToken: undefined, loading: false});
-  },
-}));
+        logout: async () => {
+          // TODO: Implement actual logout.
+          set({loading: true});
+          await mockDelay(500);
+          set({
+            accessToken: undefined,
+            refreshToken: undefined,
+            loading: false,
+          });
+        },
+
+        hasHydrated: false,
+        setHasHydrated: flag => {
+          set({hasHydrated: flag});
+        },
+      }),
+      {
+        name: STORE_NAME,
+        getStorage: () => AsyncStorage,
+        partialize: state => {
+          const {loading, hasHydrated, ...persisted} = state;
+          return persisted;
+        },
+        onRehydrateStorage: () => state => {
+          state?.setHasHydrated(true);
+        },
+      },
+    ),
+    {name: STORE_NAME},
+  ),
+);
 
 export const useAuthStoreLogoutSelector = () =>
   useAuthStore(state => ({
@@ -64,6 +96,7 @@ export const useAuthStoreAuthSelector = () =>
     accessToken: state.accessToken,
     refreshToken: state.refreshToken,
     refresh: state.refresh,
+    hasHydrated: state.hasHydrated,
   }));
 
 export const useAuthStoreLoginSelector = () =>
