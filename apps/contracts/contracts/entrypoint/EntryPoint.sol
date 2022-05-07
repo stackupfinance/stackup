@@ -25,7 +25,9 @@ contract EntryPoint is IEntryPoint, Staking {
 
   struct UserOpVerification {
     bytes context;
+    uint256 prefund;
     uint256 gasUsed;
+    bytes32 requestId;
   }
 
   event UserOperationExecuted(
@@ -57,9 +59,9 @@ contract EntryPoint is IEntryPoint, Staking {
 
   function simulateValidation(UserOperation calldata op) external returns (uint256 preOpGas, uint256 prefund) {
     uint256 preGas = gasleft();
-    _verifyOp(0, op);
+    UserOpVerification memory verification = _verifyOp(0, op);
     preOpGas = GasUsed.since(preGas) + op.preVerificationGas;
-    prefund = op.requiredPrefund();
+    prefund = verification.prefund;
     require(msg.sender == address(0), "EntryPoint: Caller not zero");
   }
 
@@ -79,7 +81,8 @@ contract EntryPoint is IEntryPoint, Staking {
     uint256 preValidationGas = gasleft();
     _createWalletIfNecessary(opIndex, op);
     bytes32 requestId = op.requestId();
-    _validateWallet(opIndex, op, requestId);
+    uint256 prefund = op.requiredPrefund();
+    _validateWallet(opIndex, op, requestId, prefund);
 
     // Marker used of-chain for opcodes validation
     uint256 marker = block.number;
@@ -87,7 +90,9 @@ contract EntryPoint is IEntryPoint, Staking {
 
     uint256 walletGas = GasUsed.since(preValidationGas);
     uint256 paymasterValidationGas = op.verificationGas.sub(walletGas, opIndex, "EntryPoint: Verif gas not enough");
-    verification.context = _validatePaymaster(opIndex, op, requestId, paymasterValidationGas);
+    verification.prefund = prefund;
+    verification.requestId = requestId;
+    verification.context = _validatePaymaster(opIndex, op, requestId, prefund, paymasterValidationGas);
     verification.gasUsed = GasUsed.since(preValidationGas);
     requireFailedOp(verification.gasUsed <= op.verificationGas, opIndex, "EntryPoint: Verif gas not enough");
   }
@@ -106,9 +111,10 @@ contract EntryPoint is IEntryPoint, Staking {
   function _validateWallet(
     uint256 opIndex,
     UserOperation calldata op,
-    bytes32 requestId
+    bytes32 requestId,
+    uint256 prefund
   ) internal {
-    uint256 requiredPrefund = op.hasPaymaster() ? 0 : op.requiredPrefund();
+    uint256 requiredPrefund = op.hasPaymaster() ? 0 : prefund;
     uint256 initBalance = address(this).balance;
 
     try IWallet(op.sender).validateUserOp{ gas: op.verificationGas }(op, requestId, requiredPrefund) {
@@ -127,15 +133,15 @@ contract EntryPoint is IEntryPoint, Staking {
     uint256 opIndex,
     UserOperation calldata op,
     bytes32 requestId,
+    uint256 prefund,
     uint256 validationGas
   ) internal returns (bytes memory) {
     if (!op.hasPaymaster()) return new bytes(0);
 
     requireFailedOp(isStaked(op.paymaster), opIndex, "EntryPoint: Deposit not staked");
-    uint256 requiredPrefund = op.requiredPrefund();
-    _decreaseStake(op.paymaster, requiredPrefund);
+    _decreaseStake(op.paymaster, prefund);
 
-    try IPaymaster(op.paymaster).validatePaymasterUserOp{ gas: validationGas }(op, requestId, requiredPrefund) returns (
+    try IPaymaster(op.paymaster).validatePaymasterUserOp{ gas: validationGas }(op, requestId, prefund) returns (
       bytes memory result
     ) {
       return result;
@@ -154,7 +160,7 @@ contract EntryPoint is IEntryPoint, Staking {
     uint256 preExecutionGas = gasleft();
     // solhint-disable-next-line avoid-low-level-calls
     (bool success, bytes memory result) = op.sender.call{ gas: op.callGas }(op.callData);
-    emit UserOperationExecuted(op.sender, op.paymaster, op.requestId(), success, result);
+    emit UserOperationExecuted(op.sender, op.paymaster, verification.requestId, success, result);
 
     uint256 totalGasUsed = verification.gasUsed + GasUsed.since(preExecutionGas);
     totalGasCost = totalGasUsed * op.gasPrice();
@@ -162,7 +168,7 @@ contract EntryPoint is IEntryPoint, Staking {
     if (op.hasPaymaster()) {
       return _executePostOp(opIndex, op, verification, preExecutionGas, totalGasCost, success);
     } else {
-      uint256 refund = op.requiredPrefund().sub(totalGasCost, opIndex, "EntryPoint: Insufficient refund");
+      uint256 refund = verification.prefund.sub(totalGasCost, opIndex, "EntryPoint: Insufficient refund");
       payable(op.sender).sendValue(refund, "EntryPoint: Failed to refund");
     }
   }
@@ -176,7 +182,6 @@ contract EntryPoint is IEntryPoint, Staking {
     bool success
   ) internal returns (uint256 actualGasCost) {
     uint256 gasPrice = op.gasPrice();
-    uint256 requiredPrefund = op.requiredPrefund();
     PostOpMode mode = success ? PostOpMode.opSucceeded : PostOpMode.opReverted;
 
     try IPaymaster(op.paymaster).postOp(mode, verification.context, gasCost) {
@@ -198,7 +203,7 @@ contract EntryPoint is IEntryPoint, Staking {
       actualGasCost = totalGasUsed * gasPrice;
     }
 
-    uint256 refund = requiredPrefund.sub(actualGasCost, opIndex, "EntryPoint: Insufficient refund");
+    uint256 refund = verification.prefund.sub(actualGasCost, opIndex, "EntryPoint: Insufficient refund");
     _increaseStake(op.paymaster, refund);
   }
 }
