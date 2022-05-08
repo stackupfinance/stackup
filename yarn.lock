@@ -16687,13 +16687,6 @@ react-jwt@^1.1.5:
   resolved "https://registry.yarnpkg.com/react-jwt/-/react-jwt-1.1.5.tgz#2e2f632add55e978f1e6bdc13b521d3b551c5c32"
   integrity sha512-DuEYo2W97E/NA48kjuh9Ezbh5NVg3TQCHyvH02CywFKNF53h9I8bs+K3wqm9vbwCImQTg20tyj+g6FkGpWo41Q==
 
-react-jwt@^1.1.6:
-  version "1.1.6"
-  resolved "https://registry.yarnpkg.com/react-jwt/-/react-jwt-1.1.6.tgz#cbf9250e57189ef1aed4b5de92315ae446a6021f"
-  integrity sha512-Yp+FmwkTvYUuO5gu6sFApLXFuMAIAlh1NEfxcB2EGnmS1chKqXXv77vp23IphV1UpSyMtm0wrphUZfDSr8GiSA==
-  optionalDependencies:
-    fsevents "^2.3.2"
-
 react-native-codegen@^0.0.13:
   version "0.0.13"
   resolved "https://registry.yarnpkg.com/react-native-codegen/-/react-native-codegen-0.0.13.tgz#4cc94546fc75a5dbe9350d59c10108f2efe6bc17"

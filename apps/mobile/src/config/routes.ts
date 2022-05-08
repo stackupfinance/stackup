@@ -23,5 +23,5 @@ export type SettingsStackParamList = {
 };
 
 export type OnboardStackParamList = {
-  Login: undefined;
+  CreateWallet: undefined;
 };

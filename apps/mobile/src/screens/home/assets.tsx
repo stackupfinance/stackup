@@ -4,8 +4,7 @@ import type {CompositeScreenProps} from '@react-navigation/native';
 import type {BottomTabScreenProps} from '@react-navigation/bottom-tabs';
 import type {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {RootStackParamList, HomeTabParamList} from '../../config';
-import {useLogout} from '../../hooks';
-import {useAuthStoreAssetsSelector} from '../../state';
+import {useRemoveWallet} from '../../hooks';
 
 type Props = CompositeScreenProps<
   BottomTabScreenProps<HomeTabParamList, 'Assets'>,
@@ -13,8 +12,7 @@ type Props = CompositeScreenProps<
 >;
 
 export default function AssetsScreen({navigation}: Props) {
-  const logout = useLogout();
-  const {loading} = useAuthStoreAssetsSelector();
+  const removeWallet = useRemoveWallet();
 
   return (
     <Box flex={1} alignItems="center" justifyContent="center">
@@ -30,9 +28,7 @@ export default function AssetsScreen({navigation}: Props) {
         Settings Overview
       </Button>
 
-      <Button isLoading={loading} onPress={logout}>
-        Logout
-      </Button>
+      <Button onPress={removeWallet}>Remove wallet</Button>
     </Box>
   );
 }
