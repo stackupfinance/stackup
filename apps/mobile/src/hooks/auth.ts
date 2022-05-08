@@ -8,9 +8,9 @@ interface UseAuthHook {
   isReady: boolean;
   isAuthenticated: boolean;
 }
-type UseRemoveHook = () => Promise<void>;
+type UseRemoveWalletHook = () => Promise<void>;
 
-export const useRemoveWallet = (): UseRemoveHook => {
+export const useRemoveWallet = (): UseRemoveWalletHook => {
   const {remove} = useWalletStoreRemoveSelector();
 
   return async () => {
