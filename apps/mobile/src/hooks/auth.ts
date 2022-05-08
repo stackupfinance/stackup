@@ -1,6 +1,6 @@
 import {useEffect, useState} from 'react';
 import {
-  useWalletStoreRemoveSelector,
+  useWalletStoreRemoveWalletSelector,
   useWalletStoreAuthSelector,
 } from '../state';
 
@@ -11,7 +11,7 @@ interface UseAuthHook {
 type UseRemoveWalletHook = () => Promise<void>;
 
 export const useRemoveWallet = (): UseRemoveWalletHook => {
-  const {remove} = useWalletStoreRemoveSelector();
+  const {remove} = useWalletStoreRemoveWalletSelector();
 
   return async () => {
     // Clear all state here before removing wallet from device.

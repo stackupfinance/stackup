@@ -71,7 +71,7 @@ const useWalletStore = create<WalletState>()(
   ),
 );
 
-export const useWalletStoreRemoveSelector = () =>
+export const useWalletStoreRemoveWalletSelector = () =>
   useWalletStore(state => ({remove: state.remove}));
 
 export const useWalletStoreAuthSelector = () =>
