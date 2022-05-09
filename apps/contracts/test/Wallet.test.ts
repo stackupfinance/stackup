@@ -698,7 +698,7 @@ describe('Wallet', () => {
 
       context('when the new implementation is UUPS-compliant', () => {
         beforeEach('deploy new UUPS-compliant implementation', async () => {
-          newImplementation = await deploy('Wallet')
+          newImplementation = await deploy('Wallet', [wallet.entryPoint.address])
         })
 
         it('upgrades to the new implementation', async () => {
@@ -710,7 +710,7 @@ describe('Wallet', () => {
         it('works fine with storage layout changes', async () => {
           const previousEntryPoint = await wallet.instance.entryPoint()
 
-          const v2 = await deploy('WalletV2Mock')
+          const v2 = await deploy('WalletV2Mock', [wallet.entryPoint.address])
           await wallet.upgradeTo(v2, { from })
           const walletV2 = await instanceAt('WalletV2Mock', wallet.address)
           expect(await wallet.getCurrentImplementation()).to.be.equal(v2.address)

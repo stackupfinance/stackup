@@ -22,6 +22,10 @@ contract Wallet is IWallet, UpgradeableACL, Paymaster {
 
   uint256 public nonce;
 
+  constructor(address entryPoint) Paymaster(entryPoint) {
+    // solhint-disable-previous-line no-empty-blocks
+  }
+
   /**
    * @dev Executes an operation
    * @param to address to be called

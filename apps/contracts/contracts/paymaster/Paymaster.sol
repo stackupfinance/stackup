@@ -22,7 +22,11 @@ contract Paymaster is IPaymaster, UpgradeableACL {
   using PaymasterHelpers for PaymasterData;
   using PaymasterHelpers for UserOperation;
 
-  address public entryPoint;
+  address public immutable entryPoint;
+
+  constructor(address _entryPoint) UpgradeableACL() {
+    entryPoint = _entryPoint;
+  }
 
   /**
    * @dev Allows receiving ETH transfers
@@ -34,13 +38,8 @@ contract Paymaster is IPaymaster, UpgradeableACL {
   /**
    * @dev Initializes the paymaster, this method can be called only once
    */
-  function initialize(
-    address _entryPoint,
-    address _owner,
-    address[] memory _guardians
-  ) external initializer {
+  function initialize(address _owner, address[] memory _guardians) external initializer {
     __UpgradeableACL__init(_owner, _guardians);
-    entryPoint = _entryPoint;
   }
 
   /**
