@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.0;
+pragma solidity 0.8.9;
 
 import "../../paymaster/Paymaster.sol";
 
@@ -12,7 +12,7 @@ contract PaymasterV2Mock is Paymaster {
   }
 
   function setX(uint256 _x) external {
-    require(x == 0, "ERR_PAYMASTER_V2_INITIALIZED");
+    require(x == 0, "PAYMASTER_V2_INITIALIZED");
     x = _x;
   }
 }

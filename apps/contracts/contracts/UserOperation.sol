@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0
 
-pragma solidity ^0.8.0;
+pragma solidity 0.8.9;
 
 /**
  * @dev Operation object specified in https://eips.ethereum.org/EIPS/eip-4337
