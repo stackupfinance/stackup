@@ -1,13 +1,13 @@
 import * as React from 'react';
 import {Box, Text, Button} from 'native-base';
 import type {CompositeScreenProps} from '@react-navigation/native';
-import type {BottomTabScreenProps} from '@react-navigation/bottom-tabs';
+import type {MaterialTopTabScreenProps} from '@react-navigation/material-top-tabs';
 import type {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {RootStackParamList, HomeTabParamList} from '../../config';
 import {useRemoveWallet} from '../../hooks';
 
 type Props = CompositeScreenProps<
-  BottomTabScreenProps<HomeTabParamList, 'Assets'>,
+  MaterialTopTabScreenProps<HomeTabParamList, 'Assets'>,
   NativeStackScreenProps<RootStackParamList>
 >;
 

@@ -41,7 +41,8 @@
       "**/react-native-screens",
       "**/native-base",
       "**/react-native-svg",
-      "**/@react-native-async-storage/async-storage"
+      "**/@react-native-async-storage/async-storage",
+      "**/react-native-pager-view"
     ]
   },
   "devDependencies": {

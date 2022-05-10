@@ -1,9 +1,9 @@
 import * as React from 'react';
 import {Box, Text} from 'native-base';
-import type {BottomTabScreenProps} from '@react-navigation/bottom-tabs';
+import type {MaterialTopTabScreenProps} from '@react-navigation/material-top-tabs';
 import {HomeTabParamList} from '../../config';
 
-type Props = BottomTabScreenProps<HomeTabParamList, 'History'>;
+type Props = MaterialTopTabScreenProps<HomeTabParamList, 'History'>;
 
 export default function HistoryScreen({}: Props) {
   return (
