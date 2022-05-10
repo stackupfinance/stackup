@@ -32,7 +32,7 @@
     "pusher-js": "^7.0.6",
     "react": "17.0.2",
     "react-dom": "17.0.2",
-    "react-hook-form": "^7.30.0",
+    "react-hook-form": "^7.31.0",
     "react-icons": "^4.3.1",
     "react-infinite-scroll-component": "^6.1.0",
     "react-jwt": "^1.1.5",
