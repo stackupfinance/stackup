@@ -28,7 +28,7 @@
     "patch-package": "^6.4.7",
     "postinstall-postinstall": "^2.1.0",
     "react": "17.0.2",
-    "react-native": "0.68.1",
+    "react-native": "0.68.2",
     "react-native-fast-crypto": "^2.2.0",
     "react-native-get-random-values": "^1.8.0",
     "react-native-pager-view": "^5.4.15",
