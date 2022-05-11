@@ -1,11 +1,13 @@
 import create from 'zustand';
 import {devtools} from 'zustand/middleware';
-import {HomeTabParamList} from '../config';
+import {NavigationState as InitialNavigationState} from '@react-navigation/native';
 
 interface NavigationState {
-  initialHomeRoute: keyof HomeTabParamList | undefined;
+  initialNavigationState: InitialNavigationState | undefined;
 
-  setInitialHomeRoute: (route: keyof HomeTabParamList) => void;
+  setInitialNavigationState: (
+    state: InitialNavigationState | undefined,
+  ) => void;
   clear: () => void;
 }
 
@@ -13,14 +15,18 @@ const STORE_NAME = 'stackup-navigation-store';
 const useNavigationStore = create<NavigationState>()(
   devtools(
     set => ({
-      initialHomeRoute: undefined,
+      initialNavigationState: undefined,
 
-      setInitialHomeRoute: (route: keyof HomeTabParamList) => {
-        set({initialHomeRoute: route});
+      setInitialNavigationState: (
+        state: InitialNavigationState | undefined,
+      ) => {
+        set({initialNavigationState: state});
       },
 
       clear: () => {
-        set({initialHomeRoute: undefined});
+        set({
+          initialNavigationState: undefined,
+        });
       },
     }),
     {name: STORE_NAME},
@@ -30,8 +36,8 @@ const useNavigationStore = create<NavigationState>()(
 export const useNavigationStoreRemoveWalletSelector = () =>
   useNavigationStore(state => ({clear: state.clear}));
 
-export const useNavigationStoreHomeSelector = () =>
+export const useNavigationStoreAppSelector = () =>
   useNavigationStore(state => ({
-    initialHomeRoute: state.initialHomeRoute,
-    setInitialHomeRoute: state.setInitialHomeRoute,
+    initialNavigationState: state.initialNavigationState,
+    setInitialNavigationState: state.setInitialNavigationState,
   }));
