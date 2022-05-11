@@ -45,7 +45,7 @@ const useFingerprintStore = create<FingerprintState>()(
           set({loading: false, isSupported});
         },
 
-        setMasterPassword: async (password: string, salt: string) => {
+        setMasterPassword: async (password, salt) => {
           set({loading: true});
 
           await Keychain.setGenericPassword(salt, password, {

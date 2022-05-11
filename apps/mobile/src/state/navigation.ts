@@ -17,9 +17,7 @@ const useNavigationStore = create<NavigationState>()(
     set => ({
       initialNavigationState: undefined,
 
-      setInitialNavigationState: (
-        state: InitialNavigationState | undefined,
-      ) => {
+      setInitialNavigationState: state => {
         set({initialNavigationState: state});
       },
 
