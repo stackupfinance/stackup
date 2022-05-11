@@ -1415,10 +1415,12 @@ declare const stackupfinance__walletjs: {
     access: {
       getGuardians: any;
     };
+    createRandom: any;
     decodeCallData: {
       Erc20FromExecuteUserOp: any;
       fromUserOperation: any;
     };
+    decryptSigner: any;
     encodeFunctionData: {
       ERC20Approve: any;
       ERC20Transfer: any;
@@ -1437,14 +1439,12 @@ declare const stackupfinance__walletjs: {
       userOperation: any;
     };
     proxy: {
-      decryptSigner: any;
       getAddress: any;
       getInitCode: any;
       getNonce: any;
-      initEncryptedIdentity: any;
       isCodeDeployed: any;
-      reencryptSigner: any;
     };
+    reencryptSigner: any;
     userOperations: {
       appendGuardianSignature: any;
       get: any;
