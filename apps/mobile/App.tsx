@@ -11,18 +11,23 @@ import {
 } from './src/screens';
 import {RootStackParamList} from './src/config';
 import {useAuth} from './src/hooks';
+import {useNavigationStoreAppSelector} from './src/state';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 function App() {
-  const {isReady, isAuthenticated} = useAuth();
+  const {isReady, hasWalletInstance} = useAuth();
+  const {initialNavigationState, setInitialNavigationState} =
+    useNavigationStoreAppSelector();
 
   return (
     <NativeBaseProvider>
       {isReady ? (
-        <NavigationContainer>
+        <NavigationContainer
+          initialState={initialNavigationState}
+          onStateChange={setInitialNavigationState}>
           <Stack.Navigator screenOptions={{headerShown: false}}>
-            {isAuthenticated ? (
+            {hasWalletInstance ? (
               <>
                 <Stack.Screen name="Home" component={HomeScreen} />
                 <Stack.Screen name="Security" component={SecurityScreen} />

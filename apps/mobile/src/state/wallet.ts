@@ -16,7 +16,11 @@ interface WalletState {
   loading: boolean;
   instance: WalletInstance | undefined;
 
-  create: () => Promise<void>;
+  create: (
+    password: string,
+    salt: string,
+    onCreate?: (password: string, salt: string) => Promise<void>,
+  ) => Promise<void>;
   remove: () => void;
 
   hasHydrated: boolean;
@@ -31,16 +35,15 @@ const useWalletStore = create<WalletState>()(
         loading: false,
         instance: undefined,
 
-        create: async () => {
+        create: async (password, salt, onCreate) => {
           set({loading: true});
 
-          const tempPassword = 'pass123';
-          const tempSalt = 'salt123';
           setTimeout(async () => {
             const instance = await wallet.proxy.initEncryptedIdentity(
-              tempPassword,
-              tempSalt,
+              password,
+              salt,
             );
+            await onCreate?.(password, salt);
 
             set({loading: false, instance});
           });
