@@ -40,10 +40,11 @@ const useWalletStore = create<WalletState>()(
           set({loading: true});
 
           setTimeout(async () => {
-            const instance: WalletInstance =
-              await wallet.proxy.initEncryptedIdentity(password, salt);
+            const instance = await wallet.proxy.initEncryptedIdentity(
+              password,
+              salt,
+            );
             await onCreate?.(password, salt);
-            console.log(instance);
 
             set({loading: false, instance});
           });
