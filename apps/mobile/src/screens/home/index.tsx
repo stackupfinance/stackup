@@ -7,6 +7,7 @@ import {faRocket} from '@fortawesome/free-solid-svg-icons/faRocket';
 import {faArrowRightArrowLeft} from '@fortawesome/free-solid-svg-icons/faArrowRightArrowLeft';
 import {faBolt} from '@fortawesome/free-solid-svg-icons/faBolt';
 import {HomeTabParamList} from '../../config';
+import {useNavigationStoreHomeSelector} from '../../state';
 import AssetsScreen from './assets';
 import EarnScreen from './earn';
 import SwapScreen from './swap';
@@ -15,8 +16,22 @@ import HistoryScreen from './history';
 const Tab = createMaterialTopTabNavigator<HomeTabParamList>();
 
 export const HomeScreen = () => {
+  const {initialHomeRoute, setInitialHomeRoute} =
+    useNavigationStoreHomeSelector();
+
+  const onStateChange = (ev: any) => {
+    const state = ev.data?.state;
+    if (state) {
+      setInitialHomeRoute(
+        state.routes[state.index].name as keyof HomeTabParamList,
+      );
+    }
+  };
+
   return (
     <Tab.Navigator
+      initialRouteName={initialHomeRoute}
+      screenListeners={{state: onStateChange}}
       tabBarPosition="bottom"
       screenOptions={({route}) => ({
         tabBarLabel: ({color}) => {

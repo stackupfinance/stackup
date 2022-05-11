@@ -15,14 +15,14 @@ import {useAuth} from './src/hooks';
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 function App() {
-  const {isReady, isAuthenticated} = useAuth();
+  const {isReady, hasWalletInstance} = useAuth();
 
   return (
     <NativeBaseProvider>
       {isReady ? (
         <NavigationContainer>
           <Stack.Navigator screenOptions={{headerShown: false}}>
-            {isAuthenticated ? (
+            {hasWalletInstance ? (
               <>
                 <Stack.Screen name="Home" component={HomeScreen} />
                 <Stack.Screen name="Security" component={SecurityScreen} />
