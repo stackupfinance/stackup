@@ -20,8 +20,13 @@ contract Wallet is IWallet, UpgradeableACL, Paymaster {
   using Signatures for UserOperation;
   using WalletHelpers for UserOperation;
 
+  // Wallet's nonce
   uint256 public nonce;
 
+  /**
+   * @dev Wallet's constructor
+   * @param entryPoint reference that will be hardcoded in the implementation contract
+   */
   constructor(address entryPoint) Paymaster(entryPoint) {
     // solhint-disable-previous-line no-empty-blocks
   }
@@ -63,11 +68,17 @@ contract Wallet is IWallet, UpgradeableACL, Paymaster {
     }
   }
 
+  /**
+   * @dev Internal function to validate an owner's signature
+   */
   function _validateOwnerSignature(SignatureData memory signatureData, bytes32 requestId) internal view {
     SignatureValue memory value = signatureData.values[0];
     _validateOwnerSignature(value.signer, requestId.toEthSignedMessageHash(), value.signature);
   }
 
+  /**
+   * @dev Internal function to validate guardians signatures
+   */
   function _validateGuardiansSignature(
     SignatureData memory signatureData,
     UserOperation calldata op,

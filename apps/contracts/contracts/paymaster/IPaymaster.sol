@@ -4,10 +4,16 @@ pragma solidity 0.8.9;
 
 import "../UserOperation.sol";
 
+/**
+ * @dev Mode used to denote the paymaster the status of the operation for the post-op process
+ * @param opSucceeded to denote the user op succeeded
+ * @param opReverted to denote the user op reverted
+ * @param postOpReverted to denote the post-op was already tried and it reverted
+ */
 enum PostOpMode {
-  opSucceeded, // user op succeeded
-  opReverted, // user op reverted. still has to pay for gas.
-  postOpReverted // user op succeeded, but caused postOp to revert
+  opSucceeded,
+  opReverted,
+  postOpReverted
 }
 
 /**
