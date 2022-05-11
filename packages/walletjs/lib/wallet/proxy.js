@@ -53,9 +53,7 @@ const generatePasswordKey = async (password, salt) => {
     p = 1,
     dkLen = 32;
   const passwordBuffer = new buffer.SlowBuffer(password.normalize("NFKC"));
-  const saltBuffer = new buffer.SlowBuffer(
-    salt.toLowerCase().normalize("NFKC")
-  );
+  const saltBuffer = new buffer.SlowBuffer(salt.normalize("NFKC"));
   return _scryptFn(passwordBuffer, saltBuffer, N, r, p, dkLen);
 };
 
@@ -122,6 +120,7 @@ module.exports.initEncryptedIdentity = async (password, salt, opts = {}) => {
     initEntryPoint,
     initOwner,
     initGuardians,
+    salt,
     encryptedSigner: AES.encrypt(
       signer.privateKey,
       Buffer.from(passwordKey).toString("hex")

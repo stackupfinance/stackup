@@ -7,6 +7,8 @@ const {
 const { Wallet, EntryPoint } = require("../contracts");
 
 const ADDRESS_REGEX = /^0x[a-fA-F0-9]{40}$/;
+const BASE64_REGEX =
+  /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{4})$/;
 
 describe("Wallet proxy", () => {
   describe("create initial identity", () => {
@@ -21,6 +23,8 @@ describe("Wallet proxy", () => {
       expect(wallet.initOwner).toMatch(ADDRESS_REGEX);
       expect(wallet.initGuardians.length).toEqual(1);
       expect(wallet.initGuardians[0]).toEqual(ethers.constants.AddressZero);
+      expect(wallet.salt).toEqual("salt");
+      expect(wallet.encryptedSigner).toMatch(BASE64_REGEX);
     });
   });
 
@@ -53,11 +57,11 @@ describe("Wallet proxy", () => {
       expect(signer).toBeUndefined();
     });
 
-    it("returns the signer when salt has different case", async () => {
+    it("does not return the signer when salt has different case", async () => {
       const wallet = await initEncryptedIdentity("password", "salt");
       const signer = await decryptSigner(wallet, "password", "SALT");
 
-      expect(wallet.initOwner).toEqual(signer.address);
+      expect(signer).toBeUndefined();
     });
   });
 

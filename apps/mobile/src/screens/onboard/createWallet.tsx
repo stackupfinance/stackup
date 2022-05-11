@@ -6,6 +6,7 @@ import {
   useWalletStoreCreateWalletSelector,
   useFingerprintStoreCreateWalletSelector,
 } from '../../state';
+import {generateSalt} from '../../utils/random';
 
 type Props = NativeStackScreenProps<OnboardStackParamList, 'CreateWallet'>;
 
@@ -23,7 +24,7 @@ export default function CreateWalletScreen({}: Props) {
   const onCreateWallet = () => {
     create(
       'tempPass123',
-      'tempSalt123',
+      generateSalt(),
       enableFingerprint ? setMasterPassword : undefined,
     );
   };
