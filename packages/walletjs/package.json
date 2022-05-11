@@ -13,17 +13,17 @@
     "generate:types": "node gentypes.js"
   },
   "devDependencies": {
-    "@types/jest": "^27.4.1",
+    "@types/jest": "^27.5.0",
     "dts-gen": "^0.6.0",
     "eslint": "^8.13.0",
     "eslint-config-prettier": "^8.5.0",
     "fs-extra": "^10.1.0",
-    "jest": "^28.0.3",
+    "jest": "^28.1.0",
     "prettier": "2.6.2"
   },
   "dependencies": {
     "crypto-js": "^4.1.1",
-    "ethers": "^5.6.4",
+    "ethers": "^5.6.5",
     "scrypt-js": "^3.0.1"
   }
 }

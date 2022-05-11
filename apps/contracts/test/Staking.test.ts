@@ -7,6 +7,8 @@ import { getSigner } from './utils/helpers/signers'
 import { advanceTime, currentTimestamp } from './utils/helpers/time'
 
 import Staking from './utils/models/staking/Staking'
+import {assertEvent, assertIndirectEvent} from "./utils/helpers/asserts";
+import {POST_OP_MODE_OK} from "./utils/helpers/constants";
 
 describe('Staking', () => {
   let staking: Staking
@@ -59,6 +61,17 @@ describe('Staking', () => {
         const currentData = await staking.getDeposit(paymaster)
         expect(previousData.unstakeDelaySec).to.be.equal(currentData.unstakeDelaySec)
         expect(previousData.withdrawTime).to.be.equal(currentData.withdrawTime)
+      })
+
+      it('emits a Deposited event', async () => {
+        const previousStake = await staking.balanceOf(paymaster)
+
+        const receipt = await staking.deposit(paymaster, amount, { from: paymaster })
+
+        await assertEvent(receipt, 'Deposited', {
+          account: paymaster.address,
+          deposited: previousStake.add(amount),
+        })
       })
     }
 
@@ -181,6 +194,18 @@ describe('Staking', () => {
 
           const currentData = await staking.getDeposit(paymaster)
           expect(currentData.withdrawTime).to.be.equal(0)
+        })
+
+        it('emits a StakeLocked event', async () => {
+          const previousStake = await staking.balanceOf(paymaster)
+
+          const receipt = await staking.stake(delay, amount, { from: paymaster })
+
+          await assertEvent(receipt, 'StakeLocked', {
+            account: paymaster.address,
+            deposited: previousStake.add(amount),
+            unstakeDelaySec: delay,
+          })
         })
       })
     }
@@ -311,6 +336,18 @@ describe('Staking', () => {
             const currentData = await staking.getDeposit(paymaster)
             expect(currentData.withdrawTime).to.be.equal(timestamp.add(previousData.unstakeDelaySec))
           })
+
+          it('emits a StakeUnlocked event', async () => {
+            const previousData = await staking.getDeposit(paymaster)
+
+            const receipt = await staking.unstake({ from: paymaster })
+            const timestamp = await currentTimestamp()
+
+            await assertEvent(receipt, 'StakeUnlocked', {
+              account: paymaster.address,
+              withdrawTime: timestamp.add(previousData.unstakeDelaySec)
+            })
+          })
         })
 
         context('when the paymaster is unstaking', async () => {
@@ -370,6 +407,19 @@ describe('Staking', () => {
         const currentData = await staking.getDeposit(paymaster)
         expect(currentData.withdrawTime).to.be.equal(0)
         expect(currentData.unstakeDelaySec).to.be.equal(0)
+      })
+
+      it('emits a Withdrawn event', async () => {
+        const previousStake = await staking.balanceOf(paymaster)
+
+        const receipt = await staking.withdraw(paymaster, { from: paymaster })
+
+        await assertEvent(receipt, 'Withdrawn', {
+          account: paymaster.address,
+          recipient: paymaster.address,
+          deposited: previousStake.sub(amount),
+          amount,
+        })
       })
     }
 

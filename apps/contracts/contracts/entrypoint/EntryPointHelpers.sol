@@ -1,11 +1,23 @@
 // SPDX-License-Identifier: AGPL-3.0
 
-pragma solidity ^0.8.0;
+pragma solidity 0.8.9;
 
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/utils/math/Math.sol";
+import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
 import "../UserOperation.sol";
+
+error FailedOp(uint256 opIndex, string reason);
+
+// solhint-disable-next-line func-visibility
+function requireFailedOp(
+  bool condition,
+  uint256 opIndex,
+  string memory reason
+) pure {
+  if (!condition) revert FailedOp(opIndex, reason);
+}
 
 library EntryPointHelpers {
   using Address for address;
@@ -76,5 +88,19 @@ library EntryPointHelpers {
           keccak256(op.paymasterData)
         )
       );
+  }
+
+  /**
+   * @dev Custom SafeMath function used for the EntryPoint to raise FailedOp errors instead
+   */
+  function sub(
+    uint256 a,
+    uint256 b,
+    uint256 opIndex,
+    string memory reason
+  ) internal pure returns (uint256) {
+    (bool succeed, uint256 result) = SafeMath.trySub(a, b);
+    requireFailedOp(succeed, opIndex, reason);
+    return result;
   }
 }

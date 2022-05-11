@@ -5,7 +5,7 @@ import { Contract } from 'ethers'
 import { bn, fp } from './utils/helpers/numbers'
 import { getSigner } from './utils/helpers/signers'
 import { deploy, instanceAt } from './utils/helpers/contracts'
-import { assertIndirectEvent, assertNoIndirectEvent, assertWithError } from './utils/helpers/asserts'
+import {assertEvent, assertIndirectEvent, assertNoIndirectEvent, assertWithError} from './utils/helpers/asserts'
 import { POST_OP_MODE_FAIL, POST_OP_MODE_OK, POST_OP_MODE_OP_FAIL, ZERO_ADDRESS } from './utils/helpers/constants'
 import { encodeCounterIncrement, encodeReverterFail, encodeWalletExecute, encodeWalletMockDeployment } from './utils/helpers/encoding'
 
@@ -68,6 +68,17 @@ describe('EntryPoint', () => {
                 const currentCounterBalance = await ethers.provider.getBalance(someone.address)
                 expect(currentCounterBalance).to.be.equal(previousCounterBalance.add(value))
               })
+
+              it('emits a UserOperationExecuted event', async () => {
+                const receipt = await entryPoint.handleOps(op)
+
+                await assertEvent(receipt, 'UserOperationExecuted', {
+                  sender: op.sender,
+                  paymaster: op.paymaster,
+                  requestId: await entryPoint.getRequestId(op),
+                  success: true
+                })
+              })
             })
 
             context('when the user does not specify a call gas value', () => {
@@ -76,6 +87,17 @@ describe('EntryPoint', () => {
               })
 
               itHandlesRevertedOpsProperly()
+
+              it('emits a UserOperationExecuted event', async () => {
+                const receipt = await entryPoint.handleOps(op)
+
+                await assertEvent(receipt, 'UserOperationExecuted', {
+                  sender: op.sender,
+                  paymaster: op.paymaster,
+                  requestId: await entryPoint.getRequestId(op),
+                  success: false,
+                })
+              })
             })
           })
 
@@ -86,11 +108,33 @@ describe('EntryPoint', () => {
             })
 
             itHandlesRevertedOpsProperly()
+
+            it('emits a UserOperationExecuted event', async () => {
+              const receipt = await entryPoint.handleOps(op)
+
+              await assertEvent(receipt, 'UserOperationExecuted', {
+                sender: op.sender,
+                paymaster: op.paymaster,
+                requestId: await entryPoint.getRequestId(op),
+                success: false,
+              })
+            })
           })
         })
 
         context('when there is no call data', () => {
           itHandlesRevertedOpsProperly()
+
+          it('emits a UserOperationExecuted event', async () => {
+            const receipt = await entryPoint.handleOps(op)
+
+            await assertEvent(receipt, 'UserOperationExecuted', {
+              sender: op.sender,
+              paymaster: op.paymaster,
+              requestId: await entryPoint.getRequestId(op),
+              success: false,
+            })
+          })
         })
       }
 
@@ -101,7 +145,7 @@ describe('EntryPoint', () => {
 
         context('when the user specifies a verification gas value', () => {
           beforeEach('set verification gas', async () => {
-            op.verificationGas = op.initCode == '0x' ? bn(30e3) : bn(690e3)
+            op.verificationGas = op.initCode == '0x' ? bn(35e3) : bn(690e3)
           })
 
           context('when the wallet verification succeeds', () => {
@@ -348,7 +392,7 @@ describe('EntryPoint', () => {
 
         context('when the user does not specify a verification gas value', () => {
           it('reverts', async () => {
-            await expect(entryPoint.handleOps(op)).to.be.revertedWith('contract call run out of gas')
+            await expect(entryPoint.handleOps(op)).to.be.revertedWith('FailedOp')
           })
         })
       })
@@ -558,7 +602,7 @@ describe('EntryPoint', () => {
 
           context('when the user does not specify a verification gas value', () => {
             it('reverts', async () => {
-              await expect(entryPoint.handleOps(op)).to.be.revertedWith('contract call run out of gas')
+              await expect(entryPoint.handleOps(op)).to.be.revertedWith('FailedOp')
             })
           })
         })
@@ -778,7 +822,7 @@ describe('EntryPoint', () => {
 
           context('when the user does not specify a verification gas value', () => {
             it('reverts', async () => {
-              await expect(entryPoint.handleOps(op)).to.be.revertedWith('contract call run out of gas')
+              await expect(entryPoint.handleOps(op)).to.be.revertedWith('FailedOp')
             })
           })
         })
@@ -791,7 +835,7 @@ describe('EntryPoint', () => {
 
           context('when the user specifies a verification gas value', () => {
             beforeEach('set verification gas', async () => {
-              op.verificationGas = op.initCode == '0x' ? bn(60e3) : bn(690e3)
+              op.verificationGas = op.initCode == '0x' ? bn(60e3) : bn(700e3)
             })
 
             context('when the wallet verification succeeds', () => {
@@ -999,7 +1043,7 @@ describe('EntryPoint', () => {
 
           context('when the user does not specify a verification gas value', () => {
             it('reverts', async () => {
-              await expect(entryPoint.handleOps(op)).to.be.revertedWith('contract call run out of gas')
+              await expect(entryPoint.handleOps(op)).to.be.revertedWith('FailedOp')
             })
           })
         })

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0
 
-pragma solidity ^0.8.0;
+pragma solidity 0.8.9;
 
 import "@openzeppelin/contracts/utils/math/SafeCast.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
@@ -19,6 +19,11 @@ contract Staking is IEntryPointStaking {
     uint32 unstakeDelaySec;
     uint64 withdrawTime;
   }
+
+  event Deposited(address indexed account, uint256 deposited);
+  event StakeLocked(address indexed account, uint256 deposited, uint256 unstakeDelaySec);
+  event StakeUnlocked(address indexed account, uint64 withdrawTime);
+  event Withdrawn(address indexed account, address recipient, uint256 deposited, uint256 amount);
 
   uint32 public immutable unstakeDelaySec;
 
@@ -62,7 +67,9 @@ contract Staking is IEntryPointStaking {
 
   function depositTo(address account) external payable override {
     Deposit storage deposit = deposits[account];
-    deposit.amount = deposit.amount + msg.value;
+    uint256 deposited = deposit.amount + msg.value;
+    deposit.amount = deposited;
+    emit Deposited(account, deposited);
   }
 
   function addStake(uint32 _unstakeDelaySec) external payable override {
@@ -70,9 +77,11 @@ contract Staking is IEntryPointStaking {
     require(_unstakeDelaySec >= unstakeDelaySec, "Staking: Low unstake delay");
     require(_unstakeDelaySec >= deposit.unstakeDelaySec, "Staking: Decreasing unstake time");
 
-    deposit.amount = deposit.amount + msg.value;
+    uint256 deposited = deposit.amount + msg.value;
+    deposit.amount = deposited;
     deposit.unstakeDelaySec = _unstakeDelaySec;
     deposit.withdrawTime = 0;
+    emit StakeLocked(msg.sender, deposited, unstakeDelaySec);
   }
 
   function unlockStake() external override {
@@ -81,7 +90,9 @@ contract Staking is IEntryPointStaking {
 
     Deposit storage deposit = deposits[msg.sender];
     // solhint-disable-next-line not-rely-on-time
-    deposit.withdrawTime = (block.timestamp + deposit.unstakeDelaySec).toUint64();
+    uint64 withdrawTime = (block.timestamp + deposit.unstakeDelaySec).toUint64();
+    deposit.withdrawTime = withdrawTime;
+    emit StakeUnlocked(msg.sender, withdrawTime);
   }
 
   function withdrawStake(address payable recipient) external override {
@@ -93,11 +104,13 @@ contract Staking is IEntryPointStaking {
     require(canWithdraw(msg.sender), "Staking: Cannot withdraw");
 
     Deposit storage deposit = deposits[msg.sender];
+    uint256 deposited = deposit.amount.sub(amount, "Staking: Insufficient deposit");
     deposit.unstakeDelaySec = 0;
     deposit.withdrawTime = 0;
-    deposit.amount = deposit.amount.sub(amount, "Staking: Insufficient deposit");
+    deposit.amount = deposited;
 
     recipient.sendValue(amount, "Staking: Withdraw failed");
+    emit Withdrawn(msg.sender, recipient, deposited, amount);
   }
 
   function _increaseStake(address account, uint256 amount) internal {

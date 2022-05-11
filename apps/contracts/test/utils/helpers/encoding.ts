@@ -11,22 +11,22 @@ export async function encodeWalletMockDeployment(verificationReverts = false, pa
 }
 
 export async function encodeWalletDeployment(entryPoint: Account, owner: Account, guardians?: Account[]): Promise<string> {
-  const implementation = await deploy('Wallet')
-  const initData = await encodeWalletInit(entryPoint, owner, guardians)
+  const implementation = await deploy('Wallet', [toAddress(entryPoint)])
+  const initData = await encodeWalletInit(owner, guardians)
   const proxyFactory = await getFactory('WalletProxy')
   const deployTx = proxyFactory.getDeployTransaction(implementation.address, initData)
   return (deployTx?.data || '0x').toString()
 }
 
-export async function encodePaymasterInit(entryPoint: Account, owner: Account, guardians?: Account[]): Promise<string> {
+export async function encodePaymasterInit(owner: Account, guardians?: Account[]): Promise<string> {
     const paymasterInterface = await getInterface('Paymaster')
-    const args = [toAddress(entryPoint), toAddress(owner), toAddresses(guardians)]
+    const args = [toAddress(owner), toAddresses(guardians)]
     return paymasterInterface.encodeFunctionData('initialize', args)
 }
 
-export async function encodeWalletInit(entryPoint: Account, owner: Account, guardians?: Account[]): Promise<string> {
+export async function encodeWalletInit(owner: Account, guardians?: Account[]): Promise<string> {
   const walletInterface = await getInterface('Wallet')
-  const args = [toAddress(entryPoint), toAddress(owner), toAddresses(guardians)]
+  const args = [toAddress(owner), toAddresses(guardians)]
   return walletInterface.encodeFunctionData('initialize', args)
 }
 

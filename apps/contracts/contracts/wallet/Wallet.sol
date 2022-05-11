@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0
 
-pragma solidity ^0.8.0;
+pragma solidity 0.8.9;
 
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 
@@ -21,6 +21,10 @@ contract Wallet is IWallet, UpgradeableACL, Paymaster {
   using WalletHelpers for UserOperation;
 
   uint256 public nonce;
+
+  constructor(address entryPoint) Paymaster(entryPoint) {
+    // solhint-disable-previous-line no-empty-blocks
+  }
 
   /**
    * @dev Executes an operation

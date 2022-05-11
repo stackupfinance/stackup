@@ -35,10 +35,21 @@
     "nohoist": [
       "**/react-native",
       "**/react-native/**",
-      "**/react-native-fast-crypto"
+      "**/react-native-fast-crypto",
+      "**/@react-navigation/**",
+      "**/react-native-safe-area-context",
+      "**/react-native-screens",
+      "**/native-base",
+      "**/react-native-svg",
+      "**/@react-native-async-storage/async-storage",
+      "**/react-native-pager-view",
+      "**/react-native-keychain"
     ]
   },
   "devDependencies": {
     "lerna": "^4.0.0"
+  },
+  "resolutions": {
+    "react-devtools-core": "4.14.0"
   }
 }
