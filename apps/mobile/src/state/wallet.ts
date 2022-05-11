@@ -9,6 +9,7 @@ interface WalletInstance {
   initEntryPoint: string;
   initOwner: string;
   initGuardians: Array<string>;
+  salt: string;
   encryptedSigner: string;
 }
 
