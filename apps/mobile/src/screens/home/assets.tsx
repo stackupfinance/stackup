@@ -24,11 +24,16 @@ export default function AssetsScreen({navigation}: Props) {
         Security Overview
       </Button>
 
-      <Button mb="16px" onPress={() => navigation.navigate('Settings')}>
+      <Button
+        mb="16px"
+        colorScheme="secondary"
+        onPress={() => navigation.navigate('Settings')}>
         Settings Overview
       </Button>
 
-      <Button onPress={removeWallet}>Remove wallet</Button>
+      <Button colorScheme="tertiary" onPress={removeWallet}>
+        Remove wallet
+      </Button>
     </Box>
   );
 }

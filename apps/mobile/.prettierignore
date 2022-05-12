@@ -8,3 +8,4 @@ Gemfile.lock
 android
 ios
 *.patch
+assets/fonts

@@ -5212,7 +5212,7 @@
   dependencies:
     "@types/react" "*"
 
-"@types/react@*", "@types/react@^17", "@types/react@^17.0.15":
+"@types/react@*", "@types/react@^17.0.15":
   version "17.0.45"
   resolved "https://registry.yarnpkg.com/@types/react/-/react-17.0.45.tgz#9b3d5b661fd26365fefef0e766a1c6c30ccf7b3f"
   integrity sha512-YfhQ22Lah2e3CHPsb93tRwIGNiSwkuz1/blk4e6QrWS0jQzCSNbGLtOEYhPg02W0yGTTmpajp7dCTbBAMN3qsg==
@@ -5746,10 +5746,10 @@ aes-js@^3.1.1, aes-js@^3.1.2:
   resolved "https://registry.npmjs.org/aes-js/-/aes-js-3.1.2.tgz"
   integrity sha512-e5pEa2kBnBOgR4Y/p20pskXI74UEz7de8ZGVo58asOtvSVG5YAbJeELPZxOmt+Bnz3rX753YKhfIn4X4l1PPRQ==
 
-agenda@^4.2.1:
-  version "4.2.1"
-  resolved "https://registry.yarnpkg.com/agenda/-/agenda-4.2.1.tgz#3bf1e039d47502e0974657b611e6bbde268d98ad"
-  integrity sha512-6DRPa1j4GPQ+tJNJLr1wWC7qbuqqdc6+adcPXDlNQucpMfLKpWr+Vl6IPkaHJe2lIO1Zh7iyU6W61au+K4Rpyg==
+agenda@^4.2.1, agenda@^4.3.0:
+  version "4.3.0"
+  resolved "https://registry.yarnpkg.com/agenda/-/agenda-4.3.0.tgz#0ca4ffac3695f63ffbd6ddf4a5fca607ec5a6513"
+  integrity sha512-hX/EfTrxWViuWlAY+vCdidwXX5QzqTi+cKMCOSOuFUHf1xNLcaHfi3FawChy/KdtSzcNSwIVQmxS+1GbWv+R2A==
   dependencies:
     cron-parser "^3.0.0"
     date.js "~0.3.3"
@@ -8824,10 +8824,10 @@ dot-prop@^6.0.1:
   dependencies:
     is-obj "^2.0.0"
 
-dotenv@^16.0.0:
-  version "16.0.0"
-  resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-16.0.0.tgz#c619001253be89ebb638d027b609c75c26e47411"
-  integrity sha512-qD9WU0MPM4SWLPJy/r2Be+2WgQj8plChsyrCNQzW/0WjvcJQiKQJ9mH3ZgB3fxbUUxgc/11ZJ0Fi5KiimWGz2Q==
+dotenv@^16.0.1:
+  version "16.0.1"
+  resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-16.0.1.tgz#8f8f9d94876c35dac989876a5d3a82a267fdce1d"
+  integrity sha512-1K6hR6wtk2FviQ4kEiSjFiH5rpzEVi8WW0x96aztHVMhEspNpc4DVOUTEHtEva5VThQ8IaBX1Pe4gSzpVVUsKQ==
 
 dotignore@~0.1.2:
   version "0.1.2"
@@ -14906,10 +14906,10 @@ nanomatch@^1.2.9:
     snapdragon "^0.8.1"
     to-regex "^3.0.1"
 
-native-base@^3.4.4:
-  version "3.4.4"
-  resolved "https://registry.yarnpkg.com/native-base/-/native-base-3.4.4.tgz#552e3d92a70db73df1f997770e13caf195c0c18e"
-  integrity sha512-S5dJCXxR3KwcA20CFHbgHeS+UvDo9eEPwBQ8UIoaE56xe1Fx44zJ/fLG4lHhSJT5J2E47ai1v34A2RxE2w9jeA==
+native-base@^3.4.5:
+  version "3.4.5"
+  resolved "https://registry.yarnpkg.com/native-base/-/native-base-3.4.5.tgz#8c67be7b8b70b76abc77c18c66ca059927715811"
+  integrity sha512-eGT+i81vS946Ova+y2ybNy0n6ROQW2yL3pFvXlp8tnxY5HCrYqO2i/ctPGKSCQZnxSBsy0PG/e2PAQuB5DRKhg==
   dependencies:
     "@react-aria/focus" "^3.2.3"
     "@react-aria/utils" "^3.6.0"
@@ -16593,10 +16593,10 @@ react-clientside-effect@^1.2.5:
   dependencies:
     "@babel/runtime" "^7.12.13"
 
-react-devtools-core@^4.23.0:
-  version "4.24.5"
-  resolved "https://registry.yarnpkg.com/react-devtools-core/-/react-devtools-core-4.24.5.tgz#99b611ecb6dbe96d5de362ca2d1b0a1b9da06e0a"
-  integrity sha512-zr1LbHB5N5XjSNSCbxbfDNW8vryQdt2zYs8qnk5YacvFcwrMXGGXYoQ4gdu0rKe4mB/5MQYwgFse6IlyQiZwVw==
+react-devtools-core@4.14.0, react-devtools-core@^4.23.0:
+  version "4.14.0"
+  resolved "https://registry.yarnpkg.com/react-devtools-core/-/react-devtools-core-4.14.0.tgz#4b9dc50937ed4cf4c04fa293430cac62d829fa8b"
+  integrity sha512-cE7tkSUkGCDxTA79pntDGJCBgzNN/XxA3kgPdXujdfSfEfVhzrItQIEsN0kCN/hJJACDvH2Q8p5+tJb/K4B3qA==
   dependencies:
     shell-quote "^1.6.1"
     ws "^7"
@@ -16632,10 +16632,10 @@ react-freeze@^1.0.0:
   resolved "https://registry.yarnpkg.com/react-freeze/-/react-freeze-1.0.0.tgz#b21c65fe1783743007c8c9a2952b1c8879a77354"
   integrity sha512-yQaiOqDmoKqks56LN9MTgY06O0qQHgV4FUrikH357DydArSZHQhl0BJFqGKIZoTqi8JizF9Dxhuk1FIZD6qCaw==
 
-react-hook-form@^7.30.0:
-  version "7.30.0"
-  resolved "https://registry.yarnpkg.com/react-hook-form/-/react-hook-form-7.30.0.tgz#c9e2fd54d3627e43bd94bf38ef549df2e80c1371"
-  integrity sha512-DzjiM6o2vtDGNMB9I4yCqW8J21P314SboNG1O0obROkbg7KVS0I7bMtwSdKyapnCPjHgnxc3L7E5PEdISeEUcQ==
+react-hook-form@^7.31.1:
+  version "7.31.1"
+  resolved "https://registry.yarnpkg.com/react-hook-form/-/react-hook-form-7.31.1.tgz#16c357dd366bc226172e6acbb5a1672873bbfb28"
+  integrity sha512-QjtjZ8r8KtEBWWpcXLyQordCraTFxILtyQpaz5KLLxN2YzcC+FZ9LLtOnNGuOnzZo9gCoB+viK3ZHV9Mb2htmQ==
 
 react-icons@^4.3.1:
   version "4.3.1"
