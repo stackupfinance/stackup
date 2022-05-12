@@ -1,4 +1,5 @@
 import * as React from 'react';
+import {StatusBar} from 'react-native';
 import {NativeBaseProvider} from 'native-base';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
@@ -9,7 +10,11 @@ import {
   OnboardScreen,
   SplashScreen,
 } from './src/screens';
-import {RootStackParamList, NativeBaseTheme} from './src/config';
+import {
+  RootStackParamList,
+  NativeBaseTheme,
+  NavigationTheme,
+} from './src/config';
 import {useAuth} from './src/hooks';
 import {useNavigationStoreAppSelector} from './src/state';
 
@@ -22,8 +27,10 @@ function App() {
 
   return (
     <NativeBaseProvider theme={NativeBaseTheme}>
+      <StatusBar barStyle="light-content" />
       {isReady ? (
         <NavigationContainer
+          theme={NavigationTheme}
           initialState={initialNavigationState}
           onStateChange={setInitialNavigationState}>
           <Stack.Navigator screenOptions={{headerShown: false}}>

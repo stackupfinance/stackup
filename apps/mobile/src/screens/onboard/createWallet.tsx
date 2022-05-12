@@ -31,9 +31,7 @@ export default function CreateWalletScreen({}: Props) {
 
   return (
     <Box flex={1} alignItems="center" justifyContent="center">
-      <Text mb="16px" color="black">
-        Create Wallet Screen
-      </Text>
+      <Text mb="16px">Create Wallet Screen</Text>
 
       {isSupported && (
         <HStack

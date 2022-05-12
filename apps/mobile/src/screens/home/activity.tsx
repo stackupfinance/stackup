@@ -4,14 +4,14 @@ import type {MaterialTopTabScreenProps} from '@react-navigation/material-top-tab
 import {HomeTabParamList} from '../../config';
 import {ScreenContainer, ScreenHeader} from '../../components';
 
-type Props = MaterialTopTabScreenProps<HomeTabParamList, 'Earn'>;
+type Props = MaterialTopTabScreenProps<HomeTabParamList, 'Activity'>;
 
-export default function EarnScreen({}: Props) {
+export default function ActivityScreen({}: Props) {
   return (
     <ScreenContainer>
       <ScreenHeader>
         <Heading fontSize={16} fontFamily="heading">
-          Earn
+          Activity
         </Heading>
       </ScreenHeader>
     </ScreenContainer>

@@ -10,7 +10,7 @@ import {HomeTabParamList} from '../../config';
 import AssetsScreen from './assets';
 import EarnScreen from './earn';
 import SwapScreen from './swap';
-import HistoryScreen from './history';
+import ActivityScreen from './activity';
 
 const Tab = createMaterialTopTabNavigator<HomeTabParamList>();
 
@@ -20,7 +20,11 @@ export const HomeScreen = () => {
       tabBarPosition="bottom"
       screenOptions={({route}) => ({
         tabBarLabel: ({color}) => {
-          return <Text color={color}>{route.name}</Text>;
+          return (
+            <Text fontFamily="heading" fontSize={9} color={color}>
+              {route.name}
+            </Text>
+          );
         },
         tabBarIcon: ({color}) => {
           let icon = faWallet;
@@ -28,11 +32,11 @@ export const HomeScreen = () => {
             icon = faRocket;
           } else if (route.name === 'Swap') {
             icon = faArrowRightArrowLeft;
-          } else if (route.name === 'History') {
+          } else if (route.name === 'Activity') {
             icon = faBolt;
           }
 
-          return <FontAwesomeIcon icon={icon} color={color} />;
+          return <FontAwesomeIcon icon={icon} color={color} size={20} />;
         },
         tabBarIndicatorStyle: {top: 0},
         tabBarShowIcon: true,
@@ -41,7 +45,7 @@ export const HomeScreen = () => {
       <Tab.Screen name="Assets" component={AssetsScreen} />
       <Tab.Screen name="Earn" component={EarnScreen} />
       <Tab.Screen name="Swap" component={SwapScreen} />
-      <Tab.Screen name="History" component={HistoryScreen} />
+      <Tab.Screen name="Activity" component={ActivityScreen} />
     </Tab.Navigator>
   );
 };
