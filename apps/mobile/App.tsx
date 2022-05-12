@@ -9,7 +9,7 @@ import {
   OnboardScreen,
   SplashScreen,
 } from './src/screens';
-import {RootStackParamList} from './src/config';
+import {RootStackParamList, NativeBaseTheme} from './src/config';
 import {useAuth} from './src/hooks';
 import {useNavigationStoreAppSelector} from './src/state';
 
@@ -21,7 +21,7 @@ function App() {
     useNavigationStoreAppSelector();
 
   return (
-    <NativeBaseProvider>
+    <NativeBaseProvider theme={NativeBaseTheme}>
       {isReady ? (
         <NavigationContainer
           initialState={initialNavigationState}
