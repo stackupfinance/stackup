@@ -1,10 +1,11 @@
 import * as React from 'react';
-import {Box, Text, Button} from 'native-base';
+import {Box, Heading, Button} from 'native-base';
 import type {CompositeScreenProps} from '@react-navigation/native';
 import type {MaterialTopTabScreenProps} from '@react-navigation/material-top-tabs';
 import type {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {RootStackParamList, HomeTabParamList} from '../../config';
 import {useRemoveWallet} from '../../hooks';
+import {ScreenContainer, ScreenHeader} from '../../components';
 
 type Props = CompositeScreenProps<
   MaterialTopTabScreenProps<HomeTabParamList, 'Assets'>,
@@ -15,25 +16,29 @@ export default function AssetsScreen({navigation}: Props) {
   const removeWallet = useRemoveWallet();
 
   return (
-    <Box flex={1} alignItems="center" justifyContent="center">
-      <Text mb="16px" color="black">
-        Assets Tab
-      </Text>
+    <ScreenContainer>
+      <ScreenHeader>
+        <Heading fontSize="16px" fontFamily="heading">
+          Assets
+        </Heading>
+      </ScreenHeader>
 
-      <Button mb="16px" onPress={() => navigation.navigate('Security')}>
-        Security Overview
-      </Button>
+      <Box flex={1} alignItems="center" justifyContent="center">
+        <Button mb="16px" onPress={() => navigation.navigate('Security')}>
+          Security Overview
+        </Button>
 
-      <Button
-        mb="16px"
-        colorScheme="secondary"
-        onPress={() => navigation.navigate('Settings')}>
-        Settings Overview
-      </Button>
+        <Button
+          mb="16px"
+          colorScheme="secondary"
+          onPress={() => navigation.navigate('Settings')}>
+          Settings Overview
+        </Button>
 
-      <Button colorScheme="tertiary" onPress={removeWallet}>
-        Remove wallet
-      </Button>
-    </Box>
+        <Button colorScheme="tertiary" onPress={removeWallet}>
+          Remove wallet
+        </Button>
+      </Box>
+    </ScreenContainer>
   );
 }
