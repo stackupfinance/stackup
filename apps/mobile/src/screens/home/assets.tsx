@@ -18,7 +18,7 @@ export default function AssetsScreen({navigation}: Props) {
   return (
     <ScreenContainer>
       <ScreenHeader>
-        <Heading fontSize={16} fontFamily="heading">
+        <Heading fontSize="16px" fontFamily="heading">
           Assets
         </Heading>
       </ScreenHeader>

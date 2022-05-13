@@ -10,7 +10,7 @@ export default function EarnScreen({}: Props) {
   return (
     <ScreenContainer>
       <ScreenHeader>
-        <Heading fontSize={16} fontFamily="heading">
+        <Heading fontSize="16px" fontFamily="heading">
           Earn
         </Heading>
       </ScreenHeader>

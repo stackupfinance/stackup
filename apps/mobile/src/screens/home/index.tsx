@@ -21,7 +21,7 @@ export const HomeScreen = () => {
       screenOptions={({route}) => ({
         tabBarLabel: ({color}) => {
           return (
-            <Text fontFamily="heading" fontSize={9} color={color}>
+            <Text fontFamily="heading" fontSize="9px" color={color}>
               {route.name}
             </Text>
           );
