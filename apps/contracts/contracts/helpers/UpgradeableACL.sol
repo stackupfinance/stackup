@@ -31,7 +31,7 @@ abstract contract UpgradeableACL is IERC1271, Initializable, UUPSUpgradeable, Ac
   }
 
   /**
-   * @dev Initializes the wallet ACL, this method can be called only once
+   * @dev Initializes the ACL, this method can be called only once
    * @param _owner Address that will be granted with the OWNER_ROLE (admin role)
    * @param _guardians Addresses that will be granted with the GUARDIANS_ROLE
    */
@@ -149,6 +149,9 @@ abstract contract UpgradeableACL is IERC1271, Initializable, UUPSUpgradeable, Ac
     _grantRole(OWNER_ROLE, account);
   }
 
+  /**
+   * @dev Internal function to validate owner's signatures
+   */
   function _validateOwnerSignature(
     address signer,
     bytes32 hash,
@@ -158,6 +161,9 @@ abstract contract UpgradeableACL is IERC1271, Initializable, UUPSUpgradeable, Ac
     require(isOwner(signer), "ACL: Signer not an owner");
   }
 
+  /**
+   * @dev Internal function to validate guardian's signatures
+   */
   function _validateGuardianSignature(
     address signer,
     bytes32 hash,

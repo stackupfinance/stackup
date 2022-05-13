@@ -5,21 +5,37 @@ pragma solidity 0.8.9;
 import "../UserOperation.sol";
 import "../paymaster/PaymasterHelpers.sol";
 
+/**
+ * @dev Signatures layout used by the Paymasters and Wallets internally
+ * @param mode whether it is an owner's or a guardian's signature
+ * @param values list of signatures value to validate
+ */
 struct SignatureData {
   SignatureMode mode;
   SignatureValue[] values;
 }
 
+/**
+ * @dev Signature's value layout used by the Paymasters and Wallets internally
+ * @param signer address of the owner or guardian signing the data
+ * @param signature data signed
+ */
 struct SignatureValue {
   address signer;
   bytes signature;
 }
 
+/**
+ * @dev Signature mode to denote whether it is an owner's or a guardian's signature
+ */
 enum SignatureMode {
   owner,
   guardians
 }
 
+/**
+ * @dev Signatures helpers library
+ */
 library Signatures {
   using PaymasterHelpers for UserOperation;
 

@@ -22,8 +22,13 @@ contract Paymaster is IPaymaster, UpgradeableACL {
   using PaymasterHelpers for PaymasterData;
   using PaymasterHelpers for UserOperation;
 
+  // EntryPoint reference
   address public immutable entryPoint;
 
+  /**
+   * @dev Wallet's constructor
+   * @param _entryPoint reference that will be hardcoded in the implementation contract
+   */
   constructor(address _entryPoint) UpgradeableACL() {
     entryPoint = _entryPoint;
   }
@@ -36,7 +41,9 @@ contract Paymaster is IPaymaster, UpgradeableACL {
   }
 
   /**
-   * @dev Initializes the paymaster, this method can be called only once
+   * @dev Initializes the paymaster, this method can only be called only once
+   * @param _owner Address that will be granted with the OWNER_ROLE (admin role)
+   * @param _guardians Addresses that will be granted with the GUARDIANS_ROLE
    */
   function initialize(address _owner, address[] memory _guardians) external initializer {
     __UpgradeableACL__init(_owner, _guardians);
