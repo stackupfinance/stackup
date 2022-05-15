@@ -13,6 +13,5 @@ export function logEvent<E extends keyof Events, P extends Events[E]>(
   event: E,
   properties?: P,
 ) {
-  console.log(STACKUP_MOBILE_AMPLITUDE_API_KEY);
   ampInstance.logEvent(event, properties);
 }
