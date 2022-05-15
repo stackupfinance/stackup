@@ -6,6 +6,12 @@ This is a [React Native](https://reactnative.dev/) project bootstrapped with [`r
 
 ## App setup
 
+Create a `.env` file for local development. Variables in here will not be commited to the git repository.
+
+```bash
+$ yarn workspace @stackupfinance/mobile run build:env
+```
+
 ```
 TODO: Add setup details.
 ```

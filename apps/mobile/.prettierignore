@@ -9,3 +9,5 @@ android
 ios
 *.patch
 assets/fonts
+*.env*
+scripts/buildenv.sh

@@ -43,7 +43,8 @@
       "**/react-native-svg",
       "**/@react-native-async-storage/async-storage",
       "**/react-native-pager-view",
-      "**/react-native-keychain"
+      "**/react-native-keychain",
+      "**/@amplitude/react-native"
     ]
   },
   "devDependencies": {
