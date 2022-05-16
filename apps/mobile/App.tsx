@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {NativeBaseProvider} from 'native-base';
+import {NativeBaseProvider, Box, useColorModeValue} from 'native-base';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {
@@ -8,6 +8,7 @@ import {
   SettingsScreen,
   OnboardScreen,
   SplashScreen,
+  ExampleScreen,
 } from './src/screens';
 import {RootStackParamList, NativeBaseTheme} from './src/config';
 import {useAuth} from './src/hooks';
@@ -35,7 +36,8 @@ function App() {
               </>
             ) : (
               <>
-                <Stack.Screen name="Onboard" component={OnboardScreen} />
+                {/* <Stack.Screen name="Onboard" component={OnboardScreen} /> */}
+                <Stack.Screen name="Example" component={ExampleScreen} />
               </>
             )}
           </Stack.Navigator>

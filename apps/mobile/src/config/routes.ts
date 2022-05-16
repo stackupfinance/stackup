@@ -5,6 +5,7 @@ export type RootStackParamList = {
   Security: undefined;
   Settings: undefined;
   Onboard: undefined;
+  Example: undefined;
 };
 
 export type HomeTabParamList = {
@@ -24,4 +25,8 @@ export type SettingsStackParamList = {
 
 export type OnboardStackParamList = {
   CreateWallet: undefined;
+};
+
+export type ExampleStackParamList = {
+  DoThings: undefined;
 };

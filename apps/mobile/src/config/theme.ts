@@ -40,10 +40,10 @@ export const AppColors = {
     },
   },
   background: {
-    1: '#0f0f14',
-    2: '#15151c',
-    3: '#20222b',
-    4: '#303247',
+    1: 'red',
+    2: 'red',
+    3: 'red',
+    4: 'red',
   },
   text: {
     1: '#f1f3f6',
@@ -55,6 +55,8 @@ export const AppColors = {
 };
 
 export const NativeBaseTheme = extendTheme({
+  useSystemColorMode: false,
+  initialColorMode: "dark",
   colors: {
     primary: AppColors.palettes.primary,
     secondary: AppColors.palettes.secondary,
