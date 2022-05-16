@@ -11,7 +11,7 @@ export type HomeTabParamList = {
   Assets: NavigatorScreenParams<RootStackParamList>;
   Earn: undefined;
   Swap: undefined;
-  History: undefined;
+  Activity: undefined;
 };
 
 export type SecurityStackParamList = {

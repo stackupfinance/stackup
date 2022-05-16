@@ -5,11 +5,8 @@ export const SplashScreen = () => {
   return (
     <Box flex={1} alignItems="center" justifyContent="center">
       <HStack space={2} justifyContent="center">
-        <Heading color="primary.500" fontSize="md">
-          Stackup
-        </Heading>
+        <Heading fontSize="md">Stackup</Heading>
       </HStack>
-      ;
     </Box>
   );
 };

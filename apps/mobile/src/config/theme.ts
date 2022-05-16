@@ -1,4 +1,11 @@
+import {Platform} from 'react-native';
 import {extendTheme} from 'native-base';
+import {DefaultTheme} from '@react-navigation/native';
+
+const HelveticaNeueMediumExtended =
+  Platform.OS === 'ios'
+    ? 'HelveticaNeue-MediumExt'
+    : 'Helvetica-Neue-Medium-Extended';
 
 export const AppColors = {
   palettes: {
@@ -92,39 +99,90 @@ export const NativeBaseTheme = extendTheme({
     },
     HelveticaNeueMediumExtended: {
       100: {
-        normal: 'Helvetica Neue Medium Extended',
+        normal: HelveticaNeueMediumExtended,
       },
       200: {
-        normal: 'Helvetica Neue Medium Extended',
+        normal: HelveticaNeueMediumExtended,
       },
       300: {
-        normal: 'Helvetica Neue Medium Extended',
+        normal: HelveticaNeueMediumExtended,
       },
       400: {
-        normal: 'Helvetica Neue Medium Extended',
+        normal: HelveticaNeueMediumExtended,
       },
       500: {
-        normal: 'Helvetica Neue Medium Extended',
+        normal: HelveticaNeueMediumExtended,
       },
       600: {
-        normal: 'Helvetica Neue Medium Extended',
+        normal: HelveticaNeueMediumExtended,
       },
       700: {
-        normal: 'Helvetica Neue Medium Extended',
+        normal: HelveticaNeueMediumExtended,
       },
       800: {
-        normal: 'Helvetica Neue Medium Extended',
+        normal: HelveticaNeueMediumExtended,
       },
       900: {
-        normal: 'Helvetica Neue Medium Extended',
+        normal: HelveticaNeueMediumExtended,
       },
     },
   },
   fonts: {
-    heading: 'Inter',
+    heading: 'HelveticaNeueMediumExtended',
     body: 'Inter',
     mono: 'Inter',
-    Inter: 'Inter',
-    HelveticaNeueMediumExtended: 'HelveticaNeueMediumExtended',
+  },
+  components: {
+    Button: {
+      baseStyle: {
+        borderRadius: '8px',
+      },
+      sizes: {
+        lg: {
+          py: '16px',
+          px: '16px',
+          _text: {
+            fontWeight: 700,
+          },
+        },
+        md: {
+          py: '16px',
+          px: '16px',
+          _text: {
+            fontWeight: 700,
+          },
+        },
+        sm: {
+          py: '16px',
+          px: '16px',
+          _text: {
+            fontWeight: 700,
+          },
+        },
+        xs: {
+          py: '16px',
+          px: '16px',
+          _text: {
+            fontWeight: 700,
+          },
+        },
+      },
+    },
+  },
+  config: {
+    useSystemColorMode: false,
+    initialColorMode: 'dark',
   },
 });
+
+export const NavigationTheme = {
+  ...DefaultTheme,
+  dark: true,
+  colors: {
+    ...DefaultTheme.colors,
+    primary: AppColors.palettes.primary[600],
+    background: AppColors.background[1],
+    card: AppColors.background[2],
+    text: 'white',
+  },
+};

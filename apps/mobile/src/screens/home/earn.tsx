@@ -1,16 +1,19 @@
 import * as React from 'react';
-import {Box, Text} from 'native-base';
+import {Heading} from 'native-base';
 import type {MaterialTopTabScreenProps} from '@react-navigation/material-top-tabs';
 import {HomeTabParamList} from '../../config';
+import {ScreenContainer, ScreenHeader} from '../../components';
 
 type Props = MaterialTopTabScreenProps<HomeTabParamList, 'Earn'>;
 
 export default function EarnScreen({}: Props) {
   return (
-    <Box flex={1} alignItems="center" justifyContent="center">
-      <Text mb="16px" color="black">
-        Earn Tab
-      </Text>
-    </Box>
+    <ScreenContainer>
+      <ScreenHeader>
+        <Heading fontSize="16px" fontFamily="heading">
+          Earn
+        </Heading>
+      </ScreenHeader>
+    </ScreenContainer>
   );
 }
