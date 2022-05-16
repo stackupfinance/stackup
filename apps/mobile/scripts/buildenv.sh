@@ -16,4 +16,4 @@ defaults.project=stackup-mobile
 auth.token=${STACKUP_MOBILE_SENTRY_AUTH_TOKEN}" \
 | tee ./ios/sentry.properties ./android/sentry.properties
 
-echo "Env files file successfully generated."
+echo "Env files successfully generated."
