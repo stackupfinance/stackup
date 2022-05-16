@@ -7,6 +7,7 @@ import {
 } from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import * as Sentry from '@sentry/react-native';
+import {STACKUP_MOBILE_SENTRY_DNS} from '@env';
 import {
   HomeScreen,
   SecurityScreen,
@@ -21,7 +22,6 @@ import {
 } from './src/config';
 import {useAuth} from './src/hooks';
 import {useNavigationStoreAppSelector} from './src/state';
-import {STACKUP_MOBILE_SENTRY_DNS} from '@env';
 
 const routingInstrumentation = new Sentry.ReactNavigationInstrumentation();
 Sentry.init({
