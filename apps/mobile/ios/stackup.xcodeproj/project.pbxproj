@@ -13,7 +13,6 @@
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		13B6C4CACD0C450DA1E99886 /* Inter-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5BAC4EECE7AB47858D70B6E4 /* Inter-Medium.ttf */; };
-		1DFC473E6CBC4AA3BD03ACDD /* Helvetica Neue Medium Extended.ttf in Resources */ = {isa = PBXBuildFile; fileRef = AD21FCC8D3E147E08CED848A /* Helvetica Neue Medium Extended.ttf */; };
 		3C3138AE3FDB4808B60D6205 /* Inter-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = D16711C6899841C69E9CA0E3 /* Inter-Bold.ttf */; };
 		5C322C32A24743CEB390557F /* Inter-ExtraBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 58C907AD2CEB4B1289B80179 /* Inter-ExtraBold.ttf */; };
 		7699B88040F8A987B510C191 /* libPods-stackup-stackupTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 19F6CBCC0A4E27FBF8BF4A61 /* libPods-stackup-stackupTests.a */; };
@@ -22,6 +21,7 @@
 		ABEE7430B7B44C3DAEA9EE13 /* Inter-Black.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8E8FA8A08858438091213157 /* Inter-Black.ttf */; };
 		AF937AA56B9B424191ACA9D6 /* Inter-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0B01D73CCC804DED8966CE00 /* Inter-Regular.ttf */; };
 		C14488650CE9494EB1FDC43A /* Inter-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 623FF75B3E3B445FBB930FC8 /* Inter-SemiBold.ttf */; };
+		D741D744B2344FE8A1D2FC45 /* Helvetica-Neue-Medium-Extended.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 67E597448F8249BCAAEF49E4 /* Helvetica-Neue-Medium-Extended.ttf */; };
 		E6F46F2A394C40FEB05CD3B4 /* Inter-ExtraLight.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E10CBD44B1E4461C8A583931 /* Inter-ExtraLight.ttf */; };
 		E77128D9971349FDACC0FFDA /* Inter-Thin.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 466A4CD721524FA2B7AA262B /* Inter-Thin.ttf */; };
 /* End PBXBuildFile section */
@@ -57,10 +57,10 @@
 		5BAC4EECE7AB47858D70B6E4 /* Inter-Medium.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "Inter-Medium.ttf"; path = "../assets/fonts/Inter-Medium.ttf"; sourceTree = "<group>"; };
 		5DCACB8F33CDC322A6C60F78 /* libPods-stackup.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-stackup.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		623FF75B3E3B445FBB930FC8 /* Inter-SemiBold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "Inter-SemiBold.ttf"; path = "../assets/fonts/Inter-SemiBold.ttf"; sourceTree = "<group>"; };
+		67E597448F8249BCAAEF49E4 /* Helvetica-Neue-Medium-Extended.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "Helvetica-Neue-Medium-Extended.ttf"; path = "../assets/fonts/Helvetica-Neue-Medium-Extended.ttf"; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = stackup/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		89C6BE57DB24E9ADA2F236DE /* Pods-stackup-stackupTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-stackup-stackupTests.release.xcconfig"; path = "Target Support Files/Pods-stackup-stackupTests/Pods-stackup-stackupTests.release.xcconfig"; sourceTree = "<group>"; };
 		8E8FA8A08858438091213157 /* Inter-Black.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "Inter-Black.ttf"; path = "../assets/fonts/Inter-Black.ttf"; sourceTree = "<group>"; };
-		AD21FCC8D3E147E08CED848A /* Helvetica Neue Medium Extended.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "Helvetica Neue Medium Extended.ttf"; path = "../assets/fonts/Helvetica Neue Medium Extended.ttf"; sourceTree = "<group>"; };
 		D16711C6899841C69E9CA0E3 /* Inter-Bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "Inter-Bold.ttf"; path = "../assets/fonts/Inter-Bold.ttf"; sourceTree = "<group>"; };
 		E10CBD44B1E4461C8A583931 /* Inter-ExtraLight.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "Inter-ExtraLight.ttf"; path = "../assets/fonts/Inter-ExtraLight.ttf"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
@@ -181,7 +181,7 @@
 				0B01D73CCC804DED8966CE00 /* Inter-Regular.ttf */,
 				623FF75B3E3B445FBB930FC8 /* Inter-SemiBold.ttf */,
 				466A4CD721524FA2B7AA262B /* Inter-Thin.ttf */,
-				AD21FCC8D3E147E08CED848A /* Helvetica Neue Medium Extended.ttf */,
+				67E597448F8249BCAAEF49E4 /* Helvetica-Neue-Medium-Extended.ttf */,
 			);
 			name = Resources;
 			path = "";
@@ -223,6 +223,7 @@
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
 				00EEFC60759A1932668264C0 /* [CP] Embed Pods Frameworks */,
 				E235C05ADACE081382539298 /* [CP] Copy Pods Resources */,
+				5CB1E998343B4F1390DDB281 /* Upload Debug Symbols to Sentry */,
 			);
 			buildRules = (
 			);
@@ -292,7 +293,7 @@
 				AF937AA56B9B424191ACA9D6 /* Inter-Regular.ttf in Resources */,
 				C14488650CE9494EB1FDC43A /* Inter-SemiBold.ttf in Resources */,
 				E77128D9971349FDACC0FFDA /* Inter-Thin.ttf in Resources */,
-				1DFC473E6CBC4AA3BD03ACDD /* Helvetica Neue Medium Extended.ttf in Resources */,
+				D741D744B2344FE8A1D2FC45 /* Helvetica-Neue-Medium-Extended.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -311,7 +312,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "set -e\n\nexport NODE_BINARY=node\n../node_modules/react-native/scripts/react-native-xcode.sh\n";
+			shellScript = "export SENTRY_PROPERTIES=sentry.properties\nexport EXTRA_PACKAGER_ARGS=\"--sourcemap-output $DERIVED_FILE_DIR/main.jsbundle.map\"\nset -e\n\nexport NODE_BINARY=node\n../node_modules/@sentry/cli/bin/sentry-cli react-native xcode ../node_modules/react-native/scripts/react-native-xcode.sh\n";
 		};
 		00EEFC60759A1932668264C0 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -329,6 +330,20 @@
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-stackup/Pods-stackup-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
+		};
+		5CB1E998343B4F1390DDB281 /* Upload Debug Symbols to Sentry */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Upload Debug Symbols to Sentry";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "export SENTRY_PROPERTIES=sentry.properties\n../node_modules/@sentry/cli/bin/sentry-cli upload-dsym";
 		};
 		A55EABD7B0C7F3A422A6CC61 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;

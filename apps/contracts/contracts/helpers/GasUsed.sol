@@ -10,6 +10,9 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 library GasUsed {
   using SafeMath for uint256;
 
+  /**
+   * @dev Tells the gas used based on a previous gas-left measure
+   */
   function since(uint256 previousGasLeft) internal view returns (uint256 gasUsed) {
     return previousGasLeft.sub(gasleft(), "Invalid previous gas left");
   }

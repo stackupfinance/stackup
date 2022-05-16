@@ -7,6 +7,7 @@ import {
   useFingerprintStoreRemoveWalletSelector,
   useNavigationStoreRemoveWalletSelector,
 } from '../state';
+import {logEvent} from '../utils/analytics';
 
 interface UseAuthHook {
   isReady: boolean;
@@ -28,6 +29,7 @@ export const useRemoveWallet = (): UseRemoveWalletHook => {
     clearNavigation();
     await resetMasterPassword();
     remove();
+    logEvent('REMOVE_WALLET');
   };
 };
 

@@ -19,6 +19,9 @@ function requireFailedOp(
   if (!condition) revert FailedOp(opIndex, reason);
 }
 
+/**
+ * @dev Entry point helpers library
+ */
 library EntryPointHelpers {
   using Address for address;
 

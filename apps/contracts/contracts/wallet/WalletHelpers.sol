@@ -6,12 +6,21 @@ import "../UserOperation.sol";
 import "../helpers/Calldata.sol";
 import "../paymaster/PaymasterHelpers.sol";
 
+/**
+ * @dev Internal object used to model a wallet execution request
+ * @param to target account
+ * @param value call value
+ * @param data calldata
+ */
 struct WalletCallData {
   address to;
   uint256 value;
   bytes data;
 }
 
+/**
+ * @dev Wallet helpers library
+ */
 library WalletHelpers {
   using Calldata for bytes;
   using PaymasterHelpers for UserOperation;

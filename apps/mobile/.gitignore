@@ -59,3 +59,11 @@ buck-out/
 # Ruby / CocoaPods
 /ios/Pods/
 /vendor/bundle/
+
+# local env files
+.env
+.env.development
+.env.production
+
+# Sentry
+sentry.properties

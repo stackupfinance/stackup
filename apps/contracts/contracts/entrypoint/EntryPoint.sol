@@ -23,6 +23,13 @@ contract EntryPoint is IEntryPoint, Staking {
   using EntryPointHelpers for address;
   using EntryPointHelpers for UserOperation;
 
+  /**
+   * Internal struct used during the verification process to avoid computing a few things more than once
+   * @param context of the paymaster in case it was required
+   * @param prefund computed based on the gas values requested
+   * @param gasUsed total gas used during the verification process
+   * @param requestId unique identifier computed as keccak256(op, entryPoint, chainId)
+   */
   struct UserOpVerification {
     bytes context;
     uint256 prefund;
@@ -30,6 +37,14 @@ contract EntryPoint is IEntryPoint, Staking {
     bytes32 requestId;
   }
 
+  /**
+   * Emitted for each successful user op
+   * @param sender the wallet executing the op
+   * @param paymaster the paymaster paying for the op
+   * @param requestId unique identifier computed as keccak256(op, entryPoint, chainId)
+   * @param success whether the execution succeed or not
+   * @param result the execution result
+   */
   event UserOperationExecuted(
     address indexed sender,
     address indexed paymaster,
@@ -38,25 +53,45 @@ contract EntryPoint is IEntryPoint, Staking {
     bytes result
   );
 
+  // Singleton factory used by the entry point to instantiate wallets
   ISingletonFactory public immutable create2Factory;
 
+  /**
+   * @dev Entry point constructor
+   * @param _create2Factory factory that will be used the entry point to instantiate wallets
+   * @param _unstakeDelaySec unstake delay that will be forced to each paymaster
+   */
   constructor(ISingletonFactory _create2Factory, uint32 _unstakeDelaySec) Staking(_unstakeDelaySec) {
     create2Factory = _create2Factory;
   }
 
+  /**
+   * @dev Tells the gas price that will be used for an op
+   */
   function getGasPrice(UserOperation calldata op) external view returns (uint256) {
     return op.gasPrice();
   }
 
+  /**
+   * @dev Tells the required prefund that will be computed for an op
+   */
   function getRequiredPrefund(UserOperation calldata op) external view returns (uint256) {
     return op.requiredPrefund();
   }
 
+  /**
+   * @dev Tells the address that will result by deploying a certain bytecode using the entry point's factory
+   * @param initCode bytecode to be deployed
+   * @param salt salt value to be used
+   */
   function getSenderAddress(bytes memory initCode, uint256 salt) external view returns (address) {
     bytes32 data = keccak256(abi.encodePacked(bytes1(0xff), address(create2Factory), salt, keccak256(initCode)));
     return address(uint160(uint256(data)));
   }
 
+  /**
+   * @dev Allows off-chain parties to validate operations through the entry point before executing them
+   */
   function simulateValidation(UserOperation calldata op) external returns (uint256 preOpGas, uint256 prefund) {
     uint256 preGas = gasleft();
     UserOpVerification memory verification = _verifyOp(0, op);
@@ -65,6 +100,9 @@ contract EntryPoint is IEntryPoint, Staking {
     require(msg.sender == address(0), "EntryPoint: Caller not zero");
   }
 
+  /**
+   * @dev Process a list of operations
+   */
   function handleOps(UserOperation[] calldata ops, address payable redeemer) external {
     UserOpVerification[] memory verifications = new UserOpVerification[](ops.length);
     for (uint256 i = 0; i < ops.length; i++) verifications[i] = _verifyOp(i, ops[i]);
@@ -74,6 +112,9 @@ contract EntryPoint is IEntryPoint, Staking {
     redeemer.sendValue(totalGasCost, "EntryPoint: Failed to redeem");
   }
 
+  /**
+   * @dev Internal function to run the verification process for a user operation
+   */
   function _verifyOp(uint256 opIndex, UserOperation calldata op)
     internal
     returns (UserOpVerification memory verification)
@@ -97,6 +138,9 @@ contract EntryPoint is IEntryPoint, Staking {
     requireFailedOp(verification.gasUsed <= op.verificationGas, opIndex, "EntryPoint: Verif gas not enough");
   }
 
+  /**
+   * @dev Internal function that will trigger a wallet creation in case it was requested in the op
+   */
   function _createWalletIfNecessary(uint256 opIndex, UserOperation calldata op) internal {
     bool hasInitCode = op.hasInitCode();
     bool isAlreadyDeployed = op.isAlreadyDeployed();
@@ -108,6 +152,9 @@ contract EntryPoint is IEntryPoint, Staking {
     }
   }
 
+  /**
+   * @dev Internal function to run the wallet verification process
+   */
   function _validateWallet(
     uint256 opIndex,
     UserOperation calldata op,
@@ -129,6 +176,9 @@ contract EntryPoint is IEntryPoint, Staking {
     requireFailedOp(actualPrefund >= requiredPrefund, opIndex, "EntryPoint: Incorrect prefund");
   }
 
+  /**
+   * @dev Internal function to run the paymaster verification process
+   */
   function _validatePaymaster(
     uint256 opIndex,
     UserOperation calldata op,
@@ -152,6 +202,9 @@ contract EntryPoint is IEntryPoint, Staking {
     }
   }
 
+  /**
+   * @dev Internal function to execute an operation
+   */
   function _executeOp(
     uint256 opIndex,
     UserOperation calldata op,
@@ -173,6 +226,9 @@ contract EntryPoint is IEntryPoint, Staking {
     }
   }
 
+  /**
+   * @dev Internal function to execute the post-op execution process, only for paymasters
+   */
   function _executePostOp(
     uint256 opIndex,
     UserOperation calldata op,
