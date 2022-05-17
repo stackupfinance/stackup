@@ -1,24 +1,39 @@
-import React from 'react';
+import React  from 'react';
 import {
   Box,
   Button,
-  Image,
   Text,
-  Link,
   HStack,
   Heading,
-  Switch,
-  useColorMode,
-  VStack,
-  Code
 } from "native-base";
 
-const PortfolioBalance = () => {
+interface PortfolioBalanceProps {
+  balance: number;
+  changeValue: number;
+  changePercent: number;
+  isHidden: boolean;
+  toggleVisibility: () => void;
+}
+
+const PortfolioBalance = (props: PortfolioBalanceProps) => {
+  const { balance, isHidden, changePercent, changeValue, toggleVisibility } = props;
+  const changeValueIndicator = (changeValue > 0) ? '+' : '-';
+  const toggleBalanceText = isHidden ? 'Show balance' : 'Hide';
+
   return (
-    <Box>
-      <VStack alignItems="center">
-        <Heading size="lg">$96,147.47</Heading>
-      </VStack>
+    <Box alignItems="center">
+      {
+        !isHidden && <Box alignItems="center">
+          <Heading size="3xl" fontWeight={600}>${balance}</Heading>
+          <HStack direction="row" space={3}>
+            <Text fontSize="xl">{changeValueIndicator}${changeValue}</Text>
+            <Text fontSize="xl" color="#1ED759">{changePercent}%</Text>
+          </HStack>
+        </Box>
+      }
+      <Box alignItems="center">
+      <Button variant="link" onPress={() => toggleVisibility()}>{toggleBalanceText}</Button>
+      </Box>
     </Box>
   );
 };

@@ -12,10 +12,20 @@ export default function DoThingsScreen({}: Props) {
   const {
     toggleColorMode
   } = useColorMode();
+
+  const [balanceIsHidden, setBalanceIsHidden] = useState(false);
+  const toggleVisibilityHandler = () => setBalanceIsHidden(!balanceIsHidden);
+
   return (
-    <Box bg={useColorModeValue("warmGray.50", "coolGray.800")}>
+    <Box bg={useColorModeValue("warmGray.50", "background.1")}>
       <Text>Stackup Wallet</Text>
-      <PortfolioBalance />
+      <PortfolioBalance 
+        balance={96147.47} 
+        changeValue={21170}
+        changePercent={22}
+        isHidden={balanceIsHidden}
+        toggleVisibility={toggleVisibilityHandler}
+      />
       <TokenList />
       <Button onPress={toggleColorMode}>
         <Text>Toggle color mode</Text>

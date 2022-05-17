@@ -1,11 +1,4 @@
-import {Platform} from 'react-native';
 import {extendTheme} from 'native-base';
-import {DefaultTheme} from '@react-navigation/native';
-
-const HelveticaNeueMediumExtended =
-  Platform.OS === 'ios'
-    ? 'HelveticaNeue-MediumExt'
-    : 'Helvetica-Neue-Medium-Extended';
 
 export const AppColors = {
   palettes: {
@@ -47,10 +40,10 @@ export const AppColors = {
     },
   },
   background: {
-    1: 'red',
-    2: 'red',
-    3: 'red',
-    4: 'red',
+    1: '#0f0f14',
+    2: '#15151c',
+    3: '#20222b',
+    4: '#303247',
   },
   text: {
     1: '#f1f3f6',
@@ -68,6 +61,7 @@ export const NativeBaseTheme = extendTheme({
     primary: AppColors.palettes.primary,
     secondary: AppColors.palettes.secondary,
     tertiary: AppColors.palettes.tertiary,
+    background: AppColors.background,
   },
   fontConfig: {
     Inter: {
@@ -101,90 +95,39 @@ export const NativeBaseTheme = extendTheme({
     },
     HelveticaNeueMediumExtended: {
       100: {
-        normal: HelveticaNeueMediumExtended,
+        normal: 'Helvetica Neue Medium Extended',
       },
       200: {
-        normal: HelveticaNeueMediumExtended,
+        normal: 'Helvetica Neue Medium Extended',
       },
       300: {
-        normal: HelveticaNeueMediumExtended,
+        normal: 'Helvetica Neue Medium Extended',
       },
       400: {
-        normal: HelveticaNeueMediumExtended,
+        normal: 'Helvetica Neue Medium Extended',
       },
       500: {
-        normal: HelveticaNeueMediumExtended,
+        normal: 'Helvetica Neue Medium Extended',
       },
       600: {
-        normal: HelveticaNeueMediumExtended,
+        normal: 'Helvetica Neue Medium Extended',
       },
       700: {
-        normal: HelveticaNeueMediumExtended,
+        normal: 'Helvetica Neue Medium Extended',
       },
       800: {
-        normal: HelveticaNeueMediumExtended,
+        normal: 'Helvetica Neue Medium Extended',
       },
       900: {
-        normal: HelveticaNeueMediumExtended,
+        normal: 'Helvetica Neue Medium Extended',
       },
     },
   },
   fonts: {
-    heading: 'HelveticaNeueMediumExtended',
+    heading: 'Inter',
     body: 'Inter',
     mono: 'Inter',
-  },
-  components: {
-    Button: {
-      baseStyle: {
-        borderRadius: '8px',
-      },
-      sizes: {
-        lg: {
-          py: '16px',
-          px: '16px',
-          _text: {
-            fontWeight: 700,
-          },
-        },
-        md: {
-          py: '16px',
-          px: '16px',
-          _text: {
-            fontWeight: 700,
-          },
-        },
-        sm: {
-          py: '16px',
-          px: '16px',
-          _text: {
-            fontWeight: 700,
-          },
-        },
-        xs: {
-          py: '16px',
-          px: '16px',
-          _text: {
-            fontWeight: 700,
-          },
-        },
-      },
-    },
-  },
-  config: {
-    useSystemColorMode: false,
-    initialColorMode: 'dark',
+    Inter: 'Inter',
+    HelveticaNeueMediumExtended: 'HelveticaNeueMediumExtended',
   },
 });
-
-export const NavigationTheme = {
-  ...DefaultTheme,
-  dark: true,
-  colors: {
-    ...DefaultTheme.colors,
-    primary: AppColors.palettes.primary[600],
-    background: AppColors.background[1],
-    card: AppColors.background[2],
-    text: 'white',
-  },
-};
