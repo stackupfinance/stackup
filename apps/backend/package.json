@@ -43,7 +43,7 @@
     "express-http-proxy": "^1.6.3",
     "express-mongo-sanitize": "^2.2.0",
     "express-rate-limit": "^6.4.0",
-    "helmet": "^5.0.2",
+    "helmet": "^5.1.0",
     "http-status": "^1.5.2",
     "joi": "^17.6.0",
     "jsonwebtoken": "^8.5.1",
