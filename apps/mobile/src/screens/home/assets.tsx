@@ -6,6 +6,7 @@ import type {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {RootStackParamList, HomeTabParamList} from '../../config';
 import {useRemoveWallet} from '../../hooks';
 import {ScreenContainer, ScreenHeader} from '../../components';
+import {useIntercomStoreSettingsSelector} from '../../state';
 
 type Props = CompositeScreenProps<
   MaterialTopTabScreenProps<HomeTabParamList, 'Assets'>,
@@ -14,6 +15,7 @@ type Props = CompositeScreenProps<
 
 export default function AssetsScreen({navigation}: Props) {
   const removeWallet = useRemoveWallet();
+  const {openMessenger} = useIntercomStoreSettingsSelector();
 
   return (
     <ScreenContainer>
@@ -33,6 +35,10 @@ export default function AssetsScreen({navigation}: Props) {
           colorScheme="secondary"
           onPress={() => navigation.navigate('Settings')}>
           Settings Overview
+        </Button>
+
+        <Button mb="16px" colorScheme="secondary" onPress={openMessenger}>
+          Display messenger
         </Button>
 
         <Button colorScheme="tertiary" onPress={removeWallet}>
