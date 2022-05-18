@@ -8,7 +8,7 @@
     "ios": "react-native run-ios",
     "start": "react-native start",
     "test": "jest",
-    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx && tsc",
     "lint:fix": "eslint . --fix",
     "prettier": "prettier --check '**'",
     "prettier:fix": "prettier --write '**'"
