@@ -1,12 +1,13 @@
+import {Platform} from 'react-native';
 import create from 'zustand';
 import {devtools} from 'zustand/middleware';
 import Intercom from '@intercom/intercom-react-native';
 
 interface IntercomState {
-  inMessenger: boolean;
+  debounceAndroidAppState: boolean;
 
   identify: (walletAddress: string) => void;
-  setInMessenger: (value: boolean) => void;
+  setDebounceAndroidAppState: (value: boolean) => void;
   openMessenger: () => void;
 
   clear: () => void;
@@ -15,11 +16,13 @@ interface IntercomState {
 const STORE_NAME = 'stackup-intercom-store';
 const useIntercomStore = create<IntercomState>()(
   devtools(
-    set => ({
-      inMessenger: false,
+    (set, get) => ({
+      debounceAndroidAppState: false,
 
-      setInMessenger: inMessenger => {
-        set({inMessenger});
+      setDebounceAndroidAppState: debounceAndroidAppState => {
+        if (Platform.OS === 'android') {
+          set({debounceAndroidAppState});
+        }
       },
 
       identify: walletAddress => {
@@ -27,13 +30,12 @@ const useIntercomStore = create<IntercomState>()(
       },
 
       openMessenger: () => {
-        Intercom.displayMessenger();
-        set({inMessenger: true});
+        Intercom.displayMessenger().then(get().setDebounceAndroidAppState);
       },
 
       clear: () => {
         Intercom.logout();
-        set({inMessenger: false});
+        set({debounceAndroidAppState: false});
       },
     }),
     {name: STORE_NAME},
@@ -46,8 +48,8 @@ export const useIntercomStoreRemoveWalletSelector = () =>
 export const useIntercomStoreAuthSelector = () =>
   useIntercomStore(state => ({
     identify: state.identify,
-    inMessenger: state.inMessenger,
-    setInMessenger: state.setInMessenger,
+    debounceAndroidAppState: state.debounceAndroidAppState,
+    setDebounceAndroidAppState: state.setDebounceAndroidAppState,
   }));
 
 export const useIntercomStoreSettingsSelector = () =>

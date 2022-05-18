@@ -46,7 +46,7 @@ export const useAuth = (): UseAuthHook => {
     getMasterPassword,
     hasHydrated: fingerprintHydrated,
   } = useFingerprintStoreAuthSelector();
-  const {identify, inMessenger, setInMessenger} =
+  const {identify, debounceAndroidAppState, setDebounceAndroidAppState} =
     useIntercomStoreAuthSelector();
   const [isReady, setIsReady] = useState<boolean>(false);
   const [hasWalletInstance, setHasWalletInstance] = useState<boolean>(false);
@@ -57,13 +57,13 @@ export const useAuth = (): UseAuthHook => {
   const isFingerprintEnabledRef = useRef<boolean>(isFingerprintEnabled);
   const hasWalletInstanceRef = useRef<boolean>(hasWalletInstance);
   const appStateDeltaRef = useRef<AppStateDelta>(appStateDelta);
-  const inMessengerRef = useRef<boolean>(inMessenger);
+  const debounceAndroidAppStateRef = useRef<boolean>(debounceAndroidAppState);
 
   const hasHydrated = walletHydrated && fingerprintHydrated;
   isFingerprintEnabledRef.current = isFingerprintEnabled;
   hasWalletInstanceRef.current = hasWalletInstance;
   appStateDeltaRef.current = appStateDelta;
-  inMessengerRef.current = inMessenger;
+  debounceAndroidAppStateRef.current = debounceAndroidAppState;
 
   const showUnlockPrompt = async () => {
     setIsReady(false);
@@ -104,7 +104,9 @@ export const useAuth = (): UseAuthHook => {
         delta.prev === 'background' &&
         delta.curr === 'active'
       ) {
-        inMessengerRef.current ? setInMessenger(false) : showUnlockPrompt();
+        debounceAndroidAppStateRef.current
+          ? setDebounceAndroidAppState(false)
+          : showUnlockPrompt();
       }
 
       setAppStateDelta(delta);
