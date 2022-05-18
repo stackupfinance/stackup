@@ -6,8 +6,8 @@ import Intercom from '@intercom/intercom-react-native';
 interface IntercomState {
   debounceAndroidAppState: boolean;
 
-  identify: (walletAddress: string) => void;
   setDebounceAndroidAppState: (value: boolean) => void;
+  identify: (walletAddress: string) => void;
   openMessenger: () => void;
 
   clear: () => void;
