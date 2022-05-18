@@ -45,7 +45,9 @@
       "**/react-native-pager-view",
       "**/react-native-keychain",
       "**/@amplitude/react-native",
-      "**/@sentry/react-native"
+      "**/@sentry/react-native",
+      "**/react-native-config",
+      "**/@intercom/intercom-react-native"
     ]
   },
   "devDependencies": {
