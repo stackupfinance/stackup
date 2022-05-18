@@ -13,7 +13,7 @@
     "generate:types": "node gentypes.js"
   },
   "devDependencies": {
-    "@types/jest": "^27.5.0",
+    "@types/jest": "^27.5.1",
     "dts-gen": "^0.6.0",
     "eslint": "^8.13.0",
     "eslint-config-prettier": "^8.5.0",
