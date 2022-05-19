@@ -17067,10 +17067,10 @@ react-test-renderer@18.1.0:
     react-shallow-renderer "^16.15.0"
     scheduler "^0.22.0"
 
-react-use-intercom@^1.5.1:
-  version "1.5.1"
-  resolved "https://registry.yarnpkg.com/react-use-intercom/-/react-use-intercom-1.5.1.tgz#94567a80ce3b56692962d712a54489c55fb4c54e"
-  integrity sha512-rsSiW3j6yv0bBWCaX+VOCK/ndh/VzntlYjxHLHhV++iQtFurFhcRD249rF07ZaLH8ZP5SR6FzP3Alqdi3usBQg==
+react-use-intercom@^1.5.2:
+  version "1.5.2"
+  resolved "https://registry.yarnpkg.com/react-use-intercom/-/react-use-intercom-1.5.2.tgz#fa3aa5783f7896e59f36c90bea7761ece69851a7"
+  integrity sha512-5bK3TtsZ9S18vWuagncc1tJA/+2WouIjMHtVlgcrvECYbDhOwFNMb1h1XDDcOIk4gZv+eDx/oiWLbNHFAR7lIA==
 
 react@17.0.2:
   version "17.0.2"
