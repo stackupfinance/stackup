@@ -7,7 +7,7 @@ import {
 } from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import * as Sentry from '@sentry/react-native';
-import {STACKUP_MOBILE_SENTRY_DNS} from '@env';
+import Config from 'react-native-config';
 import {
   HomeScreen,
   SecurityScreen,
@@ -26,7 +26,7 @@ import {useNavigationStoreAppSelector} from './src/state';
 
 const routingInstrumentation = new Sentry.ReactNavigationInstrumentation();
 Sentry.init({
-  dsn: STACKUP_MOBILE_SENTRY_DNS,
+  dsn: Config.STACKUP_MOBILE_SENTRY_DNS,
   tracesSampleRate: 0.5,
   integrations: [new Sentry.ReactNativeTracing({routingInstrumentation})],
 });

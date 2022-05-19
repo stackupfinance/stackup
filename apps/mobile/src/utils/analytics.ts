@@ -1,5 +1,5 @@
 import {Amplitude} from '@amplitude/react-native';
-import {STACKUP_MOBILE_AMPLITUDE_API_KEY} from '@env';
+import Config from 'react-native-config';
 
 type Events = {
   CREATE_WALLET: {enableFingerprint: boolean};
@@ -7,7 +7,7 @@ type Events = {
 };
 
 const ampInstance = Amplitude.getInstance();
-ampInstance.init(STACKUP_MOBILE_AMPLITUDE_API_KEY);
+ampInstance.init(Config.STACKUP_MOBILE_AMPLITUDE_API_KEY);
 
 export function logEvent<E extends keyof Events, P extends Events[E]>(
   event: E,
