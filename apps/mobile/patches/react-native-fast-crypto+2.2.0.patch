@@ -1,7 +1,28 @@
 diff --git a/node_modules/react-native-fast-crypto/index.js b/node_modules/react-native-fast-crypto/index.ts
-similarity index 100%
+similarity index 89%
 rename from node_modules/react-native-fast-crypto/index.js
 rename to node_modules/react-native-fast-crypto/index.ts
+index 3dbf764..7c9f251 100644
+--- a/node_modules/react-native-fast-crypto/index.js
++++ b/node_modules/react-native-fast-crypto/index.ts
+@@ -23,15 +23,12 @@ async function pbkdf2DeriveAsync(
+   return base64.parse(out, { out: Buffer.allocUnsafe })
+ }
+ 
+-export async function scrypt(passwd, salt, N, r, p, size) {
+-  passwd = base64.stringify(passwd)
+-  salt = base64.stringify(salt)
+-
++export async function scrypt(passwd: ArrayLike<number>, salt: ArrayLike<number>, N: number, r: number, p: number, size: number) {
+   console.log(
+     'RNFS:scrypt(' + N.toString() + ', ' + r.toString() + ', ' + p.toString()
+   )
+   const t = Date.now()
+-  const retval: string = await RNFastCrypto.scrypt(passwd, salt, N, r, p, size)
++  const retval: string = await RNFastCrypto.scrypt(base64.stringify(passwd), base64.stringify(salt), N, r, p, size)
+   const elapsed = Date.now() - t
+   console.log('RNFS:script finished in ' + elapsed + 'ms')
+ 
 diff --git a/node_modules/react-native-fast-crypto/package.json b/node_modules/react-native-fast-crypto/package.json
 index 86ba5fc..4c6631d 100644
 --- a/node_modules/react-native-fast-crypto/package.json

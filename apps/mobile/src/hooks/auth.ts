@@ -6,6 +6,8 @@ import {
   useFingerprintStoreAuthSelector,
   useFingerprintStoreRemoveWalletSelector,
   useNavigationStoreRemoveWalletSelector,
+  useIntercomStoreRemoveWalletSelector,
+  useIntercomStoreAuthSelector,
 } from '../state';
 import {logEvent} from '../utils/analytics';
 
@@ -23,11 +25,14 @@ export const useRemoveWallet = (): UseRemoveWalletHook => {
   const {remove} = useWalletStoreRemoveWalletSelector();
   const {resetMasterPassword} = useFingerprintStoreRemoveWalletSelector();
   const {clear: clearNavigation} = useNavigationStoreRemoveWalletSelector();
+  const {clear: clearIntercom} = useIntercomStoreRemoveWalletSelector();
 
   return async () => {
     // Clear all state here before removing wallet from device.
     clearNavigation();
-    await resetMasterPassword();
+    clearIntercom();
+
+    resetMasterPassword();
     remove();
     logEvent('REMOVE_WALLET');
   };
@@ -41,6 +46,8 @@ export const useAuth = (): UseAuthHook => {
     getMasterPassword,
     hasHydrated: fingerprintHydrated,
   } = useFingerprintStoreAuthSelector();
+  const {identify, debounceAndroidAppState, setDebounceAndroidAppState} =
+    useIntercomStoreAuthSelector();
   const [isReady, setIsReady] = useState<boolean>(false);
   const [hasWalletInstance, setHasWalletInstance] = useState<boolean>(false);
   const [appStateDelta, setAppStateDelta] = useState<AppStateDelta>({
@@ -50,11 +57,13 @@ export const useAuth = (): UseAuthHook => {
   const isFingerprintEnabledRef = useRef<boolean>(isFingerprintEnabled);
   const hasWalletInstanceRef = useRef<boolean>(hasWalletInstance);
   const appStateDeltaRef = useRef<AppStateDelta>(appStateDelta);
+  const debounceAndroidAppStateRef = useRef<boolean>(debounceAndroidAppState);
 
   const hasHydrated = walletHydrated && fingerprintHydrated;
   isFingerprintEnabledRef.current = isFingerprintEnabled;
   hasWalletInstanceRef.current = hasWalletInstance;
   appStateDeltaRef.current = appStateDelta;
+  debounceAndroidAppStateRef.current = debounceAndroidAppState;
 
   const showUnlockPrompt = async () => {
     setIsReady(false);
@@ -74,6 +83,10 @@ export const useAuth = (): UseAuthHook => {
       checkDevice();
       setHasWalletInstance(Boolean(instance));
       setIsReady(true);
+
+      if (instance) {
+        identify(instance.walletAddress);
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hasHydrated, instance]);
@@ -91,7 +104,9 @@ export const useAuth = (): UseAuthHook => {
         delta.prev === 'background' &&
         delta.curr === 'active'
       ) {
-        showUnlockPrompt();
+        debounceAndroidAppStateRef.current
+          ? setDebounceAndroidAppState(false)
+          : showUnlockPrompt();
       }
 
       setAppStateDelta(delta);

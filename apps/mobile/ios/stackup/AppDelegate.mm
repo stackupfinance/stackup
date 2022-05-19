@@ -1,10 +1,13 @@
 #import "AppDelegate.h"
+#import "ReactNativeConfig.h"
 
 #import <React/RCTBridge.h>
 #import <React/RCTBundleURLProvider.h>
 #import <React/RCTRootView.h>
 
 #import <React/RCTAppSetupUtils.h>
+
+#import <IntercomModule.h>
 
 #if RCT_NEW_ARCH_ENABLED
 #import <React/CoreModulesPlugins.h>
@@ -54,6 +57,11 @@
   rootViewController.view = rootView;
   self.window.rootViewController = rootViewController;
   [self.window makeKeyAndVisible];
+
+  NSString *intercomApiKey = [ReactNativeConfig envFor:@"STACKUP_MOBILE_INTERCOM_IOS_API_KEY"];
+  NSString *intercomAppId = [ReactNativeConfig envFor:@"STACKUP_MOBILE_INTERCOM_APP_ID"];
+  [IntercomModule initialize:intercomApiKey withAppId:intercomAppId];
+
   return YES;
 }
 
