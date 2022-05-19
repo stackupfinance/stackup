@@ -9,15 +9,15 @@ import {
 
 interface PortfolioBalanceProps {
   balance: number;
-  changeValue: number;
+  valueChange: number;
   changePercent: number;
   isHidden: boolean;
   toggleVisibility: () => void;
 }
 
 const PortfolioBalance = (props: PortfolioBalanceProps) => {
-  const { balance, isHidden, changePercent, changeValue, toggleVisibility } = props;
-  const changeValueIndicator = (changeValue > 0) ? '+' : '-';
+  const { balance, isHidden, changePercent, valueChange, toggleVisibility } = props;
+  const changeValueIndicator = (valueChange > 0) ? '+' : '-';
   const toggleBalanceText = isHidden ? 'Show balance' : 'Hide';
 
   return (
@@ -25,8 +25,8 @@ const PortfolioBalance = (props: PortfolioBalanceProps) => {
       {
         !isHidden && <Box alignItems="center">
           <Heading size="3xl" fontWeight={600}>${balance}</Heading>
-          <HStack direction="row" space={3}>
-            <Text fontSize="xl">{changeValueIndicator}${changeValue}</Text>
+          <HStack space={3}>
+            <Text fontSize="xl">{changeValueIndicator}${valueChange}</Text>
             <Text fontSize="xl" color="#1ED759">{changePercent}%</Text>
           </HStack>
         </Box>

@@ -62,6 +62,7 @@ export const NativeBaseTheme = extendTheme({
     secondary: AppColors.palettes.secondary,
     tertiary: AppColors.palettes.tertiary,
     background: AppColors.background,
+    text: AppColors.text,
   },
   fontConfig: {
     Inter: {
