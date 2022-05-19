@@ -22,6 +22,7 @@
     "dev:mobile:start": "yarn workspace @stackupfinance/mobile run start",
     "dev:mobile:ios": "yarn workspace @stackupfinance/mobile run ios",
     "dev:mobile:android": "yarn workspace @stackupfinance/mobile run android",
+    "release:mobile": "yarn workspace @stackupfinance/mobile run np",
     "build:web": "yarn workspace @stackupfinance/web run build",
     "build:backend": "yarn workspace @stackupfinance/backend run build:env",
     "start:web": "yarn workspace @stackupfinance/web run start",

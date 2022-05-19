@@ -1,7 +1,8 @@
 {
   "name": "@stackupfinance/mobile",
   "version": "0.0.1",
-  "private": true,
+  "repository": "git@github.com:stackupfinance/stackup.git",
+  "license": "GPL-3.0",
   "scripts": {
     "build:env": "./scripts/buildenv.sh",
     "android": "react-native run-android",
@@ -11,7 +12,9 @@
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx && tsc",
     "lint:fix": "eslint . --fix",
     "prettier": "prettier --check '**'",
-    "prettier:fix": "prettier --write '**'"
+    "prettier:fix": "prettier --write '**'",
+    "np": "np --no-publish",
+    "postversion": "react-native-version"
   },
   "dependencies": {
     "@amplitude/react-native": "^2.11.0",
@@ -59,7 +62,9 @@
     "eslint-plugin-unused-imports": "^2.0.0",
     "jest": "^28.1.0",
     "metro-react-native-babel-preset": "^0.70.3",
+    "np": "^7.6.1",
     "react-native-monorepo-tools": "^1.1.4",
+    "react-native-version": "^4.0.0",
     "react-test-renderer": "18.1.0",
     "typescript": "^4.6.4"
   },
