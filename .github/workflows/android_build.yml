@@ -97,5 +97,5 @@ jobs:
           packageName: com.stackup
           releaseFiles: apps/mobile/android/app/build/outputs/bundle/release/*.aab
           track: internal
-          status: completed
+          status: draft
           inAppUpdatePriority: 2
