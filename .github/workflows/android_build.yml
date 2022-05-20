@@ -18,6 +18,11 @@ jobs:
         uses: actions/setup-java@v1.4.3
         with:
           java-version: 1.8
+      
+    - name: Set up Node environment
+      uses: actions/setup-node@v2
+      with:
+        node-version: 14.x
 
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
