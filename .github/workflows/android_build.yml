@@ -92,7 +92,7 @@ jobs:
       - name: Upload App Bundle as artifact
         uses: actions/upload-artifact@v3
         with:
-          name: Signed App Bundle
+          name: signed-app-bundle
           path: apps/mobile/android/app/build/outputs/bundle/release/*.aab
 
       # - name: Upload App to Google Play
