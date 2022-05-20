@@ -89,19 +89,13 @@ jobs:
           alias: ${{ secrets.ANDROID_ALIAS }}
           keyStorePassword: ${{ secrets.ANDROID_KEY_STORE_PASSWORD }}
 
-      - name: Upload App Bundle as artifact
-        uses: actions/upload-artifact@v3
+      - name: Upload App to Google Play
+        uses: r0adkll/upload-google-play@v1
         with:
-          name: signed-app-bundle
-          path: apps/mobile/android/app/build/outputs/bundle/release/*.aab
-
-      # - name: Upload App to Google Play
-      #   uses: r0adkll/upload-google-play@v1
-      #   with:
-      #     serviceAccountJsonPlainText: |
-      #       ${{ secrets.ANDROID_SERVICE_ACCOUNT_JSON_TEXT }}
-      #     packageName: com.stackup
-      #     releaseFiles: apps/mobile/android/app/build/outputs/bundle/release/*.aab
-      #     track: alpha
-      #     status: completed
-      #     inAppUpdatePriority: 2
+          serviceAccountJsonPlainText: |
+            ${{ secrets.ANDROID_SERVICE_ACCOUNT_JSON_TEXT }}
+          packageName: com.stackup
+          releaseFiles: apps/mobile/android/app/build/outputs/bundle/release/*.aab
+          track: alpha
+          status: completed
+          inAppUpdatePriority: 2
