@@ -2,10 +2,12 @@ import React  from 'react';
 import {
   Box,
   Button,
+  Image,
   Text,
   HStack,
   Heading,
 } from "native-base";
+import { GreenUpArrow } from '../../../assets/images';
 
 interface PortfolioBalanceProps {
   balance: number;
@@ -21,13 +23,21 @@ const PortfolioBalance = (props: PortfolioBalanceProps) => {
   const toggleBalanceText = isHidden ? 'Show balance' : 'Hide';
 
   return (
-    <Box alignItems="center">
+    <Box alignItems="center" my="4">
       {
         !isHidden && <Box alignItems="center">
           <Heading size="3xl" fontWeight={600}>${balance}</Heading>
           <HStack space={3}>
             <Text fontSize="xl">{changeValueIndicator}${valueChange}</Text>
             <Text fontSize="xl" color="#1ED759">{changePercent}%</Text>
+            <Image 
+              source={GreenUpArrow}
+              alt="Alternate Text" 
+              size="xl" 
+              width={23}
+              height={14}
+              mt="2"
+            />
           </HStack>
         </Box>
       }

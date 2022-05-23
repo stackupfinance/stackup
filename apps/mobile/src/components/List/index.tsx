@@ -5,6 +5,7 @@ import {
   Text,
 } from "native-base";
 import ListItem from '../ListItem';
+import AssetListItemDetails from '../AssetListItemDetails';
 import { TokenListItem, NFTListItem } from '../../types/Assets';
 
 type ListItemType = TokenListItem | NFTListItem;
@@ -23,7 +24,15 @@ const List = (props: ListProps<ListItemType>) => {
       }
       <FlatList 
         data={data} 
-        renderItem={({ item }) => <ListItem data={item} />} 
+        renderItem={
+          ({ item }) => {
+            return (
+              <ListItem data={item}>
+                <AssetListItemDetails data={item} />
+              </ListItem>
+            );
+          }
+        }
       />
     </Box>
   );

@@ -1,12 +1,20 @@
-import * as React from 'react';
-import {Box, Heading, Button} from 'native-base';
+import React, {useState} from 'react';
+import {Box, Heading, Button, Image, Text, HStack, VStack, useColorMode} from 'native-base';
 import type {CompositeScreenProps} from '@react-navigation/native';
 import type {MaterialTopTabScreenProps} from '@react-navigation/material-top-tabs';
 import type {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {RootStackParamList, HomeTabParamList} from '../../config';
 import {useRemoveWallet} from '../../hooks';
 import {ScreenContainer, ScreenHeader} from '../../components';
+import PortfolioBalance from '../../components/PortfolioBalance';
+import List from '../../components/List';
+import {BitcoinAvatar} from '../../../assets/images';
+import {EthereumAvatar} from '../../../assets/images';
+import {MaticAvatar} from '../../../assets/images';
+import {USDCAvatar} from '../../../assets/images';
+import {SlidersIcon} from '../../../assets/images';
 import {useIntercomStoreSettingsSelector} from '../../state';
+
 
 type Props = CompositeScreenProps<
   MaterialTopTabScreenProps<HomeTabParamList, 'Assets'>,
@@ -17,34 +25,109 @@ export default function AssetsScreen({navigation}: Props) {
   const removeWallet = useRemoveWallet();
   const {openMessenger} = useIntercomStoreSettingsSelector();
 
+  // temp: for color testing
+  const {
+    toggleColorMode
+  } = useColorMode();
+
+  // PortfolioBalance props
+  const [balanceIsHidden, setBalanceIsHidden] = useState(false);
+  const toggleVisibilityHandler = () => setBalanceIsHidden(!balanceIsHidden);
+
+  // List props
+  const tokenData = [
+    { 
+      name: 'Bitcoin',
+      id: '1',
+      value: '1.332 BTC',
+      valueUSDC: '$52,472',
+      percentChange: '19',
+      valueChange: '9230',
+      imgSrc: BitcoinAvatar
+    },
+    { 
+      name: 'Ethereum',
+      id: '2',
+      value: '8.123 ETH',
+      valueUSDC: '$20,504',
+      percentChange: '10',
+      valueChange: '2050',
+      imgSrc: EthereumAvatar
+    },
+    { 
+      name: 'USDC',
+      id: '3',
+      value: '24,300 USDC',
+      valueUSDC: '$24,180',
+      percentChange: '40',
+      valueChange: '10000',
+      imgSrc: USDCAvatar
+    },
+  ];
+
   return (
     <ScreenContainer>
       <ScreenHeader>
         <Heading fontSize="16px" fontFamily="heading">
           Assets
         </Heading>
+
       </ScreenHeader>
 
-      <Box flex={1} alignItems="center" justifyContent="center">
-        <Button mb="16px" onPress={() => navigation.navigate('Security')}>
-          Security Overview
-        </Button>
+      <Box>
+        <PortfolioBalance 
+          balance={96147.47} 
+          valueChange={21170}
+          changePercent={22}
+          isHidden={balanceIsHidden}
+          toggleVisibility={toggleVisibilityHandler}
+        />
 
-        <Button
-          mb="16px"
-          colorScheme="secondary"
-          onPress={() => navigation.navigate('Settings')}>
-          Settings Overview
-        </Button>
+        <HStack mx="4" space={3} justifyContent="center">
+          <Button _text={{ fontWeight: "700" }} my="5" py="5" width="50%">Deposit</Button>
+          <Button _text={{ fontWeight: "700" }} my="5" py="5" width="50%">Send</Button>
+        </HStack>
 
-        <Button mb="16px" colorScheme="secondary" onPress={openMessenger}>
-          Display messenger
-        </Button>
+        <List data={tokenData} title="Token List" />
 
-        <Button colorScheme="tertiary" onPress={removeWallet}>
-          Remove wallet
-        </Button>
+        <HStack my="4" justifyContent="center">
+          <Image 
+            source={SlidersIcon}
+            alt="Manage token list"
+            size="xl" 
+            width="20px"
+            height="15px"
+            mt={1}
+          />
+          <Text mx="4">Manage token list</Text>
+        </HStack>
+
+        <VStack mx="4" my="5">
+          <Button colorScheme="tertiary" onPress={removeWallet}>
+            Remove wallet
+          </Button>
+          
+          <Button
+            mb="16px"
+            colorScheme="secondary"
+            onPress={() => navigation.navigate('Settings')}>
+            Settings Overview
+          </Button>
+
+          <Button onPress={toggleColorMode} my="5" py="5">
+            <Text>Toggle color mode</Text>
+          </Button>
+
+          <Button mb="16px" onPress={() => navigation.navigate('Security')}>
+            Security Overview
+          </Button>
+
+          <Button mb="16px" colorScheme="secondary" onPress={openMessenger}>
+            Display messenger
+          </Button>
+        </VStack>
       </Box>
+
     </ScreenContainer>
   );
 }

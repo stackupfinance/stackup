@@ -62,8 +62,7 @@ function App() {
               </>
             ) : (
               <>
-                {/* <Stack.Screen name="Onboard" component={OnboardScreen} /> */}
-                <Stack.Screen name="Example" component={ExampleScreen} />
+                <Stack.Screen name="Onboard" component={OnboardScreen} />
               </>
             )}
           </Stack.Navigator>
