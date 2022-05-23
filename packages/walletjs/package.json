@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "crypto-js": "^4.1.1",
-    "ethers": "^5.6.6",
+    "ethers": "^5.6.7",
     "scrypt-js": "^3.0.1"
   }
 }
