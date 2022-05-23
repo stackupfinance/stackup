@@ -14,7 +14,6 @@ import {
   SettingsScreen,
   OnboardScreen,
   SplashScreen,
-  ExampleScreen,
 } from './src/screens';
 import {
   RootStackParamList,
