@@ -22,12 +22,7 @@ export const errorConverter = (
   next(error);
 };
 
-export const errorHandler = (
-  err: any,
-  _req: Request,
-  res: Response,
-  _next: NextFunction
-) => {
+export const errorHandler = (err: any, _req: Request, res: Response) => {
   let { statusCode, message } = err;
   if (Env.NODE_ENV === "production" && !err.isOperational) {
     statusCode = httpStatus.INTERNAL_SERVER_ERROR;
