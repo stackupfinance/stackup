@@ -1,0 +1,7 @@
+node_modules
+.gitkeep
+.gitignore
+.prettierignore
+build
+*.env*
+scripts/buildenv.sh
