@@ -9,7 +9,7 @@ type Route = {
 };
 
 const defaultRoutes: Array<Route> = [
-  { path: "paymaster", route: paymasterRoute },
+  { path: "/paymaster", route: paymasterRoute },
 ];
 
 defaultRoutes.forEach((route) => {
