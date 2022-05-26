@@ -37,8 +37,9 @@ $ yarn install:ios
 Next we'll have to setup some app specific environment variables in order to get everything working end to end. See the `README.md` files in the following directories for more details.
 
 - [Contracts](./apps/contracts) - A collection of solidity smart contracts for Stackup.
-- [Backend](./apps/backend) - REST API for supporting frontend apps.
+- [Bundler](./apps/bundler) Service for forwarding UserOperations to the EntryPoint.
 - [Mobile](./apps/mobile) - A mobile native frontend for IOS and Android.
+- [Backend](./apps/backend) - **[DEPRECATED]** REST API for supporting frontend apps.
 - [Web](./apps/web) - **[DEPRECATED]** A responsive web frontend.
 
 ## Running locally

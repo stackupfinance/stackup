@@ -1,0 +1,95 @@
+name: IOS Build
+
+on:
+  workflow_dispatch:
+  release:
+    types: [published]
+
+jobs:
+  ios-build:
+    name: IOS Build
+    runs-on: macOS-latest
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v2
+
+      - name: Set up Node environment
+        uses: actions/setup-node@v2
+        with:
+          node-version: 14.x
+
+      - name: Setup Ruby (bundle)
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.0
+          bundler-cache: true
+
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+
+      - name: Restore node_modules from cache
+        uses: actions/cache@v2
+        id: yarn-cache
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build environment files
+        run: yarn workspace @stackupfinance/mobile run build:env
+        env:
+          STACKUP_MOBILE_BACKEND_URL: |
+            ${{ secrets.STACKUP_MOBILE_BACKEND_URL }}
+          STACKUP_MOBILE_AMPLITUDE_API_KEY: |
+            ${{ secrets.STACKUP_MOBILE_AMPLITUDE_API_KEY }}
+          STACKUP_MOBILE_SENTRY_DNS: |
+            ${{ secrets.STACKUP_MOBILE_SENTRY_DNS }}
+          STACKUP_MOBILE_INTERCOM_APP_ID: |
+            ${{ secrets.STACKUP_MOBILE_INTERCOM_APP_ID }}
+          STACKUP_MOBILE_INTERCOM_ANDROID_API_KEY: |
+            ${{ secrets.STACKUP_MOBILE_INTERCOM_ANDROID_API_KEY }}
+          STACKUP_MOBILE_INTERCOM_IOS_API_KEY: |
+            ${{ secrets.STACKUP_MOBILE_INTERCOM_IOS_API_KEY }}
+          STACKUP_MOBILE_SENTRY_AUTH_TOKEN: |
+            ${{ secrets.STACKUP_MOBILE_SENTRY_AUTH_TOKEN }}
+
+      - name: Restore Pods cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            apps/mobile/ios/Pods
+            ~/Library/Caches/CocoaPods
+            ~/.cocoapods
+          key: |
+            ${{ runner.os }}-pods-${{ hashFiles('apps/mobile/ios/Podfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pods-
+
+      - name: Install Pods
+        run: yarn install:ios
+
+      - name: Build IOS app
+        uses: yukiarrr/ios-build-action@v1.5.0
+        with:
+          project-path: apps/mobile/ios/stackup.xcodeproj
+          p12-base64: ${{ secrets.IOS_P12_BASE64 }}
+          mobileprovision-base64: ${{ secrets.IOS_MOBILE_PROVISION_BASE64 }}
+          code-signing-identity: "iPhone Distribution"
+          team-id: ${{ secrets.IOS_TEAM_ID }}
+          certificate-password: ${{ secrets.IOS_CERTIFICATE_PASSWORD }}
+          workspace-path: apps/mobile/ios/stackup.xcworkspace
+          scheme: stackup
+
+      - name: Upload app to TestFlight
+        uses: apple-actions/upload-testflight-build@v1
+        with:
+          app-path: output.ipa
+          issuer-id: ${{ secrets.IOS_APPSTORE_ISSUER_ID }}
+          api-key-id: ${{ secrets.IOS_APPSTORE_API_KEY_ID }}
+          api-private-key: ${{ secrets.IOS_APPSTORE_API_PRIVATE_KEY }}
