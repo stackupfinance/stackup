@@ -1,5 +1,5 @@
 import React from 'react';
-import {Actionsheet, useDisclose} from 'native-base';
+import {Actionsheet} from 'native-base';
 
 type SettingsProps = {
   isOpen: boolean;
