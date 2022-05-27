@@ -10,3 +10,4 @@ artifacts
 *.env*
 *.ts
 tsconfig.json
+scripts/buildenv.sh

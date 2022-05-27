@@ -5,29 +5,19 @@ const walletProxy = require("../contracts/walletProxy");
 const userOperation = require("../constants/userOperations");
 const encodeFunctionData = require("./encodeFunctionData");
 
-const _getInitCode = (
-  initImplementation,
-  initEntryPoint,
-  initOwner,
-  initGuardians
-) => {
+const _getInitCode = (initImplementation, initOwner, initGuardians) => {
   return walletProxy.factory.getDeployTransaction(
     initImplementation,
-    encodeFunctionData.initialize(initEntryPoint, initOwner, initGuardians)
+    encodeFunctionData.initialize(initOwner, initGuardians)
   ).data;
 };
 
-const _getAddress = (
-  initImplementation,
-  initEntryPoint,
-  initOwner,
-  initGuardians
-) => {
+const _getAddress = (initImplementation, initOwner, initGuardians) => {
   return ethers.utils.getCreate2Address(
     SingletonFactory.address,
     ethers.utils.formatBytes32String(userOperation.initNonce),
     ethers.utils.keccak256(
-      _getInitCode(initImplementation, initEntryPoint, initOwner, initGuardians)
+      _getInitCode(initImplementation, initOwner, initGuardians)
     )
   );
 };

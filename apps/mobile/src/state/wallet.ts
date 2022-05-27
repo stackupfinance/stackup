@@ -6,7 +6,6 @@ import {wallet} from '@stackupfinance/walletjs';
 interface WalletInstance {
   walletAddress: string;
   initImplementation: string;
-  initEntryPoint: string;
   initOwner: string;
   initGuardians: Array<string>;
   salt: string;

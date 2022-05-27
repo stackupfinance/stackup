@@ -1,20 +1,20 @@
-const { ethers } = require("hardhat");
-const { contracts } = require("@stackupfinance/walletjs");
+import { ethers } from "hardhat";
+import { contracts } from "@stackupfinance/walletjs";
 
 async function main() {
   const [signer] = await ethers.getSigners();
   const SingletonFactory = contracts.SingletonFactory.getInstance(signer);
 
   const tx = await SingletonFactory.deploy(
-    contracts.Wallet.deployInitCode,
-    contracts.Wallet.deploySalt,
+    contracts.EntryPoint.deployInitCode,
+    contracts.EntryPoint.deploySalt,
     {
       gasLimit: 5000000,
     }
-  ).then((tx) => tx.wait());
+  ).then((tx: any) => tx.wait());
 
-  console.log("Wallet deployment transaction:", tx);
-  console.log("Wallet will be deployed to:", contracts.Wallet.address);
+  console.log("EntryPoint deployment transaction:", tx);
+  console.log("EntryPoint will be deployed to:", contracts.EntryPoint.address);
 }
 
 main()

@@ -3,6 +3,7 @@ const ERC20 = require("../contracts/erc20");
 const EntryPoint = require("../contracts/entryPoint");
 const Wallet = require("../contracts/wallet");
 const userOperations = require("../constants/userOperations");
+const staking = require("../constants/staking");
 
 module.exports.ERC20Approve = (tokenAddress, spender, value) => {
   return Wallet.interface.encodeFunctionData("executeUserOp", [
@@ -28,12 +29,8 @@ module.exports.executeUserOp = (to, value, data) => {
   ]);
 };
 
-module.exports.initialize = (entryPoint, owner, guardians) => {
-  return Wallet.interface.encodeFunctionData("initialize", [
-    entryPoint,
-    owner,
-    guardians,
-  ]);
+module.exports.initialize = (owner, guardians) => {
+  return Wallet.interface.encodeFunctionData("initialize", [owner, guardians]);
 };
 
 module.exports.transferOwner = (newOwner) => {
@@ -52,15 +49,9 @@ module.exports.addEntryPointStake = (value) => {
   return Wallet.interface.encodeFunctionData("executeUserOp", [
     EntryPoint.address,
     value._isBigNumber ? value : ethers.utils.parseEther(value),
-    EntryPoint.interface.encodeFunctionData("addStake"),
-  ]);
-};
-
-module.exports.lockEntryPointStake = () => {
-  return Wallet.interface.encodeFunctionData("executeUserOp", [
-    EntryPoint.address,
-    0,
-    EntryPoint.interface.encodeFunctionData("lockStake"),
+    EntryPoint.interface.encodeFunctionData("addStake", [
+      ethers.BigNumber.from(staking.default_unlock_delay_sec),
+    ]),
   ]);
 };
 

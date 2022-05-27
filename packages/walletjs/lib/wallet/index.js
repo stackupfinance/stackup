@@ -4,7 +4,6 @@ const scrypt = require("scrypt-js");
 const buffer = require("scrypt-js/thirdparty/buffer");
 require("scrypt-js/thirdparty/setImmediate");
 const Utf8 = require("crypto-js/enc-utf8");
-const EntryPoint = require("../contracts/entryPoint");
 const Wallet = require("../contracts/wallet");
 const proxy = require("./proxy");
 
@@ -34,7 +33,7 @@ module.exports.decryptSigner = async (wallet, password, salt) => {
       wallet.encryptedSigner,
       Buffer.from(passwordKey).toString("hex")
     ).toString(Utf8);
-    if (!privateKey) return;
+    if (!ethers.utils.isBytesLike(privateKey)) return;
 
     return new ethers.Wallet(privateKey);
   } catch (error) {
@@ -74,12 +73,10 @@ module.exports.createRandom = async (password, salt, opts = {}) => {
   const signer = new ethers.Wallet(ethers.utils.randomBytes(32));
 
   const initImplementation = Wallet.address;
-  const initEntryPoint = EntryPoint.address;
   const initOwner = signer.address;
   const initGuardians = opts.guardians ?? [];
   const walletAddress = proxy.getAddress(
     initImplementation,
-    initEntryPoint,
     initOwner,
     initGuardians
   );
@@ -87,7 +84,6 @@ module.exports.createRandom = async (password, salt, opts = {}) => {
   return {
     walletAddress,
     initImplementation,
-    initEntryPoint,
     initOwner,
     initGuardians,
     salt,

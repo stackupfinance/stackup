@@ -1,6 +1,6 @@
 const { ethers } = require("ethers");
 const { createRandom, decryptSigner, reencryptSigner } = require(".");
-const { Wallet, EntryPoint } = require("../contracts");
+const { Wallet } = require("../contracts");
 
 const ADDRESS_REGEX = /^0x[a-fA-F0-9]{40}$/;
 const BASE64_REGEX =
@@ -15,7 +15,6 @@ describe("Wallet", () => {
 
       expect(wallet.walletAddress).toMatch(ADDRESS_REGEX);
       expect(wallet.initImplementation).toEqual(Wallet.address);
-      expect(wallet.initEntryPoint).toEqual(EntryPoint.address);
       expect(wallet.initOwner).toMatch(ADDRESS_REGEX);
       expect(wallet.initGuardians.length).toEqual(1);
       expect(wallet.initGuardians[0]).toEqual(ethers.constants.AddressZero);

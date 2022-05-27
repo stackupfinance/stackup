@@ -5,6 +5,9 @@ declare const stackupfinance__walletjs: {
     ERC1271: {
       magicValue: string;
     };
+    staking: {
+      default_unlock_delay_sec: number;
+    };
     userOperations: {
       defaultGas: number;
       defaultMaxFee: number;
@@ -61,8 +64,105 @@ declare const stackupfinance__walletjs: {
         encodeFilterTopics: any;
         encodeFunctionData: any;
         encodeFunctionResult: any;
-        errors: {};
-        events: {};
+        errors: {
+          "FailedOp(uint256,string)": {
+            format: any;
+            inputs: {
+              arrayChildren: any;
+              arrayLength: any;
+              baseType: string;
+              components: any;
+              format: any;
+              indexed: any;
+              name: string;
+              type: string;
+            }[];
+            name: string;
+            type: string;
+          };
+        };
+        events: {
+          "Deposited(address,uint256)": {
+            anonymous: boolean;
+            format: any;
+            inputs: {
+              arrayChildren: any;
+              arrayLength: any;
+              baseType: string;
+              components: any;
+              format: any;
+              indexed: boolean;
+              name: string;
+              type: string;
+            }[];
+            name: string;
+            type: string;
+          };
+          "StakeLocked(address,uint256,uint256)": {
+            anonymous: boolean;
+            format: any;
+            inputs: {
+              arrayChildren: any;
+              arrayLength: any;
+              baseType: string;
+              components: any;
+              format: any;
+              indexed: boolean;
+              name: string;
+              type: string;
+            }[];
+            name: string;
+            type: string;
+          };
+          "StakeUnlocked(address,uint64)": {
+            anonymous: boolean;
+            format: any;
+            inputs: {
+              arrayChildren: any;
+              arrayLength: any;
+              baseType: string;
+              components: any;
+              format: any;
+              indexed: boolean;
+              name: string;
+              type: string;
+            }[];
+            name: string;
+            type: string;
+          };
+          "UserOperationExecuted(address,address,bytes32,bool,bytes)": {
+            anonymous: boolean;
+            format: any;
+            inputs: {
+              arrayChildren: any;
+              arrayLength: any;
+              baseType: string;
+              components: any;
+              format: any;
+              indexed: boolean;
+              name: string;
+              type: string;
+            }[];
+            name: string;
+            type: string;
+          };
+          "Withdrawn(address,address,uint256,uint256)": {
+            anonymous: boolean;
+            format: any;
+            inputs: {
+              arrayChildren: any;
+              arrayLength: any;
+              baseType: string;
+              components: any;
+              format: any;
+              indexed: boolean;
+              name: string;
+              type: string;
+            }[];
+            name: string;
+            type: string;
+          };
+        };
         format: any;
         fragments: {
           format: any;
@@ -83,13 +183,80 @@ declare const stackupfinance__walletjs: {
           type: string;
         }[];
         functions: {
-          "addStake()": {
+          "addStake(uint32)": {
             constant: boolean;
             format: any;
             gas: any;
-            inputs: any[];
+            inputs: {
+              arrayChildren: any;
+              arrayLength: any;
+              baseType: string;
+              components: any;
+              format: any;
+              indexed: any;
+              name: string;
+              type: string;
+            }[];
             name: string;
             outputs: any[];
+            payable: boolean;
+            stateMutability: string;
+            type: string;
+          };
+          "balanceOf(address)": {
+            constant: boolean;
+            format: any;
+            gas: any;
+            inputs: {
+              arrayChildren: any;
+              arrayLength: any;
+              baseType: string;
+              components: any;
+              format: any;
+              indexed: any;
+              name: string;
+              type: string;
+            }[];
+            name: string;
+            outputs: {
+              arrayChildren: any;
+              arrayLength: any;
+              baseType: string;
+              components: any;
+              format: any;
+              indexed: any;
+              name: any;
+              type: string;
+            }[];
+            payable: boolean;
+            stateMutability: string;
+            type: string;
+          };
+          "canWithdraw(address)": {
+            constant: boolean;
+            format: any;
+            gas: any;
+            inputs: {
+              arrayChildren: any;
+              arrayLength: any;
+              baseType: string;
+              components: any;
+              format: any;
+              indexed: any;
+              name: string;
+              type: string;
+            }[];
+            name: string;
+            outputs: {
+              arrayChildren: any;
+              arrayLength: any;
+              baseType: string;
+              components: any;
+              format: any;
+              indexed: any;
+              name: any;
+              type: string;
+            }[];
             payable: boolean;
             stateMutability: string;
             type: string;
@@ -114,7 +281,141 @@ declare const stackupfinance__walletjs: {
             stateMutability: string;
             type: string;
           };
-          "getStake(address)": {
+          "depositTo(address)": {
+            constant: boolean;
+            format: any;
+            gas: any;
+            inputs: {
+              arrayChildren: any;
+              arrayLength: any;
+              baseType: string;
+              components: any;
+              format: any;
+              indexed: any;
+              name: string;
+              type: string;
+            }[];
+            name: string;
+            outputs: any[];
+            payable: boolean;
+            stateMutability: string;
+            type: string;
+          };
+          "getDeposit(address)": {
+            constant: boolean;
+            format: any;
+            gas: any;
+            inputs: {
+              arrayChildren: any;
+              arrayLength: any;
+              baseType: string;
+              components: any;
+              format: any;
+              indexed: any;
+              name: string;
+              type: string;
+            }[];
+            name: string;
+            outputs: {
+              arrayChildren: any;
+              arrayLength: any;
+              baseType: string;
+              components: {
+                arrayChildren: any;
+                arrayLength: any;
+                baseType: string;
+                components: any;
+                format: any;
+                indexed: any;
+                name: string;
+                type: string;
+              }[];
+              format: any;
+              indexed: any;
+              name: any;
+              type: string;
+            }[];
+            payable: boolean;
+            stateMutability: string;
+            type: string;
+          };
+          "getGasPrice((address,uint256,bytes,bytes,uint256,uint256,uint256,uint256,uint256,address,bytes,bytes))": {
+            constant: boolean;
+            format: any;
+            gas: any;
+            inputs: {
+              arrayChildren: any;
+              arrayLength: any;
+              baseType: string;
+              components: {
+                arrayChildren: any;
+                arrayLength: any;
+                baseType: string;
+                components: any;
+                format: any;
+                indexed: any;
+                name: string;
+                type: string;
+              }[];
+              format: any;
+              indexed: any;
+              name: string;
+              type: string;
+            }[];
+            name: string;
+            outputs: {
+              arrayChildren: any;
+              arrayLength: any;
+              baseType: string;
+              components: any;
+              format: any;
+              indexed: any;
+              name: any;
+              type: string;
+            }[];
+            payable: boolean;
+            stateMutability: string;
+            type: string;
+          };
+          "getRequiredPrefund((address,uint256,bytes,bytes,uint256,uint256,uint256,uint256,uint256,address,bytes,bytes))": {
+            constant: boolean;
+            format: any;
+            gas: any;
+            inputs: {
+              arrayChildren: any;
+              arrayLength: any;
+              baseType: string;
+              components: {
+                arrayChildren: any;
+                arrayLength: any;
+                baseType: string;
+                components: any;
+                format: any;
+                indexed: any;
+                name: string;
+                type: string;
+              }[];
+              format: any;
+              indexed: any;
+              name: string;
+              type: string;
+            }[];
+            name: string;
+            outputs: {
+              arrayChildren: any;
+              arrayLength: any;
+              baseType: string;
+              components: any;
+              format: any;
+              indexed: any;
+              name: any;
+              type: string;
+            }[];
+            payable: boolean;
+            stateMutability: string;
+            type: string;
+          };
+          "getSenderAddress(bytes,uint256)": {
             constant: boolean;
             format: any;
             gas: any;
@@ -136,7 +437,7 @@ declare const stackupfinance__walletjs: {
               components: any;
               format: any;
               indexed: any;
-              name: string;
+              name: any;
               type: string;
             }[];
             payable: boolean;
@@ -190,13 +491,127 @@ declare const stackupfinance__walletjs: {
             stateMutability: string;
             type: string;
           };
-          "lockStake()": {
+          "hasDeposited(address,uint256)": {
             constant: boolean;
             format: any;
             gas: any;
-            inputs: any[];
+            inputs: {
+              arrayChildren: any;
+              arrayLength: any;
+              baseType: string;
+              components: any;
+              format: any;
+              indexed: any;
+              name: string;
+              type: string;
+            }[];
             name: string;
-            outputs: any[];
+            outputs: {
+              arrayChildren: any;
+              arrayLength: any;
+              baseType: string;
+              components: any;
+              format: any;
+              indexed: any;
+              name: any;
+              type: string;
+            }[];
+            payable: boolean;
+            stateMutability: string;
+            type: string;
+          };
+          "isStaked(address)": {
+            constant: boolean;
+            format: any;
+            gas: any;
+            inputs: {
+              arrayChildren: any;
+              arrayLength: any;
+              baseType: string;
+              components: any;
+              format: any;
+              indexed: any;
+              name: string;
+              type: string;
+            }[];
+            name: string;
+            outputs: {
+              arrayChildren: any;
+              arrayLength: any;
+              baseType: string;
+              components: any;
+              format: any;
+              indexed: any;
+              name: any;
+              type: string;
+            }[];
+            payable: boolean;
+            stateMutability: string;
+            type: string;
+          };
+          "isUnstaking(address)": {
+            constant: boolean;
+            format: any;
+            gas: any;
+            inputs: {
+              arrayChildren: any;
+              arrayLength: any;
+              baseType: string;
+              components: any;
+              format: any;
+              indexed: any;
+              name: string;
+              type: string;
+            }[];
+            name: string;
+            outputs: {
+              arrayChildren: any;
+              arrayLength: any;
+              baseType: string;
+              components: any;
+              format: any;
+              indexed: any;
+              name: any;
+              type: string;
+            }[];
+            payable: boolean;
+            stateMutability: string;
+            type: string;
+          };
+          "simulateValidation((address,uint256,bytes,bytes,uint256,uint256,uint256,uint256,uint256,address,bytes,bytes))": {
+            constant: boolean;
+            format: any;
+            gas: any;
+            inputs: {
+              arrayChildren: any;
+              arrayLength: any;
+              baseType: string;
+              components: {
+                arrayChildren: any;
+                arrayLength: any;
+                baseType: string;
+                components: any;
+                format: any;
+                indexed: any;
+                name: string;
+                type: string;
+              }[];
+              format: any;
+              indexed: any;
+              name: string;
+              type: string;
+            }[];
+            name: string;
+            outputs: {
+              arrayChildren: any;
+              arrayLength: any;
+              baseType: string;
+              components: any;
+              format: any;
+              indexed: any;
+              name: string;
+              type: string;
+            }[];
             payable: boolean;
             stateMutability: string;
             type: string;
@@ -212,7 +627,47 @@ declare const stackupfinance__walletjs: {
             stateMutability: string;
             type: string;
           };
+          "unstakeDelaySec()": {
+            constant: boolean;
+            format: any;
+            gas: any;
+            inputs: any[];
+            name: string;
+            outputs: {
+              arrayChildren: any;
+              arrayLength: any;
+              baseType: string;
+              components: any;
+              format: any;
+              indexed: any;
+              name: any;
+              type: string;
+            }[];
+            payable: boolean;
+            stateMutability: string;
+            type: string;
+          };
           "withdrawStake(address)": {
+            constant: boolean;
+            format: any;
+            gas: any;
+            inputs: {
+              arrayChildren: any;
+              arrayLength: any;
+              baseType: string;
+              components: any;
+              format: any;
+              indexed: any;
+              name: string;
+              type: string;
+            }[];
+            name: string;
+            outputs: any[];
+            payable: boolean;
+            stateMutability: string;
+            type: string;
+          };
+          "withdrawTo(address,uint256)": {
             constant: boolean;
             format: any;
             gas: any;
@@ -577,7 +1032,16 @@ declare const stackupfinance__walletjs: {
         deploy: {
           format: any;
           gas: any;
-          inputs: any[];
+          inputs: {
+            arrayChildren: any;
+            arrayLength: any;
+            baseType: string;
+            components: any;
+            format: any;
+            indexed: any;
+            name: string;
+            type: string;
+          }[];
           name: any;
           payable: boolean;
           stateMutability: string;
@@ -608,6 +1072,22 @@ declare const stackupfinance__walletjs: {
             type: string;
           };
           "BeaconUpgraded(address)": {
+            anonymous: boolean;
+            format: any;
+            inputs: {
+              arrayChildren: any;
+              arrayLength: any;
+              baseType: string;
+              components: any;
+              format: any;
+              indexed: boolean;
+              name: string;
+              type: string;
+            }[];
+            name: string;
+            type: string;
+          };
+          "Initialized(uint8)": {
             anonymous: boolean;
             format: any;
             inputs: {
@@ -692,7 +1172,16 @@ declare const stackupfinance__walletjs: {
         fragments: {
           format: any;
           gas: any;
-          inputs: any[];
+          inputs: {
+            arrayChildren: any;
+            arrayLength: any;
+            baseType: string;
+            components: any;
+            format: any;
+            indexed: any;
+            name: string;
+            type: string;
+          }[];
           name: any;
           payable: boolean;
           stateMutability: string;
@@ -848,7 +1337,27 @@ declare const stackupfinance__walletjs: {
             stateMutability: string;
             type: string;
           };
-          "getGuardianCount()": {
+          "getGuardiansCount()": {
+            constant: boolean;
+            format: any;
+            gas: any;
+            inputs: any[];
+            name: string;
+            outputs: {
+              arrayChildren: any;
+              arrayLength: any;
+              baseType: string;
+              components: any;
+              format: any;
+              indexed: any;
+              name: any;
+              type: string;
+            }[];
+            payable: boolean;
+            stateMutability: string;
+            type: string;
+          };
+          "getMinGuardiansSignatures()": {
             constant: boolean;
             format: any;
             gas: any;
@@ -897,7 +1406,7 @@ declare const stackupfinance__walletjs: {
             stateMutability: string;
             type: string;
           };
-          "getOwnerCount()": {
+          "getOwnersCount()": {
             constant: boolean;
             format: any;
             gas: any;
@@ -1073,7 +1582,7 @@ declare const stackupfinance__walletjs: {
             stateMutability: string;
             type: string;
           };
-          "initialize(address,address,address[])": {
+          "initialize(address,address[])": {
             constant: boolean;
             format: any;
             gas: any;
@@ -1089,6 +1598,93 @@ declare const stackupfinance__walletjs: {
             }[];
             name: string;
             outputs: any[];
+            payable: boolean;
+            stateMutability: string;
+            type: string;
+          };
+          "isGuardian(address)": {
+            constant: boolean;
+            format: any;
+            gas: any;
+            inputs: {
+              arrayChildren: any;
+              arrayLength: any;
+              baseType: string;
+              components: any;
+              format: any;
+              indexed: any;
+              name: string;
+              type: string;
+            }[];
+            name: string;
+            outputs: {
+              arrayChildren: any;
+              arrayLength: any;
+              baseType: string;
+              components: any;
+              format: any;
+              indexed: any;
+              name: any;
+              type: string;
+            }[];
+            payable: boolean;
+            stateMutability: string;
+            type: string;
+          };
+          "isOwner(address)": {
+            constant: boolean;
+            format: any;
+            gas: any;
+            inputs: {
+              arrayChildren: any;
+              arrayLength: any;
+              baseType: string;
+              components: any;
+              format: any;
+              indexed: any;
+              name: string;
+              type: string;
+            }[];
+            name: string;
+            outputs: {
+              arrayChildren: any;
+              arrayLength: any;
+              baseType: string;
+              components: any;
+              format: any;
+              indexed: any;
+              name: any;
+              type: string;
+            }[];
+            payable: boolean;
+            stateMutability: string;
+            type: string;
+          };
+          "isSenderAllowed(address)": {
+            constant: boolean;
+            format: any;
+            gas: any;
+            inputs: {
+              arrayChildren: any;
+              arrayLength: any;
+              baseType: string;
+              components: any;
+              format: any;
+              indexed: any;
+              name: string;
+              type: string;
+            }[];
+            name: string;
+            outputs: {
+              arrayChildren: any;
+              arrayLength: any;
+              baseType: string;
+              components: any;
+              format: any;
+              indexed: any;
+              name: any;
+              type: string;
+            }[];
             payable: boolean;
             stateMutability: string;
             type: string;
@@ -1331,7 +1927,7 @@ declare const stackupfinance__walletjs: {
             stateMutability: string;
             type: string;
           };
-          "validatePaymasterUserOp((address,uint256,bytes,bytes,uint256,uint256,uint256,uint256,uint256,address,bytes,bytes),uint256)": {
+          "validatePaymasterUserOp((address,uint256,bytes,bytes,uint256,uint256,uint256,uint256,uint256,address,bytes,bytes),bytes32,uint256)": {
             constant: boolean;
             format: any;
             gas: any;
@@ -1428,7 +2024,6 @@ declare const stackupfinance__walletjs: {
       executeUserOp: any;
       grantGuardian: any;
       initialize: any;
-      lockEntryPointStake: any;
       revokeGuardian: any;
       transferOwner: any;
       upgradeTo: any;
