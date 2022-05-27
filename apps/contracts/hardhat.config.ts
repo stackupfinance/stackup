@@ -20,14 +20,14 @@ const config: HardhatUserConfig = {
   },
   networks: {
     mumbai: {
-      url: process.env.STACKUP_CONTRACTS_MUMBAI_RPC,
+      url: process.env.STACKUP_CONTRACTS_MUMBAI_RPC || "",
       chainId: 80001,
       accounts: {
         mnemonic: process.env.STACKUP_CONTRACTS_MNEMONIC || "",
       },
     },
     polygon: {
-      url: process.env.STACKUP_CONTRACTS_POLYGON_RPC,
+      url: process.env.STACKUP_CONTRACTS_POLYGON_RPC || "",
       chainId: 137,
       accounts: {
         mnemonic: process.env.STACKUP_CONTRACTS_MNEMONIC || "",
@@ -35,7 +35,7 @@ const config: HardhatUserConfig = {
     },
   },
   etherscan: {
-    apiKey: process.env.STACKUP_CONTRACTS_POLYGONSCAN_API_KEY,
+    apiKey: process.env.STACKUP_CONTRACTS_POLYGONSCAN_API_KEY || "",
   },
 };
 
