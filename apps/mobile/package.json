@@ -59,7 +59,7 @@
     "eslint": "^7.32.0",
     "eslint-plugin-unused-imports": "^2.0.0",
     "jest": "^28.1.0",
-    "metro-react-native-babel-preset": "^0.70.3",
+    "metro-react-native-babel-preset": "^0.71.0",
     "prettier": "2.6.2",
     "react-native-monorepo-tools": "^1.1.4",
     "react-native-version": "^4.0.0",
