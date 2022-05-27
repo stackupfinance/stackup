@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import {
+  Actionsheet,
   Box,
   Heading,
   Button,
@@ -8,6 +9,7 @@ import {
   VStack,
   useColorMode,
   useTheme,
+  useDisclose,
 } from 'native-base';
 import type {CompositeScreenProps} from '@react-navigation/native';
 import type {MaterialTopTabScreenProps} from '@react-navigation/material-top-tabs';
@@ -15,6 +17,7 @@ import type {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {RootStackParamList, HomeTabParamList} from '../../config';
 import {useRemoveWallet} from '../../hooks';
 import {ScreenContainer, ScreenHeader} from '../../components';
+import Settings from '../../components/Settings';
 import PortfolioBalance from '../../components/PortfolioBalance';
 import List from '../../components/List';
 import {BitcoinAvatar} from '../../../assets/images';
@@ -35,6 +38,7 @@ export default function AssetsScreen({navigation}: Props) {
 
   // temp: for color testing
   const {toggleColorMode} = useColorMode();
+  const {isOpen, onOpen, onClose} = useDisclose();
 
   const {colors} = useTheme();
 
@@ -118,11 +122,8 @@ export default function AssetsScreen({navigation}: Props) {
             Remove wallet
           </Button>
 
-          <Button
-            mb="16px"
-            colorScheme="secondary"
-            onPress={() => navigation.navigate('Settings')}>
-            Settings Overview
+          <Button mb="16px" colorScheme="secondary" onPress={onOpen}>
+            Settings
           </Button>
 
           <Button onPress={toggleColorMode} my="5" py="5">
@@ -138,6 +139,7 @@ export default function AssetsScreen({navigation}: Props) {
           </Button>
         </VStack>
       </Box>
+      <Settings isOpen={isOpen} onClose={onClose} />
     </ScreenContainer>
   );
 }

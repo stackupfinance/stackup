@@ -11,7 +11,7 @@ export default function OverviewScreen({navigation}: Props) {
     <ScreenContainer>
       <ScreenHeader>
         <Heading fontSize="16px" fontFamily="heading">
-          Security
+          Settings
         </Heading>
       </ScreenHeader>
       <Box justifyContent="center">
