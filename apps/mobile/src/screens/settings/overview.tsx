@@ -21,7 +21,9 @@ export default function OverviewScreen({navigation}: Props) {
           <Button>Help &amp; Support</Button>
           <Button>Join Stackup Community</Button>
         </VStack>
-        <Button mx="4" my="4" onPress={() => navigation.goBack()}>Back to Home</Button>
+        <Button mx="4" my="4" onPress={() => navigation.goBack()}>
+          Back to Home
+        </Button>
       </Box>
     </ScreenContainer>
   );

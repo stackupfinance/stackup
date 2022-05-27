@@ -8,7 +8,10 @@ export const ScreenContainer = ({
 }: PropsWithChildren<{}>): ReactElement => {
   const statusBarHeight = getStatusBarHeight(true);
   return (
-    <Box flex={1} mt={statusBarHeight + px2dp(53)} bg={useColorModeValue("warmGray.50", "background.1")}>
+    <Box
+      flex={1}
+      mt={statusBarHeight + px2dp(53)}
+      bg={useColorModeValue('warmGray.50', 'background.1')}>
       {children}
     </Box>
   );

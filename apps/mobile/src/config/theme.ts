@@ -51,13 +51,13 @@ export const AppColors = {
     3: '#aab3c4',
     4: '#7d829c',
     5: '#636882',
-    6: '#1ED759'
+    6: '#1ED759',
   },
 };
 
 export const NativeBaseTheme = extendTheme({
   useSystemColorMode: false,
-  initialColorMode: "dark",
+  initialColorMode: 'dark',
   colors: {
     primary: AppColors.palettes.primary,
     secondary: AppColors.palettes.secondary,

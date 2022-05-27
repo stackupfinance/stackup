@@ -1,5 +1,14 @@
 import React, {useState} from 'react';
-import {Box, Heading, Button, Text, HStack, VStack, useColorMode, useTheme} from 'native-base';
+import {
+  Box,
+  Heading,
+  Button,
+  Text,
+  HStack,
+  VStack,
+  useColorMode,
+  useTheme,
+} from 'native-base';
 import type {CompositeScreenProps} from '@react-navigation/native';
 import type {MaterialTopTabScreenProps} from '@react-navigation/material-top-tabs';
 import type {NativeStackScreenProps} from '@react-navigation/native-stack';
@@ -25,11 +34,9 @@ export default function AssetsScreen({navigation}: Props) {
   const {openMessenger} = useIntercomStoreSettingsSelector();
 
   // temp: for color testing
-  const {
-    toggleColorMode
-  } = useColorMode();
+  const {toggleColorMode} = useColorMode();
 
-  const { colors } = useTheme();
+  const {colors} = useTheme();
 
   // PortfolioBalance props
   const [balanceIsHidden, setBalanceIsHidden] = useState(false);
@@ -37,32 +44,32 @@ export default function AssetsScreen({navigation}: Props) {
 
   // List props
   const tokenData = [
-    { 
+    {
       name: 'Bitcoin',
       id: '1',
       value: '1.332 BTC',
       valueUSDC: '$52,472',
       percentChange: '19',
       valueChange: '9230',
-      imgSrc: BitcoinAvatar
+      imgSrc: BitcoinAvatar,
     },
-    { 
+    {
       name: 'Ethereum',
       id: '2',
       value: '8.123 ETH',
       valueUSDC: '$20,504',
       percentChange: '-10',
       valueChange: '-2050',
-      imgSrc: EthereumAvatar
+      imgSrc: EthereumAvatar,
     },
-    { 
+    {
       name: 'USDC',
       id: '3',
       value: '24,300 USDC',
       valueUSDC: '$24,180',
       percentChange: '40',
       valueChange: '10000',
-      imgSrc: USDCAvatar
+      imgSrc: USDCAvatar,
     },
   ];
 
@@ -72,12 +79,11 @@ export default function AssetsScreen({navigation}: Props) {
         <Heading fontSize="16px" fontFamily="heading">
           Assets
         </Heading>
-
       </ScreenHeader>
 
       <Box>
-        <PortfolioBalance 
-          balance={96147.47} 
+        <PortfolioBalance
+          balance={96147.47}
           valueChange={21170}
           changePercent={22}
           isHidden={balanceIsHidden}
@@ -85,16 +91,25 @@ export default function AssetsScreen({navigation}: Props) {
         />
 
         <HStack mx="4" space={3} justifyContent="center">
-          <Button _text={{ fontWeight: "700" }} my="5" py="5" width="50%">Deposit</Button>
-          <Button _text={{ fontWeight: "700" }} my="5" py="5" width="50%">Send</Button>
+          <Button _text={{fontWeight: '700'}} my="5" py="5" width="50%">
+            Deposit
+          </Button>
+          <Button _text={{fontWeight: '700'}} my="5" py="5" width="50%">
+            Send
+          </Button>
         </HStack>
 
         <List data={tokenData} title="Token List" />
 
         <HStack my="4" justifyContent="center">
-          <FontAwesomeIcon icon={faSliders} style={ /* @ts-ignore */
-            { color: colors.text[4] }
-          } size={20} />
+          <FontAwesomeIcon
+            icon={faSliders}
+            style={{
+              /* @ts-ignore */
+              color: colors.text[4],
+            }}
+            size={20}
+          />
           <Text mx="4">Manage token list</Text>
         </HStack>
 
@@ -102,7 +117,7 @@ export default function AssetsScreen({navigation}: Props) {
           <Button colorScheme="tertiary" onPress={removeWallet}>
             Remove wallet
           </Button>
-          
+
           <Button
             mb="16px"
             colorScheme="secondary"
@@ -123,7 +138,6 @@ export default function AssetsScreen({navigation}: Props) {
           </Button>
         </VStack>
       </Box>
-
     </ScreenContainer>
   );
 }
