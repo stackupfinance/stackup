@@ -1,8 +1,0 @@
-/*
-* Fix 'jumping scrollbar' issue using only CSS
-* From https://aykevl.nl/2014/09/fix-jumping-scrollbar
-*/
-html {
-  width: 100vw;
-  overflow-x: hidden;
-}

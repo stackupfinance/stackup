@@ -1,8 +1,0 @@
-node_modules
-public
-.next
-.*ignore
-.DS_Store
-*.env*
-.gitkeep
-sentry.properties
