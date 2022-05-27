@@ -51,6 +51,7 @@ export const AppColors = {
     3: '#aab3c4',
     4: '#7d829c',
     5: '#636882',
+    6: '#1ED759'
   },
 };
 

@@ -4,9 +4,9 @@ import {
   FlatList,
   Text,
 } from "native-base";
-import ListItem from '../ListItem';
-import AssetListItemDetails from '../AssetListItemDetails';
-import { TokenListItem, NFTListItem } from '../../types/Assets';
+import ListItem from './ListItem';
+import AssetListItemDetails from './AssetListItemDetails';
+import { TokenListItem, NFTListItem } from '../types/Assets';
 
 type ListItemType = TokenListItem | NFTListItem;
 

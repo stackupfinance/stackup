@@ -15,7 +15,6 @@ import {USDCAvatar} from '../../../assets/images';
 import {SlidersIcon} from '../../../assets/images';
 import {useIntercomStoreSettingsSelector} from '../../state';
 
-
 type Props = CompositeScreenProps<
   MaterialTopTabScreenProps<HomeTabParamList, 'Assets'>,
   NativeStackScreenProps<RootStackParamList>
@@ -50,8 +49,8 @@ export default function AssetsScreen({navigation}: Props) {
       id: '2',
       value: '8.123 ETH',
       valueUSDC: '$20,504',
-      percentChange: '10',
-      valueChange: '2050',
+      percentChange: '-10',
+      valueChange: '-2050',
       imgSrc: EthereumAvatar
     },
     { 
