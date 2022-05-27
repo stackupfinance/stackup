@@ -1,8 +1,11 @@
 import fs from "fs/promises";
 import path from "path";
 import prettier from "prettier";
+// @ts-ignore
 import EntryPoint from "../../artifacts/contracts/entrypoint/EntryPoint.sol/EntryPoint.json";
+// @ts-ignore
 import Wallet from "../../artifacts/contracts/wallet/Wallet.sol/Wallet.json";
+// @ts-ignore
 import WalletProxy from "../../artifacts/contracts/wallet/WalletProxy.sol/WalletProxy.json";
 
 async function main() {

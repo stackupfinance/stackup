@@ -33,7 +33,7 @@ module.exports.decryptSigner = async (wallet, password, salt) => {
       wallet.encryptedSigner,
       Buffer.from(passwordKey).toString("hex")
     ).toString(Utf8);
-    if (!privateKey) return;
+    if (!ethers.utils.isBytesLike(privateKey)) return;
 
     return new ethers.Wallet(privateKey);
   } catch (error) {
