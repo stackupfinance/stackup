@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {Box, Heading, Button, Image, Text, HStack, VStack, useColorMode} from 'native-base';
+import {Box, Heading, Button, Text, HStack, VStack, useColorMode, useTheme} from 'native-base';
 import type {CompositeScreenProps} from '@react-navigation/native';
 import type {MaterialTopTabScreenProps} from '@react-navigation/material-top-tabs';
 import type {NativeStackScreenProps} from '@react-navigation/native-stack';
@@ -10,9 +10,9 @@ import PortfolioBalance from '../../components/PortfolioBalance';
 import List from '../../components/List';
 import {BitcoinAvatar} from '../../../assets/images';
 import {EthereumAvatar} from '../../../assets/images';
-import {MaticAvatar} from '../../../assets/images';
 import {USDCAvatar} from '../../../assets/images';
-import {SlidersIcon} from '../../../assets/images';
+import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
+import {faSliders} from '@fortawesome/free-solid-svg-icons/faSliders';
 import {useIntercomStoreSettingsSelector} from '../../state';
 
 type Props = CompositeScreenProps<
@@ -28,6 +28,8 @@ export default function AssetsScreen({navigation}: Props) {
   const {
     toggleColorMode
   } = useColorMode();
+
+  const { colors } = useTheme();
 
   // PortfolioBalance props
   const [balanceIsHidden, setBalanceIsHidden] = useState(false);
@@ -90,14 +92,9 @@ export default function AssetsScreen({navigation}: Props) {
         <List data={tokenData} title="Token List" />
 
         <HStack my="4" justifyContent="center">
-          <Image 
-            source={SlidersIcon}
-            alt="Manage token list"
-            size="xl" 
-            width="20px"
-            height="15px"
-            mt={1}
-          />
+          <FontAwesomeIcon icon={faSliders} style={ /* @ts-ignore */
+            { color: colors.text[4] }
+          } size={20} />
           <Text mx="4">Manage token list</Text>
         </HStack>
 
