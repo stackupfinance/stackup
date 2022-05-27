@@ -15,11 +15,7 @@ import {
   OnboardScreen,
   SplashScreen,
 } from './src/screens';
-import {
-  RootStackParamList,
-  NativeBaseTheme,
-  NavigationTheme,
-} from './src/config';
+import {RootStackParamList, NativeBaseTheme} from './src/config';
 import {useAuth} from './src/hooks';
 import {useNavigationStoreAppSelector} from './src/state';
 
@@ -46,7 +42,6 @@ function App() {
       {isReady ? (
         <NavigationContainer
           ref={navigation}
-          theme={NavigationTheme}
           initialState={initialNavigationState}
           onStateChange={setInitialNavigationState}
           onReady={() => {
