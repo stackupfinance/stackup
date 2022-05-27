@@ -1,11 +1,15 @@
 const { ethers } = require("ethers");
 const SingletonFactory = require("./singletonFactory");
 const source = require("./source/EntryPoint.json");
+const { staking } = require("../constants");
 
 const _deployInitCode = new ethers.ContractFactory(
   source.abi,
   source.bytecode
-).getDeployTransaction(SingletonFactory.address).data;
+).getDeployTransaction(
+  SingletonFactory.address,
+  staking.default_unlock_delay_sec
+).data;
 
 const _deploySalt = ethers.utils.formatBytes32String(0);
 

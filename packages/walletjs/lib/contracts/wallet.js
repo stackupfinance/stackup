@@ -1,11 +1,12 @@
 const { ethers } = require("ethers");
 const SingletonFactory = require("./singletonFactory");
+const EntryPoint = require("./entryPoint");
 const source = require("./source/Wallet.json");
 
 const _deployInitCode = new ethers.ContractFactory(
   source.abi,
   source.bytecode
-).getDeployTransaction().data;
+).getDeployTransaction(EntryPoint.address).data;
 
 const _deploySalt = ethers.utils.formatBytes32String(0);
 

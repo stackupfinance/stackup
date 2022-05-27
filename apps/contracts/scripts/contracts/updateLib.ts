@@ -1,9 +1,9 @@
-const fs = require("fs").promises;
-const path = require("path");
-const prettier = require("prettier");
-const EntryPoint = require("../../artifacts/contracts/ERC4337/EntryPoint.sol/EntryPoint.json");
-const WalletProxy = require("../../artifacts/contracts/ERC4337/WalletProxy.sol/WalletProxy.json");
-const Wallet = require("../../artifacts/contracts/ERC4337/Wallet.sol/Wallet.json");
+import fs from "fs/promises";
+import path from "path";
+import prettier from "prettier";
+import EntryPoint from "../../artifacts/contracts/entrypoint/EntryPoint.sol/EntryPoint.json";
+import Wallet from "../../artifacts/contracts/wallet/Wallet.sol/Wallet.json";
+import WalletProxy from "../../artifacts/contracts/wallet/WalletProxy.sol/WalletProxy.json";
 
 async function main() {
   return Promise.all([

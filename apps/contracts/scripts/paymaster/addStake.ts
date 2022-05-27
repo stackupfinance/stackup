@@ -1,16 +1,12 @@
-const { ethers } = require("hardhat");
-const { contracts, wallet, constants } = require("@stackupfinance/walletjs");
+import { ethers } from "hardhat";
+import { contracts, wallet, constants } from "@stackupfinance/walletjs";
 
 async function main() {
   const [signer] = await ethers.getSigners();
-  const init = [
-    contracts.Wallet.address,
-    contracts.EntryPoint.address,
-    signer.address,
-    [],
-  ];
+  const init = [contracts.Wallet.address, signer.address, []];
 
-  const paymaster = process.env.PAYMASTER ?? wallet.proxy.getAddress(...init);
+  const paymaster =
+    process.env.STACKUP_CONTRACTS_PAYMASTER ?? wallet.proxy.getAddress(...init);
   const isDeployed = await wallet.proxy.isCodeDeployed(
     ethers.provider,
     paymaster
@@ -23,17 +19,12 @@ async function main() {
       signer,
       wallet.userOperations.get(paymaster, {
         nonce,
+        verificationGas:
+          constants.userOperations.defaultGas * (isDeployed ? 1 : 3),
         initCode: isDeployed
           ? constants.userOperations.nullCode
           : wallet.proxy.getInitCode(...init),
         callData: wallet.encodeFunctionData.addEntryPointStake("1"),
-      })
-    ),
-    wallet.userOperations.sign(
-      signer,
-      wallet.userOperations.get(paymaster, {
-        nonce: nonce + 1,
-        callData: wallet.encodeFunctionData.lockEntryPointStake(),
       })
     ),
   ]).then((ops) => ops.filter(Boolean));
@@ -50,7 +41,7 @@ async function main() {
       maxFeePerGas: constants.userOperations.defaultMaxFee,
       maxPriorityFeePerGas: constants.userOperations.defaultMaxPriorityFee,
     })
-    .then((tx) => tx.wait());
+    .then((tx: any) => tx.wait());
   console.log("Paymaster add stake transaction:", tx);
   console.log("Paymaster wallet address:", paymaster);
   console.log("EntryPoint address:", contracts.EntryPoint.address);

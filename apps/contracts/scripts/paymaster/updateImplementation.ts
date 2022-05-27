@@ -1,8 +1,8 @@
-const { ethers } = require("hardhat");
-const { contracts, wallet, constants } = require("@stackupfinance/walletjs");
+import { ethers } from "hardhat";
+import { contracts, wallet, constants } from "@stackupfinance/walletjs";
 
 async function main() {
-  const paymaster = process.env.PAYMASTER;
+  const paymaster = process.env.STACKUP_CONTRACTS_PAYMASTER;
   if (!paymaster) {
     throw new Error("No wallet address provided.");
   }
@@ -45,7 +45,7 @@ async function main() {
       maxFeePerGas: constants.userOperations.defaultMaxFee,
       maxPriorityFeePerGas: constants.userOperations.defaultMaxPriorityFee,
     })
-    .then((tx) => tx.wait());
+    .then((tx: any) => tx.wait());
   console.log("upgradeTo transaction:", tx);
   console.log("Paymaster new implementation:", contracts.Wallet.address);
 }

@@ -1,7 +1,7 @@
 const { ethers } = require("ethers");
 
 const _defaultGas = 215000;
-const _defaultMaxFee = 50000000000;
+const _defaultMaxFee = 50000000000; // 50 Gwei
 const _initNonce = 0;
 const _nullCode = "0x";
 
