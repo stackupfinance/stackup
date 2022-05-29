@@ -5,7 +5,7 @@ export const ScreenHeader = ({
   children,
 }: PropsWithChildren<{}>): ReactElement => {
   return (
-    <HStack justifyContent="space-around" alignItems="center">
+    <HStack justifyContent="space-between" alignItems="center">
       {children}
     </HStack>
   );

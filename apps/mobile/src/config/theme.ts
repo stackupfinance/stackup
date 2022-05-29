@@ -59,6 +59,11 @@ export const AppColors = {
     4: '#7d829c',
     5: '#636882',
   },
+  singletons: {
+    good: '#1ed759',
+    medium: '#e77f05',
+    warning: '#ed4245',
+  },
 };
 
 export const NativeBaseTheme = extendTheme({
@@ -66,6 +71,8 @@ export const NativeBaseTheme = extendTheme({
     primary: AppColors.palettes.primary,
     secondary: AppColors.palettes.secondary,
     tertiary: AppColors.palettes.tertiary,
+    background: AppColors.background,
+    text: AppColors.text,
   },
   fontConfig: {
     Inter: {
