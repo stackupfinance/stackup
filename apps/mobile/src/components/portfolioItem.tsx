@@ -1,16 +1,14 @@
 import React, {PropsWithChildren} from 'react';
-import {ImageSourcePropType} from 'react-native';
 import {HStack, VStack, Text} from 'native-base';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faArrowTrendUp} from '@fortawesome/free-solid-svg-icons/faArrowTrendUp';
 import {faArrowTrendDown} from '@fortawesome/free-solid-svg-icons/faArrowTrendDown';
 import {ethers, BigNumberish} from 'ethers';
-import {ListItem} from './listItem';
+import {BaseItem} from './baseItem';
 import {AppColors, CurrencySymbols, CurrencyMeta} from '../config';
 import {formatCurrency, percentChange} from '../utils/currency';
 
 type Props = {
-  source: ImageSourcePropType;
   currency: CurrencySymbols;
   defaultCurrency: CurrencySymbols;
   balance: BigNumberish;
@@ -20,7 +18,6 @@ type Props = {
 };
 
 export const PortfolioItem = ({
-  source,
   currency,
   defaultCurrency,
   balance,
@@ -49,7 +46,7 @@ export const PortfolioItem = ({
   );
 
   return (
-    <ListItem source={source} alt="test">
+    <BaseItem source={CurrencyMeta[currency].logo} alt="portfolioItem">
       <VStack>
         <HStack justifyContent="space-between" alignItems="center">
           <Text fontSize="16px" fontWeight={500}>
@@ -86,6 +83,6 @@ export const PortfolioItem = ({
           </HStack>
         </HStack>
       </VStack>
-    </ListItem>
+    </BaseItem>
   );
 };

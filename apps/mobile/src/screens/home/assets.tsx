@@ -15,10 +15,8 @@ import {
   List,
   PortfolioBalance,
   PortfolioItem,
-  UsdLogo,
-  EthereumLogo,
-  PolygonLogo,
 } from '../../components';
+import {useNavigationStoreAssetsSelector} from '../../state';
 
 type Props = CompositeScreenProps<
   MaterialTopTabScreenProps<HomeTabParamList, 'Assets'>,
@@ -26,12 +24,13 @@ type Props = CompositeScreenProps<
 >;
 
 export default function AssetsScreen({navigation}: Props) {
+  const {setShowSettingsSheet} = useNavigationStoreAssetsSelector();
   const [isHidden, setIsHidden] = useState<boolean>(false);
 
   return (
     <ScreenContainer>
       <ScreenHeader>
-        <SettingsButton onPress={() => {}} />
+        <SettingsButton onPress={() => setShowSettingsSheet(true)} />
 
         <HomeTabTitle screen="Assets" network="Polygon" />
 
@@ -69,7 +68,6 @@ export default function AssetsScreen({navigation}: Props) {
           <List
             items={[
               <PortfolioItem
-                source={UsdLogo}
                 currency="USDC"
                 defaultCurrency="USDC"
                 balance="10000000000"
@@ -78,7 +76,6 @@ export default function AssetsScreen({navigation}: Props) {
                 isHidden={isHidden}
               />,
               <PortfolioItem
-                source={EthereumLogo}
                 currency="ETH"
                 defaultCurrency="USDC"
                 balance="1860000000000000000"
@@ -87,7 +84,6 @@ export default function AssetsScreen({navigation}: Props) {
                 isHidden={isHidden}
               />,
               <PortfolioItem
-                source={PolygonLogo}
                 currency="MATIC"
                 defaultCurrency="USDC"
                 balance="6240000000000000000"

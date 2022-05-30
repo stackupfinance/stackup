@@ -3,14 +3,20 @@ import {ImageSourcePropType} from 'react-native';
 import {Box, Image, HStack} from 'native-base';
 
 type Props = {
-  source: ImageSourcePropType;
   alt: string;
+  source?: ImageSourcePropType;
+  backgroundColor?: string;
 };
 
-export const ListItem = ({source, alt, children}: PropsWithChildren<Props>) => {
+export const BaseItem = ({
+  source,
+  alt,
+  backgroundColor = 'background.3',
+  children,
+}: PropsWithChildren<Props>) => {
   return (
     <HStack
-      bg="background.3"
+      bg={backgroundColor}
       borderRadius="8px"
       w="100%"
       space="12px"
@@ -18,7 +24,9 @@ export const ListItem = ({source, alt, children}: PropsWithChildren<Props>) => {
       alignItems="center"
       py="13px"
       px="16px">
-      <Image source={source} alt={alt} w="40px" h="40px" />
+      {source ? (
+        <Image source={source} alt={alt} w="40px" h="40px" />
+      ) : undefined}
       <Box flex={1}>{children}</Box>
     </HStack>
   );

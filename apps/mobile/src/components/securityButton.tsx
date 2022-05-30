@@ -11,7 +11,7 @@ type Props = {
 
 export const SecurityButton = ({onPress}: Props) => {
   return (
-    <Pressable onPress={onPress}>
+    <Pressable onPress={onPress} w="22px" h="22px">
       {({isPressed}) => (
         <Box
           w="26px"
