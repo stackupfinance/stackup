@@ -12,7 +12,7 @@ import AssetsScreen from './assets';
 // import EarnScreen from './earn';
 // import SwapScreen from './swap';
 // import ActivityScreen from './activity';
-import {SettingsSheet} from '../../components';
+import {SettingsSheet, TokenListSheet} from '../../components';
 import {useRemoveWallet} from '../../hooks';
 import {
   useNavigationStoreHomeSelector,
@@ -22,19 +22,28 @@ import {
 const Tab = createMaterialTopTabNavigator<HomeTabParamList>();
 
 export const HomeScreen = () => {
-  const {showSettingsSheet, setShowSettingsSheet} =
-    useNavigationStoreHomeSelector();
+  const {
+    showSettingsSheet,
+    showTokenListSheet,
+    setShowSettingsSheet,
+    setShowTokenListSheet,
+    resetAllSheets,
+  } = useNavigationStoreHomeSelector();
   const {openMessenger} = useIntercomStoreHomeSelector();
   const removeWallet = useRemoveWallet();
 
   useEffect(() => {
     return () => {
-      setShowSettingsSheet(false);
+      resetAllSheets();
     };
-  }, [setShowSettingsSheet]);
+  }, [resetAllSheets]);
 
   const onCloseSettingsSheet = () => {
     setShowSettingsSheet(false);
+  };
+
+  const onCloseTokenListSheet = () => {
+    setShowTokenListSheet(false);
   };
 
   const onHelpPress = () => {
@@ -90,6 +99,17 @@ export const HomeScreen = () => {
         onHelpPress={onHelpPress}
         onDiscordPress={onDiscordPress}
         onRemoveWalletPress={onRemoveWalletPress}
+      />
+
+      <TokenListSheet
+        isOpen={showTokenListSheet}
+        onClose={onCloseTokenListSheet}
+        onTokenChange={(currency, enabled) => console.log(currency, enabled)}
+        tokenSettings={[
+          {currency: 'USDC', balance: '10000000000', enabled: true},
+          {currency: 'ETH', balance: '1860000000000000000', enabled: true},
+          {currency: 'MATIC', balance: '6240000000000000000', enabled: true},
+        ]}
       />
     </>
   );

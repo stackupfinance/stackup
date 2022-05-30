@@ -5,45 +5,50 @@ import {NavigationState as InitialNavigationState} from '@react-navigation/nativ
 interface NavigationState {
   initialNavigationState: InitialNavigationState | undefined;
   showSettingsSheet: boolean;
-  showSecuritySheet: boolean;
+  showTokenListSheet: boolean;
 
   setInitialNavigationState: (
     state: InitialNavigationState | undefined,
   ) => void;
   setShowSettingsSheet: (value: boolean) => void;
-  toggleSecuritySheet: () => void;
+  setShowTokenListSheet: (value: boolean) => void;
+  resetAllSheets: () => void;
   clear: () => void;
 }
 
 const STORE_NAME = 'stackup-navigation-store';
 const useNavigationStore = create<NavigationState>()(
   devtools(
-    (set, get) => ({
+    set => ({
       initialNavigationState: undefined,
       showSettingsSheet: false,
-      showSecuritySheet: false,
+      showTokenListSheet: false,
 
       setInitialNavigationState: state => {
         set({
           initialNavigationState: state,
           showSettingsSheet: false,
-          showSecuritySheet: false,
+          showTokenListSheet: false,
         });
       },
 
       setShowSettingsSheet: value => {
-        set({showSettingsSheet: value});
+        set({showSettingsSheet: value, showTokenListSheet: false});
       },
 
-      toggleSecuritySheet: () => {
-        set({showSecuritySheet: !get().showSecuritySheet});
+      setShowTokenListSheet: value => {
+        set({showSettingsSheet: false, showTokenListSheet: value});
+      },
+
+      resetAllSheets: () => {
+        set({showSettingsSheet: false, showTokenListSheet: false});
       },
 
       clear: () => {
         set({
           initialNavigationState: undefined,
           showSettingsSheet: false,
-          showSecuritySheet: false,
+          showTokenListSheet: false,
         });
       },
     }),
@@ -63,10 +68,14 @@ export const useNavigationStoreAppSelector = () =>
 export const useNavigationStoreHomeSelector = () =>
   useNavigationStore(state => ({
     showSettingsSheet: state.showSettingsSheet,
+    showTokenListSheet: state.showTokenListSheet,
     setShowSettingsSheet: state.setShowSettingsSheet,
+    setShowTokenListSheet: state.setShowTokenListSheet,
+    resetAllSheets: state.resetAllSheets,
   }));
 
 export const useNavigationStoreAssetsSelector = () =>
   useNavigationStore(state => ({
     setShowSettingsSheet: state.setShowSettingsSheet,
+    setShowTokenListSheet: state.setShowTokenListSheet,
   }));

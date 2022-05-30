@@ -1,20 +1,24 @@
 import React, {useMemo, useRef, useEffect, FunctionComponent} from 'react';
 import {Dimensions} from 'react-native';
-import {Box, HStack, Heading, VStack, Button, Divider} from 'native-base';
+import {Box, HStack, Heading, VStack} from 'native-base';
 import BottomSheet, {BottomSheetHandleProps} from '@gorhom/bottom-sheet';
-import {faArrowUpRightFromSquare} from '@fortawesome/free-solid-svg-icons/faArrowUpRightFromSquare';
 import {faXmark} from '@fortawesome/free-solid-svg-icons/faXmark';
-import {faDiscord} from '@fortawesome/free-brands-svg-icons/faDiscord';
+import {BigNumberish} from 'ethers';
 import {px2dp} from '../utils/units';
-import {IconButton, MenuItem} from '.';
-import {AppColors} from '../config';
+import {IconButton, ManageTokenItem} from '.';
+import {AppColors, CurrencySymbols} from '../config';
+
+type TokenSettings = {
+  currency: CurrencySymbols;
+  balance: BigNumberish;
+  enabled: boolean;
+};
 
 type Props = {
   isOpen: boolean;
+  tokenSettings: Array<TokenSettings>;
+  onTokenChange: (currency: CurrencySymbols, enabled: boolean) => void;
   onClose: () => void;
-  onHelpPress: () => void;
-  onDiscordPress: () => void;
-  onRemoveWalletPress: () => void;
 };
 
 type HandleComponentFn = (
@@ -34,7 +38,7 @@ const handleComponentFn: HandleComponentFn = onClose => () => {
       <Box />
 
       <Heading fontSize="16px" fontFamily="heading">
-        Settings
+        Manage token list
       </Heading>
 
       <IconButton icon={faXmark} onPress={onClose} />
@@ -42,18 +46,21 @@ const handleComponentFn: HandleComponentFn = onClose => () => {
   );
 };
 
-export const SettingsSheet = ({
+export const TokenListSheet = ({
   isOpen,
+  tokenSettings,
+  onTokenChange,
   onClose,
-  onHelpPress,
-  onDiscordPress,
-  onRemoveWalletPress,
 }: Props) => {
   const bottomSheetRef = useRef<BottomSheet>(null);
   const snapPoints = useMemo(
     () => [Dimensions.get('window').height - px2dp(49)],
     [],
   );
+
+  const onValueChange = (currency: CurrencySymbols) => (enabled: boolean) => {
+    onTokenChange(currency, enabled);
+  };
 
   useEffect(() => {
     if (isOpen) {
@@ -73,25 +80,13 @@ export const SettingsSheet = ({
       snapPoints={snapPoints}
       handleComponent={handleComponentFn(onClose)}>
       <VStack flex={1} p="24px" backgroundColor="background.1" space="11px">
-        <MenuItem
-          heading="Help & Support"
-          icon={faArrowUpRightFromSquare}
-          onPress={onHelpPress}
-        />
-
-        <MenuItem
-          heading="Join Stackup community"
-          description="We’re not big yet, but we like to make new friends :)"
-          backgroundColor={AppColors.palettes.primary[600]}
-          icon={faDiscord}
-          onPress={onDiscordPress}
-        />
-
-        <Divider />
-
-        <Button colorScheme="tertiary" onPress={onRemoveWalletPress}>
-          Remove Wallet
-        </Button>
+        {tokenSettings.map(props => (
+          <ManageTokenItem
+            key={`manage-token-item-${props.currency}`}
+            {...props}
+            onValueChange={onValueChange(props.currency)}
+          />
+        ))}
       </VStack>
     </BottomSheet>
   );

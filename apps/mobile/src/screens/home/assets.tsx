@@ -25,17 +25,26 @@ type Props = CompositeScreenProps<
 >;
 
 export default function AssetsScreen({navigation}: Props) {
-  const {setShowSettingsSheet} = useNavigationStoreAssetsSelector();
+  const {setShowSettingsSheet, setShowTokenListSheet} =
+    useNavigationStoreAssetsSelector();
   const [isHidden, setIsHidden] = useState<boolean>(false);
 
   const onSecurityPress = () => {
     navigation.navigate('Security');
   };
 
+  const onSettingPress = () => {
+    setShowSettingsSheet(true);
+  };
+
+  const onTokenListPress = () => {
+    setShowTokenListSheet(true);
+  };
+
   return (
     <TabScreenContainer>
       <TabScreenHeader>
-        <IconButton icon={faBars} onPress={() => setShowSettingsSheet(true)} />
+        <IconButton icon={faBars} onPress={onSettingPress} />
 
         <HomeTabTitle screen="Assets" network="Polygon" />
 
@@ -97,6 +106,7 @@ export default function AssetsScreen({navigation}: Props) {
         <Button
           colorScheme="text"
           variant="link"
+          onPress={onTokenListPress}
           _text={{color: AppColors.text[4], fontWeight: 400}}
           leftIcon={
             <FontAwesomeIcon
