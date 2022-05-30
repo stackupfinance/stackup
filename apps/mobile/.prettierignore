@@ -11,3 +11,4 @@ ios
 assets/fonts
 *.env*
 scripts/buildenv.sh
+*.png

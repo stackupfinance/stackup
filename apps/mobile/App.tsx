@@ -6,6 +6,7 @@ import {
   NavigationContainerRef,
 } from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import {gestureHandlerRootHOC} from 'react-native-gesture-handler';
 import * as Sentry from '@sentry/react-native';
 import Config from 'react-native-config';
 import {
@@ -73,4 +74,4 @@ function App() {
   );
 }
 
-export default Sentry.wrap(App);
+export default Sentry.wrap(gestureHandlerRootHOC(App));

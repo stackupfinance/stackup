@@ -1,11 +1,11 @@
 import React, {ReactElement, PropsWithChildren} from 'react';
 import {HStack} from 'native-base';
 
-export const ScreenHeader = ({
+export const TabScreenHeader = ({
   children,
 }: PropsWithChildren<{}>): ReactElement => {
   return (
-    <HStack justifyContent="space-around" alignItems="center">
+    <HStack justifyContent="space-between" alignItems="center">
       {children}
     </HStack>
   );

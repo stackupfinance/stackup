@@ -44,7 +44,10 @@
       "**/@amplitude/react-native",
       "**/@sentry/react-native",
       "**/react-native-config",
-      "**/@intercom/intercom-react-native"
+      "**/@intercom/intercom-react-native",
+      "**/@gorhom/bottom-sheet",
+      "**/react-native-reanimated",
+      "**/react-native-gesture-handler"
     ]
   },
   "devDependencies": {
