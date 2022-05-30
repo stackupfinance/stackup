@@ -6,12 +6,13 @@ import React, {
   FunctionComponent,
 } from 'react';
 import {Dimensions} from 'react-native';
-import {Box, HStack, Heading, VStack} from 'native-base';
+import {Box, HStack, Heading, VStack, Button, Divider} from 'native-base';
 import BottomSheet, {BottomSheetHandleProps} from '@gorhom/bottom-sheet';
 import {faArrowUpRightFromSquare} from '@fortawesome/free-solid-svg-icons/faArrowUpRightFromSquare';
+import {faXmark} from '@fortawesome/free-solid-svg-icons/faXmark';
 import {faDiscord} from '@fortawesome/free-brands-svg-icons/faDiscord';
 import {px2dp} from '../utils/units';
-import {CloseButton, MenuItem} from '.';
+import {IconButton, MenuItem} from '.';
 import {AppColors} from '../config';
 
 type Props = {
@@ -19,6 +20,7 @@ type Props = {
   onClose: () => void;
   onHelpPress: () => void;
   onDiscordPress: () => void;
+  onRemoveWalletPress: () => void;
 };
 
 type HandleComponentFn = (
@@ -41,7 +43,7 @@ const handleComponentFn: HandleComponentFn = onClose => () => {
         Settings
       </Heading>
 
-      <CloseButton onPress={onClose} />
+      <IconButton icon={faXmark} onPress={onClose} />
     </HStack>
   );
 };
@@ -51,6 +53,7 @@ export const SettingsSheet = ({
   onClose,
   onHelpPress,
   onDiscordPress,
+  onRemoveWalletPress,
 }: Props) => {
   const bottomSheetRef = useRef<BottomSheet>(null);
   const snapPoints = useMemo(
@@ -94,6 +97,12 @@ export const SettingsSheet = ({
           icon={faDiscord}
           onPress={onDiscordPress}
         />
+
+        <Divider />
+
+        <Button colorScheme="tertiary" onPress={onRemoveWalletPress}>
+          Remove Wallet
+        </Button>
       </VStack>
     </BottomSheet>
   );

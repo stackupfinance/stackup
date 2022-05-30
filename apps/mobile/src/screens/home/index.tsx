@@ -1,6 +1,6 @@
 import React, {useEffect} from 'react';
 import {Linking} from 'react-native';
-import {Text} from 'native-base';
+import {Box, Text} from 'native-base';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faWallet} from '@fortawesome/free-solid-svg-icons/faWallet';
@@ -9,10 +9,11 @@ import {faArrowRightArrowLeft} from '@fortawesome/free-solid-svg-icons/faArrowRi
 import {faBolt} from '@fortawesome/free-solid-svg-icons/faBolt';
 import {HomeTabParamList, externalLinks} from '../../config';
 import AssetsScreen from './assets';
-import EarnScreen from './earn';
-import SwapScreen from './swap';
-import ActivityScreen from './activity';
+// import EarnScreen from './earn';
+// import SwapScreen from './swap';
+// import ActivityScreen from './activity';
 import {SettingsSheet} from '../../components';
+import {useRemoveWallet} from '../../hooks';
 import {
   useNavigationStoreHomeSelector,
   useIntercomStoreHomeSelector,
@@ -24,6 +25,7 @@ export const HomeScreen = () => {
   const {showSettingsSheet, setShowSettingsSheet} =
     useNavigationStoreHomeSelector();
   const {openMessenger} = useIntercomStoreHomeSelector();
+  const removeWallet = useRemoveWallet();
 
   useEffect(() => {
     return () => {
@@ -43,10 +45,15 @@ export const HomeScreen = () => {
     Linking.openURL(externalLinks.discord);
   };
 
+  const onRemoveWalletPress = () => {
+    removeWallet();
+  };
+
   return (
     <>
       <Tab.Navigator
         tabBarPosition="bottom"
+        tabBar={() => <Box />} // TODO: Remove this when adding more tabs
         screenOptions={({route}) => ({
           tabBarLabel: ({color}) => {
             return (
@@ -72,9 +79,9 @@ export const HomeScreen = () => {
           headerShown: false,
         })}>
         <Tab.Screen name="Assets" component={AssetsScreen} />
-        <Tab.Screen name="Earn" component={EarnScreen} />
+        {/* <Tab.Screen name="Earn" component={EarnScreen} />
         <Tab.Screen name="Swap" component={SwapScreen} />
-        <Tab.Screen name="Activity" component={ActivityScreen} />
+        <Tab.Screen name="Activity" component={ActivityScreen} /> */}
       </Tab.Navigator>
 
       <SettingsSheet
@@ -82,6 +89,7 @@ export const HomeScreen = () => {
         onClose={onCloseSettingsSheet}
         onHelpPress={onHelpPress}
         onDiscordPress={onDiscordPress}
+        onRemoveWalletPress={onRemoveWalletPress}
       />
     </>
   );

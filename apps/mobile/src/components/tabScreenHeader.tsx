@@ -1,7 +1,7 @@
 import React, {ReactElement, PropsWithChildren} from 'react';
 import {HStack} from 'native-base';
 
-export const ScreenHeader = ({
+export const TabScreenHeader = ({
   children,
 }: PropsWithChildren<{}>): ReactElement => {
   return (

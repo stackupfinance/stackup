@@ -5,13 +5,14 @@ import type {MaterialTopTabScreenProps} from '@react-navigation/material-top-tab
 import type {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faSliders} from '@fortawesome/free-solid-svg-icons/faSliders';
+import {faBars} from '@fortawesome/free-solid-svg-icons/faBars';
 import {RootStackParamList, HomeTabParamList, AppColors} from '../../config';
 import {
-  ScreenContainer,
-  ScreenHeader,
+  TabScreenContainer,
+  TabScreenHeader,
   HomeTabTitle,
   SecurityButton,
-  SettingsButton,
+  IconButton,
   List,
   PortfolioBalance,
   PortfolioItem,
@@ -27,15 +28,19 @@ export default function AssetsScreen({navigation}: Props) {
   const {setShowSettingsSheet} = useNavigationStoreAssetsSelector();
   const [isHidden, setIsHidden] = useState<boolean>(false);
 
+  const onSecurityPress = () => {
+    navigation.navigate('Security');
+  };
+
   return (
-    <ScreenContainer>
-      <ScreenHeader>
-        <SettingsButton onPress={() => setShowSettingsSheet(true)} />
+    <TabScreenContainer>
+      <TabScreenHeader>
+        <IconButton icon={faBars} onPress={() => setShowSettingsSheet(true)} />
 
         <HomeTabTitle screen="Assets" network="Polygon" />
 
-        <SecurityButton onPress={() => {}} />
-      </ScreenHeader>
+        <SecurityButton onPress={onSecurityPress} />
+      </TabScreenHeader>
 
       <Box flex={1}>
         <Box mt="20px">
@@ -49,17 +54,11 @@ export default function AssetsScreen({navigation}: Props) {
         </Box>
 
         <HStack mt="33px" space="14px">
-          <Button
-            flex={1}
-            mb="16px"
-            onPress={() => navigation.navigate('Security')}>
+          <Button flex={1} mb="16px" onPress={() => {}}>
             Deposit
           </Button>
 
-          <Button
-            flex={1}
-            mb="16px"
-            onPress={() => navigation.navigate('Security')}>
+          <Button flex={1} mb="16px" onPress={() => {}}>
             Send
           </Button>
         </HStack>
@@ -109,6 +108,6 @@ export default function AssetsScreen({navigation}: Props) {
           Manage token list
         </Button>
       </Box>
-    </ScreenContainer>
+    </TabScreenContainer>
   );
 }
