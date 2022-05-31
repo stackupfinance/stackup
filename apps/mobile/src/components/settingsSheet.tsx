@@ -1,12 +1,8 @@
-import React, {useMemo, useRef, useEffect, FunctionComponent} from 'react';
-import {Dimensions} from 'react-native';
-import {Box, HStack, Heading, VStack, Button, Divider} from 'native-base';
-import BottomSheet, {BottomSheetHandleProps} from '@gorhom/bottom-sheet';
+import React from 'react';
+import {VStack, Button, Divider} from 'native-base';
 import {faArrowUpRightFromSquare} from '@fortawesome/free-solid-svg-icons/faArrowUpRightFromSquare';
-import {faXmark} from '@fortawesome/free-solid-svg-icons/faXmark';
 import {faDiscord} from '@fortawesome/free-brands-svg-icons/faDiscord';
-import {px2dp} from '../utils/units';
-import {IconButton, MenuItem} from '.';
+import {MenuItem, BaseSheet} from '.';
 import {AppColors} from '../config';
 
 type Props = {
@@ -17,31 +13,6 @@ type Props = {
   onRemoveWalletPress: () => void;
 };
 
-type HandleComponentFn = (
-  onClose: Props['onClose'],
-) => FunctionComponent<BottomSheetHandleProps>;
-
-const handleComponentFn: HandleComponentFn = onClose => () => {
-  return (
-    <HStack
-      backgroundColor="background.3"
-      borderTopRadius="15px"
-      pt="24px"
-      pb="15px"
-      px="18px"
-      justifyContent="space-between"
-      alignItems="center">
-      <Box />
-
-      <Heading fontSize="16px" fontFamily="heading">
-        Settings
-      </Heading>
-
-      <IconButton icon={faXmark} onPress={onClose} />
-    </HStack>
-  );
-};
-
 export const SettingsSheet = ({
   isOpen,
   onClose,
@@ -49,29 +20,8 @@ export const SettingsSheet = ({
   onDiscordPress,
   onRemoveWalletPress,
 }: Props) => {
-  const bottomSheetRef = useRef<BottomSheet>(null);
-  const snapPoints = useMemo(
-    () => [Dimensions.get('window').height - px2dp(49)],
-    [],
-  );
-
-  useEffect(() => {
-    if (isOpen) {
-      bottomSheetRef.current?.expand();
-    } else {
-      bottomSheetRef.current?.close();
-    }
-  }, [isOpen]);
-
   return (
-    <BottomSheet
-      backgroundStyle={{
-        backgroundColor: AppColors.background[1],
-      }}
-      ref={bottomSheetRef}
-      index={-1}
-      snapPoints={snapPoints}
-      handleComponent={handleComponentFn(onClose)}>
+    <BaseSheet title="Settings" isOpen={isOpen} onClose={onClose}>
       <VStack flex={1} p="24px" backgroundColor="background.1" space="11px">
         <MenuItem
           heading="Help & Support"
@@ -93,6 +43,6 @@ export const SettingsSheet = ({
           Remove Wallet
         </Button>
       </VStack>
-    </BottomSheet>
+    </BaseSheet>
   );
 };

@@ -85,3 +85,6 @@ export const useWalletStoreCreateWalletSelector = () =>
     loading: state.loading,
     create: state.create,
   }));
+
+export const useWalletStoreHomeSelector = () =>
+  useWalletStore(state => ({instance: state.instance}));

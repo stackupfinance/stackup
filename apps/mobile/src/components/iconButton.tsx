@@ -11,7 +11,7 @@ type Props = {
 
 export const IconButton = ({icon, onPress}: Props) => {
   return (
-    <Pressable onPress={onPress} w="22px" h="22px">
+    <Pressable onPress={onPress} hitSlop={16} w="22px" h="22px">
       {({isPressed}) => (
         <Box justifyContent="center" alignItems="center">
           <FontAwesomeIcon
