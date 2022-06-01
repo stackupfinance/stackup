@@ -12,29 +12,57 @@ import AssetsScreen from './assets';
 // import EarnScreen from './earn';
 // import SwapScreen from './swap';
 // import ActivityScreen from './activity';
-import {SettingsSheet} from '../../components';
+import {
+  SettingsSheet,
+  TokenListSheet,
+  DepositSheet,
+  FromWalletSheet,
+} from '../../components';
 import {useRemoveWallet} from '../../hooks';
 import {
   useNavigationStoreHomeSelector,
   useIntercomStoreHomeSelector,
+  useWalletStoreHomeSelector,
 } from '../../state';
 
 const Tab = createMaterialTopTabNavigator<HomeTabParamList>();
 
 export const HomeScreen = () => {
-  const {showSettingsSheet, setShowSettingsSheet} =
-    useNavigationStoreHomeSelector();
+  const {
+    showSettingsSheet,
+    showTokenListSheet,
+    showDepositSheet,
+    showFromWalletSheet,
+    setShowSettingsSheet,
+    setShowTokenListSheet,
+    setShowDepositSheet,
+    setShowFromWalletSheet,
+    resetAllSheets,
+  } = useNavigationStoreHomeSelector();
+  const {instance} = useWalletStoreHomeSelector();
   const {openMessenger} = useIntercomStoreHomeSelector();
   const removeWallet = useRemoveWallet();
 
   useEffect(() => {
     return () => {
-      setShowSettingsSheet(false);
+      resetAllSheets();
     };
-  }, [setShowSettingsSheet]);
+  }, [resetAllSheets]);
 
   const onCloseSettingsSheet = () => {
     setShowSettingsSheet(false);
+  };
+
+  const onCloseTokenListSheet = () => {
+    setShowTokenListSheet(false);
+  };
+
+  const onCloseDepositSheet = () => {
+    setShowDepositSheet(false);
+  };
+
+  const onCloseFromWalletSheet = () => {
+    setShowFromWalletSheet(false);
   };
 
   const onHelpPress = () => {
@@ -47,6 +75,14 @@ export const HomeScreen = () => {
 
   const onRemoveWalletPress = () => {
     removeWallet();
+  };
+
+  const onTransferFromWalletPress = () => {
+    setShowFromWalletSheet(true);
+  };
+
+  const onFromWalletBackPress = () => {
+    setShowDepositSheet(true);
   };
 
   return (
@@ -91,6 +127,33 @@ export const HomeScreen = () => {
         onDiscordPress={onDiscordPress}
         onRemoveWalletPress={onRemoveWalletPress}
       />
+
+      <TokenListSheet
+        isOpen={showTokenListSheet}
+        onClose={onCloseTokenListSheet}
+        onTokenChange={(currency, enabled) => console.log(currency, enabled)}
+        tokenSettings={[
+          {currency: 'USDC', balance: '10000000000', enabled: true},
+          {currency: 'ETH', balance: '1860000000000000000', enabled: true},
+          {currency: 'MATIC', balance: '6240000000000000000', enabled: true},
+        ]}
+      />
+
+      <DepositSheet
+        isOpen={showDepositSheet}
+        onClose={onCloseDepositSheet}
+        onTransferFromWalletPress={onTransferFromWalletPress}
+      />
+
+      {instance ? (
+        <FromWalletSheet
+          network="Polygon"
+          walletAddress={instance.walletAddress}
+          isOpen={showFromWalletSheet}
+          onBack={onFromWalletBackPress}
+          onClose={onCloseFromWalletSheet}
+        />
+      ) : null}
     </>
   );
 };

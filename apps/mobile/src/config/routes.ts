@@ -3,7 +3,6 @@ import {NavigatorScreenParams} from '@react-navigation/native';
 export type RootStackParamList = {
   Home: undefined;
   Security: undefined;
-  Settings: undefined;
   Onboard: undefined;
 };
 

@@ -25,17 +25,30 @@ type Props = CompositeScreenProps<
 >;
 
 export default function AssetsScreen({navigation}: Props) {
-  const {setShowSettingsSheet} = useNavigationStoreAssetsSelector();
+  const {setShowSettingsSheet, setShowTokenListSheet, setShowDepositSheet} =
+    useNavigationStoreAssetsSelector();
   const [isHidden, setIsHidden] = useState<boolean>(false);
 
   const onSecurityPress = () => {
     navigation.navigate('Security');
   };
 
+  const onSettingPress = () => {
+    setShowSettingsSheet(true);
+  };
+
+  const onTokenListPress = () => {
+    setShowTokenListSheet(true);
+  };
+
+  const onDepositPress = () => {
+    setShowDepositSheet(true);
+  };
+
   return (
     <TabScreenContainer>
       <TabScreenHeader>
-        <IconButton icon={faBars} onPress={() => setShowSettingsSheet(true)} />
+        <IconButton icon={faBars} onPress={onSettingPress} />
 
         <HomeTabTitle screen="Assets" network="Polygon" />
 
@@ -54,42 +67,47 @@ export default function AssetsScreen({navigation}: Props) {
         </Box>
 
         <HStack mt="33px" space="14px">
-          <Button flex={1} mb="16px" onPress={() => {}}>
+          <Button flex={1} onPress={onDepositPress}>
             Deposit
           </Button>
 
-          <Button flex={1} mb="16px" onPress={() => {}}>
+          <Button flex={1} onPress={() => {}}>
             Send
           </Button>
         </HStack>
 
         <Box mt="31px">
           <List
-            items={[
-              <PortfolioItem
-                currency="USDC"
-                defaultCurrency="USDC"
-                balance="10000000000"
-                previousBalanceInDefaultCurrency="10000000000"
-                currentBalanceInDefaultCurrency="10000000000"
-                isHidden={isHidden}
-              />,
-              <PortfolioItem
-                currency="ETH"
-                defaultCurrency="USDC"
-                balance="1860000000000000000"
-                previousBalanceInDefaultCurrency="1773741200"
-                currentBalanceInDefaultCurrency="1880165672"
-                isHidden={isHidden}
-              />,
-              <PortfolioItem
-                currency="MATIC"
-                defaultCurrency="USDC"
-                balance="6240000000000000000"
-                previousBalanceInDefaultCurrency="4103000"
-                currentBalanceInDefaultCurrency="3730000"
-                isHidden={isHidden}
-              />,
+            sections={[
+              {
+                title: '',
+                data: [
+                  <PortfolioItem
+                    currency="USDC"
+                    defaultCurrency="USDC"
+                    balance="10000000000"
+                    previousBalanceInDefaultCurrency="10000000000"
+                    currentBalanceInDefaultCurrency="10000000000"
+                    isHidden={isHidden}
+                  />,
+                  <PortfolioItem
+                    currency="ETH"
+                    defaultCurrency="USDC"
+                    balance="1860000000000000000"
+                    previousBalanceInDefaultCurrency="1773741200"
+                    currentBalanceInDefaultCurrency="1880165672"
+                    isHidden={isHidden}
+                  />,
+                  <PortfolioItem
+                    currency="MATIC"
+                    defaultCurrency="USDC"
+                    balance="6240000000000000000"
+                    previousBalanceInDefaultCurrency="4103000"
+                    currentBalanceInDefaultCurrency="3730000"
+                    isHidden={isHidden}
+                  />,
+                ],
+              },
             ]}
           />
         </Box>
@@ -97,6 +115,7 @@ export default function AssetsScreen({navigation}: Props) {
         <Button
           colorScheme="text"
           variant="link"
+          onPress={onTokenListPress}
           _text={{color: AppColors.text[4], fontWeight: 400}}
           leftIcon={
             <FontAwesomeIcon

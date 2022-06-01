@@ -2,48 +2,99 @@ import create from 'zustand';
 import {devtools} from 'zustand/middleware';
 import {NavigationState as InitialNavigationState} from '@react-navigation/native';
 
-interface NavigationState {
-  initialNavigationState: InitialNavigationState | undefined;
+interface Sheets {
   showSettingsSheet: boolean;
-  showSecuritySheet: boolean;
+  showTokenListSheet: boolean;
+  showDepositSheet: boolean;
+  showFromWalletSheet: boolean;
+  showPasswordSheet: boolean;
+  showVerifyEmailSheet: boolean;
+  showEmailSheet: boolean;
+  showEmailConfirmedSheet: boolean;
+}
+
+interface NavigationState extends Sheets {
+  initialNavigationState: InitialNavigationState | undefined;
 
   setInitialNavigationState: (
     state: InitialNavigationState | undefined,
   ) => void;
   setShowSettingsSheet: (value: boolean) => void;
-  toggleSecuritySheet: () => void;
+  setShowTokenListSheet: (value: boolean) => void;
+  setShowDepositSheet: (value: boolean) => void;
+  setShowFromWalletSheet: (value: boolean) => void;
+  setShowPasswordSheet: (value: boolean) => void;
+  setShowEmailSheet: (value: boolean) => void;
+  setShowVerifyEmailSheet: (value: boolean) => void;
+  setShowEmailConfirmedSheet: (value: boolean) => void;
+  resetAllSheets: () => void;
   clear: () => void;
 }
 
+const sheetDefaults: Sheets = {
+  showSettingsSheet: false,
+  showTokenListSheet: false,
+  showDepositSheet: false,
+  showFromWalletSheet: false,
+  showPasswordSheet: false,
+  showEmailSheet: false,
+  showVerifyEmailSheet: false,
+  showEmailConfirmedSheet: false,
+};
 const STORE_NAME = 'stackup-navigation-store';
 const useNavigationStore = create<NavigationState>()(
   devtools(
-    (set, get) => ({
+    set => ({
       initialNavigationState: undefined,
-      showSettingsSheet: false,
-      showSecuritySheet: false,
+      ...sheetDefaults,
 
       setInitialNavigationState: state => {
         set({
           initialNavigationState: state,
-          showSettingsSheet: false,
-          showSecuritySheet: false,
+          ...sheetDefaults,
         });
       },
 
       setShowSettingsSheet: value => {
-        set({showSettingsSheet: value});
+        set({...sheetDefaults, showSettingsSheet: value});
       },
 
-      toggleSecuritySheet: () => {
-        set({showSecuritySheet: !get().showSecuritySheet});
+      setShowTokenListSheet: value => {
+        set({...sheetDefaults, showTokenListSheet: value});
+      },
+
+      setShowDepositSheet: value => {
+        set({...sheetDefaults, showDepositSheet: value});
+      },
+
+      setShowFromWalletSheet: value => {
+        set({...sheetDefaults, showFromWalletSheet: value});
+      },
+
+      setShowPasswordSheet: value => {
+        set({...sheetDefaults, showPasswordSheet: value});
+      },
+
+      setShowEmailSheet: value => {
+        set({...sheetDefaults, showEmailSheet: value});
+      },
+
+      setShowVerifyEmailSheet: value => {
+        set({...sheetDefaults, showVerifyEmailSheet: value});
+      },
+
+      setShowEmailConfirmedSheet: value => {
+        set({...sheetDefaults, showEmailConfirmedSheet: value});
+      },
+
+      resetAllSheets: () => {
+        set({...sheetDefaults});
       },
 
       clear: () => {
         set({
           initialNavigationState: undefined,
-          showSettingsSheet: false,
-          showSecuritySheet: false,
+          ...sheetDefaults,
         });
       },
     }),
@@ -63,10 +114,38 @@ export const useNavigationStoreAppSelector = () =>
 export const useNavigationStoreHomeSelector = () =>
   useNavigationStore(state => ({
     showSettingsSheet: state.showSettingsSheet,
+    showTokenListSheet: state.showTokenListSheet,
+    showDepositSheet: state.showDepositSheet,
+    showFromWalletSheet: state.showFromWalletSheet,
     setShowSettingsSheet: state.setShowSettingsSheet,
+    setShowTokenListSheet: state.setShowTokenListSheet,
+    setShowDepositSheet: state.setShowDepositSheet,
+    setShowFromWalletSheet: state.setShowFromWalletSheet,
+    resetAllSheets: state.resetAllSheets,
   }));
 
 export const useNavigationStoreAssetsSelector = () =>
   useNavigationStore(state => ({
     setShowSettingsSheet: state.setShowSettingsSheet,
+    setShowTokenListSheet: state.setShowTokenListSheet,
+    setShowDepositSheet: state.setShowDepositSheet,
+  }));
+
+export const useNavigationStoreSecuritySelector = () =>
+  useNavigationStore(state => ({
+    showPasswordSheet: state.showPasswordSheet,
+    showEmailSheet: state.showEmailSheet,
+    showVerifyEmailSheet: state.showVerifyEmailSheet,
+    showEmailConfirmedSheet: state.showEmailConfirmedSheet,
+    setShowPasswordSheet: state.setShowPasswordSheet,
+    setShowEmailSheet: state.setShowEmailSheet,
+    setShowVerifyEmailSheet: state.setShowVerifyEmailSheet,
+    setShowEmailConfirmedSheet: state.setShowEmailConfirmedSheet,
+    resetAllSheets: state.resetAllSheets,
+  }));
+
+export const useNavigationStoreSecurityOverviewSelector = () =>
+  useNavigationStore(state => ({
+    setShowPasswordSheet: state.setShowPasswordSheet,
+    setshowEmailSheet: state.setShowEmailSheet,
   }));

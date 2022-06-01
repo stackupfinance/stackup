@@ -12,7 +12,6 @@ import Config from 'react-native-config';
 import {
   HomeScreen,
   SecurityScreen,
-  SettingsScreen,
   OnboardScreen,
   SplashScreen,
 } from './src/screens';
@@ -58,7 +57,6 @@ function App() {
               <>
                 <Stack.Screen name="Home" component={HomeScreen} />
                 <Stack.Screen name="Security" component={SecurityScreen} />
-                <Stack.Screen name="Settings" component={SettingsScreen} />
               </>
             ) : (
               <>

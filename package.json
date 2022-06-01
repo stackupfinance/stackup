@@ -47,7 +47,8 @@
       "**/@intercom/intercom-react-native",
       "**/@gorhom/bottom-sheet",
       "**/react-native-reanimated",
-      "**/react-native-gesture-handler"
+      "**/react-native-gesture-handler",
+      "**/@react-native-clipboard/clipboard"
     ]
   },
   "devDependencies": {
