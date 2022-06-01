@@ -145,13 +145,15 @@ export const HomeScreen = () => {
         onTransferFromWalletPress={onTransferFromWalletPress}
       />
 
-      <FromWalletSheet
-        network="Polygon"
-        walletAddress={instance?.walletAddress ?? ''}
-        isOpen={showFromWalletSheet}
-        onBack={onFromWalletBackPress}
-        onClose={onCloseFromWalletSheet}
-      />
+      {instance ? (
+        <FromWalletSheet
+          network="Polygon"
+          walletAddress={instance.walletAddress}
+          isOpen={showFromWalletSheet}
+          onBack={onFromWalletBackPress}
+          onClose={onCloseFromWalletSheet}
+        />
+      ) : null}
     </>
   );
 };

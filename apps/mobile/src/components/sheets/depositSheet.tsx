@@ -1,7 +1,8 @@
 import React from 'react';
 import {VStack} from 'native-base';
 import {faArrowRight} from '@fortawesome/free-solid-svg-icons/faArrowRight';
-import {MenuItem, BaseSheet} from '.';
+import {BaseSheet} from '.';
+import {MenuItem} from '..';
 
 type Props = {
   isOpen: boolean;

@@ -2,7 +2,7 @@ import React from 'react';
 import {Box, HStack, Heading} from 'native-base';
 import {faArrowLeft} from '@fortawesome/free-solid-svg-icons/faArrowLeft';
 import {faXmark} from '@fortawesome/free-solid-svg-icons/faXmark';
-import {IconButton} from '.';
+import {IconButton} from '..';
 
 type Props = {
   title: string;

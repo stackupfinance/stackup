@@ -7,6 +7,10 @@ interface Sheets {
   showTokenListSheet: boolean;
   showDepositSheet: boolean;
   showFromWalletSheet: boolean;
+  showPasswordSheet: boolean;
+  showVerifyEmailSheet: boolean;
+  showEmailSheet: boolean;
+  showEmailConfirmedSheet: boolean;
 }
 
 interface NavigationState extends Sheets {
@@ -19,6 +23,10 @@ interface NavigationState extends Sheets {
   setShowTokenListSheet: (value: boolean) => void;
   setShowDepositSheet: (value: boolean) => void;
   setShowFromWalletSheet: (value: boolean) => void;
+  setShowPasswordSheet: (value: boolean) => void;
+  setShowEmailSheet: (value: boolean) => void;
+  setShowVerifyEmailSheet: (value: boolean) => void;
+  setShowEmailConfirmedSheet: (value: boolean) => void;
   resetAllSheets: () => void;
   clear: () => void;
 }
@@ -28,6 +36,10 @@ const sheetDefaults: Sheets = {
   showTokenListSheet: false,
   showDepositSheet: false,
   showFromWalletSheet: false,
+  showPasswordSheet: false,
+  showEmailSheet: false,
+  showVerifyEmailSheet: false,
+  showEmailConfirmedSheet: false,
 };
 const STORE_NAME = 'stackup-navigation-store';
 const useNavigationStore = create<NavigationState>()(
@@ -57,6 +69,22 @@ const useNavigationStore = create<NavigationState>()(
 
       setShowFromWalletSheet: value => {
         set({...sheetDefaults, showFromWalletSheet: value});
+      },
+
+      setShowPasswordSheet: value => {
+        set({...sheetDefaults, showPasswordSheet: value});
+      },
+
+      setShowEmailSheet: value => {
+        set({...sheetDefaults, showEmailSheet: value});
+      },
+
+      setShowVerifyEmailSheet: value => {
+        set({...sheetDefaults, showVerifyEmailSheet: value});
+      },
+
+      setShowEmailConfirmedSheet: value => {
+        set({...sheetDefaults, showEmailConfirmedSheet: value});
       },
 
       resetAllSheets: () => {
@@ -101,4 +129,23 @@ export const useNavigationStoreAssetsSelector = () =>
     setShowSettingsSheet: state.setShowSettingsSheet,
     setShowTokenListSheet: state.setShowTokenListSheet,
     setShowDepositSheet: state.setShowDepositSheet,
+  }));
+
+export const useNavigationStoreSecuritySelector = () =>
+  useNavigationStore(state => ({
+    showPasswordSheet: state.showPasswordSheet,
+    showEmailSheet: state.showEmailSheet,
+    showVerifyEmailSheet: state.showVerifyEmailSheet,
+    showEmailConfirmedSheet: state.showEmailConfirmedSheet,
+    setShowPasswordSheet: state.setShowPasswordSheet,
+    setShowEmailSheet: state.setShowEmailSheet,
+    setShowVerifyEmailSheet: state.setShowVerifyEmailSheet,
+    setShowEmailConfirmedSheet: state.setShowEmailConfirmedSheet,
+    resetAllSheets: state.resetAllSheets,
+  }));
+
+export const useNavigationStoreSecurityOverviewSelector = () =>
+  useNavigationStore(state => ({
+    setShowPasswordSheet: state.setShowPasswordSheet,
+    setshowEmailSheet: state.setShowEmailSheet,
   }));

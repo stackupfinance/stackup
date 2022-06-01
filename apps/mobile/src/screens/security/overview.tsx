@@ -7,16 +7,31 @@ import {
   IconButton,
   SecurityOverview,
   SecurityItem,
-  FingerprintLogo,
   ShieldWithCheckLogo,
+  FingerprintLogo,
+  EmailLogo,
+  // LockLogo,
+  List,
 } from '../../components';
 import {SecurityStackParamList} from '../../config';
+import {useNavigationStoreSecurityOverviewSelector} from '../../state';
 
 type Props = NativeStackScreenProps<SecurityStackParamList, 'Overview'>;
 
 export default function OverviewScreen({navigation}: Props) {
+  const {setShowPasswordSheet, setshowEmailSheet} =
+    useNavigationStoreSecurityOverviewSelector();
+
   const onBackPress = () => {
     navigation.goBack();
+  };
+
+  const onPasswordPress = () => {
+    setShowPasswordSheet(true);
+  };
+
+  const onEmailPress = () => {
+    setshowEmailSheet(true);
   };
 
   return (
@@ -31,29 +46,52 @@ export default function OverviewScreen({navigation}: Props) {
         <Box />
       </StackScreenHeader>
 
-      <Box flex={1} py="25px" px="18px">
+      <VStack flex={1} py="25px" px="18px" space="19px">
         <SecurityOverview level="Insufficient" />
 
-        <VStack mt="29px" space="9px">
-          <SecurityItem
-            heading="Fingerprint"
-            description="Access wallet with Touch ID"
-            source={FingerprintLogo}
-            isActive={true}
-            showArrow={false}
-            onPress={() => {}}
-          />
-
-          <SecurityItem
-            heading="Cloud Backup"
-            description="Encrypted storage for easy import"
-            source={ShieldWithCheckLogo}
-            isActive={false}
-            showArrow={true}
-            onPress={() => {}}
-          />
-        </VStack>
-      </Box>
+        <List
+          sections={[
+            {
+              title: 'Account security',
+              data: [
+                <SecurityItem
+                  heading="Password"
+                  description="Old fashion yet effective security"
+                  source={ShieldWithCheckLogo}
+                  isActive={true}
+                  onPress={onPasswordPress}
+                />,
+                <SecurityItem
+                  heading="Fingerprint"
+                  description="Use your finger to get in"
+                  source={FingerprintLogo}
+                  isActive={true}
+                  onPress={() => {}}
+                />,
+              ],
+            },
+            {
+              title: 'Backup your account',
+              data: [
+                <SecurityItem
+                  heading="Email"
+                  description="Link your account to your email"
+                  source={EmailLogo}
+                  isActive={false}
+                  onPress={onEmailPress}
+                />,
+                // <SecurityItem
+                //   heading="Authenticator"
+                //   description="6 digit authenticator code"
+                //   source={LockLogo}
+                //   isActive={false}
+                //   onPress={() => {}}
+                // />,
+              ],
+            },
+          ]}
+        />
+      </VStack>
     </>
   );
 }

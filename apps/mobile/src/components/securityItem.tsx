@@ -12,7 +12,6 @@ type Props = {
   description: string;
   onPress: () => void;
   isActive: boolean;
-  showArrow: boolean;
   source: ImageSourcePropType;
 };
 
@@ -21,7 +20,6 @@ export const SecurityItem = ({
   description,
   onPress,
   isActive,
-  showArrow,
   source,
 }: Props) => {
   return (
@@ -58,13 +56,11 @@ export const SecurityItem = ({
                 {description}
               </Text>
 
-              {showArrow ? (
-                <FontAwesomeIcon
-                  icon={faArrowRight}
-                  color={AppColors.text[1]}
-                  size={15}
-                />
-              ) : undefined}
+              <FontAwesomeIcon
+                icon={faArrowRight}
+                color={AppColors.text[1]}
+                size={15}
+              />
             </HStack>
           </VStack>
         </BaseItem>

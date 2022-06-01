@@ -1,8 +1,9 @@
 import React from 'react';
 import {VStack} from 'native-base';
 import {BigNumberish} from 'ethers';
-import {ManageTokenItem, BaseSheet} from '.';
-import {CurrencySymbols} from '../config';
+import {BaseSheet} from '.';
+import {ManageTokenItem} from '..';
+import {CurrencySymbols} from '../../config';
 
 type TokenSettings = {
   currency: CurrencySymbols;

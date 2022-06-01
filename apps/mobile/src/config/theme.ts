@@ -140,6 +140,33 @@ export const NativeBaseTheme = extendTheme({
     mono: 'Inter',
   },
   components: {
+    Input: {
+      baseStyle: {
+        _dark: {
+          placeholderTextColor: 'text.5',
+          borderColor: 'background.3',
+        },
+      },
+      variants: {
+        outline: {
+          borderWidth: '2px',
+        },
+      },
+      sizes: {
+        lg: {
+          fontSize: '16px',
+        },
+        md: {
+          fontSize: '16px',
+        },
+        sm: {
+          fontSize: '16px',
+        },
+        xs: {
+          fontSize: '16px',
+        },
+      },
+    },
     Button: {
       baseStyle: {
         borderRadius: '8px',

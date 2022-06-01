@@ -28,7 +28,6 @@ export const WalletAddress = ({value, network}: Props) => {
     <VStack space="12px">
       <Input
         mt="34px"
-        borderWidth="2px"
         borderRadius="7px"
         value={truncate(value)}
         fontFamily="heading"

@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 import React, {
   useMemo,
   useRef,
@@ -7,10 +8,13 @@ import React, {
 } from 'react';
 import {Dimensions} from 'react-native';
 import {getStatusBarHeight} from 'react-native-status-bar-height';
-import BottomSheet, {BottomSheetHandleProps} from '@gorhom/bottom-sheet';
-import {px2dp} from '../utils/units';
+import BottomSheet, {
+  BottomSheetHandleProps,
+  BottomSheetScrollView,
+} from '@gorhom/bottom-sheet';
+import {px2dp} from '../../utils/units';
 import {SheetHandle} from '.';
-import {AppColors} from '../config';
+import {AppColors} from '../../config';
 
 type Props = {
   title: string;
@@ -60,7 +64,9 @@ export const BaseSheet = ({
       index={-1}
       snapPoints={snapPoints}
       handleComponent={handleComponentFn(title, onClose, onBack)}>
-      {children}
+      <BottomSheetScrollView contentContainerStyle={{minHeight: '100%'}}>
+        {children}
+      </BottomSheetScrollView>
     </BottomSheet>
   );
 };

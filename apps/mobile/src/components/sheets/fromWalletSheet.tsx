@@ -1,8 +1,9 @@
 import React from 'react';
 import {Box} from 'native-base';
 import {faArrowDown} from '@fortawesome/free-solid-svg-icons/faArrowDown';
-import {ImageWithIconBadge, QRCode, WalletAddress, BaseSheet} from '.';
-import {Networks, NetworksConfig} from '../config';
+import {BaseSheet} from '.';
+import {ImageWithIconBadge, QRCode, WalletAddress} from '..';
+import {Networks, NetworksConfig} from '../../config';
 
 type Props = {
   isOpen: boolean;
