@@ -1,6 +1,6 @@
 import { Job } from "agenda";
 import { Jobs } from "../config";
 
-export default async function Processor(job: Job<Jobs["checkBlock"]>) {
+export default async function Processor(job: Job<Jobs["parseBlock"]>) {
   job;
 }
