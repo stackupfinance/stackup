@@ -19,7 +19,7 @@ type Props = NativeStackScreenProps<
 export default function OnboardFingerprintScreen({navigation}: Props) {
   const {loading: walletLoading, create} = useWalletStoreCreateWalletSelector();
   const {setMasterPassword} = useFingerprintStoreCreateWalletSelector();
-  const [enableFingerprint, setEnableFingerprint] = useState(false);
+  const [enableFingerprint] = useState(false);
 
   const loading = walletLoading;
 

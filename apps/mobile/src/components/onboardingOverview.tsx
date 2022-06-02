@@ -1,7 +1,6 @@
 import * as React from 'react';
 import {ImageSourcePropType} from 'react-native';
 import {Box, Image, Text, VStack} from 'native-base';
-import {AppColors} from '../config';
 
 export const OnboardingWelcomeImage: ImageSourcePropType = require('../../assets/images/onboarding-welcome-image.png');
 

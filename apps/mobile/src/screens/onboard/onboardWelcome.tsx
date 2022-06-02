@@ -15,12 +15,9 @@ import {
 type Props = NativeStackScreenProps<OnboardStackParamList, 'OnboardWelcome'>;
 
 export default function OnboardWelcomeScreen({navigation}: Props) {
-  const {loading: walletLoading, create} = useWalletStoreCreateWalletSelector();
-  const {
-    loading: fingerprintLoading,
-    isSupported,
-    setMasterPassword,
-  } = useFingerprintStoreCreateWalletSelector();
+  const {loading: walletLoading} = useWalletStoreCreateWalletSelector();
+  const {loading: fingerprintLoading, isSupported} =
+    useFingerprintStoreCreateWalletSelector();
   const [enableFingerprint, setEnableFingerprint] = useState(false);
 
   const loading = walletLoading || fingerprintLoading;

@@ -1,15 +1,5 @@
 import React from 'react';
-import {
-  Box,
-  Button,
-  HStack,
-  Icon,
-  Input,
-  Link,
-  Stack,
-  Text,
-  VStack,
-} from 'native-base';
+import {Box, Button, Icon, Input, Link, Stack, Text, VStack} from 'native-base';
 import type {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faCode} from '@fortawesome/free-solid-svg-icons/faCode';
