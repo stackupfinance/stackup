@@ -75,7 +75,7 @@ export const VerifyEmailSheet = ({
         />
 
         <Image
-          mt="42px"
+          mt="20px"
           source={Saly10Illustration}
           w="286px"
           h="245px"

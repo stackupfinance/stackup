@@ -34,7 +34,7 @@ export const SettingsSheet = ({
 
         <MenuItem
           heading="Join Stackup community"
-          description="We’re not big yet, but we like to make new friends :)"
+          description="We're not big yet, but we like to make new friends :)"
           backgroundColor={AppColors.palettes.primary[600]}
           icon={faDiscord}
           onPress={onDiscordPress}
