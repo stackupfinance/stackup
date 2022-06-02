@@ -14,7 +14,7 @@ interface AppEnvironment {
 export const Env: AppEnvironment = {
   NODE_ENV:
     process.env.NODE_ENV === "production" ? "production" : "development",
-  NAME: "Bundler",
+  NAME: "Explorer",
   PORT: Number(process.env.STACKUP_EXPLORER_PORT),
   MONGO_URL: process.env.STACKUP_EXPLORER_MONGODB_URL ?? "",
   SENTRY_DSN: process.env.STACKUP_EXPLORER_SENTRY_DNS ?? "",
