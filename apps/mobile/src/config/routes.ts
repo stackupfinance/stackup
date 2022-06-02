@@ -22,5 +22,11 @@ export type SettingsStackParamList = {
 };
 
 export type OnboardStackParamList = {
-  CreateWallet: undefined;
+  OnboardWelcome: undefined;
+  OnboardPassword: undefined;
+  OnboardFingerprint: undefined;
+  OnboardWalletImport: undefined;
+  OnboardWalletFound: undefined;
+  OnboardMasterPassword: undefined;
+  OnboardWalletRecovered: undefined;
 };
