@@ -13,7 +13,7 @@ import {IconButton, OnboardingFingerprint} from '../../components';
 
 type Props = NativeStackScreenProps<
   OnboardStackParamList,
-  'OnboardMasterPassword'
+  'OnboardFingerprint'
 >;
 
 export default function OnboardFingerprintScreen({navigation}: Props) {
