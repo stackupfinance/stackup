@@ -7,6 +7,6 @@ const router = express.Router();
 
 router
   .route("/:address")
-  .get(validate(addressValidation.get), addressController.get);
+  .post(validate(addressValidation.post), addressController.post);
 
 export default router;

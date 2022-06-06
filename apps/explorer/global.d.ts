@@ -3,3 +3,9 @@ declare module "xss-clean" {
 
   export default value;
 }
+
+declare module "@meanie/mongoose-to-json" {
+  const value: () => any;
+
+  export default value;
+}

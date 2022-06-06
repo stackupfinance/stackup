@@ -1,7 +1,15 @@
+import httpStatus from "http-status";
 import { ethers, BigNumberish } from "ethers";
-import { catchAsync } from "../utils";
-import { CurrencySymbols, TimePeriod } from "../config";
-// import * as AlchemyService from "../services/alchemy.service";
+import { catchAsync, ApiError } from "../utils";
+import { CurrencySymbols, Networks, TimePeriod } from "../config";
+import * as ReceiptService from "../services/receipt.service";
+import * as AlchemyService from "../services/alchemy.service";
+
+interface RequestBody {
+  network: Networks;
+  timePeriod: TimePeriod;
+  currencies: Array<CurrencySymbols>;
+}
 
 interface WalletBalance {
   currency: CurrencySymbols;
@@ -9,7 +17,7 @@ interface WalletBalance {
   currentBalance: BigNumberish;
 }
 
-interface TokenBalance {
+interface CurrencyBalance {
   currency: CurrencySymbols;
   quoteCurrency: CurrencySymbols;
   previousBalanceInQuoteCurrency: BigNumberish;
@@ -19,23 +27,50 @@ interface TokenBalance {
 interface GetResponse {
   timePeriod: TimePeriod;
   walletBalance: WalletBalance;
-  tokenBalances: Array<TokenBalance>;
+  currencies: Array<CurrencyBalance>;
 }
 
-export const get = catchAsync(async (req, res) => {
-  // const { address } = req.params;
+export const post = catchAsync(async (req, res) => {
+  const { address } = req.params;
+  const { network, timePeriod, currencies } = req.body as RequestBody;
 
-  // console.log(await AlchemyService.getBlockNumber("Polygon"));
-  // console.log(await AlchemyService.getTransactionReceipts("Polygon", 26570764));
+  const previousBlockNumber = await ReceiptService.getClosestBlockForTimePeriod(
+    network,
+    timePeriod
+  );
+  if (!previousBlockNumber) {
+    throw new ApiError(
+      httpStatus.INTERNAL_SERVER_ERROR,
+      "Previous block not found"
+    );
+  }
+  const [previousCurrencyBalances, currentCurrencyBalances] = await Promise.all(
+    [
+      AlchemyService.getCurrencyBalances(
+        network,
+        address,
+        currencies,
+        previousBlockNumber
+      ),
+      AlchemyService.getCurrencyBalances(network, address, currencies),
+    ]
+  );
 
   const response: GetResponse = {
-    timePeriod: "Max",
+    timePeriod,
     walletBalance: {
       currency: "USDC",
       previousBalance: ethers.constants.Zero,
       currentBalance: ethers.constants.Zero,
     },
-    tokenBalances: [],
+    currencies: currencies.map((currency) => ({
+      currency,
+      quoteCurrency: "USDC",
+      previousBalanceInQuoteCurrency:
+        previousCurrencyBalances[currency] ?? ethers.constants.Zero,
+      currentBalanceInQuoteCurrency:
+        currentCurrencyBalances[currency] ?? ethers.constants.Zero,
+    })),
   };
 
   res.send(response);

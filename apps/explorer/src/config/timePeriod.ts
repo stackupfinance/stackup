@@ -1,1 +1,1 @@
-export type TimePeriod = "Day" | "Week" | "Month" | "Year" | "Max";
+export type TimePeriod = "Hour" | "Day" | "Week" | "Month" | "Year" | "Max";

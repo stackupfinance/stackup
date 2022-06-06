@@ -1,4 +1,16 @@
+import { Networks } from ".";
+
+type CheckBlock = {
+  network: Networks;
+};
+
+type ParseBlock = {
+  network: Networks;
+  blockNumber: number;
+  attempt: number;
+};
+
 export type Jobs = {
-  checkBlock: Record<string, unknown>;
-  parseBlock: Record<string, unknown>;
+  checkBlock: CheckBlock;
+  parseBlock: ParseBlock;
 };
