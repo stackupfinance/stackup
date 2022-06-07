@@ -16,7 +16,7 @@
     "prettier:fix": "prettier --write '**'"
   },
   "dependencies": {
-    "@sentry/node": "^6.19.7",
+    "@sentry/node": "^7.1.0",
     "@sentry/tracing": "^6.19.7",
     "agenda": "^4.3.0",
     "compression": "^1.7.4",
