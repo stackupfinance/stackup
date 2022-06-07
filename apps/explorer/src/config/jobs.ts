@@ -1,7 +1,8 @@
-import { Networks } from ".";
+import { Networks, CurrencySymbols } from ".";
 
 type CheckBlock = {
   network: Networks;
+  attempt: number;
 };
 
 type ParseBlock = {
@@ -10,7 +11,13 @@ type ParseBlock = {
   attempt: number;
 };
 
+type FetchQuotes = {
+  quoteCurrency: CurrencySymbols;
+  attempt: number;
+};
+
 export type Jobs = {
   checkBlock: CheckBlock;
   parseBlock: ParseBlock;
+  fetchQuotes: FetchQuotes;
 };

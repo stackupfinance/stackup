@@ -1,31 +1,29 @@
 import Joi from "joi";
 import { ethereumAddress } from "./custom.validation";
-import { Networks, TimePeriod, CurrencySymbols } from "../config";
-
-const validNetworks: Array<Networks> = ["Polygon"];
-const validTimePeriods: Array<TimePeriod> = [
-  "Hour",
-  "Day",
-  "Week",
-  "Month",
-  "Year",
-  "Max",
-];
-const validCurrencies: Array<CurrencySymbols> = ["USDC", "ETH", "MATIC"];
+import {
+  ValidNetworks,
+  ValidTimePeriods,
+  ValidQuoteCurrenies,
+  ValidCurrencies,
+} from "../config";
 
 export const post = {
   params: Joi.object().keys({
     address: Joi.required().custom(ethereumAddress),
   }),
   body: Joi.object().keys({
+    quoteCurrency: Joi.string()
+      .valid(...ValidQuoteCurrenies)
+      .required(),
     network: Joi.string()
-      .valid(...validNetworks)
+      .valid(...ValidNetworks)
       .required(),
     timePeriod: Joi.string()
-      .valid(...validTimePeriods)
+      .valid(...ValidTimePeriods)
       .required(),
     currencies: Joi.array()
-      .items(Joi.string().valid(...validCurrencies))
+      .items(Joi.string().valid(...ValidCurrencies))
+      .unique()
       .required()
       .min(1)
       .max(10),

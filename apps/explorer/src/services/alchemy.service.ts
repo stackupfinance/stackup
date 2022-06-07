@@ -3,6 +3,7 @@ import { createAlchemyWeb3 } from "@alch/alchemy-web3";
 import { ethers, BigNumberish } from "ethers";
 import { contracts } from "@stackupfinance/walletjs";
 import { Env, Networks, NetworksConfig, CurrencySymbols } from "../config";
+import { getRPC } from "../utils";
 
 interface TokenBalanceResponse {
   id: number;
@@ -11,16 +12,6 @@ interface TokenBalanceResponse {
 type CurrencyBalances = Partial<Record<CurrencySymbols, BigNumberish>>;
 
 const ALCHEMY_POLYGON_INSTANCE = createAlchemyWeb3(Env.ALCHEMY_POLYGON_RPC);
-
-const getRPC = (network: Networks) => {
-  switch (network) {
-    case "Polygon":
-      return Env.ALCHEMY_POLYGON_RPC;
-
-    default:
-      return Env.ALCHEMY_POLYGON_RPC;
-  }
-};
 
 const getInstance = (network: Networks) => {
   switch (network) {

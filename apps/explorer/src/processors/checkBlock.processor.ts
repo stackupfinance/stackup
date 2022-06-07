@@ -1,15 +1,16 @@
 import { Job } from "agenda";
 import { initJob } from "../queue";
 import { Jobs } from "../config";
-import { logger } from "../utils";
+import { logger, exponentialBackoffDelay } from "../utils";
 import * as AlchemyService from "../services/alchemy.service";
 import * as CheckpointService from "../services/checkpoint.service";
 
+const MAX_ATTEMPTS = 5;
 export default async function Processor(job: Job) {
   if (!job.attrs.data) {
     throw new Error("Invalid job");
   }
-  const { network } = job.attrs.data as Jobs["checkBlock"];
+  const { network, attempt } = job.attrs.data as Jobs["checkBlock"];
 
   try {
     const [blockNumber, checkpoint] = await Promise.all([
@@ -28,7 +29,15 @@ export default async function Processor(job: Job) {
     await CheckpointService.updateCheckpoint(network, blockNumber);
     logger.info(`network: ${network}, lastBlockNumber: ${blockNumber}`);
   } catch (error) {
-    logger.error(error);
-    throw error;
+    if (attempt < MAX_ATTEMPTS) {
+      initJob(
+        "checkBlock",
+        { network, attempt: attempt + 1 },
+        exponentialBackoffDelay(attempt)
+      );
+    } else {
+      logger.error(error);
+      throw error;
+    }
   }
 }

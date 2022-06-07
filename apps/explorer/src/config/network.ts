@@ -1,12 +1,15 @@
 import { ethers } from "ethers";
 import { Env } from "./env";
 import { CurrencySymbols } from ".";
+
 export type Networks = "Polygon";
 
 type NetworksConfig = {
   nativeCurrency: CurrencySymbols;
   currencies: Record<CurrencySymbols, { address: string }>;
 };
+
+export const ValidNetworks: Array<Networks> = ["Polygon"];
 
 export const NetworksConfig: Record<Networks, NetworksConfig> = {
   Polygon: {
