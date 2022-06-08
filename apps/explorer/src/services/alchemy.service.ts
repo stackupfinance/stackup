@@ -9,6 +9,7 @@ interface TokenBalanceResponse {
   id: number;
   result: string;
 }
+
 type CurrencyBalances = Record<CurrencySymbols, BigNumberish>;
 
 const BASE_CURRENCY_BALANCE_MAP: CurrencyBalances = {

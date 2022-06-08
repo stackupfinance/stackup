@@ -26,13 +26,13 @@ interface CryptocurrencyQuoteLatestResponse {
 
 type CurrencyIdMap = Record<CurrencySymbols, number>;
 
-const COINMARKETCAP_URL = "https://pro-api.coinmarketcap.com";
-
 const BASE_CURRENCY_ID_MAP: CurrencyIdMap = {
   USDC: 3408,
   ETH: 1027,
   MATIC: 3890,
 };
+
+const COINMARKETCAP_URL = "https://pro-api.coinmarketcap.com";
 
 const fetchIDMap = async (): Promise<CurrencyIdMap> => {
   const response = await axios.get<CryptocurrencyMapResponse>(
