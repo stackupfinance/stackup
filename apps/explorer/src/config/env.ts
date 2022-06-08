@@ -4,6 +4,7 @@ dotenv.config();
 
 interface AppEnvironment {
   NODE_ENV: "production" | "development";
+  NETWORK_ENV: "mainnet" | "testnet";
   NAME: string;
   PORT: number;
   MONGO_URL: string;
@@ -15,6 +16,10 @@ interface AppEnvironment {
 export const Env: AppEnvironment = {
   NODE_ENV:
     process.env.NODE_ENV === "production" ? "production" : "development",
+  NETWORK_ENV:
+    process.env.STACKUP_EXPLORER_NETWORK_ENV === "mainnet"
+      ? "mainnet"
+      : "testnet",
   NAME: "Explorer",
   PORT: Number(process.env.STACKUP_EXPLORER_PORT),
   MONGO_URL: process.env.STACKUP_EXPLORER_MONGODB_URL ?? "",
