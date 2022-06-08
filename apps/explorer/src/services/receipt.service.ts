@@ -29,5 +29,5 @@ export const getClosestBlockForTimePeriod = async (
     { sort: { updatedAt: "asc" } }
   );
 
-  return recepit?.blockNumber ?? null;
+  return recepit?.blockNumber ?? "latest";
 };

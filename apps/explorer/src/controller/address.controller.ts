@@ -1,6 +1,5 @@
-import httpStatus from "http-status";
 import { ethers, BigNumberish } from "ethers";
-import { catchAsync, ApiError, convertToQuoteCurrency } from "../utils";
+import { catchAsync, convertToQuoteCurrency } from "../utils";
 import { CurrencySymbols, Networks, TimePeriod } from "../config";
 import * as ReceiptService from "../services/receipt.service";
 import * as AlchemyService from "../services/alchemy.service";
@@ -37,30 +36,25 @@ export const post = catchAsync(async (req, res) => {
   const { quoteCurrency, network, timePeriod, currencies } =
     req.body as RequestBody;
 
-  const [previousBlockNumber, previousQuotes, currentQuotes] =
-    await Promise.all([
-      ReceiptService.getClosestBlockForTimePeriod(network, timePeriod),
-      QuoteService.getClosestQuotes(quoteCurrency, currencies, timePeriod),
-      QuoteService.getClosestQuotes(quoteCurrency, currencies),
-    ]);
-  if (!previousBlockNumber) {
-    throw new ApiError(
-      httpStatus.INTERNAL_SERVER_ERROR,
-      "Previous block not found"
-    );
-  }
-
-  const [previousCurrencyBalances, currentCurrencyBalances] = await Promise.all(
-    [
-      AlchemyService.getCurrencyBalances(
-        network,
-        address,
-        currencies,
-        previousBlockNumber
-      ),
-      AlchemyService.getCurrencyBalances(network, address, currencies),
-    ]
-  );
+  const [
+    previousCurrencyBalances,
+    currentCurrencyBalances,
+    previousQuotes,
+    currentQuotes,
+  ] = await Promise.all([
+    ReceiptService.getClosestBlockForTimePeriod(network, timePeriod).then(
+      (blockNumber) =>
+        AlchemyService.getCurrencyBalances(
+          network,
+          address,
+          currencies,
+          blockNumber
+        )
+    ),
+    AlchemyService.getCurrencyBalances(network, address, currencies),
+    QuoteService.getClosestQuotes(quoteCurrency, currencies, timePeriod),
+    QuoteService.getClosestQuotes(quoteCurrency, currencies),
+  ]);
 
   const response: PostResponse = {
     timePeriod,
