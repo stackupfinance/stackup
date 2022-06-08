@@ -66,7 +66,7 @@ export const post = catchAsync(async (req, res) => {
           previousBalance: ethers.BigNumber.from(prev.previousBalance)
             .add(
               convertToQuoteCurrency(
-                previousCurrencyBalances[curr] ?? ethers.constants.Zero,
+                previousCurrencyBalances[curr],
                 curr,
                 quoteCurrency,
                 previousQuotes[curr]
@@ -76,7 +76,7 @@ export const post = catchAsync(async (req, res) => {
           currentBalance: ethers.BigNumber.from(prev.currentBalance)
             .add(
               convertToQuoteCurrency(
-                currentCurrencyBalances[curr] ?? ethers.constants.Zero,
+                currentCurrencyBalances[curr],
                 curr,
                 quoteCurrency,
                 currentQuotes[curr]
@@ -96,13 +96,13 @@ export const post = catchAsync(async (req, res) => {
       currency,
       quoteCurrency,
       previousBalanceInQuoteCurrency: convertToQuoteCurrency(
-        previousCurrencyBalances[currency] ?? ethers.constants.Zero,
+        previousCurrencyBalances[currency],
         currency,
         quoteCurrency,
         previousQuotes[currency]
       ).toString(),
       currentBalanceInQuoteCurrency: convertToQuoteCurrency(
-        currentCurrencyBalances[currency] ?? ethers.constants.Zero,
+        currentCurrencyBalances[currency],
         currency,
         quoteCurrency,
         currentQuotes[currency]

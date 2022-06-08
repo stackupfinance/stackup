@@ -9,7 +9,13 @@ interface TokenBalanceResponse {
   id: number;
   result: string;
 }
-type CurrencyBalances = Partial<Record<CurrencySymbols, BigNumberish>>;
+type CurrencyBalances = Record<CurrencySymbols, BigNumberish>;
+
+const BASE_CURRENCY_BALANCE_MAP: CurrencyBalances = {
+  USDC: ethers.constants.Zero,
+  ETH: ethers.constants.Zero,
+  MATIC: ethers.constants.Zero,
+};
 
 const ALCHEMY_POLYGON_INSTANCE = createAlchemyWeb3(Env.ALCHEMY_POLYGON_RPC);
 
@@ -91,12 +97,15 @@ const getLatestCurrencyBalances = async (
     }, {});
   }
 
-  return currencies.reduce((prev, curr) => {
-    return {
-      ...prev,
-      [curr]: balances[NetworksConfig[network].currencies[curr].address],
-    };
-  }, {});
+  return currencies.reduce(
+    (prev, curr) => {
+      return {
+        ...prev,
+        [curr]: balances[NetworksConfig[network].currencies[curr].address],
+      };
+    },
+    { ...BASE_CURRENCY_BALANCE_MAP }
+  );
 };
 
 const getCurrencyBalancesAtBlock = async (
@@ -133,12 +142,15 @@ const getCurrencyBalancesAtBlock = async (
     getRPC(network),
     batch
   );
-  return response.data.reduce((prev, curr) => {
-    return {
-      ...prev,
-      [currencies[curr.id]]: ethers.BigNumber.from(curr.result),
-    };
-  }, {});
+  return response.data.reduce(
+    (prev, curr) => {
+      return {
+        ...prev,
+        [currencies[curr.id]]: ethers.BigNumber.from(curr.result),
+      };
+    },
+    { ...BASE_CURRENCY_BALANCE_MAP }
+  );
 };
 
 export const getCurrencyBalances = async (
