@@ -16,6 +16,7 @@
     "prettier:fix": "prettier --write '**'"
   },
   "dependencies": {
+    "@meanie/mongoose-to-json": "^2.6.0",
     "@sentry/node": "^6.19.7",
     "@sentry/tracing": "^6.19.7",
     "agenda": "^4.3.0",

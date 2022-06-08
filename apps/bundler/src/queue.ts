@@ -1,7 +1,9 @@
 import { Agenda, Processor } from "agenda";
 import { Env, Jobs } from "./config";
 
-const agenda = new Agenda({ db: { address: Env.MONGO_URL } });
+const agenda = new Agenda({
+  db: { address: Env.MONGO_URL, collection: "jobs" },
+});
 
 export function defineJob(name: keyof Jobs, processor: Processor) {
   agenda.define(name, processor);

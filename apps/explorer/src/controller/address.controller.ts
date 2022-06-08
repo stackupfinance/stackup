@@ -1,41 +1,113 @@
 import { ethers, BigNumberish } from "ethers";
-import { catchAsync } from "../utils";
-import { CurrencySymbols, TimePeriod } from "../config";
-// import * as AlchemyService from "../services/alchemy.service";
+import { catchAsync, convertToQuoteCurrency } from "../utils";
+import { CurrencySymbols, Networks, TimePeriod } from "../config";
+import * as ReceiptService from "../services/receipt.service";
+import * as AlchemyService from "../services/alchemy.service";
+import * as QuoteService from "../services/quote.service";
+
+interface RequestBody {
+  quoteCurrency: CurrencySymbols;
+  network: Networks;
+  timePeriod: TimePeriod;
+  currencies: Array<CurrencySymbols>;
+}
 
 interface WalletBalance {
-  currency: CurrencySymbols;
+  quoteCurrency: CurrencySymbols;
   previousBalance: BigNumberish;
   currentBalance: BigNumberish;
 }
 
-interface TokenBalance {
+interface CurrencyBalance {
   currency: CurrencySymbols;
   quoteCurrency: CurrencySymbols;
   previousBalanceInQuoteCurrency: BigNumberish;
   currentBalanceInQuoteCurrency: BigNumberish;
 }
 
-interface GetResponse {
+interface PostResponse {
   timePeriod: TimePeriod;
   walletBalance: WalletBalance;
-  tokenBalances: Array<TokenBalance>;
+  currencies: Array<CurrencyBalance>;
 }
 
-export const get = catchAsync(async (req, res) => {
-  // const { address } = req.params;
+export const post = catchAsync(async (req, res) => {
+  const { address } = req.params;
+  const { quoteCurrency, network, timePeriod, currencies } =
+    req.body as RequestBody;
 
-  // console.log(await AlchemyService.getBlockNumber("Polygon"));
-  // console.log(await AlchemyService.getTransactionReceipts("Polygon", 26570764));
+  const [
+    previousCurrencyBalances,
+    currentCurrencyBalances,
+    previousQuotes,
+    currentQuotes,
+  ] = await Promise.all([
+    ReceiptService.getClosestBlockForTimePeriod(network, timePeriod).then(
+      (blockNumber) =>
+        AlchemyService.getCurrencyBalances(
+          network,
+          address,
+          currencies,
+          blockNumber
+        )
+    ),
+    AlchemyService.getCurrencyBalances(network, address, currencies),
+    QuoteService.getClosestQuotes(quoteCurrency, currencies, timePeriod),
+    QuoteService.getClosestQuotes(quoteCurrency, currencies),
+  ]);
 
-  const response: GetResponse = {
-    timePeriod: "Max",
-    walletBalance: {
-      currency: "USDC",
-      previousBalance: ethers.constants.Zero,
-      currentBalance: ethers.constants.Zero,
-    },
-    tokenBalances: [],
+  const response: PostResponse = {
+    timePeriod,
+
+    walletBalance: currencies.reduce(
+      (prev, curr) => {
+        return {
+          ...prev,
+          previousBalance: ethers.BigNumber.from(prev.previousBalance)
+            .add(
+              convertToQuoteCurrency(
+                previousCurrencyBalances[curr],
+                curr,
+                quoteCurrency,
+                previousQuotes[curr]
+              )
+            )
+            .toString(),
+          currentBalance: ethers.BigNumber.from(prev.currentBalance)
+            .add(
+              convertToQuoteCurrency(
+                currentCurrencyBalances[curr],
+                curr,
+                quoteCurrency,
+                currentQuotes[curr]
+              )
+            )
+            .toString(),
+        };
+      },
+      {
+        quoteCurrency,
+        previousBalance: "0",
+        currentBalance: "0",
+      }
+    ),
+
+    currencies: currencies.map((currency) => ({
+      currency,
+      quoteCurrency,
+      previousBalanceInQuoteCurrency: convertToQuoteCurrency(
+        previousCurrencyBalances[currency],
+        currency,
+        quoteCurrency,
+        previousQuotes[currency]
+      ).toString(),
+      currentBalanceInQuoteCurrency: convertToQuoteCurrency(
+        currentCurrencyBalances[currency],
+        currency,
+        quoteCurrency,
+        currentQuotes[currency]
+      ).toString(),
+    })),
   };
 
   res.send(response);
