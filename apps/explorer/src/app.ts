@@ -1,6 +1,6 @@
 import express, { Express } from "express";
 import * as Sentry from "@sentry/node";
-import Tracing from "@sentry/tracing";
+import * as Tracing from "@sentry/tracing";
 import isURL from "validator/lib/isURL";
 import helmet from "helmet";
 import xss from "xss-clean";
