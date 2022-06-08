@@ -15,6 +15,12 @@ export const dateForTimePeriod = (timePeriod: TimePeriod) => {
     case "Month":
       return sub(Date.now(), { months: 1 });
 
+    case "3_Month":
+      return sub(Date.now(), { months: 3 });
+
+    case "6_Month":
+      return sub(Date.now(), { months: 6 });
+
     case "Year":
       return sub(Date.now(), { years: 1 });
 
