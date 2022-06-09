@@ -19,8 +19,7 @@
         ],
         "no-shadow": "off",
         "no-undef": "off",
-        "unused-imports/no-unused-imports": "error",
-        "@typescript-eslint/ban-ts-comment": "off"
+        "unused-imports/no-unused-imports": "error"
       }
     }
   ],
