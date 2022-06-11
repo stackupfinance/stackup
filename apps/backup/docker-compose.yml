@@ -1,0 +1,12 @@
+version: "3"
+
+services:
+  mongodb:
+    image: mongo:4.4.11
+    ports:
+      - "27018:27017"
+    volumes:
+      - dbdata:/data/db
+
+volumes:
+  dbdata:

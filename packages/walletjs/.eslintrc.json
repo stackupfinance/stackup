@@ -1,13 +1,28 @@
 {
-  "env": {
-    "node": true,
-    "commonjs": true,
-    "es2021": true,
-    "jest": true
-  },
-  "extends": ["eslint:recommended", "prettier"],
-  "parserOptions": {
-    "ecmaVersion": 12
-  },
-  "rules": {}
+  "root": true,
+  "parser": "@typescript-eslint/parser",
+  "plugins": ["@typescript-eslint", "unused-imports"],
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
+    "prettier"
+  ],
+  "overrides": [
+    {
+      "files": ["*.ts"],
+      "rules": {
+        "@typescript-eslint/no-explicit-any": "off",
+        "@typescript-eslint/no-shadow": ["error"],
+        "@typescript-eslint/no-unused-vars": [
+          "error",
+          { "ignoreRestSiblings": true }
+        ],
+        "no-shadow": "off",
+        "no-undef": "off",
+        "unused-imports/no-unused-imports": "error",
+        "@typescript-eslint/ban-ts-comment": "off"
+      }
+    }
+  ],
+  "ignorePatterns": ["build"]
 }

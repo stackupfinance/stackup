@@ -3,7 +3,11 @@ import { contracts, wallet, constants } from "@stackupfinance/walletjs";
 
 async function main() {
   const [signer] = await ethers.getSigners();
-  const init = [contracts.Wallet.address, signer.address, []];
+  const init: [string, string, Array<never>] = [
+    contracts.Wallet.address,
+    signer.address,
+    [],
+  ];
 
   const paymaster =
     process.env.STACKUP_CONTRACTS_PAYMASTER ?? wallet.proxy.getAddress(...init);
