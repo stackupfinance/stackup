@@ -2,8 +2,10 @@
   "name": "@stackupfinance/walletjs",
   "version": "1.0.0",
   "private": true,
-  "main": "lib/index.ts",
+  "main": "build/lib",
+  "types": "build/types",
   "scripts": {
+    "build": "tsc",
     "test": "jest",
     "lint": "eslint . && tsc --noEmit",
     "lint:fix": "eslint . --fix",

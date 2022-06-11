@@ -11,4 +11,8 @@ router
   .route("/ping")
   .post(validate(walletValidation.ping), walletController.ping);
 
+router
+  .route("/fetch")
+  .post(validate(walletValidation.fetch), walletController.fetch);
+
 export default router;
