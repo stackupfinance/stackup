@@ -37,7 +37,8 @@ $ yarn install:ios
 Next we'll have to setup some app specific environment variables in order to get everything working end to end. See the `README.md` files in the following directories for more details.
 
 - [Contracts](./apps/contracts) - A collection of solidity smart contracts for Stackup.
-- [Explorer](./apps/explorer) Service for fetching blockchain data for an address.
+- [Explorer](./apps/explorer) - Service for fetching blockchain data for an address.
+- [Backup](./apps/backup) - Service for providing encrypted and non-custodial backup of wallets.
 - [Bundler](./apps/bundler) Service for forwarding UserOperations to the EntryPoint.
 - [Mobile](./apps/mobile) - A mobile native frontend for IOS and Android.
 
