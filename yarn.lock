@@ -24,10 +24,10 @@
     web3-utils "1.7.1"
     websocket "^1.0.28"
 
-"@amplitude/react-native@^2.11.0":
-  version "2.11.0"
-  resolved "https://registry.yarnpkg.com/@amplitude/react-native/-/react-native-2.11.0.tgz#ea8a9e14fda5369b37ea5984e6554196ff2d7a4f"
-  integrity sha512-mSnB3FXHo5ajGCx7Xo4OFHlYB7X+Kbh50uazTx/zkcsuqkwqMrC9F2xr4w9O3dE+PC+9dbamccL+vveBID7tbA==
+"@amplitude/react-native@^2.12.1":
+  version "2.12.1"
+  resolved "https://registry.yarnpkg.com/@amplitude/react-native/-/react-native-2.12.1.tgz#88798269d29386a6e5694ac5da262b22d104bfbd"
+  integrity sha512-J+EMC2X2U5DZaY8XyiXk4nDDaNxBihd33ZPU2oRzXdVp/25JSuyBtX3I5mllgvCWzF5tVzMacd7uNZAcsWNW4g==
 
 "@ampproject/remapping@^2.1.0":
   version "2.1.2"
