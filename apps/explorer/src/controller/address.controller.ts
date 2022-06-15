@@ -93,7 +93,9 @@ export const post = catchAsync(async (req, res) => {
     currencies: currencies.map((currency) => ({
       currency,
       quoteCurrency,
-      balance: currentCurrencyBalances[currency].toString(),
+      balance: ethers.BigNumber.from(
+        currentCurrencyBalances[currency]
+      ).toString(),
       previousBalanceInQuoteCurrency: convertToQuoteCurrency(
         previousCurrencyBalances[currency],
         currency,
