@@ -21,12 +21,12 @@ interface WalletBalance {
 interface CurrencyBalance {
   currency: CurrencySymbols;
   quoteCurrency: CurrencySymbols;
+  balance: BigNumberish;
   previousBalanceInQuoteCurrency: BigNumberish;
   currentBalanceInQuoteCurrency: BigNumberish;
 }
 
 interface PostResponse {
-  timePeriod: TimePeriod;
   walletBalance: WalletBalance;
   currencies: Array<CurrencyBalance>;
 }
@@ -57,8 +57,6 @@ export const post = catchAsync(async (req, res) => {
   ]);
 
   const response: PostResponse = {
-    timePeriod,
-
     walletBalance: currencies.reduce(
       (prev, curr) => {
         return {
@@ -95,6 +93,7 @@ export const post = catchAsync(async (req, res) => {
     currencies: currencies.map((currency) => ({
       currency,
       quoteCurrency,
+      balance: currentCurrencyBalances[currency],
       previousBalanceInQuoteCurrency: convertToQuoteCurrency(
         previousCurrencyBalances[currency],
         currency,
