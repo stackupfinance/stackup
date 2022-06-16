@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useMemo} from 'react';
 import {Box, Button, HStack} from 'native-base';
 import type {CompositeScreenProps} from '@react-navigation/native';
 import type {MaterialTopTabScreenProps} from '@react-navigation/material-top-tabs';
@@ -33,15 +33,24 @@ export default function AssetsScreen({navigation}: Props) {
   const {setShowSettingsSheet, setShowTokenListSheet, setShowDepositSheet} =
     useNavigationStoreAssetsSelector();
   const [isHidden, setIsHidden] = useState<boolean>(false);
-  const {network, quoteCurrency, currencies, timePeriod} =
-    useSettingsStoreAssetsSelector();
+  const {
+    network,
+    quoteCurrency,
+    timePeriod,
+    currencies: enabledCurrencies,
+  } = useSettingsStoreAssetsSelector();
   const {instance} = useWalletStoreAssetsSelector();
   const {
     loading: explorerLoading,
     walletBalance,
-    currencies: currencyBalances,
+    currencies,
     fetchAddressOverview,
   } = useExplorerStoreAssetsSelector();
+
+  const currencySet = useMemo(
+    () => new Set(enabledCurrencies),
+    [enabledCurrencies],
+  );
 
   useEffect(() => {
     onRefresh();
@@ -68,7 +77,6 @@ export default function AssetsScreen({navigation}: Props) {
     fetchAddressOverview(
       network,
       quoteCurrency,
-      currencies,
       timePeriod,
       instance.walletAddress,
     );
@@ -113,21 +121,23 @@ export default function AssetsScreen({navigation}: Props) {
         sections={[
           {
             title: '',
-            data: currencyBalances.map(currencyBalance => (
-              <PortfolioItem
-                key={currencyBalance.currency}
-                currency={currencyBalance.currency}
-                quoteCurrency={currencyBalance.quoteCurrency}
-                balance={currencyBalance.balance}
-                previousBalanceInQuoteCurrency={
-                  currencyBalance.previousBalanceInQuoteCurrency
-                }
-                currentBalanceInQuoteCurrency={
-                  currencyBalance.currentBalanceInQuoteCurrency
-                }
-                isHidden={isHidden}
-              />
-            )),
+            data: currencies
+              .filter(currency => currencySet.has(currency.currency))
+              .map(currency => (
+                <PortfolioItem
+                  key={currency.currency}
+                  currency={currency.currency}
+                  quoteCurrency={currency.quoteCurrency}
+                  balance={currency.balance}
+                  previousBalanceInQuoteCurrency={
+                    currency.previousBalanceInQuoteCurrency
+                  }
+                  currentBalanceInQuoteCurrency={
+                    currency.currentBalanceInQuoteCurrency
+                  }
+                  isHidden={isHidden}
+                />
+              )),
           },
         ]}
         footer={
@@ -144,7 +154,7 @@ export default function AssetsScreen({navigation}: Props) {
                 size={20}
               />
             }>
-            Manage token list
+            Manage currency list
           </Button>
         }
       />

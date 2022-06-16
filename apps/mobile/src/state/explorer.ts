@@ -3,7 +3,13 @@ import {persist, devtools} from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {BigNumberish} from 'ethers';
 import axios from 'axios';
-import {CurrencySymbols, Networks, TimePeriod, Env} from '../config';
+import {
+  CurrencySymbols,
+  CurrencyList,
+  Networks,
+  TimePeriod,
+  Env,
+} from '../config';
 
 interface WalletBalance {
   quoteCurrency: CurrencySymbols;
@@ -34,7 +40,6 @@ interface ExplorerState extends ExplorerStateConstants {
   fetchAddressOverview: (
     network: Networks,
     quoteCurrency: CurrencySymbols,
-    currencies: Array<CurrencySymbols>,
     timePeriod: TimePeriod,
     address: string,
   ) => Promise<void>;
@@ -63,7 +68,6 @@ const useExplorerStore = create<ExplorerState>()(
         fetchAddressOverview: async (
           network,
           quoteCurrency,
-          currencies,
           timePeriod,
           address,
         ) => {
@@ -75,7 +79,7 @@ const useExplorerStore = create<ExplorerState>()(
                 network,
                 quoteCurrency,
                 timePeriod,
-                currencies,
+                currencies: CurrencyList,
               },
             );
             const data = response.data;
@@ -118,6 +122,9 @@ const useExplorerStore = create<ExplorerState>()(
 
 export const useExplorerStoreRemoveWalletSelector = () =>
   useExplorerStore(state => ({clear: state.clear}));
+
+export const useExplorerStoreHomeSelector = () =>
+  useExplorerStore(state => ({currencies: state.currencies}));
 
 export const useExplorerStoreAssetsSelector = () =>
   useExplorerStore(state => ({

@@ -12,6 +12,7 @@ interface SettingsStateConstants {
 }
 
 interface SettingsState extends SettingsStateConstants {
+  toggleCurrency: (currency: CurrencySymbols, enabled: boolean) => void;
   clear: () => void;
 
   hasHydrated: boolean;
@@ -22,15 +23,22 @@ const defaults: SettingsStateConstants = {
   loading: false,
   network: 'Polygon',
   quoteCurrency: 'USDC',
-  currencies: ['USDC', 'ETH', 'MATIC'],
+  currencies: ['USDC'],
   timePeriod: 'Year',
 };
 const STORE_NAME = 'stackup-settings-store';
 const useSettingsStore = create<SettingsState>()(
   devtools(
     persist(
-      set => ({
+      (set, get) => ({
         ...defaults,
+
+        toggleCurrency: (currency, enabled) => {
+          const currencies = enabled
+            ? [...new Set([...get().currencies, currency])]
+            : [...get().currencies].filter(curr => curr !== currency);
+          set({currencies});
+        },
 
         clear: () => {
           set({...defaults});
@@ -59,6 +67,12 @@ const useSettingsStore = create<SettingsState>()(
 
 export const useSettingsStoreRemoveWalletSelector = () =>
   useSettingsStore(state => ({clear: state.clear}));
+
+export const useSettingsStoreHomeSelector = () =>
+  useSettingsStore(state => ({
+    currencies: state.currencies,
+    toggleCurrency: state.toggleCurrency,
+  }));
 
 export const useSettingsStoreAssetsSelector = () =>
   useSettingsStore(state => ({
