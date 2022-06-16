@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {Box, Button, HStack} from 'native-base';
 import type {CompositeScreenProps} from '@react-navigation/native';
 import type {MaterialTopTabScreenProps} from '@react-navigation/material-top-tabs';
@@ -17,7 +17,12 @@ import {
   PortfolioBalance,
   PortfolioItem,
 } from '../../components';
-import {useNavigationStoreAssetsSelector} from '../../state';
+import {
+  useNavigationStoreAssetsSelector,
+  useSettingsStoreAssetsSelector,
+  useWalletStoreAssetsSelector,
+  useExplorerStoreAssetsSelector,
+} from '../../state';
 
 type Props = CompositeScreenProps<
   MaterialTopTabScreenProps<HomeTabParamList, 'Assets'>,
@@ -28,6 +33,20 @@ export default function AssetsScreen({navigation}: Props) {
   const {setShowSettingsSheet, setShowTokenListSheet, setShowDepositSheet} =
     useNavigationStoreAssetsSelector();
   const [isHidden, setIsHidden] = useState<boolean>(false);
+  const {network, quoteCurrency, currencies, timePeriod} =
+    useSettingsStoreAssetsSelector();
+  const {instance} = useWalletStoreAssetsSelector();
+  const {
+    loading: explorerLoading,
+    walletBalance,
+    currencies: currencyBalances,
+    fetchAddressOverview,
+  } = useExplorerStoreAssetsSelector();
+
+  useEffect(() => {
+    onRefresh();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const onSecurityPress = () => {
     navigation.navigate('Security');
@@ -45,6 +64,16 @@ export default function AssetsScreen({navigation}: Props) {
     setShowDepositSheet(true);
   };
 
+  const onRefresh = () => {
+    fetchAddressOverview(
+      network,
+      quoteCurrency,
+      currencies,
+      timePeriod,
+      instance.walletAddress,
+    );
+  };
+
   return (
     <TabScreenContainer>
       <TabScreenHeader>
@@ -55,78 +84,70 @@ export default function AssetsScreen({navigation}: Props) {
         <SecurityButton onPress={onSecurityPress} />
       </TabScreenHeader>
 
-      <Box flex={1}>
-        <Box mt="20px">
-          <PortfolioBalance
-            previousBalance="11777844200"
-            currentBalance="11883895672"
-            currency="USDC"
-            isHidden={isHidden}
-            onToggleVisibility={() => setIsHidden(!isHidden)}
-          />
-        </Box>
+      <List
+        onRefresh={onRefresh}
+        isRefreshing={explorerLoading}
+        header={
+          <Box key="assets-header">
+            <Box mt="20px">
+              <PortfolioBalance
+                previousBalance={walletBalance.previousBalance}
+                currentBalance={walletBalance.currentBalance}
+                currency={quoteCurrency}
+                isHidden={isHidden}
+                onToggleVisibility={() => setIsHidden(!isHidden)}
+              />
+            </Box>
 
-        <HStack mt="33px" space="14px">
-          <Button flex={1} onPress={onDepositPress}>
-            Deposit
+            <HStack mt="33px" mb="31px" space="14px">
+              <Button flex={1} onPress={onDepositPress}>
+                Deposit
+              </Button>
+
+              <Button flex={1} onPress={() => {}}>
+                Send
+              </Button>
+            </HStack>
+          </Box>
+        }
+        sections={[
+          {
+            title: '',
+            data: currencyBalances.map(currencyBalance => (
+              <PortfolioItem
+                key={currencyBalance.currency}
+                currency={currencyBalance.currency}
+                quoteCurrency={currencyBalance.quoteCurrency}
+                balance={currencyBalance.balance}
+                previousBalanceInQuoteCurrency={
+                  currencyBalance.previousBalanceInQuoteCurrency
+                }
+                currentBalanceInQuoteCurrency={
+                  currencyBalance.currentBalanceInQuoteCurrency
+                }
+                isHidden={isHidden}
+              />
+            )),
+          },
+        ]}
+        footer={
+          <Button
+            key="assets-footer"
+            colorScheme="text"
+            variant="link"
+            onPress={onTokenListPress}
+            _text={{color: AppColors.text[4], fontWeight: 400}}
+            leftIcon={
+              <FontAwesomeIcon
+                icon={faSliders}
+                color={AppColors.text[4]}
+                size={20}
+              />
+            }>
+            Manage token list
           </Button>
-
-          <Button flex={1} onPress={() => {}}>
-            Send
-          </Button>
-        </HStack>
-
-        <Box mt="31px">
-          <List
-            sections={[
-              {
-                title: '',
-                data: [
-                  <PortfolioItem
-                    currency="USDC"
-                    defaultCurrency="USDC"
-                    balance="10000000000"
-                    previousBalanceInDefaultCurrency="10000000000"
-                    currentBalanceInDefaultCurrency="10000000000"
-                    isHidden={isHidden}
-                  />,
-                  <PortfolioItem
-                    currency="ETH"
-                    defaultCurrency="USDC"
-                    balance="1860000000000000000"
-                    previousBalanceInDefaultCurrency="1773741200"
-                    currentBalanceInDefaultCurrency="1880165672"
-                    isHidden={isHidden}
-                  />,
-                  <PortfolioItem
-                    currency="MATIC"
-                    defaultCurrency="USDC"
-                    balance="6240000000000000000"
-                    previousBalanceInDefaultCurrency="4103000"
-                    currentBalanceInDefaultCurrency="3730000"
-                    isHidden={isHidden}
-                  />,
-                ],
-              },
-            ]}
-          />
-        </Box>
-
-        <Button
-          colorScheme="text"
-          variant="link"
-          onPress={onTokenListPress}
-          _text={{color: AppColors.text[4], fontWeight: 400}}
-          leftIcon={
-            <FontAwesomeIcon
-              icon={faSliders}
-              color={AppColors.text[4]}
-              size={20}
-            />
-          }>
-          Manage token list
-        </Button>
-      </Box>
+        }
+      />
     </TabScreenContainer>
   );
 }

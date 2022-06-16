@@ -8,7 +8,6 @@ import {
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {gestureHandlerRootHOC} from 'react-native-gesture-handler';
 import * as Sentry from '@sentry/react-native';
-import Config from 'react-native-config';
 import {
   HomeScreen,
   SecurityScreen,
@@ -19,13 +18,14 @@ import {
   RootStackParamList,
   NativeBaseTheme,
   NavigationTheme,
+  Env,
 } from './src/config';
 import {useAuth} from './src/hooks';
 import {useNavigationStoreAppSelector} from './src/state';
 
 const routingInstrumentation = new Sentry.ReactNavigationInstrumentation();
 Sentry.init({
-  dsn: Config.STACKUP_MOBILE_SENTRY_DNS,
+  dsn: Env.SENTRY_DSN,
   tracesSampleRate: 0.5,
   integrations: [new Sentry.ReactNativeTracing({routingInstrumentation})],
 });

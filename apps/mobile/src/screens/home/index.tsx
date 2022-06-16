@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unstable-nested-components */
 import React, {useEffect} from 'react';
 import {Linking} from 'react-native';
 import {Box, Text} from 'native-base';
@@ -89,7 +90,8 @@ export const HomeScreen = () => {
     <>
       <Tab.Navigator
         tabBarPosition="bottom"
-        tabBar={() => <Box />} // TODO: Remove this when adding more tabs
+        // TODO: Remove this when adding more tabs
+        tabBar={() => <Box />}
         screenOptions={({route}) => ({
           tabBarLabel: ({color}) => {
             return (
@@ -145,15 +147,13 @@ export const HomeScreen = () => {
         onTransferFromWalletPress={onTransferFromWalletPress}
       />
 
-      {instance ? (
-        <FromWalletSheet
-          network="Polygon"
-          walletAddress={instance.walletAddress}
-          isOpen={showFromWalletSheet}
-          onBack={onFromWalletBackPress}
-          onClose={onCloseFromWalletSheet}
-        />
-      ) : null}
+      <FromWalletSheet
+        network="Polygon"
+        walletAddress={instance.walletAddress}
+        isOpen={showFromWalletSheet}
+        onBack={onFromWalletBackPress}
+        onClose={onCloseFromWalletSheet}
+      />
     </>
   );
 };

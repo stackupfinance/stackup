@@ -15,6 +15,17 @@ type Props = {
   onRemoveWalletPress: () => void;
 };
 
+const PopoverTrigger = (triggerProps: any) => (
+  <Button
+    {...triggerProps}
+    size="sm"
+    colorScheme="tertiary"
+    variant="outline"
+    borderColor="tertiary.600">
+    Remove Wallet
+  </Button>
+);
+
 export const SettingsSheet = ({
   isOpen,
   onClose,
@@ -42,17 +53,7 @@ export const SettingsSheet = ({
 
         <Divider />
 
-        <Popover
-          trigger={triggerProps => (
-            <Button
-              {...triggerProps}
-              size="sm"
-              colorScheme="tertiary"
-              variant="outline"
-              borderColor="tertiary.600">
-              Remove Wallet
-            </Button>
-          )}>
+        <Popover trigger={PopoverTrigger}>
           <Popover.Content
             accessibilityLabel="Remove Wallet"
             borderWidth="0px"
