@@ -1,21 +1,15 @@
 import create from 'zustand';
 import {persist, devtools} from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {ethers} from 'ethers';
 import {wallet} from '@stackupfinance/walletjs';
 
-interface WalletInstance {
-  walletAddress: string;
-  initImplementation: string;
-  initOwner: string;
-  initGuardians: Array<string>;
-  salt: string;
-  encryptedSigner: string;
+interface WalletStateConstants {
+  loading: boolean;
+  instance: wallet.WalletInstance;
 }
 
-interface WalletState {
-  loading: boolean;
-  instance: WalletInstance | undefined;
-
+interface WalletState extends WalletStateConstants {
   create: (
     password: string,
     salt: string,
@@ -27,13 +21,25 @@ interface WalletState {
   setHasHydrated: (flag: boolean) => void;
 }
 
+const defaults: WalletStateConstants = {
+  loading: false,
+
+  // This is just a dummy instance and does not represent a real wallet.
+  instance: {
+    walletAddress: ethers.constants.AddressZero,
+    initImplementation: ethers.constants.AddressZero,
+    initGuardians: [ethers.constants.AddressZero],
+    initOwner: ethers.constants.AddressZero,
+    salt: '',
+    encryptedSigner: '',
+  },
+};
 const STORE_NAME = 'stackup-wallet-store';
 const useWalletStore = create<WalletState>()(
   devtools(
     persist(
       set => ({
-        loading: false,
-        instance: undefined,
+        ...defaults,
 
         create: async (password, salt, onCreate) => {
           set({loading: true});
@@ -47,7 +53,7 @@ const useWalletStore = create<WalletState>()(
         },
 
         remove: () => {
-          set({instance: undefined});
+          set({...defaults});
         },
 
         hasHydrated: false,
@@ -87,4 +93,7 @@ export const useWalletStoreCreateWalletSelector = () =>
   }));
 
 export const useWalletStoreHomeSelector = () =>
+  useWalletStore(state => ({instance: state.instance}));
+
+export const useWalletStoreAssetsSelector = () =>
   useWalletStore(state => ({instance: state.instance}));

@@ -8,6 +8,8 @@ import {
   useNavigationStoreRemoveWalletSelector,
   useIntercomStoreRemoveWalletSelector,
   useIntercomStoreAuthSelector,
+  useSettingsStoreRemoveWalletSelector,
+  useExplorerStoreRemoveWalletSelector,
 } from '../state';
 import {logEvent} from '../utils/analytics';
 
@@ -26,11 +28,15 @@ export const useRemoveWallet = (): UseRemoveWalletHook => {
   const {resetMasterPassword} = useFingerprintStoreRemoveWalletSelector();
   const {clear: clearNavigation} = useNavigationStoreRemoveWalletSelector();
   const {clear: clearIntercom} = useIntercomStoreRemoveWalletSelector();
+  const {clear: clearSettings} = useSettingsStoreRemoveWalletSelector();
+  const {clear: clearExplorer} = useExplorerStoreRemoveWalletSelector();
 
   return async () => {
     // Clear all state here before removing wallet from device.
     clearNavigation();
     clearIntercom();
+    clearSettings();
+    clearExplorer();
 
     resetMasterPassword();
     remove();
@@ -81,7 +87,7 @@ export const useAuth = (): UseAuthHook => {
   useEffect(() => {
     if (hasHydrated) {
       checkDevice();
-      setHasWalletInstance(Boolean(instance));
+      setHasWalletInstance(Boolean(instance.encryptedSigner));
       setIsReady(true);
 
       if (instance) {

@@ -51,6 +51,15 @@ export const percentChange = (
   curr: BigNumberish,
   currency: CurrencySymbols,
 ): string => {
+  if (
+    ethers.BigNumber.from(prev).isZero() &&
+    ethers.BigNumber.from(curr).isZero()
+  ) {
+    return parseFloat(ethers.constants.Zero.toString()).toFixed(2);
+  } else if (ethers.BigNumber.from(prev).isZero()) {
+    return '∞';
+  }
+
   return Math.abs(
     (parseFloat(
       ethers.utils.formatUnits(

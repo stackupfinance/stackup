@@ -10,23 +10,23 @@ import {formatCurrency, percentChange} from '../utils/currency';
 
 type Props = {
   currency: CurrencySymbols;
-  defaultCurrency: CurrencySymbols;
+  quoteCurrency: CurrencySymbols;
   balance: BigNumberish;
-  previousBalanceInDefaultCurrency: BigNumberish;
-  currentBalanceInDefaultCurrency: BigNumberish;
+  previousBalanceInQuoteCurrency: BigNumberish;
+  currentBalanceInQuoteCurrency: BigNumberish;
   isHidden: boolean;
 };
 
 export const PortfolioItem = ({
   currency,
-  defaultCurrency,
+  quoteCurrency,
   balance,
-  previousBalanceInDefaultCurrency,
-  currentBalanceInDefaultCurrency,
+  previousBalanceInQuoteCurrency,
+  currentBalanceInQuoteCurrency,
   isHidden,
 }: PropsWithChildren<Props>) => {
-  const isTrendUp = ethers.BigNumber.from(currentBalanceInDefaultCurrency).gte(
-    previousBalanceInDefaultCurrency,
+  const isTrendUp = ethers.BigNumber.from(currentBalanceInQuoteCurrency).gte(
+    previousBalanceInQuoteCurrency,
   );
   const changePercentColor = isTrendUp
     ? AppColors.singletons.good
@@ -55,10 +55,7 @@ export const PortfolioItem = ({
           <Text fontSize="16px" fontWeight={500}>
             {isHidden
               ? '•••••••'
-              : formatCurrency(
-                  currentBalanceInDefaultCurrency,
-                  defaultCurrency,
-                )}
+              : formatCurrency(currentBalanceInQuoteCurrency, quoteCurrency)}
           </Text>
         </HStack>
 
@@ -73,9 +70,9 @@ export const PortfolioItem = ({
                 isHidden
                   ? '•••'
                   : `${percentChange(
-                      previousBalanceInDefaultCurrency,
-                      currentBalanceInDefaultCurrency,
-                      defaultCurrency,
+                      previousBalanceInQuoteCurrency,
+                      currentBalanceInQuoteCurrency,
+                      quoteCurrency,
                     )}%`
               }`}{' '}
               {trendIcon}
