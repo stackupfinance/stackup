@@ -25,6 +25,6 @@ export const dateForTimePeriod = (timePeriod: TimePeriod) => {
       return sub(Date.now(), { years: 1 });
 
     default:
-      return new Date(0);
+      return sub(Date.now(), { years: 1 });
   }
 };
