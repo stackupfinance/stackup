@@ -1,5 +1,5 @@
 /* eslint-disable react/no-unstable-nested-components */
-import React, {useEffect} from 'react';
+import React, {useEffect, useMemo} from 'react';
 import {Linking} from 'react-native';
 import {Box, Text} from 'native-base';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
@@ -24,6 +24,8 @@ import {
   useNavigationStoreHomeSelector,
   useIntercomStoreHomeSelector,
   useWalletStoreHomeSelector,
+  useSettingsStoreHomeSelector,
+  useExplorerStoreHomeSelector,
 } from '../../state';
 
 const Tab = createMaterialTopTabNavigator<HomeTabParamList>();
@@ -42,7 +44,15 @@ export const HomeScreen = () => {
   } = useNavigationStoreHomeSelector();
   const {instance} = useWalletStoreHomeSelector();
   const {openMessenger} = useIntercomStoreHomeSelector();
+  const {currencies: enabledCurrencies, toggleCurrency} =
+    useSettingsStoreHomeSelector();
+  const {currencies} = useExplorerStoreHomeSelector();
   const removeWallet = useRemoveWallet();
+
+  const currencySet = useMemo(
+    () => new Set(enabledCurrencies),
+    [enabledCurrencies],
+  );
 
   useEffect(() => {
     return () => {
@@ -133,12 +143,12 @@ export const HomeScreen = () => {
       <TokenListSheet
         isOpen={showTokenListSheet}
         onClose={onCloseTokenListSheet}
-        onTokenChange={(currency, enabled) => console.log(currency, enabled)}
-        tokenSettings={[
-          {currency: 'USDC', balance: '10000000000', enabled: true},
-          {currency: 'ETH', balance: '1860000000000000000', enabled: true},
-          {currency: 'MATIC', balance: '6240000000000000000', enabled: true},
-        ]}
+        onTokenChange={toggleCurrency}
+        tokenSettings={currencies.map(({currency, balance}) => ({
+          currency,
+          balance,
+          enabled: currencySet.has(currency),
+        }))}
       />
 
       <DepositSheet

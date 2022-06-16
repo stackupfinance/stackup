@@ -29,7 +29,7 @@ export const TokenListSheet = ({
   };
 
   return (
-    <BaseSheet title="Manage token list" isOpen={isOpen} onClose={onClose}>
+    <BaseSheet title="Manage currency list" isOpen={isOpen} onClose={onClose}>
       <VStack flex={1} p="24px" backgroundColor="background.1" space="11px">
         {tokenSettings.map(props => (
           <ManageTokenItem
