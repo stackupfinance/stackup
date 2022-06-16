@@ -5,8 +5,7 @@ export type TimePeriod =
   | "Month"
   | "3_Month"
   | "6_Month"
-  | "Year"
-  | "Max";
+  | "Year";
 
 export const ValidTimePeriods: Array<TimePeriod> = [
   "Hour",
@@ -16,5 +15,4 @@ export const ValidTimePeriods: Array<TimePeriod> = [
   "3_Month",
   "6_Month",
   "Year",
-  "Max",
 ];
