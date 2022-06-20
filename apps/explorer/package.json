@@ -16,7 +16,7 @@
     "prettier:fix": "prettier --write '**'"
   },
   "dependencies": {
-    "@alch/alchemy-web3": "^1.4.2",
+    "@alch/alchemy-web3": "^1.4.3",
     "@meanie/mongoose-to-json": "^2.6.0",
     "@sentry/node": "^6.19.7",
     "@sentry/tracing": "^6.19.7",
