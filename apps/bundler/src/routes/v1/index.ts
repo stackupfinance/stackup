@@ -1,5 +1,6 @@
 import express, { Router } from "express";
 import paymasterRoute from "./paymaster.route";
+import relayRoute from "./relay.route";
 
 const router = express.Router();
 
@@ -10,6 +11,7 @@ type Route = {
 
 const defaultRoutes: Array<Route> = [
   { path: "/paymaster", route: paymasterRoute },
+  { path: "/relay", route: relayRoute },
 ];
 
 defaultRoutes.forEach((route) => {
