@@ -11,7 +11,7 @@ import {
   TabScreenContainer,
   TabScreenHeader,
   HomeTabTitle,
-  SecurityButton,
+  // SecurityButton,
   IconButton,
   List,
   PortfolioBalance,
@@ -57,6 +57,8 @@ export default function AssetsScreen({navigation}: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // TODO: Remove this when enabling security button
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const onSecurityPress = () => {
     navigation.navigate('Security');
   };
@@ -89,7 +91,10 @@ export default function AssetsScreen({navigation}: Props) {
 
         <HomeTabTitle screen="Assets" network="Polygon" />
 
-        <SecurityButton onPress={onSecurityPress} />
+        <Box
+        // TODO: Remove this when enabling security button
+        />
+        {/* <SecurityButton onPress={onSecurityPress} /> */}
       </TabScreenHeader>
 
       <List
