@@ -15,7 +15,7 @@ interface WalletState extends WalletStateConstants {
   create: (
     password: string,
     salt: string,
-    onCreate?: (password: string, salt: string) => Promise<void>,
+    callback?: () => Promise<void>,
   ) => Promise<void>;
   pingBackup: (walletAddress: string) => Promise<Boolean>;
   verifyEncryptedBackup: (
@@ -50,14 +50,14 @@ const useWalletStore = create<WalletState>()(
       set => ({
         ...defaults,
 
-        create: async (password, salt, onCreate) => {
+        create: async (password, salt, callback) => {
           set({loading: true});
 
           setTimeout(async () => {
             try {
               const instance = await wallet.createRandom(password, salt);
               await axios.post(`${Env.BACKUP_URL}/v1/wallet`, {...instance});
-              await onCreate?.(password, salt);
+              await callback?.();
 
               set({loading: false, instance});
             } catch (error) {

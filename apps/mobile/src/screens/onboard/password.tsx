@@ -58,9 +58,10 @@ export default function PasswordScreen({navigation, route}: Props) {
         placement: 'top',
       });
     } else {
-      create(password, generateSalt(), async (pw, salt) => {
+      const salt = generateSalt();
+      create(password, salt, async () => {
         logEvent('CREATE_WALLET', {enableFingerprint});
-        enableFingerprint && setMasterPassword(pw, salt);
+        enableFingerprint && setMasterPassword(password, salt);
       });
     }
   };
