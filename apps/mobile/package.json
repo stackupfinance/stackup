@@ -66,7 +66,7 @@
     "@typescript-eslint/eslint-plugin": "^5.23.0",
     "@typescript-eslint/parser": "^5.25.0",
     "babel-jest": "^28.1.1",
-    "eslint": "^8.17.0",
+    "eslint": "^8.18.0",
     "eslint-plugin-unused-imports": "^2.0.0",
     "jest": "^28.1.1",
     "metro-react-native-babel-preset": "^0.71.1",
