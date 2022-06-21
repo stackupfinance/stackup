@@ -1538,9 +1538,9 @@
   integrity sha512-k2Ty1JcVojjJFwrg/ThKi2ujJ7XNLYaFGNB/bWT9wGR+oSMJHMa5w+CUq6p/pVrKeNNgA7pCqEcjSnHVoqJQFw==
 
 "@gorhom/bottom-sheet@^4":
-  version "4.3.1"
-  resolved "https://registry.yarnpkg.com/@gorhom/bottom-sheet/-/bottom-sheet-4.3.1.tgz#842790fd9f4c2470dc0682a1eb9616b68f93a71e"
-  integrity sha512-z7Mlo8GOqGAZsPJXL17v3o+I1TQBPZ+n+FmZybBCoM73m/aYXLCtpXo/knoPaZkI91eKuWQ3LLz+yCfGkNPiuA==
+  version "4.3.2"
+  resolved "https://registry.yarnpkg.com/@gorhom/bottom-sheet/-/bottom-sheet-4.3.2.tgz#83de68387f54f6e3cc9419329b8e4f925a3426c8"
+  integrity sha512-kOnxKz3TuxbwagxhHvAyo2b1fgUCzw/Xs3OQD2lTE7vjGEdibsYnRaBxdpKKLV25VOQA6zVFmZq9apICj9foPw==
   dependencies:
     "@gorhom/portal" "1.0.13"
     invariant "^2.2.4"
