@@ -1,4 +1,4 @@
-[
+export const entrypointJSON = [
   {
     "inputs": [
       {
@@ -744,4 +744,4 @@
     "stateMutability": "payable",
     "type": "receive"
   }
-]
+];

@@ -1,4 +1,4 @@
-[
+export const walletJSON = [
   {
     "inputs": [
       {
@@ -107,4 +107,4 @@
     "stateMutability": "nonpayable",
     "type": "function"
   }
-]
+];

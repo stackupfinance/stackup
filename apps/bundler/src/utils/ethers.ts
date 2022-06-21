@@ -2,9 +2,9 @@ import { ethers } from "ethers";
 import { getRPC } from "./rpc";
 import dotenv from "dotenv";
 dotenv.config();
-const entryPointContractAbi = require("../../contracts/abi/entrypoint.json");
-const paymasterContractAbi = require("../../contracts/abi/paymaster.json");
-const walletContractAbi = require("../../contracts/abi/wallet.json");
+import { entrypointJSON as entryPointContractAbi } from "../../contracts/abi/entrypoint.js";
+import { paymasterJSON as paymasterContractAbi } from "../../contracts/abi/paymaster.js";
+import { walletJSON as walletContractAbi } from "../../contracts/abi/wallet.js";
 
 const rpcUri = getRPC("Polygon");
 export const provider = new ethers.providers.JsonRpcProvider(rpcUri);

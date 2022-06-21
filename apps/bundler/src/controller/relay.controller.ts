@@ -1,4 +1,3 @@
-import { ethers } from "ethers";
 import { catchAsync } from "../utils";
 import { entryPointContract, signer } from "../utils/ethers";
 import dotenv from "dotenv";

@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
 import { catchAsync } from "../utils";
-import { provider, signer, paymasterContract } from "../utils/ethers";
+import { signer, paymasterContract } from "../utils/ethers";
 
 // POC
 // export const sign = catchAsync(async (_req, res) => {
