@@ -1,5 +1,6 @@
 export * from './sheets';
 export * from './baseItem';
+export * from './enableFingerprint';
 export * from './homeTabTitle';
 export * from './iconButton';
 export * from './imageSources';
@@ -13,6 +14,7 @@ export * from './qrCode';
 export * from './securityButton';
 export * from './securityItem';
 export * from './securityOverview';
+export * from './stackScreenContainer';
 export * from './stackScreenHeader';
 export * from './switch';
 export * from './tabScreenContainer';

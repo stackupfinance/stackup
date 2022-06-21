@@ -8,3 +8,7 @@ export const truncate = (address: string) => {
 
   return `${match[1]}....${match[2]}`;
 };
+
+export const isValid = (address: string) => {
+  return address.match(/^0x[a-fA-F0-9]{40}$/);
+};

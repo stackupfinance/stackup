@@ -1,4 +1,5 @@
 import {NavigatorScreenParams} from '@react-navigation/native';
+import {wallet} from '@stackupfinance/walletjs';
 
 export type RootStackParamList = {
   Home: undefined;
@@ -22,5 +23,20 @@ export type SettingsStackParamList = {
 };
 
 export type OnboardStackParamList = {
-  CreateWallet: undefined;
+  Welcome: undefined;
+  Password: {
+    enableFingerprint: boolean;
+  };
+  WalletImport: {
+    enableFingerprint: boolean;
+  };
+  MasterPassword: {
+    enableFingerprint: boolean;
+    walletAddress: string;
+  };
+  WalletRecovered: {
+    enableFingerprint: boolean;
+    password: string;
+    instance: wallet.WalletInstance;
+  };
 };
