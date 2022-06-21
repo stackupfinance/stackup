@@ -2,6 +2,7 @@ import {Platform} from 'react-native';
 import create from 'zustand';
 import {devtools} from 'zustand/middleware';
 import Intercom from '@intercom/intercom-react-native';
+import {Env} from '../config';
 
 interface IntercomState {
   debounceAndroidAppState: boolean;
@@ -26,7 +27,8 @@ const useIntercomStore = create<IntercomState>()(
       },
 
       identify: walletAddress => {
-        Intercom.registerIdentifiedUser({userId: walletAddress});
+        Env.INTERCOM_APP_ID &&
+          Intercom.registerIdentifiedUser({userId: walletAddress});
       },
 
       openMessenger: () => {
@@ -34,7 +36,7 @@ const useIntercomStore = create<IntercomState>()(
       },
 
       clear: () => {
-        Intercom.logout();
+        Env.INTERCOM_APP_ID && Intercom.logout();
         set({debounceAndroidAppState: false});
       },
     }),
@@ -53,4 +55,10 @@ export const useIntercomStoreAuthSelector = () =>
   }));
 
 export const useIntercomStoreHomeSelector = () =>
+  useIntercomStore(state => ({openMessenger: state.openMessenger}));
+
+export const useIntercomStoreWalletImportSelector = () =>
+  useIntercomStore(state => ({openMessenger: state.openMessenger}));
+
+export const useIntercomStoreMasterPasswordSelector = () =>
   useIntercomStore(state => ({openMessenger: state.openMessenger}));

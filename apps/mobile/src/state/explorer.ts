@@ -56,7 +56,15 @@ const defaults: ExplorerStateConstants = {
     previousBalance: '0',
     currentBalance: '0',
   },
-  currencies: [],
+  currencies: [
+    {
+      currency: 'USDC',
+      quoteCurrency: 'USDC',
+      balance: '0',
+      previousBalanceInQuoteCurrency: '0',
+      currentBalanceInQuoteCurrency: '0',
+    },
+  ],
 };
 const STORE_NAME = 'stackup-explorer-store';
 const useExplorerStore = create<ExplorerState>()(

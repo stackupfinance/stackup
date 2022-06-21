@@ -1,13 +1,11 @@
 import * as React from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {OnboardStackParamList} from '../../config';
-import OnboardWelcomeScreen from './onboardWelcome';
-import OnboardPasswordScreen from './onboardPassword';
-import OnboardFingerprintScreen from './onboardFingerprint';
-import OnboardWalletImportScreen from './onboardWalletImport';
-import OnboardWalletFoundScreen from './onboardWalletFound';
-import OnboardMasterPasswordScreen from './onboardMasterPassword';
-import OnboardWalletRecoveredScreen from './onboardWalletRecovered';
+import WelcomeScreen from './welcome';
+import PasswordScreen from './password';
+import WalletImportScreen from './walletImport';
+import MasterPasswordScreen from './masterPassword';
+import WalletRecoveredScreen from './walletRecovered';
 
 const Stack = createNativeStackNavigator<OnboardStackParamList>();
 
@@ -15,29 +13,12 @@ export const OnboardScreen = () => {
   return (
     <Stack.Navigator
       screenOptions={{headerShown: false}}
-      initialRouteName="OnboardWelcome">
-      <Stack.Screen name="OnboardWelcome" component={OnboardWelcomeScreen} />
-      <Stack.Screen name="OnboardPassword" component={OnboardPasswordScreen} />
-      <Stack.Screen
-        name="OnboardFingerprint"
-        component={OnboardFingerprintScreen}
-      />
-      <Stack.Screen
-        name="OnboardWalletImport"
-        component={OnboardWalletImportScreen}
-      />
-      <Stack.Screen
-        name="OnboardWalletFound"
-        component={OnboardWalletFoundScreen}
-      />
-      <Stack.Screen
-        name="OnboardMasterPassword"
-        component={OnboardMasterPasswordScreen}
-      />
-      <Stack.Screen
-        name="OnboardWalletRecovered"
-        component={OnboardWalletRecoveredScreen}
-      />
+      initialRouteName="Welcome">
+      <Stack.Screen name="Welcome" component={WelcomeScreen} />
+      <Stack.Screen name="Password" component={PasswordScreen} />
+      <Stack.Screen name="WalletImport" component={WalletImportScreen} />
+      <Stack.Screen name="MasterPassword" component={MasterPasswordScreen} />
+      <Stack.Screen name="WalletRecovered" component={WalletRecoveredScreen} />
     </Stack.Navigator>
   );
 };

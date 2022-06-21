@@ -2,7 +2,9 @@ import create from 'zustand';
 import {persist, devtools} from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {ethers} from 'ethers';
+import axios from 'axios';
 import {wallet} from '@stackupfinance/walletjs';
+import {Env} from '../config';
 
 interface WalletStateConstants {
   loading: boolean;
@@ -15,6 +17,13 @@ interface WalletState extends WalletStateConstants {
     salt: string,
     onCreate?: (password: string, salt: string) => Promise<void>,
   ) => Promise<void>;
+  pingBackup: (walletAddress: string) => Promise<Boolean>;
+  verifyEncryptedBackup: (
+    walletAddress: string,
+    password: string,
+  ) => Promise<wallet.WalletInstance | undefined>;
+  setFromVerifiedBackup: (instance: wallet.WalletInstance) => void;
+
   remove: () => void;
 
   hasHydrated: boolean;
@@ -45,11 +54,61 @@ const useWalletStore = create<WalletState>()(
           set({loading: true});
 
           setTimeout(async () => {
-            const instance = await wallet.createRandom(password, salt);
-            await onCreate?.(password, salt);
+            try {
+              const instance = await wallet.createRandom(password, salt);
+              await axios.post(`${Env.BACKUP_URL}/v1/wallet`, {...instance});
+              await onCreate?.(password, salt);
 
-            set({loading: false, instance});
+              set({loading: false, instance});
+            } catch (error) {
+              set({loading: false});
+              throw error;
+            }
           });
+        },
+
+        pingBackup: async walletAddress => {
+          set({loading: true});
+
+          try {
+            const response = await axios.post<{exist: boolean}>(
+              `${Env.BACKUP_URL}/v1/wallet/ping`,
+              {walletAddress},
+            );
+
+            set({loading: false});
+            return response.data.exist;
+          } catch (error) {
+            set({loading: false});
+            throw error;
+          }
+        },
+
+        verifyEncryptedBackup: async (walletAddress, password) => {
+          set({loading: true});
+
+          try {
+            const response = await axios.post<wallet.WalletInstance>(
+              `${Env.BACKUP_URL}/v1/wallet/fetch`,
+              {walletAddress},
+            );
+            const walletInstance = response.data;
+            const signer = await wallet.decryptSigner(
+              walletInstance,
+              password,
+              walletInstance.salt,
+            );
+
+            set({loading: false});
+            return signer ? walletInstance : undefined;
+          } catch (error) {
+            set({loading: false});
+            throw error;
+          }
+        },
+
+        setFromVerifiedBackup: instance => {
+          set({instance});
         },
 
         remove: () => {
@@ -86,14 +145,31 @@ export const useWalletStoreAuthSelector = () =>
     hasHydrated: state.hasHydrated,
   }));
 
-export const useWalletStoreCreateWalletSelector = () =>
-  useWalletStore(state => ({
-    loading: state.loading,
-    create: state.create,
-  }));
-
 export const useWalletStoreHomeSelector = () =>
   useWalletStore(state => ({instance: state.instance}));
 
 export const useWalletStoreAssetsSelector = () =>
   useWalletStore(state => ({instance: state.instance}));
+
+export const useWalletStorePasswordSelector = () =>
+  useWalletStore(state => ({
+    loading: state.loading,
+    create: state.create,
+  }));
+
+export const useWalletStoreWalletImportSelector = () =>
+  useWalletStore(state => ({
+    loading: state.loading,
+    pingBackup: state.pingBackup,
+  }));
+
+export const useWalletStoreMasterPasswordSelector = () =>
+  useWalletStore(state => ({
+    loading: state.loading,
+    verifyEncryptedBackup: state.verifyEncryptedBackup,
+  }));
+
+export const useWalletStoreWalletRecoveredSelector = () =>
+  useWalletStore(state => ({
+    setFromVerifiedBackup: state.setFromVerifiedBackup,
+  }));

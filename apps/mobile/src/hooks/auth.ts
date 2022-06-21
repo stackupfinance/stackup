@@ -90,7 +90,7 @@ export const useAuth = (): UseAuthHook => {
       setHasWalletInstance(Boolean(instance.encryptedSigner));
       setIsReady(true);
 
-      if (instance) {
+      if (instance.encryptedSigner) {
         identify(instance.walletAddress);
       }
     }

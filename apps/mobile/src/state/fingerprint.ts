@@ -108,9 +108,19 @@ export const useFingerprintStoreAuthSelector = () =>
     hasHydrated: state.hasHydrated,
   }));
 
-export const useFingerprintStoreCreateWalletSelector = () =>
+export const useFingerprintStoreWelcomeSelector = () =>
   useFingerprintStore(state => ({
     loading: state.loading,
     isSupported: state.isSupported,
+  }));
+
+export const useFingerprintStorePasswordSelector = () =>
+  useFingerprintStore(state => ({
+    setMasterPassword: state.setMasterPassword,
+  }));
+
+export const useFingerprintStoreWalletRecoveredSelector = () =>
+  useFingerprintStore(state => ({
+    loading: state.loading,
     setMasterPassword: state.setMasterPassword,
   }));
