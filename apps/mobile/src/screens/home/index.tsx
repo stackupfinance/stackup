@@ -8,7 +8,8 @@ import {faWallet} from '@fortawesome/free-solid-svg-icons/faWallet';
 import {faRocket} from '@fortawesome/free-solid-svg-icons/faRocket';
 import {faArrowRightArrowLeft} from '@fortawesome/free-solid-svg-icons/faArrowRightArrowLeft';
 import {faBolt} from '@fortawesome/free-solid-svg-icons/faBolt';
-import {HomeTabParamList, externalLinks} from '../../config';
+import {BigNumberish} from 'ethers';
+import {HomeTabParamList, externalLinks, CurrencySymbols} from '../../config';
 import AssetsScreen from './assets';
 // import EarnScreen from './earn';
 // import SwapScreen from './swap';
@@ -17,9 +18,12 @@ import {
   SettingsSheet,
   TokenListSheet,
   DepositSheet,
+  SelectCurrencySheet,
+  SendSheet,
+  SendSummarySheet,
   FromWalletSheet,
 } from '../../components';
-import {useRemoveWallet} from '../../hooks';
+import {useRemoveWallet, useSendUserOperation} from '../../hooks';
 import {
   useNavigationStoreHomeSelector,
   useIntercomStoreHomeSelector,
@@ -35,19 +39,33 @@ export const HomeScreen = () => {
     showSettingsSheet,
     showTokenListSheet,
     showDepositSheet,
+    showSelectCurrencySheet,
+    showSendSheet,
+    showSendSummarySheet,
     showFromWalletSheet,
     setShowSettingsSheet,
     setShowTokenListSheet,
     setShowDepositSheet,
+    setShowSelectCurrencySheet,
+    setShowSendSheet,
+    setShowSendSummarySheet,
     setShowFromWalletSheet,
     resetAllSheets,
   } = useNavigationStoreHomeSelector();
   const {instance} = useWalletStoreHomeSelector();
   const {openMessenger} = useIntercomStoreHomeSelector();
-  const {currencies: enabledCurrencies, toggleCurrency} =
-    useSettingsStoreHomeSelector();
+  const {
+    currencies: enabledCurrencies,
+    network,
+    toggleCurrency,
+  } = useSettingsStoreHomeSelector();
   const {currencies} = useExplorerStoreHomeSelector();
   const removeWallet = useRemoveWallet();
+  const {
+    data: sendData,
+    update: updateSendData,
+    clear: clearSendData,
+  } = useSendUserOperation();
 
   const currencySet = useMemo(
     () => new Set(enabledCurrencies),
@@ -72,6 +90,21 @@ export const HomeScreen = () => {
     setShowDepositSheet(false);
   };
 
+  const onCloseSelectCurrencySheet = () => {
+    clearSendData();
+    setShowSelectCurrencySheet(false);
+  };
+
+  const onCloseSendSheet = () => {
+    clearSendData();
+    setShowSendSheet(false);
+  };
+
+  const onCloseSendSummarySheet = () => {
+    clearSendData();
+    setShowSendSummarySheet(false);
+  };
+
   const onCloseFromWalletSheet = () => {
     setShowFromWalletSheet(false);
   };
@@ -92,8 +125,27 @@ export const HomeScreen = () => {
     setShowFromWalletSheet(true);
   };
 
+  const onSelectCurrencyItem = (currency: CurrencySymbols) => {
+    updateSendData({currency});
+    setShowSendSheet(true);
+  };
+
+  const onSendNextPress = (toAddress: string, value: BigNumberish) => {
+    updateSendData({toAddress, value});
+    setShowSendSummarySheet(true);
+  };
+
   const onFromWalletBackPress = () => {
     setShowDepositSheet(true);
+  };
+
+  const onSendBackPress = () => {
+    clearSendData('toAddress');
+    setShowSelectCurrencySheet(true);
+  };
+
+  const onSendSummaryBackPress = () => {
+    setShowSendSheet(true);
   };
 
   return (
@@ -155,6 +207,39 @@ export const HomeScreen = () => {
         isOpen={showDepositSheet}
         onClose={onCloseDepositSheet}
         onTransferFromWalletPress={onTransferFromWalletPress}
+      />
+
+      <SelectCurrencySheet
+        isOpen={showSelectCurrencySheet}
+        onClose={onCloseSelectCurrencySheet}
+        currencyList={currencies.map(({currency, balance}) => ({
+          currency,
+          balance,
+        }))}
+        onSelectCurrencyItem={onSelectCurrencyItem}
+      />
+
+      <SendSheet
+        isOpen={showSendSheet}
+        onClose={onCloseSendSheet}
+        onBack={onSendBackPress}
+        onNext={onSendNextPress}
+        currency={sendData.currency}
+        currencyBalances={currencies.reduce((prev, curr) => {
+          return {...prev, [curr.currency]: curr.balance};
+        }, {})}
+      />
+
+      <SendSummarySheet
+        isOpen={showSendSummarySheet}
+        onClose={onCloseSendSummarySheet}
+        onBack={onSendSummaryBackPress}
+        fromAddress={instance.walletAddress}
+        toAddress={sendData.toAddress}
+        value={sendData.value}
+        fee={{value: '100000', currency: 'USDC'}}
+        currency={sendData.currency}
+        network={network}
       />
 
       <FromWalletSheet

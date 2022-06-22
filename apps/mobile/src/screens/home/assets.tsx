@@ -30,8 +30,12 @@ type Props = CompositeScreenProps<
 >;
 
 export default function AssetsScreen({navigation}: Props) {
-  const {setShowSettingsSheet, setShowTokenListSheet, setShowDepositSheet} =
-    useNavigationStoreAssetsSelector();
+  const {
+    setShowSettingsSheet,
+    setShowTokenListSheet,
+    setShowDepositSheet,
+    setShowSelectCurrencySheet,
+  } = useNavigationStoreAssetsSelector();
   const [isHidden, setIsHidden] = useState<boolean>(false);
   const {
     network,
@@ -73,6 +77,10 @@ export default function AssetsScreen({navigation}: Props) {
 
   const onDepositPress = () => {
     setShowDepositSheet(true);
+  };
+
+  const onSendPress = () => {
+    setShowSelectCurrencySheet(true);
   };
 
   const onRefresh = () => {
@@ -117,7 +125,7 @@ export default function AssetsScreen({navigation}: Props) {
                 Deposit
               </Button>
 
-              <Button flex={1} onPress={() => {}}>
+              <Button flex={1} onPress={onSendPress}>
                 Send
               </Button>
             </HStack>
