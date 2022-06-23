@@ -20,7 +20,7 @@ const config: HardhatUserConfig = {
   },
   networks: {
     mumbai: {
-      url: "",
+      url: process.env.STACKUP_CONTRACTS_MUMBAI_RPC || "",
       chainId: 80001,
       accounts: {
         mnemonic: process.env.STACKUP_CONTRACTS_MNEMONIC || "",
