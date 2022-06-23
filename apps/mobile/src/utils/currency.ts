@@ -37,6 +37,15 @@ export const formatCurrency = (
   }
 };
 
+export const parseCurrency = (
+  value: string,
+  symbol: CurrencySymbols,
+): BigNumberish => {
+  return ethers.utils
+    .parseUnits(value, CurrencyMeta[symbol].decimals)
+    .toString();
+};
+
 export const valueChange = (
   prev: BigNumberish,
   curr: BigNumberish,

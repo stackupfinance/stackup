@@ -6,6 +6,9 @@ interface Sheets {
   showSettingsSheet: boolean;
   showTokenListSheet: boolean;
   showDepositSheet: boolean;
+  showSelectCurrencySheet: boolean;
+  showSendSheet: boolean;
+  showSendSummarySheet: boolean;
   showFromWalletSheet: boolean;
   showPasswordSheet: boolean;
   showVerifyEmailSheet: boolean;
@@ -22,6 +25,9 @@ interface NavigationState extends Sheets {
   setShowSettingsSheet: (value: boolean) => void;
   setShowTokenListSheet: (value: boolean) => void;
   setShowDepositSheet: (value: boolean) => void;
+  setShowSelectCurrencySheet: (value: boolean) => void;
+  setShowSendSheet: (value: boolean) => void;
+  setShowSendSummarySheet: (value: boolean) => void;
   setShowFromWalletSheet: (value: boolean) => void;
   setShowPasswordSheet: (value: boolean) => void;
   setShowEmailSheet: (value: boolean) => void;
@@ -35,6 +41,9 @@ const sheetDefaults: Sheets = {
   showSettingsSheet: false,
   showTokenListSheet: false,
   showDepositSheet: false,
+  showSelectCurrencySheet: false,
+  showSendSheet: false,
+  showSendSummarySheet: false,
   showFromWalletSheet: false,
   showPasswordSheet: false,
   showEmailSheet: false,
@@ -65,6 +74,18 @@ const useNavigationStore = create<NavigationState>()(
 
       setShowDepositSheet: value => {
         set({...sheetDefaults, showDepositSheet: value});
+      },
+
+      setShowSelectCurrencySheet: value => {
+        set({...sheetDefaults, showSelectCurrencySheet: value});
+      },
+
+      setShowSendSheet: value => {
+        set({...sheetDefaults, showSendSheet: value});
+      },
+
+      setShowSendSummarySheet: value => {
+        set({...sheetDefaults, showSendSummarySheet: value});
       },
 
       setShowFromWalletSheet: value => {
@@ -116,10 +137,16 @@ export const useNavigationStoreHomeSelector = () =>
     showSettingsSheet: state.showSettingsSheet,
     showTokenListSheet: state.showTokenListSheet,
     showDepositSheet: state.showDepositSheet,
+    showSelectCurrencySheet: state.showSelectCurrencySheet,
+    showSendSheet: state.showSendSheet,
+    showSendSummarySheet: state.showSendSummarySheet,
     showFromWalletSheet: state.showFromWalletSheet,
     setShowSettingsSheet: state.setShowSettingsSheet,
     setShowTokenListSheet: state.setShowTokenListSheet,
     setShowDepositSheet: state.setShowDepositSheet,
+    setShowSelectCurrencySheet: state.setShowSelectCurrencySheet,
+    setShowSendSheet: state.setShowSendSheet,
+    setShowSendSummarySheet: state.setShowSendSummarySheet,
     setShowFromWalletSheet: state.setShowFromWalletSheet,
     resetAllSheets: state.resetAllSheets,
   }));
@@ -129,6 +156,7 @@ export const useNavigationStoreAssetsSelector = () =>
     setShowSettingsSheet: state.setShowSettingsSheet,
     setShowTokenListSheet: state.setShowTokenListSheet,
     setShowDepositSheet: state.setShowDepositSheet,
+    setShowSelectCurrencySheet: state.setShowSelectCurrencySheet,
   }));
 
 export const useNavigationStoreSecuritySelector = () =>

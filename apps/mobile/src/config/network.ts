@@ -11,8 +11,8 @@ type NetworksConfig = {
 
 export const NetworksConfig: Record<Networks, NetworksConfig> = {
   Polygon: {
-    name: 'Polygon Network',
-    color: '#7830d2cc',
+    name: 'Polygon',
+    color: '#6561ff',
     logo: PolygonLogo,
   },
 };

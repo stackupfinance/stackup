@@ -24,7 +24,7 @@ const defaults: SettingsStateConstants = {
   network: 'Polygon',
   quoteCurrency: 'USDC',
   currencies: ['USDC'],
-  timePeriod: 'Year',
+  timePeriod: 'Month',
 };
 const STORE_NAME = 'stackup-settings-store';
 const useSettingsStore = create<SettingsState>()(
@@ -71,6 +71,7 @@ export const useSettingsStoreRemoveWalletSelector = () =>
 export const useSettingsStoreHomeSelector = () =>
   useSettingsStore(state => ({
     currencies: state.currencies,
+    network: state.network,
     toggleCurrency: state.toggleCurrency,
   }));
 
