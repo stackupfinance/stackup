@@ -27,6 +27,7 @@ interface CurrencyBalance {
 }
 
 interface PostResponse {
+  walletDeployed: boolean;
   walletBalance: WalletBalance;
   currencies: Array<CurrencyBalance>;
 }
@@ -37,11 +38,13 @@ export const post = catchAsync(async (req, res) => {
     req.body as RequestBody;
 
   const [
+    walletDeployed,
     previousCurrencyBalances,
     currentCurrencyBalances,
     previousQuotes,
     currentQuotes,
   ] = await Promise.all([
+    AlchemyService.isWalletDeployed(network, address),
     ReceiptService.getClosestBlockForTimePeriod(network, timePeriod).then(
       (blockNumber) =>
         AlchemyService.getCurrencyBalances(
@@ -57,6 +60,7 @@ export const post = catchAsync(async (req, res) => {
   ]);
 
   const response: PostResponse = {
+    walletDeployed,
     walletBalance: currencies.reduce(
       (prev, curr) => {
         return {

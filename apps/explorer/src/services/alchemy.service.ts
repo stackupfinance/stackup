@@ -1,7 +1,7 @@
 import axios from "axios";
 import { createAlchemyWeb3 } from "@alch/alchemy-web3";
 import { ethers, BigNumberish } from "ethers";
-import { contracts } from "@stackupfinance/walletjs";
+import { contracts, wallet } from "@stackupfinance/walletjs";
 import { Env, Networks, NetworksConfig, CurrencySymbols } from "../config";
 import { getRPC } from "../utils";
 
@@ -165,4 +165,9 @@ export const getCurrencyBalances = async (
   } else {
     return getLatestCurrencyBalances(network, address, tokens);
   }
+};
+
+export const isWalletDeployed = async (network: Networks, address: string) => {
+  const provider = new ethers.providers.JsonRpcProvider(getRPC(network));
+  return wallet.proxy.isCodeDeployed(provider, address);
 };
