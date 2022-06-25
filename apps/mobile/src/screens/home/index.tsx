@@ -57,19 +57,30 @@ export const HomeScreen = () => {
   const {
     currencies: enabledCurrencies,
     network,
+    quoteCurrency,
     toggleCurrency,
   } = useSettingsStoreHomeSelector();
-  const {currencies} = useExplorerStoreHomeSelector();
+  const {walletStatus, currencies} = useExplorerStoreHomeSelector();
   const removeWallet = useRemoveWallet();
   const {
+    loading: sendUserOpsLoading,
     data: sendData,
     update: updateSendData,
     clear: clearSendData,
+    buildOps: buildSendOps,
   } = useSendUserOperation();
 
   const currencySet = useMemo(
     () => new Set(enabledCurrencies),
     [enabledCurrencies],
+  );
+
+  const currencyBalances = useMemo(
+    () =>
+      currencies.reduce((prev, curr) => {
+        return {...prev, [curr.currency]: curr.balance};
+      }, {}),
+    [currencies],
   );
 
   useEffect(() => {
@@ -130,8 +141,18 @@ export const HomeScreen = () => {
     setShowSendSheet(true);
   };
 
-  const onSendNextPress = (toAddress: string, value: BigNumberish) => {
-    updateSendData({toAddress, value});
+  const onSendNextPress = async (toAddress: string, value: BigNumberish) => {
+    updateSendData({
+      toAddress,
+      value,
+      ...(await buildSendOps(
+        instance,
+        network,
+        quoteCurrency,
+        walletStatus.isDeployed,
+        walletStatus.nonce,
+      )),
+    });
     setShowSendSummarySheet(true);
   };
 
@@ -221,13 +242,12 @@ export const HomeScreen = () => {
 
       <SendSheet
         isOpen={showSendSheet}
+        isLoading={sendUserOpsLoading}
         onClose={onCloseSendSheet}
         onBack={onSendBackPress}
         onNext={onSendNextPress}
         currency={sendData.currency}
-        currencyBalances={currencies.reduce((prev, curr) => {
-          return {...prev, [curr.currency]: curr.balance};
-        }, {})}
+        currencyBalances={currencyBalances}
       />
 
       <SendSummarySheet
@@ -237,8 +257,9 @@ export const HomeScreen = () => {
         fromAddress={instance.walletAddress}
         toAddress={sendData.toAddress}
         value={sendData.value}
-        fee={{value: '100000', currency: 'USDC'}}
+        fee={sendData.fee}
         currency={sendData.currency}
+        currencyBalances={currencyBalances}
         network={network}
       />
 
