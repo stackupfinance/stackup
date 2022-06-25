@@ -6,6 +6,7 @@ import {BaseSheet} from '.';
 import {ImageWithIconBadge, SummaryTable} from '..';
 import {
   CurrencySymbols,
+  CurrencyBalances,
   Networks,
   CurrencyMeta,
   NetworksConfig,
@@ -24,7 +25,7 @@ type Props = {
   value: BigNumberish;
   fee: Fee;
   currency: CurrencySymbols;
-  currencyBalances: Partial<Record<CurrencySymbols, BigNumberish>>;
+  currencyBalances: CurrencyBalances;
   network: Networks;
 };
 

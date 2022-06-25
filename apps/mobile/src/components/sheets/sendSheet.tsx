@@ -4,7 +4,12 @@ import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faCheck} from '@fortawesome/free-solid-svg-icons/faCheck';
 import {BigNumberish, ethers} from 'ethers';
 import {BaseSheet} from '.';
-import {CurrencySymbols, CurrencyMeta, AppColors} from '../../config';
+import {
+  CurrencySymbols,
+  CurrencyBalances,
+  CurrencyMeta,
+  AppColors,
+} from '../../config';
 import {formatCurrency, parseCurrency} from '../../utils/currency';
 import {isValid} from '../../utils/address';
 
@@ -15,7 +20,7 @@ type Props = {
   onBack: () => void;
   onNext: (toAddress: string, value: BigNumberish) => Promise<void>;
   currency: CurrencySymbols;
-  currencyBalances: Partial<Record<CurrencySymbols, BigNumberish>>;
+  currencyBalances: CurrencyBalances;
 };
 
 const TO_FLOAT_REGEX = /[^\d.-]/g;

@@ -1,13 +1,12 @@
 import create from 'zustand';
 import {devtools} from 'zustand/middleware';
-import {BigNumberish} from 'ethers';
 import axios from 'axios';
-import {Env, CurrencySymbols, Networks} from '../config';
+import {Env, CurrencyBalances, Networks} from '../config';
 
 interface StatusResponse {
   address: string;
-  fees: Partial<Record<CurrencySymbols, BigNumberish>>;
-  allowances: Record<CurrencySymbols, BigNumberish>;
+  fees: CurrencyBalances;
+  allowances: CurrencyBalances;
 }
 
 interface BundlerStateConstants {
