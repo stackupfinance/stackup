@@ -1,7 +1,10 @@
 import {ImageSourcePropType} from 'react-native';
+import {BigNumberish} from 'ethers';
 import {UsdLogo, EthereumLogo, PolygonLogo} from '../components';
 
 export type CurrencySymbols = 'USDC' | 'ETH' | 'MATIC';
+
+export type CurrencyBalances = Partial<Record<CurrencySymbols, BigNumberish>>;
 
 type CurrencyMeta = {
   name: string;

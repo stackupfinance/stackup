@@ -4,23 +4,30 @@ import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faCheck} from '@fortawesome/free-solid-svg-icons/faCheck';
 import {BigNumberish, ethers} from 'ethers';
 import {BaseSheet} from '.';
-import {CurrencySymbols, CurrencyMeta, AppColors} from '../../config';
+import {
+  CurrencySymbols,
+  CurrencyBalances,
+  CurrencyMeta,
+  AppColors,
+} from '../../config';
 import {formatCurrency, parseCurrency} from '../../utils/currency';
 import {isValid} from '../../utils/address';
 
 type Props = {
   isOpen: boolean;
+  isLoading: boolean;
   onClose: () => void;
   onBack: () => void;
-  onNext: (toAddress: string, value: BigNumberish) => void;
+  onNext: (toAddress: string, value: BigNumberish) => Promise<void>;
   currency: CurrencySymbols;
-  currencyBalances: Partial<Record<CurrencySymbols, BigNumberish>>;
+  currencyBalances: CurrencyBalances;
 };
 
 const TO_FLOAT_REGEX = /[^\d.-]/g;
 
 export const SendSheet = ({
   isOpen,
+  isLoading,
   onClose,
   onBack,
   onNext,
@@ -51,7 +58,7 @@ export const SendSheet = ({
       : setValue(formatCurrency('0', currency));
   };
 
-  const onNextHandler = () => {
+  const onNextHandler = async () => {
     const toAddress = address;
     const parsedValue = parseCurrency(
       parseFloat(value.replace(TO_FLOAT_REGEX, '')).toString(),
@@ -76,9 +83,9 @@ export const SendSheet = ({
       return;
     }
 
+    await onNext(toAddress, parsedValue);
     setAddress('');
     setValue(formatCurrency('0', currency));
-    onNext(toAddress, parsedValue);
   };
 
   return (
@@ -140,7 +147,9 @@ export const SendSheet = ({
       <Box flex={1} />
 
       <Box px="18px" pb="24px">
-        <Button onPress={onNextHandler}>Next</Button>
+        <Button isLoading={isLoading} onPress={onNextHandler}>
+          Next
+        </Button>
       </Box>
     </BaseSheet>
   );

@@ -11,6 +11,11 @@ import {
   Env,
 } from '../config';
 
+interface WalletStatus {
+  isDeployed: boolean;
+  nonce: number;
+}
+
 interface WalletBalance {
   quoteCurrency: CurrencySymbols;
   previousBalance: BigNumberish;
@@ -26,12 +31,14 @@ interface CurrencyBalance {
 }
 
 interface AddressOverviewResponse {
+  walletStatus: WalletStatus;
   walletBalance: WalletBalance;
   currencies: Array<CurrencyBalance>;
 }
 
 interface ExplorerStateConstants {
   loading: boolean;
+  walletStatus: WalletStatus;
   walletBalance: WalletBalance;
   currencies: Array<CurrencyBalance>;
 }
@@ -51,6 +58,10 @@ interface ExplorerState extends ExplorerStateConstants {
 
 const defaults: ExplorerStateConstants = {
   loading: false,
+  walletStatus: {
+    isDeployed: false,
+    nonce: 0,
+  },
   walletBalance: {
     quoteCurrency: 'USDC',
     previousBalance: '0',
@@ -94,6 +105,7 @@ const useExplorerStore = create<ExplorerState>()(
 
             set({
               loading: false,
+              walletStatus: data.walletStatus,
               walletBalance: data.walletBalance,
               currencies: data.currencies,
             });
@@ -132,7 +144,10 @@ export const useExplorerStoreRemoveWalletSelector = () =>
   useExplorerStore(state => ({clear: state.clear}));
 
 export const useExplorerStoreHomeSelector = () =>
-  useExplorerStore(state => ({currencies: state.currencies}));
+  useExplorerStore(state => ({
+    walletStatus: state.walletStatus,
+    currencies: state.currencies,
+  }));
 
 export const useExplorerStoreAssetsSelector = () =>
   useExplorerStore(state => ({

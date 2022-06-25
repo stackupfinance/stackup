@@ -9,4 +9,8 @@ router
   .route("/sign")
   .post(validate(paymasterValidation.sign), paymasterController.sign);
 
+router
+  .route("/status")
+  .get(validate(paymasterValidation.status), paymasterController.status);
+
 export default router;

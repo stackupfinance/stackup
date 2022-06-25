@@ -1,22 +1,20 @@
 import React from 'react';
-import {Box, VStack, Heading, Button} from 'native-base';
-import {BigNumberish} from 'ethers';
+import {Box, VStack, Heading, Text, Button} from 'native-base';
+import {ethers, BigNumberish} from 'ethers';
 import {faArrowUp} from '@fortawesome/free-solid-svg-icons/faArrowUp';
 import {BaseSheet} from '.';
 import {ImageWithIconBadge, SummaryTable} from '..';
 import {
   CurrencySymbols,
+  CurrencyBalances,
   Networks,
   CurrencyMeta,
   NetworksConfig,
+  AppColors,
+  Fee,
 } from '../../config';
 import {formatCurrency} from '../../utils/currency';
 import {truncate} from '../../utils/address';
-
-type Fee = {
-  value: BigNumberish;
-  currency: CurrencySymbols;
-};
 
 type Props = {
   isOpen: boolean;
@@ -27,6 +25,7 @@ type Props = {
   value: BigNumberish;
   fee: Fee;
   currency: CurrencySymbols;
+  currencyBalances: CurrencyBalances;
   network: Networks;
 };
 
@@ -39,8 +38,36 @@ export const SendSummarySheet = ({
   value,
   fee,
   currency,
+  currencyBalances,
   network,
 }: Props) => {
+  const hasInsufficientFunds =
+    currency === fee.currency
+      ? ethers.BigNumber.from(currencyBalances[currency]).lt(
+          ethers.BigNumber.from(value).add(fee.value),
+        )
+      : ethers.BigNumber.from(currencyBalances[currency]).lt(value);
+  const hasInsufficientFee =
+    currency === fee.currency
+      ? hasInsufficientFunds
+      : ethers.BigNumber.from(currencyBalances[fee.currency]).lt(fee.value);
+  const isDisabled = hasInsufficientFunds || hasInsufficientFee;
+
+  const renderError = () => {
+    let message;
+    if (hasInsufficientFunds) {
+      message = `Not enough ${CurrencyMeta[currency].name} for this transaction`;
+    } else if (hasInsufficientFee) {
+      message = `Not enough ${CurrencyMeta[currency].name} to pay fees`;
+    }
+
+    return message ? (
+      <Text mt="8px" fontWeight={600} color={AppColors.singletons.warning}>
+        {message}
+      </Text>
+    ) : undefined;
+  };
+
   return (
     <BaseSheet
       title="Summary"
@@ -82,9 +109,11 @@ export const SendSummarySheet = ({
           ]}
         />
 
+        {renderError()}
+
         <Box flex={1} />
 
-        <Button w="100%" onPress={() => {}}>
+        <Button isDisabled={isDisabled} w="100%" onPress={() => {}}>
           Send
         </Button>
       </VStack>

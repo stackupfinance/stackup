@@ -72,6 +72,7 @@ export const useSettingsStoreHomeSelector = () =>
   useSettingsStore(state => ({
     currencies: state.currencies,
     network: state.network,
+    quoteCurrency: state.quoteCurrency,
     toggleCurrency: state.toggleCurrency,
   }));
 

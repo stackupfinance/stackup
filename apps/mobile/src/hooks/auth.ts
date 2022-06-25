@@ -10,6 +10,7 @@ import {
   useIntercomStoreAuthSelector,
   useSettingsStoreRemoveWalletSelector,
   useExplorerStoreRemoveWalletSelector,
+  useBundlerStoreRemoveWalletSelector,
 } from '../state';
 import {logEvent} from '../utils/analytics';
 
@@ -30,6 +31,7 @@ export const useRemoveWallet = (): UseRemoveWalletHook => {
   const {clear: clearIntercom} = useIntercomStoreRemoveWalletSelector();
   const {clear: clearSettings} = useSettingsStoreRemoveWalletSelector();
   const {clear: clearExplorer} = useExplorerStoreRemoveWalletSelector();
+  const {clear: clearBundler} = useBundlerStoreRemoveWalletSelector();
 
   return async () => {
     // Clear all state here before removing wallet from device.
@@ -37,6 +39,7 @@ export const useRemoveWallet = (): UseRemoveWalletHook => {
     clearIntercom();
     clearSettings();
     clearExplorer();
+    clearBundler();
 
     resetMasterPassword();
     remove();
