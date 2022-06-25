@@ -1,8 +1,14 @@
 import axios from "axios";
 import { createAlchemyWeb3 } from "@alch/alchemy-web3";
 import { ethers, BigNumberish } from "ethers";
-import { contracts, wallet } from "@stackupfinance/walletjs";
-import { Env, Networks, NetworksConfig, CurrencySymbols } from "../config";
+import { contracts, wallet, constants } from "@stackupfinance/walletjs";
+import {
+  Env,
+  Networks,
+  NetworksConfig,
+  CurrencySymbols,
+  WalletStatus,
+} from "../config";
 import { getRPC } from "../utils";
 
 interface TokenBalanceResponse {
@@ -167,7 +173,15 @@ export const getCurrencyBalances = async (
   }
 };
 
-export const isWalletDeployed = async (network: Networks, address: string) => {
+export const getWalletStatus = async (
+  network: Networks,
+  address: string
+): Promise<WalletStatus> => {
   const provider = new ethers.providers.JsonRpcProvider(getRPC(network));
-  return wallet.proxy.isCodeDeployed(provider, address);
+  const isDeployed = await wallet.proxy.isCodeDeployed(provider, address);
+  const nonce = isDeployed
+    ? await wallet.proxy.getNonce(provider, address)
+    : constants.userOperations.initNonce;
+
+  return { isDeployed, nonce };
 };

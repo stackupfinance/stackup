@@ -1,6 +1,6 @@
 import { ethers, BigNumberish } from "ethers";
 import { catchAsync, convertToQuoteCurrency } from "../utils";
-import { CurrencySymbols, Networks, TimePeriod } from "../config";
+import { CurrencySymbols, Networks, TimePeriod, WalletStatus } from "../config";
 import * as ReceiptService from "../services/receipt.service";
 import * as AlchemyService from "../services/alchemy.service";
 import * as QuoteService from "../services/quote.service";
@@ -27,7 +27,7 @@ interface CurrencyBalance {
 }
 
 interface PostResponse {
-  walletDeployed: boolean;
+  walletStatus: WalletStatus;
   walletBalance: WalletBalance;
   currencies: Array<CurrencyBalance>;
 }
@@ -38,13 +38,13 @@ export const post = catchAsync(async (req, res) => {
     req.body as RequestBody;
 
   const [
-    walletDeployed,
+    walletStatus,
     previousCurrencyBalances,
     currentCurrencyBalances,
     previousQuotes,
     currentQuotes,
   ] = await Promise.all([
-    AlchemyService.isWalletDeployed(network, address),
+    AlchemyService.getWalletStatus(network, address),
     ReceiptService.getClosestBlockForTimePeriod(network, timePeriod).then(
       (blockNumber) =>
         AlchemyService.getCurrencyBalances(
@@ -60,7 +60,7 @@ export const post = catchAsync(async (req, res) => {
   ]);
 
   const response: PostResponse = {
-    walletDeployed,
+    walletStatus,
     walletBalance: currencies.reduce(
       (prev, curr) => {
         return {
