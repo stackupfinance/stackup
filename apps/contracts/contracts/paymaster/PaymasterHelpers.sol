@@ -83,7 +83,7 @@ library PaymasterHelpers {
           op.maxFeePerGas,
           op.maxPriorityFeePerGas,
           op.paymaster,
-          keccak256(abi.encodePacked(pd.fee, pd.token, pd.feed))
+          keccak256(abi.encodePacked(pd.fee, pd.mode, pd.token, pd.feed))
         )
       ).toEthSignedMessageHash();
   }

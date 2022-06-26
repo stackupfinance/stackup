@@ -8,6 +8,5 @@ artifacts
 .gitignore
 .eslintignore
 *.env*
-*.ts
 tsconfig.json
 scripts/buildenv.sh
