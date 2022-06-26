@@ -21,9 +21,7 @@ export default class Staking {
     return this.instance.address;
   }
 
-  async getDeposit(
-    paymaster: Account
-  ): Promise<{
+  async getDeposit(paymaster: Account): Promise<{
     amount: BigNumber;
     unstakeDelaySec: BigNumber;
     withdrawTime: BigNumber;
