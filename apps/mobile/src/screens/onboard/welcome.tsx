@@ -9,6 +9,7 @@ import {
   EnableFingerprint,
   Saly43Illustration,
 } from '../../components';
+import {logEvent} from '../../utils/analytics';
 
 type Props = NativeStackScreenProps<OnboardStackParamList, 'Welcome'>;
 
@@ -25,6 +26,7 @@ export default function WelcomeScreen({navigation}: Props) {
   };
 
   const onDiscordPress = () => {
+    logEvent('JOIN_DISCORD');
     Linking.openURL(externalLinks.discord);
   };
 

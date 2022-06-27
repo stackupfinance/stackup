@@ -7,6 +7,7 @@ import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faSliders} from '@fortawesome/free-solid-svg-icons/faSliders';
 import {faBars} from '@fortawesome/free-solid-svg-icons/faBars';
 import {RootStackParamList, HomeTabParamList, AppColors} from '../../config';
+import {logEvent} from '../../utils/analytics';
 import {
   TabScreenContainer,
   TabScreenHeader,
@@ -64,22 +65,27 @@ export default function AssetsScreen({navigation}: Props) {
   // TODO: Remove this when enabling security button
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const onSecurityPress = () => {
+    logEvent('NAVIGATE_SECURITY');
     navigation.navigate('Security');
   };
 
   const onSettingPress = () => {
+    logEvent('OPEN_SETTINGS');
     setShowSettingsSheet(true);
   };
 
   const onTokenListPress = () => {
+    logEvent('MANAGE_CURRENCY_LIST');
     setShowTokenListSheet(true);
   };
 
   const onDepositPress = () => {
+    logEvent('DEPOSIT');
     setShowDepositSheet(true);
   };
 
   const onSendPress = () => {
+    logEvent('SEND');
     setShowSelectCurrencySheet(true);
   };
 

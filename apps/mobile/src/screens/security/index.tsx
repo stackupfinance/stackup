@@ -17,6 +17,7 @@ import {
   EmailConfirmedSheet,
 } from '../../components';
 import {useNavigationStoreSecuritySelector} from '../../state';
+import {logEvent} from '../../utils/analytics';
 
 const Stack = createNativeStackNavigator<SecurityStackParamList>();
 
@@ -74,6 +75,7 @@ export const SecurityScreen = ({navigation}: Props) => {
   };
 
   const onDiscordPress = () => {
+    logEvent('JOIN_DISCORD');
     Linking.openURL(externalLinks.discord);
   };
 

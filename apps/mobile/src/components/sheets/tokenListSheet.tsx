@@ -4,6 +4,7 @@ import {BigNumberish} from 'ethers';
 import {BaseSheet} from '.';
 import {ManageTokenItem} from '..';
 import {CurrencySymbols} from '../../config';
+import {logEvent} from '../../utils/analytics';
 
 type TokenSettings = {
   currency: CurrencySymbols;
@@ -25,6 +26,7 @@ export const TokenListSheet = ({
   onClose,
 }: Props) => {
   const onValueChange = (currency: CurrencySymbols) => (enabled: boolean) => {
+    logEvent('CHANGE_CURRENCY_SETTING', {token: currency, enabled: enabled});
     onTokenChange(currency, enabled);
   };
 

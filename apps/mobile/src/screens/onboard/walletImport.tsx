@@ -11,6 +11,7 @@ import {
   useWalletStoreWalletImportSelector,
 } from '../../state';
 import {isValid} from '../../utils/address';
+import {logEvent} from '../../utils/analytics';
 
 type Props = NativeStackScreenProps<OnboardStackParamList, 'WalletImport'>;
 
@@ -22,6 +23,7 @@ export default function WalletImportScreen({navigation, route}: Props) {
   const {enableFingerprint} = route.params;
 
   const onHelpPress = () => {
+    logEvent('HELP_AND_SUPPORT');
     openMessenger();
   };
 

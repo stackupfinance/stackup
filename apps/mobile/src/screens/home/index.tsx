@@ -40,6 +40,7 @@ import {
   useBundlerStoreHomeSelector,
   useFingerprintStoreHomeSelector,
 } from '../../state';
+import {logEvent} from '../../utils/analytics';
 
 const Tab = createMaterialTopTabNavigator<HomeTabParamList>();
 
@@ -119,14 +120,17 @@ export const HomeScreen = () => {
   };
 
   const onCloseSettingsSheet = () => {
+    logEvent('CLOSE_SETTINGS');
     setShowSettingsSheet(false);
   };
 
   const onCloseTokenListSheet = () => {
+    logEvent('CLOSE_TOKEN_LIST');
     setShowTokenListSheet(false);
   };
 
   const onCloseDepositSheet = () => {
+    logEvent('CLOSE_DEPOSIT_SHEET');
     setShowDepositSheet(false);
   };
 
@@ -146,22 +150,27 @@ export const HomeScreen = () => {
   };
 
   const onCloseFromWalletSheet = () => {
+    logEvent('CLOSE_FROM_WALLET_SHEET');
     setShowFromWalletSheet(false);
   };
 
   const onHelpPress = () => {
+    logEvent('HELP_AND_SUPPORT');
     openMessenger();
   };
 
   const onDiscordPress = () => {
+    logEvent('JOIN_DISCORD');
     Linking.openURL(externalLinks.discord);
   };
 
   const onRemoveWalletPress = () => {
+    logEvent('REMOVE_WALLET');
     removeWallet();
   };
 
   const onTransferFromWalletPress = () => {
+    logEvent('TRANSFER_FROM_WALLET');
     setShowFromWalletSheet(true);
   };
 
@@ -281,6 +290,7 @@ export const HomeScreen = () => {
     };
 
   const onFromWalletBackPress = () => {
+    logEvent('BACK_PRESS_FROM_WALLET');
     setShowDepositSheet(true);
   };
 
