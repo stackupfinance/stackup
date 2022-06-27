@@ -27,3 +27,16 @@ export const getCurrencyAllowanceForPaymaster = async (
 
   return allowance;
 };
+
+export const getCurrencyBalanceForPaymaster = async (
+  network: Networks,
+  currency: CurrencySymbols,
+  walletAddress: string
+): Promise<BigNumberish> => {
+  const balances = await getInstance(network).alchemy.getTokenBalances(
+    walletAddress,
+    [NetworksConfig[network].currencies[currency].address]
+  );
+
+  return balances.tokenBalances[0].tokenBalance ?? "0";
+};

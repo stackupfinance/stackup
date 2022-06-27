@@ -13,7 +13,6 @@ interface SendData {
 }
 
 interface UseSendUserOperationHook {
-  loading: boolean;
   data: SendData;
 
   update: (patch: Partial<SendData>) => void;
@@ -39,11 +38,10 @@ const defaultData: SendData = {
 };
 
 export const useSendUserOperation = (): UseSendUserOperationHook => {
-  const {loading, fetchPaymasterStatus} = useBundlerStoreUserOpHooksSelector();
+  const {fetchPaymasterStatus} = useBundlerStoreUserOpHooksSelector();
   const [data, setData] = useState<SendData>(defaultData);
 
   return {
-    loading,
     data,
     update: patch => setData({...data, ...patch}),
 
@@ -70,6 +68,7 @@ export const useSendUserOperation = (): UseSendUserOperationHook => {
       const approveOp = shouldApprove
         ? wallet.userOperations.get(instance.walletAddress, {
             nonce,
+            preVerificationGas: 0,
             initCode: isDeployed
               ? constants.userOperations.nullCode
               : wallet.proxy.getInitCode(
@@ -86,6 +85,7 @@ export const useSendUserOperation = (): UseSendUserOperationHook => {
         : undefined;
       const sendOp = wallet.userOperations.get(instance.walletAddress, {
         nonce: shouldApprove ? nonce + 1 : nonce,
+        preVerificationGas: 0,
         callData: wallet.encodeFunctionData.ERC20Transfer(
           NetworksConfig[network].currencies[data.currency].address,
           data.toAddress,

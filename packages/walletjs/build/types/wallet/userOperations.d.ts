@@ -1,5 +1,6 @@
-import { BigNumberish, ethers } from "ethers";
+import { ethers } from "ethers";
 import * as userOperations from "../constants/userOperations";
+import * as message from "./message";
 export declare const appendGuardianSignature: (userOp: userOperations.IUserOperation, signedUserOp: userOperations.IUserOperation) => {
     signature: string;
     sender: string;
@@ -17,4 +18,4 @@ export declare const appendGuardianSignature: (userOp: userOperations.IUserOpera
 export declare const get: (sender: string, override?: {}) => userOperations.IUserOperation;
 export declare const sign: (signer: ethers.Signer, op: userOperations.IUserOperation) => Promise<userOperations.IUserOperation>;
 export declare const signAsGuardian: (signer: ethers.Wallet, guardian: string, op: userOperations.IUserOperation) => Promise<userOperations.IUserOperation>;
-export declare const signPaymasterData: (signer: ethers.Wallet, paymaster: string, fee: BigNumberish, token: string, priceFeed: string, op: userOperations.IUserOperation) => Promise<userOperations.IUserOperation>;
+export declare const signPaymasterData: (op: userOperations.IUserOperation, signer: ethers.Wallet, paymaster: string, paymasterData: message.PaymasterData) => Promise<userOperations.IUserOperation>;
