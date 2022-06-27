@@ -39,7 +39,7 @@ Stackup is built from the combination of multiple apps. See the `README.md` file
 - [Contracts](./apps/contracts) - A collection of solidity smart contracts for Stackup.
 - [Explorer](./apps/explorer) - Service for fetching blockchain data for an address.
 - [Backup](./apps/backup) - Service for providing encrypted and non-custodial backup of wallets.
-- [Bundler](./apps/bundler) Service for forwarding UserOperations to the EntryPoint.
+- [Bundler](./apps/bundler) - Service for forwarding UserOperations to the EntryPoint.
 - [Mobile](./apps/mobile) - A mobile native frontend for IOS and Android.
 
 # License

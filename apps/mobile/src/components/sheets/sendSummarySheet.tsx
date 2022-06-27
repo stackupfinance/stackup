@@ -18,8 +18,10 @@ import {truncate} from '../../utils/address';
 
 type Props = {
   isOpen: boolean;
+  isLoading: boolean;
   onClose: () => void;
   onBack: () => void;
+  onNext: () => Promise<void>;
   fromAddress: string;
   toAddress: string;
   value: BigNumberish;
@@ -31,8 +33,10 @@ type Props = {
 
 export const SendSummarySheet = ({
   isOpen,
+  isLoading,
   onClose,
   onBack,
+  onNext,
   fromAddress,
   toAddress,
   value,
@@ -113,7 +117,11 @@ export const SendSummarySheet = ({
 
         <Box flex={1} />
 
-        <Button isDisabled={isDisabled} w="100%" onPress={() => {}}>
+        <Button
+          isLoading={isLoading}
+          isDisabled={isDisabled}
+          w="100%"
+          onPress={onNext}>
           Send
         </Button>
       </VStack>

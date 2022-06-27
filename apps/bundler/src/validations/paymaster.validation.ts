@@ -5,6 +5,9 @@ import { ValidNetworks } from "../config";
 
 export const sign = {
   body: Joi.object().keys({
+    network: Joi.string()
+      .valid(...ValidNetworks)
+      .required(),
     userOperations: Joi.array().items(UserOperationSchema).required().min(1),
   }),
 };

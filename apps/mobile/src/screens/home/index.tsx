@@ -30,6 +30,7 @@ import {
   useWalletStoreHomeSelector,
   useSettingsStoreHomeSelector,
   useExplorerStoreHomeSelector,
+  useBundlerStoreHomeSelector,
 } from '../../state';
 
 const Tab = createMaterialTopTabNavigator<HomeTabParamList>();
@@ -61,9 +62,10 @@ export const HomeScreen = () => {
     toggleCurrency,
   } = useSettingsStoreHomeSelector();
   const {walletStatus, currencies} = useExplorerStoreHomeSelector();
+  const {loading: sendUserOpsLoading, requestPaymasterSignature} =
+    useBundlerStoreHomeSelector();
   const removeWallet = useRemoveWallet();
   const {
-    loading: sendUserOpsLoading,
     data: sendData,
     update: updateSendData,
     clear: clearSendData,
@@ -154,6 +156,14 @@ export const HomeScreen = () => {
       )),
     });
     setShowSendSummarySheet(true);
+  };
+
+  const onSendSummaryNextPress = async () => {
+    const ops = await requestPaymasterSignature(
+      sendData.userOperations,
+      network,
+    );
+    console.log(ops);
   };
 
   const onFromWalletBackPress = () => {
@@ -252,6 +262,7 @@ export const HomeScreen = () => {
 
       <SendSummarySheet
         isOpen={showSendSummarySheet}
+        isLoading={sendUserOpsLoading}
         onClose={onCloseSendSummarySheet}
         onBack={onSendSummaryBackPress}
         fromAddress={instance.walletAddress}
@@ -261,6 +272,7 @@ export const HomeScreen = () => {
         currency={sendData.currency}
         currencyBalances={currencyBalances}
         network={network}
+        onNext={onSendSummaryNextPress}
       />
 
       <FromWalletSheet

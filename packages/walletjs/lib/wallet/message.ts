@@ -1,6 +1,20 @@
 import { BigNumberish, ethers } from "ethers";
 import { IUserOperation } from "../constants/userOperations";
 
+export enum PaymasterMode {
+  FULL,
+  FEE_ONLY,
+  GAS_ONLY,
+  FREE,
+}
+export interface PaymasterData {
+  fee: BigNumberish;
+  mode: PaymasterMode;
+  token: string;
+  feed: string;
+  signature?: string;
+}
+
 const _userOperation = (op: IUserOperation) => {
   return ethers.utils.keccak256(
     ethers.utils.solidityPack(
@@ -36,9 +50,10 @@ const _userOperation = (op: IUserOperation) => {
 
 export const paymasterData = (
   op: IUserOperation,
-  paymasterFee: BigNumberish,
-  erc20Token: string,
-  priceFeed: string
+  fee: BigNumberish,
+  mode: PaymasterMode,
+  token: string,
+  feed: string
 ) => {
   return ethers.utils.arrayify(
     ethers.utils.keccak256(
@@ -70,8 +85,8 @@ export const paymasterData = (
           // Hash all paymasterData together
           ethers.utils.keccak256(
             ethers.utils.solidityPack(
-              ["uint256", "address", "address"],
-              [paymasterFee, erc20Token, priceFeed]
+              ["uint256", "uint8", "address", "address"],
+              [fee, mode, token, feed]
             )
           ),
         ]

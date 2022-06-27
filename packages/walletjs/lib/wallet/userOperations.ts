@@ -1,4 +1,4 @@
-import { BigNumberish, ethers } from "ethers";
+import { ethers } from "ethers";
 import * as EntryPoint from "../contracts/entryPoint";
 import * as userOperations from "../constants/userOperations";
 import * as message from "./message";
@@ -120,25 +120,30 @@ export const signAsGuardian = async (
 };
 
 export const signPaymasterData = async (
+  op: userOperations.IUserOperation,
   signer: ethers.Wallet,
   paymaster: string,
-  fee: BigNumberish,
-  token: string,
-  priceFeed: string,
-  op: userOperations.IUserOperation
+  paymasterData: message.PaymasterData
 ): Promise<userOperations.IUserOperation> => {
   const userOp = { ...op, paymaster };
 
   return {
     ...userOp,
     paymasterData: ethers.utils.defaultAbiCoder.encode(
-      ["uint256", "address", "address", "bytes"],
+      ["uint256", "uint8", "address", "address", "bytes"],
       [
-        fee,
-        token,
-        priceFeed,
+        paymasterData.fee,
+        paymasterData.mode,
+        paymasterData.token,
+        paymasterData.feed,
         await signer.signMessage(
-          message.paymasterData(userOp, fee, token, priceFeed)
+          message.paymasterData(
+            userOp,
+            paymasterData.fee,
+            paymasterData.mode,
+            paymasterData.token,
+            paymasterData.feed
+          )
         ),
       ]
     ),

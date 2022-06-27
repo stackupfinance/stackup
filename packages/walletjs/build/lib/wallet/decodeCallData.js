@@ -23,9 +23,19 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.fromUserOperation = void 0;
+exports.Erc20FromExecuteUserOp = exports.fromUserOperation = void 0;
 const Wallet = __importStar(require("../contracts/wallet"));
+const ERC20 = __importStar(require("../contracts/erc20"));
 const fromUserOperation = (userOp) => {
     return Wallet.interface.parseTransaction({ data: userOp.callData });
 };
 exports.fromUserOperation = fromUserOperation;
+const Erc20FromExecuteUserOp = (wcd) => {
+    try {
+        return ERC20.interface.parseTransaction({ data: wcd.args.data });
+    }
+    catch (_error) {
+        return undefined;
+    }
+};
+exports.Erc20FromExecuteUserOp = Erc20FromExecuteUserOp;

@@ -90,15 +90,16 @@ const signAsGuardian = async (signer, guardian, op) => {
     };
 };
 exports.signAsGuardian = signAsGuardian;
-const signPaymasterData = async (signer, paymaster, fee, token, priceFeed, op) => {
+const signPaymasterData = async (op, signer, paymaster, paymasterData) => {
     const userOp = { ...op, paymaster };
     return {
         ...userOp,
-        paymasterData: ethers_1.ethers.utils.defaultAbiCoder.encode(["uint256", "address", "address", "bytes"], [
-            fee,
-            token,
-            priceFeed,
-            await signer.signMessage(message.paymasterData(userOp, fee, token, priceFeed)),
+        paymasterData: ethers_1.ethers.utils.defaultAbiCoder.encode(["uint256", "uint8", "address", "address", "bytes"], [
+            paymasterData.fee,
+            paymasterData.mode,
+            paymasterData.token,
+            paymasterData.feed,
+            await signer.signMessage(message.paymasterData(userOp, paymasterData.fee, paymasterData.mode, paymasterData.token, paymasterData.feed)),
         ]),
     };
 };
