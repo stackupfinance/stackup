@@ -22,10 +22,14 @@ async function main() {
   }
 
   const [signer] = await ethers.getSigners();
+  if (!signer.provider) {
+    throw new Error("No provider.");
+  }
   const nonce = await wallet.proxy.getNonce(ethers.provider, paymaster);
   const paymasterOps = await Promise.all([
     wallet.userOperations.sign(
       signer,
+      await signer.provider.getNetwork().then((n) => n.chainId),
       wallet.userOperations.get(paymaster, {
         nonce,
         callData: wallet.encodeFunctionData.upgradeTo(contracts.Wallet.address),

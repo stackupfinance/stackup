@@ -35,7 +35,7 @@ export async function repeatJob<N extends keyof Jobs, D extends Jobs[N]>(
   await agenda
     .create(name, data)
     .repeatEvery(schedule)
-    .unique({ [`data.${uniquePath}`]: data[uniquePath] })
+    .unique({ [`data.${String(uniquePath)}`]: data[uniquePath] })
     .save();
 }
 

@@ -23,6 +23,8 @@ interface UseSendUserOperationHook {
     quoteCurrency: CurrencySymbols,
     isDeployed: boolean,
     nonce: number,
+    toAddress: string,
+    value: BigNumberish,
   ) => Promise<{
     fee: Fee;
     userOperations: Array<constants.userOperations.IUserOperation>;
@@ -53,7 +55,15 @@ export const useSendUserOperation = (): UseSendUserOperationHook => {
       }
     },
 
-    buildOps: async (instance, network, quoteCurrency, isDeployed, nonce) => {
+    buildOps: async (
+      instance,
+      network,
+      quoteCurrency,
+      isDeployed,
+      nonce,
+      toAddress,
+      value,
+    ) => {
       const status = await fetchPaymasterStatus(
         instance.walletAddress,
         network,
@@ -69,13 +79,16 @@ export const useSendUserOperation = (): UseSendUserOperationHook => {
         ? wallet.userOperations.get(instance.walletAddress, {
             nonce,
             preVerificationGas: 0,
+            verificationGas: constants.userOperations.defaultGas * 3,
             initCode: isDeployed
               ? constants.userOperations.nullCode
-              : wallet.proxy.getInitCode(
-                  instance.initImplementation,
-                  instance.initOwner,
-                  instance.initGuardians,
-                ),
+              : wallet.proxy
+                  .getInitCode(
+                    instance.initImplementation,
+                    instance.initOwner,
+                    instance.initGuardians,
+                  )
+                  .toString(),
             callData: wallet.encodeFunctionData.ERC20Approve(
               NetworksConfig[network].currencies[data.currency].address,
               paymasterAddress,
@@ -83,13 +96,15 @@ export const useSendUserOperation = (): UseSendUserOperationHook => {
             ),
           })
         : undefined;
+      console.log('value', data.value);
       const sendOp = wallet.userOperations.get(instance.walletAddress, {
         nonce: shouldApprove ? nonce + 1 : nonce,
         preVerificationGas: 0,
+        verificationGas: constants.userOperations.defaultGas * 3,
         callData: wallet.encodeFunctionData.ERC20Transfer(
           NetworksConfig[network].currencies[data.currency].address,
-          data.toAddress,
-          data.value,
+          toAddress,
+          value,
         ),
       });
       const userOperations = approveOp ? [approveOp, sendOp] : [sendOp];

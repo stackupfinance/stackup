@@ -71,6 +71,7 @@ export const useSettingsStoreRemoveWalletSelector = () =>
 export const useSettingsStoreHomeSelector = () =>
   useSettingsStore(state => ({
     currencies: state.currencies,
+    timePeriod: state.timePeriod,
     network: state.network,
     quoteCurrency: state.quoteCurrency,
     toggleCurrency: state.toggleCurrency,

@@ -11,6 +11,7 @@ export * from './menuItem';
 export * from './portfolioBalance';
 export * from './portfolioItem';
 export * from './qrCode';
+export * from './requestMasterPassword';
 export * from './securityButton';
 export * from './securityItem';
 export * from './securityOverview';
