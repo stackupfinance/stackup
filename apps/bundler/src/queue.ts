@@ -12,14 +12,9 @@ export function defineJob(name: keyof Jobs, processor: Processor) {
 
 export function initJob<N extends keyof Jobs, D extends Jobs[N]>(
   name: N,
-  data: D,
-  schedule?: string
+  data: D
 ) {
-  if (schedule) {
-    agenda.schedule(schedule, name, data);
-  } else {
-    agenda.now(name, data);
-  }
+  agenda.now(name, data);
 }
 
 export default agenda;
