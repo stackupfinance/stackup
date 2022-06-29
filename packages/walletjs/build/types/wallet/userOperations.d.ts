@@ -15,7 +15,7 @@ export declare const appendGuardianSignature: (userOp: userOperations.IUserOpera
     paymaster: string;
     paymasterData: string;
 };
-export declare const get: (sender: string, override?: {}) => userOperations.IUserOperation;
-export declare const sign: (signer: ethers.Signer, op: userOperations.IUserOperation) => Promise<userOperations.IUserOperation>;
+export declare const get: (sender: string, override?: Partial<userOperations.IUserOperation>) => userOperations.IUserOperation;
+export declare const sign: (signer: ethers.Signer, chainId: ethers.BigNumberish, op: userOperations.IUserOperation) => Promise<userOperations.IUserOperation>;
 export declare const signAsGuardian: (signer: ethers.Wallet, guardian: string, op: userOperations.IUserOperation) => Promise<userOperations.IUserOperation>;
 export declare const signPaymasterData: (op: userOperations.IUserOperation, signer: ethers.Wallet, paymaster: string, paymasterData: message.PaymasterData) => Promise<userOperations.IUserOperation>;

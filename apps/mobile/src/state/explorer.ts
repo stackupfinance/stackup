@@ -147,6 +147,7 @@ export const useExplorerStoreHomeSelector = () =>
   useExplorerStore(state => ({
     walletStatus: state.walletStatus,
     currencies: state.currencies,
+    fetchAddressOverview: state.fetchAddressOverview,
   }));
 
 export const useExplorerStoreAssetsSelector = () =>

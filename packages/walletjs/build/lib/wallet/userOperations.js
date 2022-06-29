@@ -57,14 +57,11 @@ const get = (sender, override = {}) => {
     };
 };
 exports.get = get;
-const sign = async (signer, op) => {
-    if (!signer.provider) {
-        throw new Error("No provider connected");
-    }
+const sign = async (signer, chainId, op) => {
     const walletSignatureValues = [
         {
             signer: await signer.getAddress(),
-            signature: await signer.signMessage(ethers_1.ethers.utils.arrayify(message.requestId(op, EntryPoint.address, await signer.provider.getNetwork().then((n) => n.chainId)))),
+            signature: await signer.signMessage(ethers_1.ethers.utils.arrayify(message.requestId(op, EntryPoint.address, chainId))),
         },
     ];
     return {
@@ -92,6 +89,16 @@ const signAsGuardian = async (signer, guardian, op) => {
 exports.signAsGuardian = signAsGuardian;
 const signPaymasterData = async (op, signer, paymaster, paymasterData) => {
     const userOp = { ...op, paymaster };
+    const paymasterSignatureValue = await signer.signMessage(message.paymasterData(userOp, paymasterData.fee, paymasterData.mode, paymasterData.token, paymasterData.feed));
+    const paymasterSignature = ethers_1.ethers.utils.defaultAbiCoder.encode(["uint8", "(address signer, bytes signature)[]"], [
+        0,
+        [
+            {
+                signer: await signer.getAddress(),
+                signature: paymasterSignatureValue,
+            },
+        ],
+    ]);
     return {
         ...userOp,
         paymasterData: ethers_1.ethers.utils.defaultAbiCoder.encode(["uint256", "uint8", "address", "address", "bytes"], [
@@ -99,7 +106,7 @@ const signPaymasterData = async (op, signer, paymaster, paymasterData) => {
             paymasterData.mode,
             paymasterData.token,
             paymasterData.feed,
-            await signer.signMessage(message.paymasterData(userOp, paymasterData.fee, paymasterData.mode, paymasterData.token, paymasterData.feed)),
+            paymasterSignature,
         ]),
     };
 };

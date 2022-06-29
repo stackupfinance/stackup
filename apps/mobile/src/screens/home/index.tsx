@@ -1,7 +1,7 @@
 /* eslint-disable react/no-unstable-nested-components */
-import React, {useEffect, useMemo} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {Linking} from 'react-native';
-import {Box, Text} from 'native-base';
+import {Box, Text, useToast} from 'native-base';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faWallet} from '@fortawesome/free-solid-svg-icons/faWallet';
@@ -9,12 +9,19 @@ import {faRocket} from '@fortawesome/free-solid-svg-icons/faRocket';
 import {faArrowRightArrowLeft} from '@fortawesome/free-solid-svg-icons/faArrowRightArrowLeft';
 import {faBolt} from '@fortawesome/free-solid-svg-icons/faBolt';
 import {BigNumberish} from 'ethers';
-import {HomeTabParamList, externalLinks, CurrencySymbols} from '../../config';
+import {constants} from '@stackupfinance/walletjs';
+import {
+  HomeTabParamList,
+  externalLinks,
+  CurrencySymbols,
+  AppColors,
+} from '../../config';
 import AssetsScreen from './assets';
 // import EarnScreen from './earn';
 // import SwapScreen from './swap';
 // import ActivityScreen from './activity';
 import {
+  RequestMasterPassword,
   SettingsSheet,
   TokenListSheet,
   DepositSheet,
@@ -31,11 +38,13 @@ import {
   useSettingsStoreHomeSelector,
   useExplorerStoreHomeSelector,
   useBundlerStoreHomeSelector,
+  useFingerprintStoreHomeSelector,
 } from '../../state';
 
 const Tab = createMaterialTopTabNavigator<HomeTabParamList>();
 
 export const HomeScreen = () => {
+  const toast = useToast();
   const {
     showSettingsSheet,
     showTokenListSheet,
@@ -57,13 +66,22 @@ export const HomeScreen = () => {
   const {openMessenger} = useIntercomStoreHomeSelector();
   const {
     currencies: enabledCurrencies,
+    timePeriod,
     network,
     quoteCurrency,
     toggleCurrency,
   } = useSettingsStoreHomeSelector();
-  const {walletStatus, currencies} = useExplorerStoreHomeSelector();
-  const {loading: sendUserOpsLoading, requestPaymasterSignature} =
-    useBundlerStoreHomeSelector();
+  const {walletStatus, currencies, fetchAddressOverview} =
+    useExplorerStoreHomeSelector();
+  const {
+    loading: sendUserOpsLoading,
+    requestPaymasterSignature,
+    verifyUserOperationsWithPaymaster,
+    signUserOperations,
+    relayUserOperations,
+  } = useBundlerStoreHomeSelector();
+  const {isEnabled: isFingerprintEnabled, getMasterPassword} =
+    useFingerprintStoreHomeSelector();
   const removeWallet = useRemoveWallet();
   const {
     data: sendData,
@@ -71,6 +89,11 @@ export const HomeScreen = () => {
     clear: clearSendData,
     buildOps: buildSendOps,
   } = useSendUserOperation();
+  const [showRequestMasterPassword, setShowRequestMasterPassword] =
+    useState(false);
+  const [unsignedUserOperations, setUnsignedUserOperations] = useState<
+    Array<constants.userOperations.IUserOperation>
+  >([]);
 
   const currencySet = useMemo(
     () => new Set(enabledCurrencies),
@@ -90,6 +113,10 @@ export const HomeScreen = () => {
       resetAllSheets();
     };
   }, [resetAllSheets]);
+
+  const onRequestMasterPasswordClose = () => {
+    setShowRequestMasterPassword(false);
+  };
 
   const onCloseSettingsSheet = () => {
     setShowSettingsSheet(false);
@@ -150,28 +177,114 @@ export const HomeScreen = () => {
       ...(await buildSendOps(
         instance,
         network,
-        quoteCurrency,
         walletStatus.isDeployed,
         walletStatus.nonce,
+        quoteCurrency,
+        toAddress,
+        value,
       )),
     });
     setShowSendSummarySheet(true);
   };
 
   const onSendSummaryNextPress = async () => {
-    const ops = await requestPaymasterSignature(
+    const userOperations = await requestPaymasterSignature(
       sendData.userOperations,
       network,
     );
-    console.log(ops);
+    setUnsignedUserOperations(userOperations);
+
+    if (isFingerprintEnabled) {
+      const masterPassword = await getMasterPassword();
+      onConfirmTransaction(userOperations)(masterPassword ?? '');
+    } else {
+      setShowRequestMasterPassword(true);
+    }
   };
+
+  const onConfirmTransaction =
+    (ops: Array<constants.userOperations.IUserOperation>) =>
+    async (masterPassword: string) => {
+      setShowRequestMasterPassword(false);
+      if (!verifyUserOperationsWithPaymaster(sendData.userOperations, ops)) {
+        toast.show({
+          title: 'Transaction corrupted, contact us for help',
+          backgroundColor: AppColors.singletons.warning,
+          placement: 'bottom',
+        });
+        return;
+      }
+
+      const userOperations = await signUserOperations(
+        instance,
+        masterPassword,
+        network,
+        ops,
+      );
+      if (!userOperations) {
+        toast.show({
+          title: 'Incorrect password',
+          backgroundColor: AppColors.singletons.warning,
+          placement: 'top',
+        });
+
+        return;
+      }
+
+      toast.show({
+        title: 'Transaction sent, this might take a minute',
+        backgroundColor: AppColors.palettes.primary[600],
+        placement: 'bottom',
+      });
+      relayUserOperations(userOperations, network, status => {
+        switch (status) {
+          case 'PENDING':
+            toast.show({
+              title: 'Transaction still pending, refresh later',
+              backgroundColor: AppColors.palettes.primary[600],
+              placement: 'bottom',
+            });
+            break;
+
+          case 'FAIL':
+            toast.show({
+              title: 'Transaction failed, contact us for help',
+              backgroundColor: AppColors.singletons.warning,
+              placement: 'bottom',
+            });
+            fetchAddressOverview(
+              network,
+              quoteCurrency,
+              timePeriod,
+              instance.walletAddress,
+            );
+            break;
+
+          default:
+            toast.show({
+              title: 'Transaction completed!',
+              backgroundColor: AppColors.singletons.good,
+              placement: 'bottom',
+            });
+            fetchAddressOverview(
+              network,
+              quoteCurrency,
+              timePeriod,
+              instance.walletAddress,
+            );
+            break;
+        }
+
+        clearSendData();
+        setShowSendSummarySheet(false);
+      });
+    };
 
   const onFromWalletBackPress = () => {
     setShowDepositSheet(true);
   };
 
   const onSendBackPress = () => {
-    clearSendData('toAddress');
     setShowSelectCurrencySheet(true);
   };
 
@@ -214,6 +327,12 @@ export const HomeScreen = () => {
         <Tab.Screen name="Swap" component={SwapScreen} />
         <Tab.Screen name="Activity" component={ActivityScreen} /> */}
       </Tab.Navigator>
+
+      <RequestMasterPassword
+        isOpen={showRequestMasterPassword}
+        onClose={onRequestMasterPasswordClose}
+        onConfirm={onConfirmTransaction(unsignedUserOperations)}
+      />
 
       <SettingsSheet
         isOpen={showSettingsSheet}

@@ -1,5 +1,5 @@
 import {ImageSourcePropType} from 'react-native';
-import {ethers} from 'ethers';
+import {BigNumberish, ethers} from 'ethers';
 import {Env} from './env';
 import {CurrencySymbols} from './currency';
 import {PolygonLogo} from '../components';
@@ -11,6 +11,7 @@ type NetworksConfig = {
   color: string;
   logo: ImageSourcePropType;
   nativeCurrency: CurrencySymbols;
+  chainId: BigNumberish;
   currencies: Record<CurrencySymbols, {address: string}>;
 };
 
@@ -20,6 +21,7 @@ export const NetworksConfig: Record<Networks, NetworksConfig> = {
     color: '#6561ff',
     logo: PolygonLogo,
     nativeCurrency: 'MATIC',
+    chainId: Env.NETWORK_ENV === 'mainnet' ? '137' : '80001',
     currencies: {
       MATIC: {address: ethers.constants.AddressZero},
       USDC: {

@@ -40,7 +40,7 @@ export const appendGuardianSignature = (
 
 export const get = (
   sender: string,
-  override = {}
+  override: Partial<userOperations.IUserOperation> = {}
 ): userOperations.IUserOperation => {
   return {
     ...userOperations.defaults,
@@ -51,22 +51,15 @@ export const get = (
 
 export const sign = async (
   signer: ethers.Signer,
+  chainId: ethers.BigNumberish,
   op: userOperations.IUserOperation
 ): Promise<userOperations.IUserOperation> => {
-  if (!signer.provider) {
-    throw new Error("No provider connected");
-  }
-
   const walletSignatureValues = [
     {
       signer: await signer.getAddress(),
       signature: await signer.signMessage(
         ethers.utils.arrayify(
-          message.requestId(
-            op,
-            EntryPoint.address,
-            await signer.provider.getNetwork().then((n) => n.chainId)
-          )
+          message.requestId(op, EntryPoint.address, chainId)
         )
       ),
     },
@@ -126,6 +119,27 @@ export const signPaymasterData = async (
   paymasterData: message.PaymasterData
 ): Promise<userOperations.IUserOperation> => {
   const userOp = { ...op, paymaster };
+  const paymasterSignatureValue = await signer.signMessage(
+    message.paymasterData(
+      userOp,
+      paymasterData.fee,
+      paymasterData.mode,
+      paymasterData.token,
+      paymasterData.feed
+    )
+  );
+  const paymasterSignature = ethers.utils.defaultAbiCoder.encode(
+    ["uint8", "(address signer, bytes signature)[]"],
+    [
+      0,
+      [
+        {
+          signer: await signer.getAddress(),
+          signature: paymasterSignatureValue,
+        },
+      ],
+    ]
+  );
 
   return {
     ...userOp,
@@ -136,15 +150,7 @@ export const signPaymasterData = async (
         paymasterData.mode,
         paymasterData.token,
         paymasterData.feed,
-        await signer.signMessage(
-          message.paymasterData(
-            userOp,
-            paymasterData.fee,
-            paymasterData.mode,
-            paymasterData.token,
-            paymasterData.feed
-          )
-        ),
+        paymasterSignature,
       ]
     ),
   };

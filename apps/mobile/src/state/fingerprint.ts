@@ -4,11 +4,6 @@ import {persist, devtools} from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Keychain from 'react-native-keychain';
 
-interface MasterPassword {
-  password: string;
-  salt: string;
-}
-
 interface FingerprintState {
   loading: boolean;
   isSupported: boolean;
@@ -16,7 +11,7 @@ interface FingerprintState {
 
   checkDevice: () => Promise<void>;
   setMasterPassword: (password: string, salt: string) => Promise<void>;
-  getMasterPassword: () => Promise<MasterPassword | undefined>;
+  getMasterPassword: () => Promise<string | undefined>;
   resetMasterPassword: () => Promise<void>;
 
   hasHydrated: boolean;
@@ -61,9 +56,7 @@ const useFingerprintStore = create<FingerprintState>()(
           const credentials = await Keychain.getGenericPassword();
 
           set({loading: false});
-          return credentials
-            ? {password: credentials.password, salt: credentials.username}
-            : undefined;
+          return credentials ? credentials.password : undefined;
         },
 
         resetMasterPassword: async () => {
@@ -106,6 +99,12 @@ export const useFingerprintStoreAuthSelector = () =>
     checkDevice: state.checkDevice,
     getMasterPassword: state.getMasterPassword,
     hasHydrated: state.hasHydrated,
+  }));
+
+export const useFingerprintStoreHomeSelector = () =>
+  useFingerprintStore(state => ({
+    isEnabled: state.isEnabled,
+    getMasterPassword: state.getMasterPassword,
   }));
 
 export const useFingerprintStoreWelcomeSelector = () =>
