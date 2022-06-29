@@ -9,6 +9,7 @@ import {faRocket} from '@fortawesome/free-solid-svg-icons/faRocket';
 import {faArrowRightArrowLeft} from '@fortawesome/free-solid-svg-icons/faArrowRightArrowLeft';
 import {faBolt} from '@fortawesome/free-solid-svg-icons/faBolt';
 import {BigNumberish} from 'ethers';
+import {constants} from '@stackupfinance/walletjs';
 import {
   HomeTabParamList,
   externalLinks,
@@ -39,7 +40,6 @@ import {
   useBundlerStoreHomeSelector,
   useFingerprintStoreHomeSelector,
 } from '../../state';
-import {constants} from '@stackupfinance/walletjs/build/types';
 
 const Tab = createMaterialTopTabNavigator<HomeTabParamList>();
 
