@@ -64,5 +64,11 @@
 		<string>Inter-Thin.ttf</string>
 		<string>Helvetica-Neue-Medium-Extended.ttf</string>
 	</array>
+  <!-- permission strings to be included in info.plist -->
+  <!-- Camera access for Ramp -->
+  <key>NSCameraUsageDescription</key>
+  <string>Please give us access to your camera, to complete the verification.</string>
+  <key>NSPhotoLibraryUsageDescription</key>
+  <string>Please give us access to your photo library to verify you.</string>
 </dict>
 </plist>

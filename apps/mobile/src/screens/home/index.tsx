@@ -24,6 +24,7 @@ import {
   RequestMasterPassword,
   SettingsSheet,
   TokenListSheet,
+  BuyTokenSheet,
   DepositSheet,
   SelectCurrencySheet,
   SendSheet,
@@ -49,6 +50,7 @@ export const HomeScreen = () => {
   const {
     showSettingsSheet,
     showTokenListSheet,
+    showBuyTokenSheet,
     showDepositSheet,
     showSelectCurrencySheet,
     showSendSheet,
@@ -56,6 +58,7 @@ export const HomeScreen = () => {
     showFromWalletSheet,
     setShowSettingsSheet,
     setShowTokenListSheet,
+    setShowBuyTokenSheet,
     setShowDepositSheet,
     setShowSelectCurrencySheet,
     setShowSendSheet,
@@ -170,6 +173,10 @@ export const HomeScreen = () => {
   const onRemoveWalletPress = () => {
     logEvent('SETTINGS_REMOVE_WALLET');
     removeWallet();
+  };
+
+  const onBuyWithPress = () => {
+    setShowBuyTokenSheet(true);
   };
 
   const onTransferFromWalletPress = () => {

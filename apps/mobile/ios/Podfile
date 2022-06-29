@@ -4,6 +4,12 @@ require_relative '../node_modules/@react-native-community/cli-platform-ios/nativ
 platform :ios, '13.0'
 install! 'cocoapods', :deterministic_uuids => false
 
+# configuration for Ramp
+source 'https://github.com/CocoaPods/Specs.git'
+source 'https://github.com/passbase/zoomauthentication-cocoapods-specs.git'
+source 'https://github.com/passbase/cocoapods-specs.git'
+source 'https://github.com/passbase/microblink-cocoapods-specs.git'
+
 target 'stackup' do
   config = use_native_modules!
 
@@ -22,13 +28,16 @@ target 'stackup' do
   target 'stackupTests' do
     inherit! :complete
     # Pods for testing
+    # configuration for Ramp
+    use_frameworks!
+    pod 'Ramp', :git => 'https://github.com/RampNetwork/ramp-sdk-ios', :tag => '2.0.0'
   end
 
   # Enables Flipper.
   #
   # Note that if you have use_frameworks! enabled, Flipper will not work and
   # you should disable the next line.
-  use_flipper!()
+  # use_flipper!()
 
   post_install do |installer|
     react_native_post_install(installer)
