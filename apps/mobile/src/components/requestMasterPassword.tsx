@@ -2,25 +2,15 @@ import React, {useEffect, useState} from 'react';
 import {AlertDialog, Button, Input, Box} from 'native-base';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faKey} from '@fortawesome/free-solid-svg-icons/faKey';
-import {constants} from '@stackupfinance/walletjs';
 import {AppColors} from '../config';
 
 type Props = {
   isOpen: boolean;
   onClose: () => void;
-  userOperations: Array<constants.userOperations.IUserOperation>;
-  onConfirm: (
-    masterPassword: string,
-    ops: Array<constants.userOperations.IUserOperation>,
-  ) => void;
+  onConfirm: (masterPassword: string) => void;
 };
 
-export const RequestMasterPassword = ({
-  isOpen,
-  onClose,
-  userOperations,
-  onConfirm,
-}: Props) => {
+export const RequestMasterPassword = ({isOpen, onClose, onConfirm}: Props) => {
   const [masterPassword, setMasterPassword] = useState('');
   const inputRef = React.useRef(null);
 
@@ -31,7 +21,7 @@ export const RequestMasterPassword = ({
   }, [isOpen]);
 
   const onConfirmPress = () => {
-    onConfirm(masterPassword, userOperations);
+    onConfirm(masterPassword);
   };
 
   return (

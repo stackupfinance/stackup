@@ -31,6 +31,10 @@ interface BundlerState extends BundlerStateConstants {
     userOperations: Array<constants.userOperations.IUserOperation>,
     network: Networks,
   ) => Promise<Array<constants.userOperations.IUserOperation>>;
+  verifyUserOperationsWithPaymaster: (
+    userOperations: Array<constants.userOperations.IUserOperation>,
+    userOperationsWithPaymaster: Array<constants.userOperations.IUserOperation>,
+  ) => boolean;
   signUserOperations: (
     instance: wallet.WalletInstance,
     masterPassword: string,
@@ -86,6 +90,36 @@ const useBundlerStore = create<BundlerState>()(
           set({loading: false});
           throw error;
         }
+      },
+
+      verifyUserOperationsWithPaymaster: (ops, opsWithPaymaster) => {
+        if (ops.length !== opsWithPaymaster.length) {
+          return false;
+        }
+
+        const isUnchanged = ops.reduce((prev, curr, i) => {
+          if (!prev) {
+            return false;
+          }
+          return (
+            curr.sender === opsWithPaymaster[i].sender &&
+            curr.nonce === opsWithPaymaster[i].nonce &&
+            curr.initCode === opsWithPaymaster[i].initCode &&
+            curr.callData === opsWithPaymaster[i].callData &&
+            curr.callGas === opsWithPaymaster[i].callGas &&
+            curr.verificationGas === opsWithPaymaster[i].verificationGas &&
+            curr.preVerificationGas ===
+              opsWithPaymaster[i].preVerificationGas &&
+            curr.maxFeePerGas === opsWithPaymaster[i].maxFeePerGas &&
+            curr.maxPriorityFeePerGas ===
+              opsWithPaymaster[i].maxPriorityFeePerGas
+          );
+        }, true);
+
+        if (!isUnchanged) {
+          set({loading: false});
+        }
+        return isUnchanged;
       },
 
       signUserOperations: async (
@@ -151,6 +185,7 @@ export const useBundlerStoreHomeSelector = () =>
   useBundlerStore(state => ({
     loading: state.loading,
     requestPaymasterSignature: state.requestPaymasterSignature,
+    verifyUserOperationsWithPaymaster: state.verifyUserOperationsWithPaymaster,
     signUserOperations: state.signUserOperations,
     relayUserOperations: state.relayUserOperations,
   }));

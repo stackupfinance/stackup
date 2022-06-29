@@ -76,6 +76,7 @@ export const HomeScreen = () => {
   const {
     loading: sendUserOpsLoading,
     requestPaymasterSignature,
+    verifyUserOperationsWithPaymaster,
     signUserOperations,
     relayUserOperations,
   } = useBundlerStoreHomeSelector();
@@ -90,6 +91,9 @@ export const HomeScreen = () => {
   } = useSendUserOperation();
   const [showRequestMasterPassword, setShowRequestMasterPassword] =
     useState(false);
+  const [unsignedUserOperations, setUnsignedUserOperations] = useState<
+    Array<constants.userOperations.IUserOperation>
+  >([]);
 
   const currencySet = useMemo(
     () => new Set(enabledCurrencies),
@@ -173,9 +177,9 @@ export const HomeScreen = () => {
       ...(await buildSendOps(
         instance,
         network,
-        quoteCurrency,
         walletStatus.isDeployed,
         walletStatus.nonce,
+        quoteCurrency,
         toAddress,
         value,
       )),
@@ -188,91 +192,99 @@ export const HomeScreen = () => {
       sendData.userOperations,
       network,
     );
-    updateSendData({userOperations});
+    setUnsignedUserOperations(userOperations);
+
     if (isFingerprintEnabled) {
       const masterPassword = await getMasterPassword();
-      onConfirmTransaction(masterPassword ?? '', userOperations);
+      onConfirmTransaction(userOperations)(masterPassword ?? '');
     } else {
       setShowRequestMasterPassword(true);
     }
   };
 
-  const onConfirmTransaction = async (
-    masterPassword: string,
-    ops: Array<constants.userOperations.IUserOperation>,
-  ) => {
-    setShowRequestMasterPassword(false);
-    const userOperations = await signUserOperations(
-      instance,
-      masterPassword,
-      network,
-      ops,
-    );
-    if (!userOperations) {
-      toast.show({
-        title: 'Incorrect password',
-        backgroundColor: AppColors.singletons.warning,
-        placement: 'top',
-      });
-
-      return;
-    }
-
-    toast.show({
-      title: 'Transaction sent, this might take a minute',
-      backgroundColor: AppColors.palettes.primary[600],
-      placement: 'bottom',
-    });
-    relayUserOperations(userOperations, network, status => {
-      switch (status) {
-        case 'PENDING':
-          toast.show({
-            title: 'Transaction still pending, refresh later',
-            backgroundColor: AppColors.palettes.primary[600],
-            placement: 'bottom',
-          });
-          break;
-
-        case 'FAIL':
-          toast.show({
-            title: 'Transaction failed, contact us for help',
-            backgroundColor: AppColors.singletons.warning,
-            placement: 'bottom',
-          });
-          fetchAddressOverview(
-            network,
-            quoteCurrency,
-            timePeriod,
-            instance.walletAddress,
-          );
-          break;
-
-        default:
-          toast.show({
-            title: 'Transaction completed!',
-            backgroundColor: AppColors.singletons.good,
-            placement: 'bottom',
-          });
-          fetchAddressOverview(
-            network,
-            quoteCurrency,
-            timePeriod,
-            instance.walletAddress,
-          );
-          break;
+  const onConfirmTransaction =
+    (ops: Array<constants.userOperations.IUserOperation>) =>
+    async (masterPassword: string) => {
+      setShowRequestMasterPassword(false);
+      if (!verifyUserOperationsWithPaymaster(sendData.userOperations, ops)) {
+        toast.show({
+          title: 'Transaction corrupted, contact us for help',
+          backgroundColor: AppColors.singletons.warning,
+          placement: 'bottom',
+        });
+        return;
       }
 
-      clearSendData();
-      setShowSendSummarySheet(false);
-    });
-  };
+      const userOperations = await signUserOperations(
+        instance,
+        masterPassword,
+        network,
+        ops,
+      );
+      if (!userOperations) {
+        toast.show({
+          title: 'Incorrect password',
+          backgroundColor: AppColors.singletons.warning,
+          placement: 'top',
+        });
+
+        return;
+      }
+
+      toast.show({
+        title: 'Transaction sent, this might take a minute',
+        backgroundColor: AppColors.palettes.primary[600],
+        placement: 'bottom',
+      });
+      relayUserOperations(userOperations, network, status => {
+        switch (status) {
+          case 'PENDING':
+            toast.show({
+              title: 'Transaction still pending, refresh later',
+              backgroundColor: AppColors.palettes.primary[600],
+              placement: 'bottom',
+            });
+            break;
+
+          case 'FAIL':
+            toast.show({
+              title: 'Transaction failed, contact us for help',
+              backgroundColor: AppColors.singletons.warning,
+              placement: 'bottom',
+            });
+            fetchAddressOverview(
+              network,
+              quoteCurrency,
+              timePeriod,
+              instance.walletAddress,
+            );
+            break;
+
+          default:
+            toast.show({
+              title: 'Transaction completed!',
+              backgroundColor: AppColors.singletons.good,
+              placement: 'bottom',
+            });
+            fetchAddressOverview(
+              network,
+              quoteCurrency,
+              timePeriod,
+              instance.walletAddress,
+            );
+            break;
+        }
+
+        clearSendData();
+        setShowSendSummarySheet(false);
+      });
+    };
 
   const onFromWalletBackPress = () => {
     setShowDepositSheet(true);
   };
 
   const onSendBackPress = () => {
-    clearSendData('toAddress');
     setShowSelectCurrencySheet(true);
   };
 
@@ -319,8 +331,7 @@ export const HomeScreen = () => {
       <RequestMasterPassword
         isOpen={showRequestMasterPassword}
         onClose={onRequestMasterPasswordClose}
-        userOperations={sendData.userOperations}
-        onConfirm={onConfirmTransaction}
+        onConfirm={onConfirmTransaction(unsignedUserOperations)}
       />
 
       <SettingsSheet

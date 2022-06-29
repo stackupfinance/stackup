@@ -16,13 +16,13 @@ interface UseSendUserOperationHook {
   data: SendData;
 
   update: (patch: Partial<SendData>) => void;
-  clear: <K extends keyof SendData>(key?: K) => void;
+  clear: () => void;
   buildOps: (
     instance: wallet.WalletInstance,
     network: Networks,
-    quoteCurrency: CurrencySymbols,
     isDeployed: boolean,
     nonce: number,
+    quoteCurrency: CurrencySymbols,
     toAddress: string,
     value: BigNumberish,
   ) => Promise<{
@@ -47,20 +47,14 @@ export const useSendUserOperation = (): UseSendUserOperationHook => {
     data,
     update: patch => setData({...data, ...patch}),
 
-    clear: key => {
-      if (key) {
-        setData({...data, [key]: defaultData[key]});
-      } else {
-        setData(defaultData);
-      }
-    },
+    clear: () => setData(defaultData),
 
     buildOps: async (
       instance,
       network,
-      quoteCurrency,
       isDeployed,
       nonce,
+      quoteCurrency,
       toAddress,
       value,
     ) => {
