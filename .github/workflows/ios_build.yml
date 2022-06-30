@@ -25,27 +25,20 @@ jobs:
           ruby-version: 3.0
           bundler-cache: true
 
-      - name: Get yarn cache directory path
-        id: yarn-cache-dir-path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-
-      - name: Restore node_modules from cache
-        uses: actions/cache@v2
-        id: yarn-cache
-        with:
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
       - name: Build environment files
         run: yarn workspace @stackupfinance/mobile run build:env
         env:
-          STACKUP_MOBILE_BACKEND_URL: |
-            ${{ secrets.STACKUP_MOBILE_BACKEND_URL }}
+          STACKUP_MOBILE_NETWORK_ENV: |
+            ${{ secrets.STACKUP_MOBILE_NETWORK_ENV }}
+          STACKUP_MOBILE_EXPLORER_URL: |
+            ${{ secrets.STACKUP_MOBILE_EXPLORER_URL }}
+          STACKUP_MOBILE_BACKUP_URL: |
+            ${{ secrets.STACKUP_MOBILE_BACKUP_URL }}
+          STACKUP_MOBILE_BUNDLER_URL: |
+            ${{ secrets.STACKUP_MOBILE_BUNDLER_URL }}
           STACKUP_MOBILE_AMPLITUDE_API_KEY: |
             ${{ secrets.STACKUP_MOBILE_AMPLITUDE_API_KEY }}
           STACKUP_MOBILE_SENTRY_DSN: |
@@ -58,18 +51,6 @@ jobs:
             ${{ secrets.STACKUP_MOBILE_INTERCOM_IOS_API_KEY }}
           STACKUP_MOBILE_SENTRY_AUTH_TOKEN: |
             ${{ secrets.STACKUP_MOBILE_SENTRY_AUTH_TOKEN }}
-
-      - name: Restore Pods cache
-        uses: actions/cache@v2
-        with:
-          path: |
-            apps/mobile/ios/Pods
-            ~/Library/Caches/CocoaPods
-            ~/.cocoapods
-          key: |
-            ${{ runner.os }}-pods-${{ hashFiles('apps/mobile/ios/Podfile.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-pods-
 
       - name: Install Pods
         run: yarn install:ios
