@@ -90,7 +90,6 @@ export const useSendUserOperation = (): UseSendUserOperationHook => {
             ),
           })
         : undefined;
-      console.log('value', data.value);
       const sendOp = wallet.userOperations.get(instance.walletAddress, {
         nonce: shouldApprove ? nonce + 1 : nonce,
         preVerificationGas: 0,
