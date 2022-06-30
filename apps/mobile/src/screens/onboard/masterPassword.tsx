@@ -10,6 +10,7 @@ import {
   useIntercomStoreMasterPasswordSelector,
   useWalletStoreMasterPasswordSelector,
 } from '../../state';
+import {logEvent} from '../../utils/analytics';
 
 type Props = NativeStackScreenProps<OnboardStackParamList, 'MasterPassword'>;
 
@@ -22,10 +23,12 @@ export default function MasterPasswordScreen({navigation, route}: Props) {
   const {enableFingerprint, walletAddress} = route.params;
 
   const onHelpPress = () => {
+    logEvent('OPEN_SUPPORT', {screen: 'MasterPassword'});
     openMessenger();
   };
 
   const onBackPress = () => {
+    logEvent('MASTER_PASSWORD_BACK');
     navigation.goBack();
   };
 
@@ -45,6 +48,7 @@ export default function MasterPasswordScreen({navigation, route}: Props) {
       password,
     );
     if (verifiedWalletInstance) {
+      logEvent('MASTER_PASSWORD_CONTINUE');
       navigation.navigate('WalletRecovered', {
         enableFingerprint,
         password,

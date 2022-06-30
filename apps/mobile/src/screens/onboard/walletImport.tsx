@@ -11,6 +11,7 @@ import {
   useWalletStoreWalletImportSelector,
 } from '../../state';
 import {isValid} from '../../utils/address';
+import {logEvent} from '../../utils/analytics';
 
 type Props = NativeStackScreenProps<OnboardStackParamList, 'WalletImport'>;
 
@@ -22,10 +23,12 @@ export default function WalletImportScreen({navigation, route}: Props) {
   const {enableFingerprint} = route.params;
 
   const onHelpPress = () => {
+    logEvent('OPEN_SUPPORT', {screen: 'WalletImport'});
     openMessenger();
   };
 
   const onBackPress = () => {
+    logEvent('WALLET_IMPORT_BACK');
     navigation.goBack();
   };
 
@@ -41,6 +44,7 @@ export default function WalletImportScreen({navigation, route}: Props) {
     }
 
     if (await pingBackup(address)) {
+      logEvent('WALLET_IMPORT_CONTINUE');
       navigation.navigate('MasterPassword', {
         enableFingerprint,
         walletAddress: address,

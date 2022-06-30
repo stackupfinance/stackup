@@ -23,7 +23,7 @@ export const Env: AppEnvironment = {
   NAME: "Explorer",
   PORT: Number(process.env.STACKUP_EXPLORER_PORT),
   MONGO_URL: process.env.STACKUP_EXPLORER_MONGODB_URL ?? "",
-  SENTRY_DSN: process.env.STACKUP_EXPLORER_SENTRY_DNS ?? "",
+  SENTRY_DSN: process.env.STACKUP_EXPLORER_SENTRY_DSN ?? "",
   COINMARKETCAP_API_KEY:
     process.env.STACKUP_EXPLORER_COINMARKETCAP_API_KEY ?? "",
   ALCHEMY_POLYGON_RPC: process.env.STACKUP_EXPLORER_ALCHEMY_POLYGON_RPC ?? "",

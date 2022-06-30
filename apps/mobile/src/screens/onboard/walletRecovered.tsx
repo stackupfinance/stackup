@@ -12,6 +12,7 @@ import {
   useFingerprintStoreWalletRecoveredSelector,
   useWalletStoreWalletRecoveredSelector,
 } from '../../state';
+import {logEvent} from '../../utils/analytics';
 
 type Props = NativeStackScreenProps<OnboardStackParamList, 'WalletRecovered'>;
 
@@ -22,6 +23,7 @@ export default function WalletRecoveredScreen({navigation, route}: Props) {
   const {enableFingerprint, password, instance} = route.params;
 
   const onBackPress = () => {
+    logEvent('WALLET_RECOVERED_BACK');
     navigation.goBack();
   };
 
@@ -29,6 +31,7 @@ export default function WalletRecoveredScreen({navigation, route}: Props) {
     if (enableFingerprint) {
       await setMasterPassword(password, instance.salt);
     }
+    logEvent('WALLET_RECOVERED_CONTINUE');
     setFromVerifiedBackup(instance);
   };
 

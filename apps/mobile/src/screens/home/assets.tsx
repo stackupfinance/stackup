@@ -23,6 +23,7 @@ import {
   useWalletStoreAssetsSelector,
   useExplorerStoreAssetsSelector,
 } from '../../state';
+import {logEvent} from '../../utils/analytics';
 
 type Props = CompositeScreenProps<
   MaterialTopTabScreenProps<HomeTabParamList, 'Assets'>,
@@ -68,18 +69,22 @@ export default function AssetsScreen({navigation}: Props) {
   };
 
   const onSettingPress = () => {
+    logEvent('SETTINGS_OPEN');
     setShowSettingsSheet(true);
   };
 
   const onTokenListPress = () => {
+    logEvent('MANAGE_CURRENCY_OPEN');
     setShowTokenListSheet(true);
   };
 
   const onDepositPress = () => {
+    logEvent('DEPOSIT_OPEN');
     setShowDepositSheet(true);
   };
 
   const onSendPress = () => {
+    logEvent('SEND_SELECT_CURRENCY_OPEN');
     setShowSelectCurrencySheet(true);
   };
 

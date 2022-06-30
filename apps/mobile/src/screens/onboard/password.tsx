@@ -39,6 +39,7 @@ export default function PasswordScreen({navigation, route}: Props) {
   };
 
   const onBackPress = () => {
+    logEvent('PASSWORD_BACK');
     navigation.goBack();
   };
 
@@ -60,7 +61,7 @@ export default function PasswordScreen({navigation, route}: Props) {
     } else {
       const salt = generateSalt();
       create(password, salt, async () => {
-        logEvent('CREATE_WALLET', {enableFingerprint});
+        logEvent('PASSWORD_CREATE_WALLET', {enableFingerprint});
         enableFingerprint && setMasterPassword(password, salt);
       });
     }

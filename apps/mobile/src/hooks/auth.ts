@@ -12,7 +12,6 @@ import {
   useExplorerStoreRemoveWalletSelector,
   useBundlerStoreRemoveWalletSelector,
 } from '../state';
-import {logEvent} from '../utils/analytics';
 
 interface UseAuthHook {
   isReady: boolean;
@@ -43,7 +42,6 @@ export const useRemoveWallet = (): UseRemoveWalletHook => {
 
     resetMasterPassword();
     remove();
-    logEvent('REMOVE_WALLET');
   };
 };
 

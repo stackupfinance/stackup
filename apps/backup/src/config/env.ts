@@ -16,5 +16,5 @@ export const Env: AppEnvironment = {
   NAME: "Backup",
   PORT: Number(process.env.STACKUP_BACKUP_PORT),
   MONGO_URL: process.env.STACKUP_BACKUP_MONGODB_URL ?? "",
-  SENTRY_DSN: process.env.STACKUP_BACKUP_SENTRY_DNS ?? "",
+  SENTRY_DSN: process.env.STACKUP_BACKUP_SENTRY_DSN ?? "",
 };
