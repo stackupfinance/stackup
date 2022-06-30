@@ -25,27 +25,20 @@ jobs:
         with:
           node-version: 14.x
 
-      - name: Get yarn cache directory path
-        id: yarn-cache-dir-path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-
-      - name: Restore node_modules from cache
-        uses: actions/cache@v2
-        id: yarn-cache
-        with:
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
       - name: Build environment files
         run: yarn workspace @stackupfinance/mobile run build:env
         env:
-          STACKUP_MOBILE_BACKEND_URL: |
-            ${{ secrets.STACKUP_MOBILE_BACKEND_URL }}
+          STACKUP_MOBILE_NETWORK_ENV: |
+            ${{ secrets.STACKUP_MOBILE_NETWORK_ENV }}
+          STACKUP_MOBILE_EXPLORER_URL: |
+            ${{ secrets.STACKUP_MOBILE_EXPLORER_URL }}
+          STACKUP_MOBILE_BACKUP_URL: |
+            ${{ secrets.STACKUP_MOBILE_BACKUP_URL }}
+          STACKUP_MOBILE_BUNDLER_URL: |
+            ${{ secrets.STACKUP_MOBILE_BUNDLER_URL }}
           STACKUP_MOBILE_AMPLITUDE_API_KEY: |
             ${{ secrets.STACKUP_MOBILE_AMPLITUDE_API_KEY }}
           STACKUP_MOBILE_SENTRY_DSN: |
@@ -58,20 +51,6 @@ jobs:
             ${{ secrets.STACKUP_MOBILE_INTERCOM_IOS_API_KEY }}
           STACKUP_MOBILE_SENTRY_AUTH_TOKEN: |
             ${{ secrets.STACKUP_MOBILE_SENTRY_AUTH_TOKEN }}
-
-      - name: Cache Gradle Wrapper
-        uses: actions/cache@v2
-        with:
-          path: ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-wrapper-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
-
-      - name: Cache Gradle Dependencies
-        uses: actions/cache@v2
-        with:
-          path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-caches-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-caches-
 
       - name: Make Gradlew Executable
         run: cd apps/mobile/android && chmod +x ./gradlew
