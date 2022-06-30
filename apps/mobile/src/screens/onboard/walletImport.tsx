@@ -28,7 +28,7 @@ export default function WalletImportScreen({navigation, route}: Props) {
   };
 
   const onBackPress = () => {
-    logEvent('IMPORT_WALLET_BACK');
+    logEvent('WALLET_IMPORT_BACK');
     navigation.goBack();
   };
 
@@ -44,7 +44,7 @@ export default function WalletImportScreen({navigation, route}: Props) {
     }
 
     if (await pingBackup(address)) {
-      logEvent('IMPORT_WALLET_CONTINUE');
+      logEvent('WALLET_IMPORT_CONTINUE');
       navigation.navigate('MasterPassword', {
         enableFingerprint,
         walletAddress: address,

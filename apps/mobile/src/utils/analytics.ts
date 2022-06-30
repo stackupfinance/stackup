@@ -8,8 +8,8 @@ type Events = {
   WELCOME_CREATE: undefined;
   WELCOME_IMPORT: undefined;
 
-  IMPORT_WALLET_CONTINUE: undefined;
-  IMPORT_WALLET_BACK: undefined;
+  WALLET_IMPORT_CONTINUE: undefined;
+  WALLET_IMPORT_BACK: undefined;
 
   MASTER_PASSWORD_CONTINUE: undefined;
   MASTER_PASSWORD_BACK: undefined;
