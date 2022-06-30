@@ -26,7 +26,7 @@ export const TokenListSheet = ({
   onClose,
 }: Props) => {
   const onValueChange = (currency: CurrencySymbols) => (enabled: boolean) => {
-    logEvent('CHANGE_CURRENCY_SETTING', {token: currency, enabled: enabled});
+    logEvent('MANAGE_CURRENCY_ON_CHANGE', {currency, enabled});
     onTokenChange(currency, enabled);
   };
 

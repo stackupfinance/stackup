@@ -24,7 +24,7 @@ export const Env: AppEnvironment = {
   NAME: "Bundler",
   PORT: Number(process.env.STACKUP_BUNDLER_PORT),
   MONGO_URL: process.env.STACKUP_BUNDLER_MONGODB_URL ?? "",
-  SENTRY_DSN: process.env.STACKUP_BUNDLER_SENTRY_DNS ?? "",
+  SENTRY_DSN: process.env.STACKUP_BUNDLER_SENTRY_DSN ?? "",
   MNEMONIC: process.env.STACKUP_BUNDLER_MNEMONIC ?? "",
   PAYMASTER_ADDRESS: process.env.STACKUP_BUNDLER_PAYMASTER_ADDRESS ?? "",
   ALCHEMY_POLYGON_RPC: process.env.STACKUP_BUNDLER_ALCHEMY_POLYGON_RPC ?? "",

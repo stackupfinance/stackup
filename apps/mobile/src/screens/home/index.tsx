@@ -120,61 +120,65 @@ export const HomeScreen = () => {
   };
 
   const onCloseSettingsSheet = () => {
-    logEvent('CLOSE_SETTINGS');
+    logEvent('SETTINGS_CLOSE');
     setShowSettingsSheet(false);
   };
 
   const onCloseTokenListSheet = () => {
-    logEvent('CLOSE_TOKEN_LIST');
+    logEvent('MANAGE_CURRENCY_CLOSE');
     setShowTokenListSheet(false);
   };
 
   const onCloseDepositSheet = () => {
-    logEvent('CLOSE_DEPOSIT_SHEET');
+    logEvent('DEPOSIT_CLOSE');
     setShowDepositSheet(false);
   };
 
+  const onCloseFromWalletSheet = () => {
+    logEvent('DEPOSIT_TRANSFER_FROM_WALLET_CLOSE');
+    setShowFromWalletSheet(false);
+  };
+
   const onCloseSelectCurrencySheet = () => {
+    logEvent('SEND_SELECT_CURRENCY_CLOSE');
     clearSendData();
     setShowSelectCurrencySheet(false);
   };
 
   const onCloseSendSheet = () => {
+    logEvent('SEND_VALUE_CLOSE');
     clearSendData();
     setShowSendSheet(false);
   };
 
   const onCloseSendSummarySheet = () => {
+    logEvent('SEND_SUMMARY_CLOSE');
     clearSendData();
     setShowSendSummarySheet(false);
   };
 
-  const onCloseFromWalletSheet = () => {
-    logEvent('CLOSE_FROM_WALLET_SHEET');
-    setShowFromWalletSheet(false);
-  };
-
   const onHelpPress = () => {
-    logEvent('HELP_AND_SUPPORT');
+    logEvent('OPEN_SUPPORT', {screen: 'Settings'});
     openMessenger();
   };
 
   const onDiscordPress = () => {
-    logEvent('JOIN_DISCORD');
+    logEvent('JOIN_DISCORD', {screen: 'Settings'});
     Linking.openURL(externalLinks.discord);
   };
 
   const onRemoveWalletPress = () => {
-    logEvent('REMOVE_WALLET');
+    logEvent('SETTINGS_REMOVE_WALLET');
     removeWallet();
   };
 
   const onTransferFromWalletPress = () => {
-    logEvent('TRANSFER_FROM_WALLET');
+    logEvent('DEPOSIT_TRANSFER_FROM_WALLET');
     setShowFromWalletSheet(true);
   };
 
   const onSelectCurrencyItem = (currency: CurrencySymbols) => {
+    logEvent('SEND_SELECT_CURRENCY_ITEM', {currency});
     updateSendData({currency});
     setShowSendSheet(true);
   };
@@ -193,6 +197,7 @@ export const HomeScreen = () => {
         value,
       )),
     });
+    logEvent('SEND_VALUE_CONTINUE');
     setShowSendSummarySheet(true);
   };
 
@@ -240,6 +245,7 @@ export const HomeScreen = () => {
         return;
       }
 
+      logEvent('SEND_SUMMARY_CONFIRM');
       toast.show({
         title: 'Transaction sent, this might take a minute',
         backgroundColor: AppColors.palettes.primary[600],
@@ -290,15 +296,17 @@ export const HomeScreen = () => {
     };
 
   const onFromWalletBackPress = () => {
-    logEvent('BACK_PRESS_FROM_WALLET');
+    logEvent('DEPOSIT_TRANSFER_FROM_WALLET_BACK');
     setShowDepositSheet(true);
   };
 
   const onSendBackPress = () => {
+    logEvent('SEND_VALUE_BACK');
     setShowSelectCurrencySheet(true);
   };
 
   const onSendSummaryBackPress = () => {
+    logEvent('SEND_SUMMARY_BACK');
     setShowSendSheet(true);
   };
 
@@ -369,6 +377,14 @@ export const HomeScreen = () => {
         onTransferFromWalletPress={onTransferFromWalletPress}
       />
 
+      <FromWalletSheet
+        network={network}
+        walletAddress={instance.walletAddress}
+        isOpen={showFromWalletSheet}
+        onBack={onFromWalletBackPress}
+        onClose={onCloseFromWalletSheet}
+      />
+
       <SelectCurrencySheet
         isOpen={showSelectCurrencySheet}
         onClose={onCloseSelectCurrencySheet}
@@ -402,14 +418,6 @@ export const HomeScreen = () => {
         currencyBalances={currencyBalances}
         network={network}
         onNext={onSendSummaryNextPress}
-      />
-
-      <FromWalletSheet
-        network="Polygon"
-        walletAddress={instance.walletAddress}
-        isOpen={showFromWalletSheet}
-        onBack={onFromWalletBackPress}
-        onClose={onCloseFromWalletSheet}
       />
     </>
   );

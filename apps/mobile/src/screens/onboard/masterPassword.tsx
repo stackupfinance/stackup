@@ -23,11 +23,12 @@ export default function MasterPasswordScreen({navigation, route}: Props) {
   const {enableFingerprint, walletAddress} = route.params;
 
   const onHelpPress = () => {
-    logEvent('HELP_AND_SUPPORT');
+    logEvent('OPEN_SUPPORT', {screen: 'MasterPassword'});
     openMessenger();
   };
 
   const onBackPress = () => {
+    logEvent('MASTER_PASSWORD_BACK');
     navigation.goBack();
   };
 
@@ -47,6 +48,7 @@ export default function MasterPasswordScreen({navigation, route}: Props) {
       password,
     );
     if (verifiedWalletInstance) {
+      logEvent('MASTER_PASSWORD_CONTINUE');
       navigation.navigate('WalletRecovered', {
         enableFingerprint,
         password,

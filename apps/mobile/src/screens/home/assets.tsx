@@ -7,7 +7,6 @@ import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faSliders} from '@fortawesome/free-solid-svg-icons/faSliders';
 import {faBars} from '@fortawesome/free-solid-svg-icons/faBars';
 import {RootStackParamList, HomeTabParamList, AppColors} from '../../config';
-import {logEvent} from '../../utils/analytics';
 import {
   TabScreenContainer,
   TabScreenHeader,
@@ -24,6 +23,7 @@ import {
   useWalletStoreAssetsSelector,
   useExplorerStoreAssetsSelector,
 } from '../../state';
+import {logEvent} from '../../utils/analytics';
 
 type Props = CompositeScreenProps<
   MaterialTopTabScreenProps<HomeTabParamList, 'Assets'>,
@@ -65,27 +65,26 @@ export default function AssetsScreen({navigation}: Props) {
   // TODO: Remove this when enabling security button
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const onSecurityPress = () => {
-    logEvent('NAVIGATE_SECURITY');
     navigation.navigate('Security');
   };
 
   const onSettingPress = () => {
-    logEvent('OPEN_SETTINGS');
+    logEvent('SETTINGS_OPEN');
     setShowSettingsSheet(true);
   };
 
   const onTokenListPress = () => {
-    logEvent('MANAGE_CURRENCY_LIST');
+    logEvent('MANAGE_CURRENCY_OPEN');
     setShowTokenListSheet(true);
   };
 
   const onDepositPress = () => {
-    logEvent('DEPOSIT');
+    logEvent('DEPOSIT_OPEN');
     setShowDepositSheet(true);
   };
 
   const onSendPress = () => {
-    logEvent('SEND');
+    logEvent('SEND_SELECT_CURRENCY_OPEN');
     setShowSelectCurrencySheet(true);
   };
 

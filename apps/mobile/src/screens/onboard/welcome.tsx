@@ -18,15 +18,17 @@ export default function WelcomeScreen({navigation}: Props) {
   const [enableFingerprint, setEnableFingerprint] = useState(false);
 
   const navigateNextHandler = () => {
+    logEvent('WELCOME_CREATE');
     navigation.navigate('Password', {enableFingerprint});
   };
 
   const navigateImportWalletHandler = () => {
+    logEvent('WELCOME_IMPORT');
     navigation.navigate('WalletImport', {enableFingerprint});
   };
 
   const onDiscordPress = () => {
-    logEvent('JOIN_DISCORD');
+    logEvent('JOIN_DISCORD', {screen: 'Welcome'});
     Linking.openURL(externalLinks.discord);
   };
 

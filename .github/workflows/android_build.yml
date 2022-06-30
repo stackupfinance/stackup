@@ -48,8 +48,8 @@ jobs:
             ${{ secrets.STACKUP_MOBILE_BACKEND_URL }}
           STACKUP_MOBILE_AMPLITUDE_API_KEY: |
             ${{ secrets.STACKUP_MOBILE_AMPLITUDE_API_KEY }}
-          STACKUP_MOBILE_SENTRY_DNS: |
-            ${{ secrets.STACKUP_MOBILE_SENTRY_DNS }}
+          STACKUP_MOBILE_SENTRY_DSN: |
+            ${{ secrets.STACKUP_MOBILE_SENTRY_DSN }}
           STACKUP_MOBILE_INTERCOM_APP_ID: |
             ${{ secrets.STACKUP_MOBILE_INTERCOM_APP_ID }}
           STACKUP_MOBILE_INTERCOM_ANDROID_API_KEY: |
