@@ -381,6 +381,7 @@ export const HomeScreen = () => {
       <DepositSheet
         isOpen={showDepositSheet}
         onClose={onCloseDepositSheet}
+        walletAddress={instance.walletAddress}
         onTransferFromWalletPress={onTransferFromWalletPress}
       />
 
