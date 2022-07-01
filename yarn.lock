@@ -2983,10 +2983,10 @@
   dependencies:
     body-scroll-lock "^2.6.4"
 
-"@ramp-network/react-native-sdk@^0.3.1":
-  version "0.3.1"
-  resolved "https://registry.yarnpkg.com/@ramp-network/react-native-sdk/-/react-native-sdk-0.3.1.tgz#a629d36b5a19562f9847d7c406a10c926bcfc468"
-  integrity sha512-g1GZdRqWM0m67cYM/h1mj8YDWHy/TCiOFjjmgCda9OU+uJacH2dODKxk/K8XTYG3LxwQ3ZLTo2bo6kMpT/8TyQ==
+"@ramp-network/react-native-sdk@0.3.2-rc.0":
+  version "0.3.2-rc.0"
+  resolved "https://registry.yarnpkg.com/@ramp-network/react-native-sdk/-/react-native-sdk-0.3.2-rc.0.tgz#e387a34a25f1f6a6b27c540e9941ae902a39bf1e"
+  integrity sha512-v6T6ti5e4BDoeSbVYPrskRSLyf7/jMxDKweHROTFd25mJt2P3h8S9nSYkqgEW9drE4tp0Aj9k+rW1qdvZYCE6Q==
   dependencies:
     "@babel/runtime" "^7.15.4"
     "@ramp-network/ramp-instant-sdk" "^2.5.0"
