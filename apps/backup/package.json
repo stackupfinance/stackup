@@ -8,7 +8,7 @@
     "build:server": "tsc",
     "start": "NODE_ENV=production node ./build/index.js",
     "dev:dependencies": "docker-compose -f docker-compose.yml up mongodb",
-    "dev": "set NODE_ENV=development && tsc-watch --onSuccess \"node ./build/index.js\"",
+    "dev": "NODE_ENV=development tsc-watch --onSuccess \"node ./build/index.js\"",
     "test": "jest",
     "lint": "eslint . --ext .js,.ts && tsc --noEmit",
     "lint:fix": "eslint . --ext .js,.ts --fix",

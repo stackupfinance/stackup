@@ -7,11 +7,6 @@ const router = express.Router();
 
 router.route("/").post(validate(walletValidation.post), walletController.post);
 
-router.route("/health").get((req, res) => {
-  console.log("health check route");
-  res.send("ok");
-});
-
 router
   .route("/ping")
   .post(validate(walletValidation.ping), walletController.ping);
