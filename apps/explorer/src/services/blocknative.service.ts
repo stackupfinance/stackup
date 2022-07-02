@@ -4,7 +4,6 @@ import { Env, Networks, NetworksConfig } from "../config";
 
 interface BlockPrices {
   estimatedPrices: Array<{
-    confidence: number;
     maxPriorityFeePerGas: number;
     maxFeePerGas: number;
   }>;
