@@ -10,6 +10,7 @@ interface AppEnvironment {
   MONGO_URL: string;
   SENTRY_DSN: string;
   COINMARKETCAP_API_KEY: string;
+  BLOCKNATIVE_API_KEY: string;
   ALCHEMY_POLYGON_RPC: string;
 }
 
@@ -26,5 +27,6 @@ export const Env: AppEnvironment = {
   SENTRY_DSN: process.env.STACKUP_EXPLORER_SENTRY_DSN ?? "",
   COINMARKETCAP_API_KEY:
     process.env.STACKUP_EXPLORER_COINMARKETCAP_API_KEY ?? "",
+  BLOCKNATIVE_API_KEY: process.env.STACKUP_EXPLORER_BLOCKNATIVE_API_KEY ?? "",
   ALCHEMY_POLYGON_RPC: process.env.STACKUP_EXPLORER_ALCHEMY_POLYGON_RPC ?? "",
 };

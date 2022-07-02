@@ -1,5 +1,6 @@
 import express, { Router } from "express";
 import addressRoute from "./address.route";
+import gasRoute from "./gas.route";
 
 const router = express.Router();
 
@@ -8,7 +9,10 @@ type Route = {
   route: Router;
 };
 
-const defaultRoutes: Array<Route> = [{ path: "/address", route: addressRoute }];
+const defaultRoutes: Array<Route> = [
+  { path: "/address", route: addressRoute },
+  { path: "/gas", route: gasRoute },
+];
 
 defaultRoutes.forEach((route) => {
   router.use(route.path, route.route);
