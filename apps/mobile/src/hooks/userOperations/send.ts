@@ -2,7 +2,11 @@ import {useState} from 'react';
 import {ethers, BigNumberish} from 'ethers';
 import {wallet, constants} from '@stackupfinance/walletjs';
 import {CurrencySymbols, Networks, Fee, NetworksConfig} from '../../config';
-import {useBundlerStoreUserOpHooksSelector} from '../../state';
+import {
+  useBundlerStoreUserOpHooksSelector,
+  useExplorerStoreUserOpHooksSelector,
+} from '../../state';
+import {gasOverrides} from '../../utils/userOperations';
 
 interface SendData {
   toAddress: string;
@@ -41,6 +45,7 @@ const defaultData: SendData = {
 
 export const useSendUserOperation = (): UseSendUserOperationHook => {
   const {fetchPaymasterStatus} = useBundlerStoreUserOpHooksSelector();
+  const {fetchGasEstimate} = useExplorerStoreUserOpHooksSelector();
   const [data, setData] = useState<SendData>(defaultData);
 
   return {
@@ -58,10 +63,10 @@ export const useSendUserOperation = (): UseSendUserOperationHook => {
       toAddress,
       value,
     ) => {
-      const status = await fetchPaymasterStatus(
-        instance.walletAddress,
-        network,
-      );
+      const [status, gasEstimate] = await Promise.all([
+        fetchPaymasterStatus(instance.walletAddress, network),
+        fetchGasEstimate(network),
+      ]);
       const paymasterAddress = status.address;
       const feeValue = ethers.BigNumber.from(status.fees[quoteCurrency] ?? '0');
       const allowance = ethers.BigNumber.from(
@@ -72,8 +77,7 @@ export const useSendUserOperation = (): UseSendUserOperationHook => {
       const approveOp = shouldApprove
         ? wallet.userOperations.get(instance.walletAddress, {
             nonce,
-            preVerificationGas: 0,
-            verificationGas: constants.userOperations.defaultGas * 3,
+            ...gasOverrides(gasEstimate),
             initCode: isDeployed
               ? constants.userOperations.nullCode
               : wallet.proxy
@@ -92,8 +96,7 @@ export const useSendUserOperation = (): UseSendUserOperationHook => {
         : undefined;
       const sendOp = wallet.userOperations.get(instance.walletAddress, {
         nonce: shouldApprove ? nonce + 1 : nonce,
-        preVerificationGas: 0,
-        verificationGas: constants.userOperations.defaultGas * 3,
+        ...gasOverrides(gasEstimate),
         callData: wallet.encodeFunctionData.ERC20Transfer(
           NetworksConfig[network].currencies[data.currency].address,
           toAddress,

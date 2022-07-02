@@ -39,8 +39,8 @@ export const relayUserOpsToEntryPoint = async (
           )
         );
       }, ethers.constants.Zero),
-      maxFeePerGas: constants.userOperations.defaultMaxFee,
-      maxPriorityFeePerGas: constants.userOperations.defaultMaxPriorityFee,
+      maxFeePerGas: userOperations[0].maxFeePerGas,
+      maxPriorityFeePerGas: userOperations[0].maxPriorityFeePerGas,
     }
   );
 };

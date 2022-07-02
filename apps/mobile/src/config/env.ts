@@ -20,3 +20,4 @@ export const Env: AppEnvironment = {
   SENTRY_DSN: Config.STACKUP_MOBILE_SENTRY_DSN,
   INTERCOM_APP_ID: Config.STACKUP_MOBILE_INTERCOM_APP_ID,
 };
+console.log(Env);
