@@ -8,6 +8,7 @@ import {
   CurrencyList,
   Networks,
   TimePeriod,
+  GasEstimate,
   Env,
 } from '../config';
 
@@ -50,6 +51,7 @@ interface ExplorerState extends ExplorerStateConstants {
     timePeriod: TimePeriod,
     address: string,
   ) => Promise<void>;
+  fetchGasEstimate: (network: Networks) => Promise<GasEstimate>;
   clear: () => void;
 
   hasHydrated: boolean;
@@ -115,6 +117,22 @@ const useExplorerStore = create<ExplorerState>()(
           }
         },
 
+        fetchGasEstimate: async (network: Networks) => {
+          try {
+            set({loading: true});
+            const response = await axios.get<GasEstimate>(
+              `${Env.EXPLORER_URL}/v1/gas/estimator`,
+              {params: {network}},
+            );
+
+            set({loading: false});
+            return response.data;
+          } catch (error) {
+            set({loading: false});
+            throw error;
+          }
+        },
+
         clear: () => {
           set({...defaults});
         },
@@ -142,6 +160,11 @@ const useExplorerStore = create<ExplorerState>()(
 
 export const useExplorerStoreRemoveWalletSelector = () =>
   useExplorerStore(state => ({clear: state.clear}));
+
+export const useExplorerStoreUserOpHooksSelector = () =>
+  useExplorerStore(state => ({
+    fetchGasEstimate: state.fetchGasEstimate,
+  }));
 
 export const useExplorerStoreHomeSelector = () =>
   useExplorerStore(state => ({
