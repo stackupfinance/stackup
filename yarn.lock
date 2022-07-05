@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@alch/alchemy-web3@^1.4.2":
-  version "1.4.2"
-  resolved "https://registry.yarnpkg.com/@alch/alchemy-web3/-/alchemy-web3-1.4.2.tgz#2615e15093f06122e39dd9fe70c46cad2f430243"
-  integrity sha512-LYL7+63gX4/ScikArbC5YUrIOs93GSbOXm8pYWr+U538BfszAzhwwG9GHZsnUeERIWX+TPfxrfZCKvf90Da5CA==
+"@alch/alchemy-web3@^1.4.4":
+  version "1.4.4"
+  resolved "https://registry.yarnpkg.com/@alch/alchemy-web3/-/alchemy-web3-1.4.4.tgz#7fcfec8fddf12fe855b3d80f448bc831c1084d23"
+  integrity sha512-SuwebUmRGn3U/kNtXQZbwGJt8kSFRcIgqddH0hlH/0SqS5ZdSaPgng5wwIkD53KnK0IbGotvZC9JMc0idFvOtw==
   dependencies:
     "@types/web3" "^1.2.2"
     assert-never "^1.2.0"
@@ -19499,23 +19499,10 @@ web3-utils@1.7.1:
     randombytes "^2.1.0"
     utf8 "3.0.0"
 
-web3-utils@1.7.3:
+web3-utils@1.7.3, web3-utils@^1.0.0-beta.31, web3-utils@^1.3.0:
   version "1.7.3"
   resolved "https://registry.yarnpkg.com/web3-utils/-/web3-utils-1.7.3.tgz#b214d05f124530d8694ad364509ac454d05f207c"
   integrity sha512-g6nQgvb/bUpVUIxJE+ezVN+rYwYmlFyMvMIRSuqpi1dk6ApDD00YNArrk7sPcZnjvxOJ76813Xs2vIN2rgh4lg==
-  dependencies:
-    bn.js "^4.11.9"
-    ethereum-bloom-filters "^1.0.6"
-    ethereumjs-util "^7.1.0"
-    ethjs-unit "0.1.6"
-    number-to-bn "1.7.0"
-    randombytes "^2.1.0"
-    utf8 "3.0.0"
-
-web3-utils@^1.0.0-beta.31, web3-utils@^1.3.0:
-  version "1.6.0"
-  resolved "https://registry.npmjs.org/web3-utils/-/web3-utils-1.6.0.tgz"
-  integrity sha512-bgCAWAeQnJF035YTFxrcHJ5mGEfTi/McsjqldZiXRwlHK7L1PyOqvXiQLE053dlzvy1kdAxWl/sSSfLMyNUAXg==
   dependencies:
     bn.js "^4.11.9"
     ethereum-bloom-filters "^1.0.6"
@@ -19592,7 +19579,7 @@ webidl-conversions@^7.0.0:
   resolved "https://registry.yarnpkg.com/webidl-conversions/-/webidl-conversions-7.0.0.tgz#256b4e1882be7debbf01d05f0aa2039778ea080a"
   integrity sha512-VwddBukDzu71offAQR975unBIGqfKZpM+8ZX6ySk8nYhVoo5CYaZyzt3YBvYtRtO+aoGlqxPg/B87NGVZ/fu6g==
 
-websocket@1.0.32, websocket@^1.0.31:
+websocket@1.0.32:
   version "1.0.32"
   resolved "https://registry.npmjs.org/websocket/-/websocket-1.0.32.tgz"
   integrity sha512-i4yhcllSP4wrpoPMU2N0TQ/q0O94LRG/eUQjEAamRltjQ1oT1PFFKOG4i877OlJgCG8rw6LrrowJp+TYCEWF7Q==
@@ -19604,7 +19591,7 @@ websocket@1.0.32, websocket@^1.0.31:
     utf-8-validate "^5.0.2"
     yaeti "^0.0.6"
 
-websocket@^1.0.28, websocket@^1.0.32:
+websocket@^1.0.28, websocket@^1.0.31, websocket@^1.0.32:
   version "1.0.34"
   resolved "https://registry.npmjs.org/websocket/-/websocket-1.0.34.tgz"
   integrity sha512-PRDso2sGwF6kM75QykIesBijKSVceR6jL2G8NGYyq2XrItNC2P5/qL5XeR056GhA+Ly7JMFvJb9I312mJfmqnQ==
