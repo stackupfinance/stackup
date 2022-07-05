@@ -15793,10 +15793,10 @@ react-native-keyboard-aware-scroll-view@^0.9.5:
     prop-types "^15.6.2"
     react-native-iphone-x-helper "^1.0.3"
 
-react-native-keychain@^8.0.0:
-  version "8.0.0"
-  resolved "https://registry.yarnpkg.com/react-native-keychain/-/react-native-keychain-8.0.0.tgz#ff708e4dc2a5440df717179bf9b7cd50f78b61d7"
-  integrity sha512-c7Cs+YQN26UaQsRG1dmlXL7VL2ctnXwH/dl0IOMEQ7ZaL2NdN313YSAI8ZEZZjrVhNmPsyWEuvTFqWrdpItqQg==
+react-native-keychain@^8.1.0:
+  version "8.1.0"
+  resolved "https://registry.yarnpkg.com/react-native-keychain/-/react-native-keychain-8.1.0.tgz#e19ba2dc87069311e434e5db5bcf81244dc9266f"
+  integrity sha512-MI5YKO8KKmaa2iBGFDiM/cdJ2E6MXaOIRLS1OyxAM9KP5tnpsLp6zowOAaeuc3nBLZ6D/J/EvZSBRggzSGnUGQ==
 
 react-native-monorepo-tools@^1.1.4:
   version "1.1.4"
