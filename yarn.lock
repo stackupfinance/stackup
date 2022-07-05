@@ -19531,10 +19531,10 @@ window-size@^0.2.0:
   resolved "https://registry.npmjs.org/window-size/-/window-size-0.2.0.tgz"
   integrity sha1-tDFbtCFKPXBY6+7okuE/ok2YsHU=
 
-winston-transport-sentry-node@^2.3.0:
-  version "2.3.0"
-  resolved "https://registry.yarnpkg.com/winston-transport-sentry-node/-/winston-transport-sentry-node-2.3.0.tgz#117acaa0e9df9132d565185bce2438896f9b9ecd"
-  integrity sha512-Cw/PoUMdwtMS/P61oe30C7EICXcdXabzUpDIOmtfK9HBkJzm4alcVoPdpETjwB5Qj5Tv+b0lYhGiFvrGuq5wUA==
+winston-transport-sentry-node@^2.4.0:
+  version "2.4.0"
+  resolved "https://registry.yarnpkg.com/winston-transport-sentry-node/-/winston-transport-sentry-node-2.4.0.tgz#f8f1cda7eea26b768dec9a32b609120d6914abd8"
+  integrity sha512-V0D0wBXZrD2F26fj0PKGPNZaDIpIrSGTZ2cKCX2yOBtvJ65B6Hjx/Ick18ZnZGimbwvKxobOzbm9/wGDNIFF7A==
   dependencies:
     "@sentry/node" "^6.13.2"
     triple-beam "^1.3.0"
