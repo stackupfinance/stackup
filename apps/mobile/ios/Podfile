@@ -4,7 +4,13 @@ require_relative '../node_modules/@react-native-community/cli-platform-ios/nativ
 platform :ios, '13.0'
 install! 'cocoapods', :deterministic_uuids => false
 
+source 'https://github.com/CocoaPods/Specs.git'
+source 'https://github.com/passbase/zoomauthentication-cocoapods-specs.git'
+source 'https://github.com/passbase/cocoapods-specs.git'
+source 'https://github.com/passbase/microblink-cocoapods-specs.git'
+
 target 'stackup' do
+  use_frameworks!
   config = use_native_modules!
 
   # Flags change depending on the env values.
@@ -19,6 +25,8 @@ target 'stackup' do
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
+  pod 'Ramp', :git => 'https://github.com/RampNetwork/ramp-sdk-ios', :tag => '2.0.0'
+
   target 'stackupTests' do
     inherit! :complete
     # Pods for testing
@@ -29,6 +37,22 @@ target 'stackup' do
   # Note that if you have use_frameworks! enabled, Flipper will not work and
   # you should disable the next line.
   use_flipper!()
+
+  # Make all the other frameworks into static frameworks by overriding the static_framework? function to return true
+  dynamic_frameworks = ['Ramp', 'Passbase', 'Microblink']
+  pre_install do |installer|
+    installer.pod_targets.each do |pod|
+      if !dynamic_frameworks.include?(pod.name)
+        puts "Overriding the static_framework? method for #{pod.name}"
+        def pod.static_framework?;
+          true
+        end
+        def pod.build_type;
+          Pod::BuildType.static_library
+        end
+      end
+    end
+  end
 
   post_install do |installer|
     react_native_post_install(installer)

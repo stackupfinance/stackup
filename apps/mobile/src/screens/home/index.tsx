@@ -39,6 +39,7 @@ import {
   useExplorerStoreHomeSelector,
   useBundlerStoreHomeSelector,
   useFingerprintStoreHomeSelector,
+  useRampStoreHomeSelector,
 } from '../../state';
 import {logEvent} from '../../utils/analytics';
 
@@ -83,6 +84,7 @@ export const HomeScreen = () => {
   } = useBundlerStoreHomeSelector();
   const {isEnabled: isFingerprintEnabled, getMasterPassword} =
     useFingerprintStoreHomeSelector();
+  const {openRamp} = useRampStoreHomeSelector();
   const removeWallet = useRemoveWallet();
   const {
     data: sendData,
@@ -175,6 +177,11 @@ export const HomeScreen = () => {
   const onTransferFromWalletPress = () => {
     logEvent('DEPOSIT_TRANSFER_FROM_WALLET');
     setShowFromWalletSheet(true);
+  };
+
+  const onDepositFromRampPress = () => {
+    logEvent('DEPOSIT_FROM_RAMP');
+    openRamp(instance.walletAddress);
   };
 
   const onSelectCurrencyItem = (currency: CurrencySymbols) => {
@@ -375,6 +382,7 @@ export const HomeScreen = () => {
         isOpen={showDepositSheet}
         onClose={onCloseDepositSheet}
         onTransferFromWalletPress={onTransferFromWalletPress}
+        onDepositFromRampPress={onDepositFromRampPress}
       />
 
       <FromWalletSheet
