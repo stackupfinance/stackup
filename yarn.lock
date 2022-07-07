@@ -2983,7 +2983,7 @@
   dependencies:
     body-scroll-lock "^2.6.4"
 
-"@ramp-network/react-native-sdk@0.3.2-rc.0":
+"@ramp-network/react-native-sdk@^0.3.2-rc.0":
   version "0.3.2-rc.0"
   resolved "https://registry.yarnpkg.com/@ramp-network/react-native-sdk/-/react-native-sdk-0.3.2-rc.0.tgz#e387a34a25f1f6a6b27c540e9941ae902a39bf1e"
   integrity sha512-v6T6ti5e4BDoeSbVYPrskRSLyf7/jMxDKweHROTFd25mJt2P3h8S9nSYkqgEW9drE4tp0Aj9k+rW1qdvZYCE6Q==
@@ -4761,7 +4761,7 @@
   dependencies:
     "@types/react" "*"
 
-"@types/react@*", "@types/react@^17":
+"@types/react@*":
   version "17.0.47"
   resolved "https://registry.yarnpkg.com/@types/react/-/react-17.0.47.tgz#4ee71aaf4c5a9e290e03aa4d0d313c5d666b3b78"
   integrity sha512-mk0BL8zBinf2ozNr3qPnlu1oyVTYq+4V7WA76RgxUAtf0Em/Wbid38KN6n4abEkvO4xMTBWmnP1FtQzgkEiJoA==
@@ -15593,10 +15593,10 @@ raw-body@^2.4.1:
     iconv-lite "0.4.24"
     unpipe "1.0.0"
 
-react-devtools-core@^4.23.0:
-  version "4.24.7"
-  resolved "https://registry.yarnpkg.com/react-devtools-core/-/react-devtools-core-4.24.7.tgz#43df22e6d244ed8286fd3ff16a80813998fe82a0"
-  integrity sha512-OFB1cp8bsh5Kc6oOJ3ZzH++zMBtydwD53yBYa50FKEGyOOdgdbJ4VsCsZhN/6F5T4gJfrZraU6EKda8P+tMLtg==
+react-devtools-core@4.14.0, react-devtools-core@^4.23.0:
+  version "4.14.0"
+  resolved "https://registry.yarnpkg.com/react-devtools-core/-/react-devtools-core-4.14.0.tgz#4b9dc50937ed4cf4c04fa293430cac62d829fa8b"
+  integrity sha512-cE7tkSUkGCDxTA79pntDGJCBgzNN/XxA3kgPdXujdfSfEfVhzrItQIEsN0kCN/hJJACDvH2Q8p5+tJb/K4B3qA==
   dependencies:
     shell-quote "^1.6.1"
     ws "^7"
