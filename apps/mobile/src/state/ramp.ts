@@ -37,7 +37,7 @@ const useRampStore = create<RampState>()(
             Env.NETWORK_ENV === 'mainnet' ? Env.RAMP_HOST_API_KEY : undefined,
           url:
             Env.NETWORK_ENV === 'mainnet'
-              ? undefined
+              ? 'https://buy.ramp.network/'
               : 'https://ri-widget-staging.firebaseapp.com',
           hostAppName: 'Stackup',
           hostLogoUrl: 'https://i.imgur.com/y4O1zwO.png',
