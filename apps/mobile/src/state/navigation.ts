@@ -3,7 +3,6 @@ import {devtools} from 'zustand/middleware';
 import {NavigationState as InitialNavigationState} from '@react-navigation/native';
 
 interface Sheets {
-  showBuyTokenSheet: boolean;
   showSettingsSheet: boolean;
   showTokenListSheet: boolean;
   showDepositSheet: boolean;
@@ -25,7 +24,6 @@ interface NavigationState extends Sheets {
   ) => void;
   setShowSettingsSheet: (value: boolean) => void;
   setShowTokenListSheet: (value: boolean) => void;
-  setShowBuyTokenSheet: (value: boolean) => void;
   setShowDepositSheet: (value: boolean) => void;
   setShowSelectCurrencySheet: (value: boolean) => void;
   setShowSendSheet: (value: boolean) => void;
@@ -42,7 +40,6 @@ interface NavigationState extends Sheets {
 const sheetDefaults: Sheets = {
   showSettingsSheet: false,
   showTokenListSheet: false,
-  showBuyTokenSheet: false,
   showDepositSheet: false,
   showSelectCurrencySheet: false,
   showSendSheet: false,
@@ -85,10 +82,6 @@ const useNavigationStore = create<NavigationState>()(
 
       setShowSendSheet: value => {
         set({...sheetDefaults, showSendSheet: value});
-      },
-
-      setShowBuyTokenSheet: value => {
-        set({...sheetDefaults, showBuyTokenSheet: value});
       },
 
       setShowSendSummarySheet: value => {
@@ -143,7 +136,6 @@ export const useNavigationStoreHomeSelector = () =>
   useNavigationStore(state => ({
     showSettingsSheet: state.showSettingsSheet,
     showTokenListSheet: state.showTokenListSheet,
-    showBuyTokenSheet: state.showBuyTokenSheet,
     showDepositSheet: state.showDepositSheet,
     showSelectCurrencySheet: state.showSelectCurrencySheet,
     showSendSheet: state.showSendSheet,
@@ -151,7 +143,6 @@ export const useNavigationStoreHomeSelector = () =>
     showFromWalletSheet: state.showFromWalletSheet,
     setShowSettingsSheet: state.setShowSettingsSheet,
     setShowTokenListSheet: state.setShowTokenListSheet,
-    setShowBuyTokenSheet: state.setShowBuyTokenSheet,
     setShowDepositSheet: state.setShowDepositSheet,
     setShowSelectCurrencySheet: state.setShowSelectCurrencySheet,
     setShowSendSheet: state.setShowSendSheet,
