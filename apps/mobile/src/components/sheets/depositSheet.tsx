@@ -21,13 +21,13 @@ export const DepositSheet = ({
     <BaseSheet title="Deposit" isOpen={isOpen} onClose={onClose}>
       <VStack flex={1} p="24px" backgroundColor="background.1" space="11px">
         <MenuItem
-          heading="Deposit with Ramp"
+          heading="💳 Deposit with card"
           icon={faArrowRight}
           onPress={onDepositFromRampPress}
         />
 
         <MenuItem
-          heading="Transfer from wallet"
+          heading="📥 Receive from wallet"
           icon={faArrowRight}
           onPress={onTransferFromWalletPress}
         />
