@@ -48,7 +48,6 @@ allprojects {
             }
         }
         google()
-        // Needed for Ramp Network
         maven { url 'https://www.jitpack.io' }
         maven { url 'https://button.passbase.com/__android' }
     }
