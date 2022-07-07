@@ -4,20 +4,26 @@ import {devtools} from 'zustand/middleware';
 import RampSdk from '@ramp-network/react-native-sdk';
 import {Env} from '../config';
 
-interface RampState {
+interface RampStateConstants {
   debounceAndroidAppState: boolean;
+}
 
+interface RampState extends RampStateConstants {
   setDebounceAndroidAppState: (value: boolean) => void;
   openRamp: (walletAddress: string) => void;
 
   clear: () => void;
 }
 
+const defaults: RampStateConstants = {
+  debounceAndroidAppState: false,
+};
+
 const STORE_NAME = 'stackup-ramp-store';
 const useRampStore = create<RampState>()(
   devtools(
     set => ({
-      debounceAndroidAppState: false,
+      ...defaults,
 
       setDebounceAndroidAppState: debounceAndroidAppState => {
         if (Platform.OS === 'android') {
@@ -46,7 +52,7 @@ const useRampStore = create<RampState>()(
       },
 
       clear: () => {
-        set({debounceAndroidAppState: false});
+        set({...defaults});
       },
     }),
     {name: STORE_NAME},

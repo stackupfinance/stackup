@@ -84,7 +84,15 @@ PODS:
     - Intercom (~> 12.4.0)
     - React-Core
   - libevent (2.1.12)
+  - Microblink (5.16.0)
   - OpenSSL-Universal (1.1.1100)
+  - Passbase (2.13.3):
+    - Microblink (= 5.16.0)
+  - Ramp (2.0.0):
+    - Passbase (~> 2.8)
+  - ramp-network-react-native-sdk (0.3.1):
+    - Ramp
+    - React-Core
   - RCT-Folly (2021.06.28.00-v2):
     - boost
     - DoubleConversion
@@ -381,7 +389,7 @@ PODS:
     - React-Core
   - RNKeychain (8.1.0):
     - React-Core
-  - RNReanimated (2.8.0):
+  - RNReanimated (2.9.1):
     - DoubleConversion
     - FBLazyVector
     - FBReactNativeSpec
@@ -454,6 +462,8 @@ DEPENDENCIES:
   - glog (from `../node_modules/react-native/third-party-podspecs/glog.podspec`)
   - "intercom-react-native (from `../node_modules/@intercom/intercom-react-native`)"
   - OpenSSL-Universal (= 1.1.1100)
+  - Ramp (from `https://github.com/RampNetwork/ramp-sdk-ios`, tag `2.0.0`)
+  - "ramp-network-react-native-sdk (from `../node_modules/@ramp-network/react-native-sdk`)"
   - RCT-Folly (from `../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec`)
   - RCTRequired (from `../node_modules/react-native/Libraries/RCTRequired`)
   - RCTTypeSafety (from `../node_modules/react-native/Libraries/TypeSafety`)
@@ -497,7 +507,7 @@ DEPENDENCIES:
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
 SPEC REPOS:
-  trunk:
+  https://github.com/CocoaPods/Specs.git:
     - Amplitude
     - AnalyticsConnector
     - CocoaAsyncSocket
@@ -517,6 +527,10 @@ SPEC REPOS:
     - Sentry
     - SocketRocket
     - YogaKit
+  https://github.com/passbase/cocoapods-specs.git:
+    - Passbase
+  https://github.com/passbase/microblink-cocoapods-specs.git:
+    - Microblink
 
 EXTERNAL SOURCES:
   amplitude-react-native:
@@ -533,6 +547,11 @@ EXTERNAL SOURCES:
     :podspec: "../node_modules/react-native/third-party-podspecs/glog.podspec"
   intercom-react-native:
     :path: "../node_modules/@intercom/intercom-react-native"
+  Ramp:
+    :git: https://github.com/RampNetwork/ramp-sdk-ios
+    :tag: 2.0.0
+  ramp-network-react-native-sdk:
+    :path: "../node_modules/@ramp-network/react-native-sdk"
   RCT-Folly:
     :podspec: "../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec"
   RCTRequired:
@@ -612,6 +631,11 @@ EXTERNAL SOURCES:
   Yoga:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
+CHECKOUT OPTIONS:
+  Ramp:
+    :git: https://github.com/RampNetwork/ramp-sdk-ios
+    :tag: 2.0.0
+
 SPEC CHECKSUMS:
   Amplitude: 2904f346250510b9e19a4e2262017bcf1d4368f9
   amplitude-react-native: 20f37edeceb5966927dc28fb6c229a812a58c010
@@ -635,7 +659,11 @@ SPEC CHECKSUMS:
   Intercom: 43bfacc55b1c93cce9ec569833696d3f15678430
   intercom-react-native: f4736830a2162d0e3bde175e030aaad1dd2aec13
   libevent: 4049cae6c81cdb3654a443be001fb9bdceff7913
+  Microblink: 9443ff3c708a97673e4999389626079e10a1bbc1
   OpenSSL-Universal: ebc357f1e6bc71fa463ccb2fe676756aff50e88c
+  Passbase: 0a99aa0ff15364b6bb7b2bede91467074811d460
+  Ramp: c522303707480a458eef7d05c96e8c9604be4840
+  ramp-network-react-native-sdk: 4f3f021d49252d34d9803bf1b4eebea905996c52
   RCT-Folly: 4d8508a426467c48885f1151029bc15fa5d7b3b8
   RCTRequired: 3e917ea5377751094f38145fdece525aa90545a0
   RCTTypeSafety: c43c072a4bd60feb49a9570b0517892b4305c45e
@@ -670,7 +698,7 @@ SPEC CHECKSUMS:
   RNCClipboard: f1736c75ab85b627a4d57587edb4b60999c4dd80
   RNGestureHandler: bad495418bcbd3ab47017a38d93d290ebd406f50
   RNKeychain: c442b8512802a20cab4db3e3a1cf53e4731615bc
-  RNReanimated: 64573e25e078ae6bec03b891586d50b9ec284393
+  RNReanimated: 5c8c17e26787fd8984cd5accdc70fef2ca70aafd
   RNScreens: 40a2cb40a02a609938137a1e0acfbf8fc9eebf19
   RNSentry: d27112c8fcb77c52a42c3fffb796193c333ee562
   RNSVG: 302bfc9905bd8122f08966dc2ce2d07b7b52b9f8
@@ -679,6 +707,6 @@ SPEC CHECKSUMS:
   Yoga: 99652481fcd320aefa4a7ef90095b95acd181952
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
 
-PODFILE CHECKSUM: d9a2a7a3e04a83dea899ab6875d628208eda4f7e
+PODFILE CHECKSUM: a9e8758c2cfa0018a2da134eb291c949dfad9673
 
 COCOAPODS: 1.11.3

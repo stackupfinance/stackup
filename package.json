@@ -52,7 +52,8 @@
       "**/@gorhom/bottom-sheet",
       "**/react-native-reanimated",
       "**/react-native-gesture-handler",
-      "**/@react-native-clipboard/clipboard"
+      "**/@react-native-clipboard/clipboard",
+      "**/@ramp-network/react-native-sdk"
     ]
   },
   "devDependencies": {
