@@ -27,6 +27,7 @@ type Events = {
   DEPOSIT_OPEN: undefined;
   DEPOSIT_CLOSE: undefined;
   DEPOSIT_TRANSFER_FROM_WALLET: undefined;
+  DEPOSIT_FROM_RAMP: undefined;
   DEPOSIT_TRANSFER_FROM_WALLET_CLOSE: undefined;
   DEPOSIT_TRANSFER_FROM_WALLET_BACK: undefined;
 

@@ -11,6 +11,8 @@ import {
   useSettingsStoreRemoveWalletSelector,
   useExplorerStoreRemoveWalletSelector,
   useBundlerStoreRemoveWalletSelector,
+  useRampStoreRemoveWalletSelector,
+  useRampStoreAuthSelector,
 } from '../state';
 
 interface UseAuthHook {
@@ -31,6 +33,7 @@ export const useRemoveWallet = (): UseRemoveWalletHook => {
   const {clear: clearSettings} = useSettingsStoreRemoveWalletSelector();
   const {clear: clearExplorer} = useExplorerStoreRemoveWalletSelector();
   const {clear: clearBundler} = useBundlerStoreRemoveWalletSelector();
+  const {clear: clearRamp} = useRampStoreRemoveWalletSelector();
 
   return async () => {
     // Clear all state here before removing wallet from device.
@@ -39,6 +42,7 @@ export const useRemoveWallet = (): UseRemoveWalletHook => {
     clearSettings();
     clearExplorer();
     clearBundler();
+    clearRamp();
 
     resetMasterPassword();
     remove();
@@ -53,8 +57,15 @@ export const useAuth = (): UseAuthHook => {
     getMasterPassword,
     hasHydrated: fingerprintHydrated,
   } = useFingerprintStoreAuthSelector();
-  const {identify, debounceAndroidAppState, setDebounceAndroidAppState} =
-    useIntercomStoreAuthSelector();
+  const {
+    identify,
+    debounceAndroidAppState: debounceAndroidAppStateIntercom,
+    setDebounceAndroidAppState: setDebounceAndroidAppStateIntercom,
+  } = useIntercomStoreAuthSelector();
+  const {
+    debounceAndroidAppState: debounceAndroidAppStateRamp,
+    setDebounceAndroidAppState: setDebounceAndroidAppStateRamp,
+  } = useRampStoreAuthSelector();
   const [isReady, setIsReady] = useState<boolean>(false);
   const [hasWalletInstance, setHasWalletInstance] = useState<boolean>(false);
   const [appStateDelta, setAppStateDelta] = useState<AppStateDelta>({
@@ -64,13 +75,19 @@ export const useAuth = (): UseAuthHook => {
   const isFingerprintEnabledRef = useRef<boolean>(isFingerprintEnabled);
   const hasWalletInstanceRef = useRef<boolean>(hasWalletInstance);
   const appStateDeltaRef = useRef<AppStateDelta>(appStateDelta);
-  const debounceAndroidAppStateRef = useRef<boolean>(debounceAndroidAppState);
+  const debounceAndroidAppStateIntercomRef = useRef<boolean>(
+    debounceAndroidAppStateIntercom,
+  );
+  const debounceAndroidAppStateRampRef = useRef<boolean>(
+    debounceAndroidAppStateRamp,
+  );
 
   const hasHydrated = walletHydrated && fingerprintHydrated;
   isFingerprintEnabledRef.current = isFingerprintEnabled;
   hasWalletInstanceRef.current = hasWalletInstance;
   appStateDeltaRef.current = appStateDelta;
-  debounceAndroidAppStateRef.current = debounceAndroidAppState;
+  debounceAndroidAppStateIntercomRef.current = debounceAndroidAppStateIntercom;
+  debounceAndroidAppStateRampRef.current = debounceAndroidAppStateRamp;
 
   const showUnlockPrompt = async () => {
     setIsReady(false);
@@ -111,8 +128,10 @@ export const useAuth = (): UseAuthHook => {
         delta.prev === 'background' &&
         delta.curr === 'active'
       ) {
-        debounceAndroidAppStateRef.current
-          ? setDebounceAndroidAppState(false)
+        debounceAndroidAppStateIntercomRef.current
+          ? setDebounceAndroidAppStateIntercom(false)
+          : debounceAndroidAppStateRampRef.current
+          ? setDebounceAndroidAppStateRamp(false)
           : showUnlockPrompt();
       }
 
