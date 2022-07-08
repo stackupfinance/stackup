@@ -51,6 +51,8 @@ jobs:
             ${{ secrets.STACKUP_MOBILE_INTERCOM_IOS_API_KEY }}
           STACKUP_MOBILE_SENTRY_AUTH_TOKEN: |
             ${{ secrets.STACKUP_MOBILE_SENTRY_AUTH_TOKEN }}
+          STACKUP_MOBILE_RAMP_HOST_API_KEY: |
+            ${{ secrets.STACKUP_MOBILE_RAMP_HOST_API_KEY }}
 
       - name: Make Gradlew Executable
         run: cd apps/mobile/android && chmod +x ./gradlew
