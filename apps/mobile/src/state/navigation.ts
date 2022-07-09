@@ -1,6 +1,7 @@
 import create from 'zustand';
 import {devtools} from 'zustand/middleware';
 import {NavigationState as InitialNavigationState} from '@react-navigation/native';
+import {CurrencySymbols} from '../config';
 
 interface Sheets {
   showSettingsSheet: boolean;
@@ -14,6 +15,10 @@ interface Sheets {
   showVerifyEmailSheet: boolean;
   showEmailSheet: boolean;
   showEmailConfirmedSheet: boolean;
+  showSwapSelectToken: {
+    value: boolean;
+    onChange: (currency: CurrencySymbols) => void;
+  };
 }
 
 interface NavigationState extends Sheets {
@@ -33,6 +38,10 @@ interface NavigationState extends Sheets {
   setShowEmailSheet: (value: boolean) => void;
   setShowVerifyEmailSheet: (value: boolean) => void;
   setShowEmailConfirmedSheet: (value: boolean) => void;
+  setShowSwapSelectToken: (
+    value: boolean,
+    onChange?: (currency: CurrencySymbols) => void,
+  ) => void;
   resetAllSheets: () => void;
   clear: () => void;
 }
@@ -49,6 +58,7 @@ const sheetDefaults: Sheets = {
   showEmailSheet: false,
   showVerifyEmailSheet: false,
   showEmailConfirmedSheet: false,
+  showSwapSelectToken: {value: false, onChange: () => {}},
 };
 const STORE_NAME = 'stackup-navigation-store';
 const useNavigationStore = create<NavigationState>()(
@@ -106,6 +116,10 @@ const useNavigationStore = create<NavigationState>()(
 
       setShowEmailConfirmedSheet: value => {
         set({...sheetDefaults, showEmailConfirmedSheet: value});
+      },
+
+      setShowSwapSelectToken: (value, onChange = () => {}) => {
+        set({...sheetDefaults, showSwapSelectToken: {value, onChange}});
       },
 
       resetAllSheets: () => {
@@ -176,4 +190,15 @@ export const useNavigationStoreSecurityOverviewSelector = () =>
   useNavigationStore(state => ({
     setShowPasswordSheet: state.setShowPasswordSheet,
     setshowEmailSheet: state.setShowEmailSheet,
+  }));
+
+export const useNavigationStoreSwapSelector = () =>
+  useNavigationStore(state => ({
+    setShowSwapSelectToken: state.setShowSwapSelectToken,
+  }));
+
+export const useNavigationStoreSwapSheetsSelector = () =>
+  useNavigationStore(state => ({
+    showSwapSelectToken: state.showSwapSelectToken,
+    setShowSwapSelectToken: state.setShowSwapSelectToken,
   }));

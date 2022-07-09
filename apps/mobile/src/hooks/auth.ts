@@ -13,6 +13,7 @@ import {
   useBundlerStoreRemoveWalletSelector,
   useRampStoreRemoveWalletSelector,
   useRampStoreAuthSelector,
+  useSwapStoreRemoveWalletSelector,
 } from '../state';
 
 interface UseAuthHook {
@@ -34,6 +35,7 @@ export const useRemoveWallet = (): UseRemoveWalletHook => {
   const {clear: clearExplorer} = useExplorerStoreRemoveWalletSelector();
   const {clear: clearBundler} = useBundlerStoreRemoveWalletSelector();
   const {clear: clearRamp} = useRampStoreRemoveWalletSelector();
+  const {clear: clearSwap} = useSwapStoreRemoveWalletSelector();
 
   return async () => {
     // Clear all state here before removing wallet from device.
@@ -43,6 +45,7 @@ export const useRemoveWallet = (): UseRemoveWalletHook => {
     clearExplorer();
     clearBundler();
     clearRamp();
+    clearSwap();
 
     resetMasterPassword();
     remove();

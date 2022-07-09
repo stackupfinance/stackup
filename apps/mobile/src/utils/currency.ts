@@ -8,6 +8,8 @@ const USDCDisplay = new Intl.NumberFormat('en-US', {
   maximumFractionDigits: 2,
 });
 
+const TO_FLOAT_REGEX = /[^\d.-]/g;
+
 const displayGenericToken = (value: BigNumberish, symbol: CurrencySymbols) => {
   return `${ethers.utils.commify(
     ethers.utils.formatUnits(
@@ -16,6 +18,9 @@ const displayGenericToken = (value: BigNumberish, symbol: CurrencySymbols) => {
     ),
   )} ${symbol}`;
 };
+
+export const stringToValidFloat = (value: string) =>
+  parseFloat(value.replace(TO_FLOAT_REGEX, '')).toString();
 
 export const formatCurrency = (
   value: BigNumberish,

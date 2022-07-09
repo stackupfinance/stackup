@@ -84,3 +84,8 @@ export const useSettingsStoreAssetsSelector = () =>
     currencies: state.currencies,
     timePeriod: state.timePeriod,
   }));
+
+export const useSettingsStoreSwapSelector = () =>
+  useSettingsStore(state => ({
+    quoteCurrency: state.quoteCurrency,
+  }));

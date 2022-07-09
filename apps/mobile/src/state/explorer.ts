@@ -180,3 +180,8 @@ export const useExplorerStoreAssetsSelector = () =>
     currencies: state.currencies,
     fetchAddressOverview: state.fetchAddressOverview,
   }));
+
+export const useExplorerStoreSwapSheetsSelector = () =>
+  useExplorerStore(state => ({
+    currencies: state.currencies,
+  }));

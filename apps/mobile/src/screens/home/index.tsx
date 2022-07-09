@@ -1,7 +1,7 @@
 /* eslint-disable react/no-unstable-nested-components */
 import React, {useEffect, useMemo, useState} from 'react';
 import {Linking} from 'react-native';
-import {Box, Text, useToast} from 'native-base';
+import {Text, useToast} from 'native-base';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faWallet} from '@fortawesome/free-solid-svg-icons/faWallet';
@@ -18,7 +18,8 @@ import {
 } from '../../config';
 import AssetsScreen from './assets';
 // import EarnScreen from './earn';
-// import SwapScreen from './swap';
+import SwapScreen from './swap';
+import SwapSheets from './swapSheets';
 // import ActivityScreen from './activity';
 import {
   RequestMasterPassword,
@@ -321,8 +322,6 @@ export const HomeScreen = () => {
     <>
       <Tab.Navigator
         tabBarPosition="bottom"
-        // TODO: Remove this when adding more tabs
-        tabBar={() => <Box />}
         screenOptions={({route}) => ({
           tabBarLabel: ({color}) => {
             return (
@@ -348,9 +347,9 @@ export const HomeScreen = () => {
           headerShown: false,
         })}>
         <Tab.Screen name="Assets" component={AssetsScreen} />
-        {/* <Tab.Screen name="Earn" component={EarnScreen} />
+        {/* <Tab.Screen name="Earn" component={EarnScreen} /> */}
         <Tab.Screen name="Swap" component={SwapScreen} />
-        <Tab.Screen name="Activity" component={ActivityScreen} /> */}
+        {/* <Tab.Screen name="Activity" component={ActivityScreen} /> */}
       </Tab.Navigator>
 
       <RequestMasterPassword
@@ -427,6 +426,8 @@ export const HomeScreen = () => {
         network={network}
         onNext={onSendSummaryNextPress}
       />
+
+      <SwapSheets />
     </>
   );
 };

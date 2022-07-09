@@ -48,7 +48,7 @@ const useRampStore = create<RampState>()(
         });
 
         set({debounceAndroidAppState: true});
-        return ramp.show();
+        ramp.show();
       },
 
       clear: () => {
