@@ -181,6 +181,11 @@ export const useExplorerStoreAssetsSelector = () =>
     fetchAddressOverview: state.fetchAddressOverview,
   }));
 
+export const useExplorerStoreSwapSelector = () =>
+  useExplorerStore(state => ({
+    currencies: state.currencies,
+  }));
+
 export const useExplorerStoreSwapSheetsSelector = () =>
   useExplorerStore(state => ({
     currencies: state.currencies,

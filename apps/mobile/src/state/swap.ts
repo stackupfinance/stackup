@@ -1,10 +1,13 @@
 import create from 'zustand';
 import {devtools} from 'zustand/middleware';
+import {BigNumberish} from 'ethers';
 import {CurrencySymbols} from '../config';
 
 interface SwapData {
   baseCurrency: CurrencySymbols;
   quoteCurrency: CurrencySymbols;
+  baseCurrencyValue: BigNumberish;
+  quoteCurrencyValue: BigNumberish;
 }
 
 interface SwapStateConstants {
@@ -21,6 +24,8 @@ const defaults: SwapStateConstants = {
   data: {
     baseCurrency: 'USDC',
     quoteCurrency: 'ETH',
+    baseCurrencyValue: '0',
+    quoteCurrencyValue: '0',
   },
 };
 

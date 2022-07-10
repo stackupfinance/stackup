@@ -24,7 +24,7 @@ export const SwapSelectTokenSheet = ({
   currencyList,
 }: Props) => {
   return (
-    <BaseSheet title="Select token" isOpen={isOpen} onClose={onClose}>
+    <BaseSheet title="Select currency" isOpen={isOpen} onClose={onClose}>
       <VStack flex={1} p="24px" backgroundColor="background.1" space="11px">
         {currencyList.map(props => (
           <SelectCurrencyItem

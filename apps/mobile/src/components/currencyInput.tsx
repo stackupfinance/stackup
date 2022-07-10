@@ -1,5 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import {Input} from 'native-base';
+import {BigNumberish} from 'ethers';
 import {
   formatCurrency,
   parseCurrency,
@@ -8,33 +9,38 @@ import {
 import {CurrencySymbols} from '../config';
 
 type Props = {
+  value?: BigNumberish;
   currency: CurrencySymbols;
+  onValueChange: (value: BigNumberish) => void;
 };
 
-export const CurrencyInput = ({currency}: Props) => {
-  const [value, setValue] = useState(formatCurrency('0', currency));
+export const CurrencyInput = ({value, currency, onValueChange}: Props) => {
+  const [inputValue, setInputValue] = useState(formatCurrency('0', currency));
 
   useEffect(() => {
-    setValue(formatCurrency('0', currency));
-  }, [currency]);
+    setInputValue(formatCurrency(value ?? '0', currency));
+  }, [value, currency]);
 
   const onChangeText = (text: string) => {
-    setValue(text);
+    setInputValue(text);
   };
 
   const onFocus = () => {
-    setValue(stringToValidFloat(value));
+    setInputValue(stringToValidFloat(inputValue));
   };
 
   const onBlur = () => {
-    value
-      ? setValue(
-          formatCurrency(
-            parseCurrency(stringToValidFloat(value), currency),
-            currency,
-          ),
-        )
-      : setValue(formatCurrency('0', currency));
+    if (inputValue) {
+      const currencyValue = parseCurrency(
+        stringToValidFloat(inputValue),
+        currency,
+      );
+      onValueChange(currencyValue);
+      setInputValue(formatCurrency(currencyValue, currency));
+    } else {
+      onValueChange('0');
+      setInputValue(formatCurrency('0', currency));
+    }
   };
 
   return (
@@ -42,7 +48,7 @@ export const CurrencyInput = ({currency}: Props) => {
       pr="0px"
       borderWidth="0px"
       keyboardType="decimal-pad"
-      value={value}
+      value={inputValue}
       textAlign="right"
       fontSize="24px"
       fontWeight={500}
