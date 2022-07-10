@@ -42,9 +42,9 @@ export const BaseSheet = ({
   children,
 }: PropsWithChildren<Props>) => {
   const statusBarHeight = getStatusBarHeight(true);
+  const [shouldRender, setShouldRender] = useState<boolean>(false);
   const isOpenRef = useRef<boolean>(isOpen);
   const bottomSheetRef = useRef<BottomSheet | null>(null);
-  const [shouldRender, setShouldRender] = useState<boolean>(true);
   const snapPoints = useMemo(
     () => [Dimensions.get('window').height - px2dp(49) - statusBarHeight],
     [statusBarHeight],
