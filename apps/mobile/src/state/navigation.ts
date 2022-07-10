@@ -1,6 +1,7 @@
 import create from 'zustand';
 import {devtools} from 'zustand/middleware';
 import {NavigationState as InitialNavigationState} from '@react-navigation/native';
+import {CurrencySymbols} from '../config';
 
 interface Sheets {
   showSettingsSheet: boolean;
@@ -14,6 +15,10 @@ interface Sheets {
   showVerifyEmailSheet: boolean;
   showEmailSheet: boolean;
   showEmailConfirmedSheet: boolean;
+  showSwapSelectTokenSheet: {
+    value: boolean;
+    onChange: (currency: CurrencySymbols) => void;
+  };
 }
 
 interface NavigationState extends Sheets {
@@ -33,6 +38,10 @@ interface NavigationState extends Sheets {
   setShowEmailSheet: (value: boolean) => void;
   setShowVerifyEmailSheet: (value: boolean) => void;
   setShowEmailConfirmedSheet: (value: boolean) => void;
+  setShowSwapSelectTokenSheet: (
+    value: boolean,
+    onChange?: (currency: CurrencySymbols) => void,
+  ) => void;
   resetAllSheets: () => void;
   clear: () => void;
 }
@@ -49,6 +58,7 @@ const sheetDefaults: Sheets = {
   showEmailSheet: false,
   showVerifyEmailSheet: false,
   showEmailConfirmedSheet: false,
+  showSwapSelectTokenSheet: {value: false, onChange: () => {}},
 };
 const STORE_NAME = 'stackup-navigation-store';
 const useNavigationStore = create<NavigationState>()(
@@ -108,6 +118,10 @@ const useNavigationStore = create<NavigationState>()(
         set({...sheetDefaults, showEmailConfirmedSheet: value});
       },
 
+      setShowSwapSelectTokenSheet: (value, onChange = () => {}) => {
+        set({...sheetDefaults, showSwapSelectTokenSheet: {value, onChange}});
+      },
+
       resetAllSheets: () => {
         set({...sheetDefaults});
       },
@@ -134,20 +148,6 @@ export const useNavigationStoreAppSelector = () =>
 
 export const useNavigationStoreHomeSelector = () =>
   useNavigationStore(state => ({
-    showSettingsSheet: state.showSettingsSheet,
-    showTokenListSheet: state.showTokenListSheet,
-    showDepositSheet: state.showDepositSheet,
-    showSelectCurrencySheet: state.showSelectCurrencySheet,
-    showSendSheet: state.showSendSheet,
-    showSendSummarySheet: state.showSendSummarySheet,
-    showFromWalletSheet: state.showFromWalletSheet,
-    setShowSettingsSheet: state.setShowSettingsSheet,
-    setShowTokenListSheet: state.setShowTokenListSheet,
-    setShowDepositSheet: state.setShowDepositSheet,
-    setShowSelectCurrencySheet: state.setShowSelectCurrencySheet,
-    setShowSendSheet: state.setShowSendSheet,
-    setShowSendSummarySheet: state.setShowSendSummarySheet,
-    setShowFromWalletSheet: state.setShowFromWalletSheet,
     resetAllSheets: state.resetAllSheets,
   }));
 
@@ -176,4 +176,33 @@ export const useNavigationStoreSecurityOverviewSelector = () =>
   useNavigationStore(state => ({
     setShowPasswordSheet: state.setShowPasswordSheet,
     setshowEmailSheet: state.setShowEmailSheet,
+  }));
+
+export const useNavigationStoreSwapSelector = () =>
+  useNavigationStore(state => ({
+    setShowSwapSelectTokenSheet: state.setShowSwapSelectTokenSheet,
+  }));
+
+export const useNavigationStoreAssetsSheetsSelector = () =>
+  useNavigationStore(state => ({
+    showSettingsSheet: state.showSettingsSheet,
+    showTokenListSheet: state.showTokenListSheet,
+    showDepositSheet: state.showDepositSheet,
+    showSelectCurrencySheet: state.showSelectCurrencySheet,
+    showSendSheet: state.showSendSheet,
+    showSendSummarySheet: state.showSendSummarySheet,
+    showFromWalletSheet: state.showFromWalletSheet,
+    setShowSettingsSheet: state.setShowSettingsSheet,
+    setShowTokenListSheet: state.setShowTokenListSheet,
+    setShowDepositSheet: state.setShowDepositSheet,
+    setShowSelectCurrencySheet: state.setShowSelectCurrencySheet,
+    setShowSendSheet: state.setShowSendSheet,
+    setShowSendSummarySheet: state.setShowSendSummarySheet,
+    setShowFromWalletSheet: state.setShowFromWalletSheet,
+  }));
+
+export const useNavigationStoreSwapSheetsSelector = () =>
+  useNavigationStore(state => ({
+    showSwapSelectTokenSheet: state.showSwapSelectTokenSheet,
+    setShowSwapSelectTokenSheet: state.setShowSwapSelectTokenSheet,
   }));

@@ -68,7 +68,7 @@ const useSettingsStore = create<SettingsState>()(
 export const useSettingsStoreRemoveWalletSelector = () =>
   useSettingsStore(state => ({clear: state.clear}));
 
-export const useSettingsStoreHomeSelector = () =>
+export const useSettingsStoreAssetsSheetsSelector = () =>
   useSettingsStore(state => ({
     currencies: state.currencies,
     timePeriod: state.timePeriod,
@@ -83,4 +83,9 @@ export const useSettingsStoreAssetsSelector = () =>
     quoteCurrency: state.quoteCurrency,
     currencies: state.currencies,
     timePeriod: state.timePeriod,
+  }));
+
+export const useSettingsStoreSwapSelector = () =>
+  useSettingsStore(state => ({
+    quoteCurrency: state.quoteCurrency,
   }));

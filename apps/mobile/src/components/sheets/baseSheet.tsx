@@ -2,6 +2,7 @@
 import React, {
   useMemo,
   useRef,
+  useState,
   useEffect,
   FunctionComponent,
   PropsWithChildren,
@@ -41,21 +42,37 @@ export const BaseSheet = ({
   children,
 }: PropsWithChildren<Props>) => {
   const statusBarHeight = getStatusBarHeight(true);
-  const bottomSheetRef = useRef<BottomSheet>(null);
+  const [shouldRender, setShouldRender] = useState<boolean>(false);
+  const isOpenRef = useRef<boolean>(isOpen);
+  const bottomSheetRef = useRef<BottomSheet | null>(null);
   const snapPoints = useMemo(
     () => [Dimensions.get('window').height - px2dp(49) - statusBarHeight],
     [statusBarHeight],
   );
+  isOpenRef.current = isOpen;
+
+  // Hack solution since expand() doesn't always expand.
+  const expand = (count = 0) => {
+    if (isOpenRef.current && count < 1000) {
+      bottomSheetRef.current?.expand();
+      setTimeout(() => expand(count + 1));
+    }
+  };
 
   useEffect(() => {
     if (isOpen) {
-      bottomSheetRef.current?.expand();
+      setShouldRender(true);
+      expand();
     } else {
       bottomSheetRef.current?.close();
+      setTimeout(() => {
+        setShouldRender(false);
+      }, 250);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
 
-  return (
+  return shouldRender ? (
     <BottomSheet
       backgroundStyle={{
         backgroundColor: AppColors.background[1],
@@ -68,5 +85,5 @@ export const BaseSheet = ({
         {children}
       </BottomSheetScrollView>
     </BottomSheet>
-  );
+  ) : null;
 };
