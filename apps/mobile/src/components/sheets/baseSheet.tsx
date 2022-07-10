@@ -52,10 +52,10 @@ export const BaseSheet = ({
   isOpenRef.current = isOpen;
 
   // Hack solution since expand() doesn't always expand.
-  const expand = () => {
-    if (isOpenRef.current) {
+  const expand = (count = 0) => {
+    if (isOpenRef.current && count < 1000) {
       bottomSheetRef.current?.expand();
-      setTimeout(expand);
+      setTimeout(() => expand(count + 1));
     }
   };
 
