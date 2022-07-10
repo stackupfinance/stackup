@@ -166,7 +166,7 @@ export const useExplorerStoreUserOpHooksSelector = () =>
     fetchGasEstimate: state.fetchGasEstimate,
   }));
 
-export const useExplorerStoreHomeSelector = () =>
+export const useExplorerStoreAssetsSwapSelector = () =>
   useExplorerStore(state => ({
     walletStatus: state.walletStatus,
     currencies: state.currencies,

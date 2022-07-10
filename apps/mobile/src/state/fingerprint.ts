@@ -101,7 +101,7 @@ export const useFingerprintStoreAuthSelector = () =>
     hasHydrated: state.hasHydrated,
   }));
 
-export const useFingerprintStoreHomeSelector = () =>
+export const useFingerprintStoreAssetsSwapSelector = () =>
   useFingerprintStore(state => ({
     isEnabled: state.isEnabled,
     getMasterPassword: state.getMasterPassword,

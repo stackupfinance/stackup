@@ -54,7 +54,7 @@ export const useIntercomStoreAuthSelector = () =>
     setDebounceAndroidAppState: state.setDebounceAndroidAppState,
   }));
 
-export const useIntercomStoreHomeSelector = () =>
+export const useIntercomStoreAssetsSwapSelector = () =>
   useIntercomStore(state => ({openMessenger: state.openMessenger}));
 
 export const useIntercomStoreWalletImportSelector = () =>

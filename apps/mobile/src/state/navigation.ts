@@ -148,20 +148,6 @@ export const useNavigationStoreAppSelector = () =>
 
 export const useNavigationStoreHomeSelector = () =>
   useNavigationStore(state => ({
-    showSettingsSheet: state.showSettingsSheet,
-    showTokenListSheet: state.showTokenListSheet,
-    showDepositSheet: state.showDepositSheet,
-    showSelectCurrencySheet: state.showSelectCurrencySheet,
-    showSendSheet: state.showSendSheet,
-    showSendSummarySheet: state.showSendSummarySheet,
-    showFromWalletSheet: state.showFromWalletSheet,
-    setShowSettingsSheet: state.setShowSettingsSheet,
-    setShowTokenListSheet: state.setShowTokenListSheet,
-    setShowDepositSheet: state.setShowDepositSheet,
-    setShowSelectCurrencySheet: state.setShowSelectCurrencySheet,
-    setShowSendSheet: state.setShowSendSheet,
-    setShowSendSummarySheet: state.setShowSendSummarySheet,
-    setShowFromWalletSheet: state.setShowFromWalletSheet,
     resetAllSheets: state.resetAllSheets,
   }));
 
@@ -195,6 +181,24 @@ export const useNavigationStoreSecurityOverviewSelector = () =>
 export const useNavigationStoreSwapSelector = () =>
   useNavigationStore(state => ({
     setShowSwapSelectToken: state.setShowSwapSelectToken,
+  }));
+
+export const useNavigationStoreAssetsSwapSelector = () =>
+  useNavigationStore(state => ({
+    showSettingsSheet: state.showSettingsSheet,
+    showTokenListSheet: state.showTokenListSheet,
+    showDepositSheet: state.showDepositSheet,
+    showSelectCurrencySheet: state.showSelectCurrencySheet,
+    showSendSheet: state.showSendSheet,
+    showSendSummarySheet: state.showSendSummarySheet,
+    showFromWalletSheet: state.showFromWalletSheet,
+    setShowSettingsSheet: state.setShowSettingsSheet,
+    setShowTokenListSheet: state.setShowTokenListSheet,
+    setShowDepositSheet: state.setShowDepositSheet,
+    setShowSelectCurrencySheet: state.setShowSelectCurrencySheet,
+    setShowSendSheet: state.setShowSendSheet,
+    setShowSendSummarySheet: state.setShowSendSummarySheet,
+    setShowFromWalletSheet: state.setShowFromWalletSheet,
   }));
 
 export const useNavigationStoreSwapSheetsSelector = () =>
