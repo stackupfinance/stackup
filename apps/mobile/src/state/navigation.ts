@@ -15,7 +15,7 @@ interface Sheets {
   showVerifyEmailSheet: boolean;
   showEmailSheet: boolean;
   showEmailConfirmedSheet: boolean;
-  showSwapSelectToken: {
+  showSwapSelectTokenSheet: {
     value: boolean;
     onChange: (currency: CurrencySymbols) => void;
   };
@@ -38,7 +38,7 @@ interface NavigationState extends Sheets {
   setShowEmailSheet: (value: boolean) => void;
   setShowVerifyEmailSheet: (value: boolean) => void;
   setShowEmailConfirmedSheet: (value: boolean) => void;
-  setShowSwapSelectToken: (
+  setShowSwapSelectTokenSheet: (
     value: boolean,
     onChange?: (currency: CurrencySymbols) => void,
   ) => void;
@@ -58,7 +58,7 @@ const sheetDefaults: Sheets = {
   showEmailSheet: false,
   showVerifyEmailSheet: false,
   showEmailConfirmedSheet: false,
-  showSwapSelectToken: {value: false, onChange: () => {}},
+  showSwapSelectTokenSheet: {value: false, onChange: () => {}},
 };
 const STORE_NAME = 'stackup-navigation-store';
 const useNavigationStore = create<NavigationState>()(
@@ -118,8 +118,8 @@ const useNavigationStore = create<NavigationState>()(
         set({...sheetDefaults, showEmailConfirmedSheet: value});
       },
 
-      setShowSwapSelectToken: (value, onChange = () => {}) => {
-        set({...sheetDefaults, showSwapSelectToken: {value, onChange}});
+      setShowSwapSelectTokenSheet: (value, onChange = () => {}) => {
+        set({...sheetDefaults, showSwapSelectTokenSheet: {value, onChange}});
       },
 
       resetAllSheets: () => {
@@ -180,7 +180,7 @@ export const useNavigationStoreSecurityOverviewSelector = () =>
 
 export const useNavigationStoreSwapSelector = () =>
   useNavigationStore(state => ({
-    setShowSwapSelectToken: state.setShowSwapSelectToken,
+    setShowSwapSelectTokenSheet: state.setShowSwapSelectTokenSheet,
   }));
 
 export const useNavigationStoreAssetsSheetsSelector = () =>
@@ -203,6 +203,6 @@ export const useNavigationStoreAssetsSheetsSelector = () =>
 
 export const useNavigationStoreSwapSheetsSelector = () =>
   useNavigationStore(state => ({
-    showSwapSelectToken: state.showSwapSelectToken,
-    setShowSwapSelectToken: state.setShowSwapSelectToken,
+    showSwapSelectTokenSheet: state.showSwapSelectTokenSheet,
+    setShowSwapSelectTokenSheet: state.setShowSwapSelectTokenSheet,
   }));

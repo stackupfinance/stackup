@@ -22,7 +22,7 @@ import {
 type Props = MaterialTopTabScreenProps<HomeTabParamList, 'Swap'>;
 
 export default function SwapScreen({}: Props) {
-  const {setShowSwapSelectToken} = useNavigationStoreSwapSelector();
+  const {setShowSwapSelectTokenSheet} = useNavigationStoreSwapSelector();
   const {quoteCurrency} = useSettingsStoreSwapSelector();
   const {currencies} = useExplorerStoreSwapSelector();
   const {data, update} = useSwapStoreSwapSelector();
@@ -53,7 +53,7 @@ export default function SwapScreen({}: Props) {
   };
 
   const onBaseCurrencyChange = () => {
-    setShowSwapSelectToken(true, currency => {
+    setShowSwapSelectTokenSheet(true, currency => {
       if (currency !== data.baseCurrency) {
         if (currency === data.quoteCurrency) {
           swapCurrencies();
@@ -61,12 +61,12 @@ export default function SwapScreen({}: Props) {
           update({baseCurrency: currency, baseCurrencyValue: '0'});
         }
       }
-      setShowSwapSelectToken(false);
+      setShowSwapSelectTokenSheet(false);
     });
   };
 
   const onQuoteCurrencyChange = () => {
-    setShowSwapSelectToken(true, currency => {
+    setShowSwapSelectTokenSheet(true, currency => {
       if (currency !== data.quoteCurrency) {
         if (currency === data.baseCurrency) {
           swapCurrencies();
@@ -74,7 +74,7 @@ export default function SwapScreen({}: Props) {
           update({quoteCurrency: currency, quoteCurrencyValue: '0'});
         }
       }
-      setShowSwapSelectToken(false);
+      setShowSwapSelectTokenSheet(false);
     });
   };
 

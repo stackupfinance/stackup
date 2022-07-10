@@ -6,20 +6,20 @@ import {
 } from '../../state';
 
 export default function SwapSheets() {
-  const {showSwapSelectToken, setShowSwapSelectToken} =
+  const {showSwapSelectTokenSheet, setShowSwapSelectTokenSheet} =
     useNavigationStoreSwapSheetsSelector();
   const {currencies} = useExplorerStoreSwapSheetsSelector();
 
   const onSwapSelectTokenClose = () => {
-    setShowSwapSelectToken(false);
+    setShowSwapSelectTokenSheet(false);
   };
 
   return (
     <>
       <SwapSelectTokenSheet
-        isOpen={showSwapSelectToken.value}
+        isOpen={showSwapSelectTokenSheet.value}
         onClose={onSwapSelectTokenClose}
-        onChange={showSwapSelectToken.onChange}
+        onChange={showSwapSelectTokenSheet.onChange}
         currencyList={currencies.map(({currency, balance}) => ({
           currency,
           balance,
