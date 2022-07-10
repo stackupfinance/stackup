@@ -183,7 +183,7 @@ export const useNavigationStoreSwapSelector = () =>
     setShowSwapSelectToken: state.setShowSwapSelectToken,
   }));
 
-export const useNavigationStoreAssetsSwapSelector = () =>
+export const useNavigationStoreAssetsSheetsSelector = () =>
   useNavigationStore(state => ({
     showSettingsSheet: state.showSettingsSheet,
     showTokenListSheet: state.showTokenListSheet,

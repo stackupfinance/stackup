@@ -181,7 +181,7 @@ export const useBundlerStoreUserOpHooksSelector = () =>
     fetchPaymasterStatus: state.fetchPaymasterStatus,
   }));
 
-export const useBundlerStoreAssetsSwapSelector = () =>
+export const useBundlerStoreAssetsSheetsSelector = () =>
   useBundlerStore(state => ({
     loading: state.loading,
     requestPaymasterSignature: state.requestPaymasterSignature,

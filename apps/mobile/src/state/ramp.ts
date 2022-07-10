@@ -68,5 +68,5 @@ export const useRampStoreAuthSelector = () =>
     setDebounceAndroidAppState: state.setDebounceAndroidAppState,
   }));
 
-export const useRampStoreAssetsSwapSelector = () =>
+export const useRampStoreAssetsSheetsSelector = () =>
   useRampStore(state => ({openRamp: state.openRamp}));

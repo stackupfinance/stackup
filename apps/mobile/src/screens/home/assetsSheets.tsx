@@ -16,14 +16,14 @@ import {
 } from '../../components';
 import {useRemoveWallet, useSendUserOperation} from '../../hooks';
 import {
-  useNavigationStoreAssetsSwapSelector,
-  useIntercomStoreAssetsSwapSelector,
-  useWalletStoreAssetsSwapSelector,
-  useSettingsStoreAssetsSwapSelector,
-  useExplorerStoreAssetsSwapSelector,
-  useBundlerStoreAssetsSwapSelector,
-  useFingerprintStoreAssetsSwapSelector,
-  useRampStoreAssetsSwapSelector,
+  useNavigationStoreAssetsSheetsSelector,
+  useIntercomStoreAssetsSheetsSelector,
+  useWalletStoreAssetsSheetsSelector,
+  useSettingsStoreAssetsSheetsSelector,
+  useExplorerStoreAssetsSheetsSelector,
+  useBundlerStoreAssetsSheetsSelector,
+  useFingerprintStoreAssetsSheetsSelector,
+  useRampStoreAssetsSheetsSelector,
 } from '../../state';
 import {logEvent} from '../../utils/analytics';
 
@@ -44,28 +44,28 @@ export default function AssetsSheetsScreen() {
     setShowSendSheet,
     setShowSendSummarySheet,
     setShowFromWalletSheet,
-  } = useNavigationStoreAssetsSwapSelector();
-  const {instance} = useWalletStoreAssetsSwapSelector();
-  const {openMessenger} = useIntercomStoreAssetsSwapSelector();
+  } = useNavigationStoreAssetsSheetsSelector();
+  const {instance} = useWalletStoreAssetsSheetsSelector();
+  const {openMessenger} = useIntercomStoreAssetsSheetsSelector();
   const {
     currencies: enabledCurrencies,
     timePeriod,
     network,
     quoteCurrency,
     toggleCurrency,
-  } = useSettingsStoreAssetsSwapSelector();
+  } = useSettingsStoreAssetsSheetsSelector();
   const {walletStatus, currencies, fetchAddressOverview} =
-    useExplorerStoreAssetsSwapSelector();
+    useExplorerStoreAssetsSheetsSelector();
   const {
     loading: sendUserOpsLoading,
     requestPaymasterSignature,
     verifyUserOperationsWithPaymaster,
     signUserOperations,
     relayUserOperations,
-  } = useBundlerStoreAssetsSwapSelector();
+  } = useBundlerStoreAssetsSheetsSelector();
   const {isEnabled: isFingerprintEnabled, getMasterPassword} =
-    useFingerprintStoreAssetsSwapSelector();
-  const {openRamp} = useRampStoreAssetsSwapSelector();
+    useFingerprintStoreAssetsSheetsSelector();
+  const {openRamp} = useRampStoreAssetsSheetsSelector();
   const removeWallet = useRemoveWallet();
   const {
     data: sendData,
