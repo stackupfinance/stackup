@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-interface AppEnvironment {
+export interface AppEnvironment {
   NODE_ENV: "production" | "development";
   NETWORK_ENV: "mainnet" | "testnet";
   NAME: string;

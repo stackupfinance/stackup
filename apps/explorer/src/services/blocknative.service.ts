@@ -19,7 +19,7 @@ export const getGasEstimate = async (network: Networks) => {
     "https://api.blocknative.com/gasprices/blockprices",
     {
       headers: { Authorization: Env.BLOCKNATIVE_API_KEY },
-      params: { chainid: NetworksConfig[network].chainId },
+      params: { chainid: NetworksConfig[network].chainId("mainnet") },
     }
   );
 
