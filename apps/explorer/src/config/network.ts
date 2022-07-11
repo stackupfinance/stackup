@@ -1,12 +1,15 @@
 import { ethers, BigNumberish } from "ethers";
-import { Env } from "./env";
-import { CurrencySymbols } from ".";
+import { Token, WETH9 } from "@uniswap/sdk-core";
+import { AppEnvironment, Env } from "./env";
+import { CurrencySymbols, CurrencyMeta } from ".";
 
 export type Networks = "Polygon";
 
 type NetworksConfig = {
   nativeCurrency: CurrencySymbols;
-  chainId: BigNumberish;
+  wrappedNativeCurrency: (networkEnv?: AppEnvironment["NETWORK_ENV"]) => string;
+  chainId: (networkEnv?: AppEnvironment["NETWORK_ENV"]) => BigNumberish;
+  uniswapV3Router: string;
   currencies: Record<CurrencySymbols, { address: string }>;
 };
 
@@ -15,7 +18,13 @@ export const ValidNetworks: Array<Networks> = ["Polygon"];
 export const NetworksConfig: Record<Networks, NetworksConfig> = {
   Polygon: {
     nativeCurrency: "MATIC",
-    chainId: "137",
+    wrappedNativeCurrency: (networkEnv = Env.NETWORK_ENV) =>
+      networkEnv === "mainnet"
+        ? "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270"
+        : "0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889",
+    chainId: (networkEnv = Env.NETWORK_ENV) =>
+      networkEnv === "mainnet" ? "137" : "80001",
+    uniswapV3Router: "0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45",
     currencies: {
       MATIC: { address: ethers.constants.AddressZero },
       USDC: {
@@ -33,3 +42,30 @@ export const NetworksConfig: Record<Networks, NetworksConfig> = {
     },
   },
 };
+
+const populateWETH9 = () => {
+  ValidNetworks.forEach((network) => {
+    const mainnetChainId = ethers.BigNumber.from(
+      NetworksConfig[network].chainId("mainnet")
+    ).toNumber();
+    const testnetChainId = ethers.BigNumber.from(
+      NetworksConfig[network].chainId("testnet")
+    ).toNumber();
+
+    WETH9[mainnetChainId] = new Token(
+      mainnetChainId,
+      NetworksConfig[network].wrappedNativeCurrency("mainnet"),
+      CurrencyMeta[NetworksConfig[network].nativeCurrency].decimals,
+      NetworksConfig[network].nativeCurrency,
+      NetworksConfig[network].nativeCurrency
+    );
+    WETH9[testnetChainId] = new Token(
+      testnetChainId,
+      NetworksConfig[network].wrappedNativeCurrency("testnet"),
+      CurrencyMeta[NetworksConfig[network].nativeCurrency].decimals,
+      NetworksConfig[network].nativeCurrency,
+      NetworksConfig[network].nativeCurrency
+    );
+  });
+};
+populateWETH9();
