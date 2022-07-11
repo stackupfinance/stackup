@@ -69,7 +69,7 @@ app.use(cors());
 app.use(
   rateLimit({
     windowMs: 60 * 1000, // 1 minutes
-    max: 10, // Limit each IP to 5 requests per `window`
+    max: 10, // Limit each IP to $max requests per `window`
     standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
     legacyHeaders: false, // Disable the `X-RateLimit-*` headers
   })
