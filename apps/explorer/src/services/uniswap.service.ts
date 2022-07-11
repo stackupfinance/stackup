@@ -16,6 +16,7 @@ import {
 import { getRPC } from "../utils";
 
 export interface OptimalQuote {
+  amount: BigNumberish;
   rate: BigNumberish;
   transaction: {
     to: string;
@@ -87,6 +88,12 @@ export const getOptimalQuote = async (
     return null;
   }
   return {
+    amount: ethers.utils
+      .parseUnits(
+        route.quote.toSignificant(),
+        CurrencyMeta[quoteCurrency].decimals
+      )
+      .toString(),
     rate: ethers.utils
       .parseUnits(
         route.quote
