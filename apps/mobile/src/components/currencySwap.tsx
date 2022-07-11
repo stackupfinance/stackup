@@ -7,6 +7,7 @@ import {CurrencySymbols, CurrencyBalances} from '../config';
 import {formatCurrency} from '../utils/currency';
 
 type Props = {
+  isDisabled?: boolean;
   baseCurrency: CurrencySymbols;
   quoteCurrency: CurrencySymbols;
   baseCurrencyValue: BigNumberish;
@@ -15,11 +16,11 @@ type Props = {
   onBaseCurrencyPress: () => void;
   onQuoteCurrencyPress: () => void;
   onBaseCurrencyValueChange: (value: BigNumberish) => void;
-  onQuoteCurrencyValueChange: (value: BigNumberish) => void;
   onSwapPress: () => void;
 };
 
 export const CurrencySwap = ({
+  isDisabled,
   baseCurrency,
   quoteCurrency,
   baseCurrencyValue,
@@ -28,7 +29,6 @@ export const CurrencySwap = ({
   onBaseCurrencyPress,
   onQuoteCurrencyPress,
   onBaseCurrencyValueChange,
-  onQuoteCurrencyValueChange,
   onSwapPress,
 }: Props) => {
   return (
@@ -52,6 +52,7 @@ export const CurrencySwap = ({
       <HStack mb="12px" justifyContent="center" alignItems="center">
         <Box flex={1}>
           <DropdownButton
+            isDisabled={isDisabled}
             currency={baseCurrency}
             onPress={onBaseCurrencyPress}
           />
@@ -59,6 +60,7 @@ export const CurrencySwap = ({
 
         <Box flex={1}>
           <CurrencyInput
+            isDisabled={isDisabled}
             value={baseCurrencyValue}
             currency={baseCurrency}
             onValueChange={onBaseCurrencyValueChange}
@@ -68,13 +70,18 @@ export const CurrencySwap = ({
 
       <Box mb="12px" justifyContent="center" alignItems="center">
         <Center rounded="full" backgroundColor="background.3" w="40px" h="40px">
-          <IconButton icon={faArrowsUpDown} onPress={onSwapPress} />
+          <IconButton
+            isDisabled={isDisabled}
+            icon={faArrowsUpDown}
+            onPress={onSwapPress}
+          />
         </Center>
       </Box>
 
       <HStack justifyContent="center" alignItems="center">
         <Box flex={1}>
           <DropdownButton
+            isDisabled={isDisabled}
             currency={quoteCurrency}
             onPress={onQuoteCurrencyPress}
           />
@@ -82,9 +89,10 @@ export const CurrencySwap = ({
 
         <Box flex={1}>
           <CurrencyInput
+            isDisabled={isDisabled}
+            isEditable={false}
             value={quoteCurrencyValue}
             currency={quoteCurrency}
-            onValueChange={onQuoteCurrencyValueChange}
           />
         </Box>
       </HStack>

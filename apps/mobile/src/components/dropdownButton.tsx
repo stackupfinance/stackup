@@ -6,13 +6,14 @@ import {faChevronDown} from '@fortawesome/free-solid-svg-icons/faChevronDown';
 import {CurrencySymbols, CurrencyMeta, AppColors} from '../config';
 
 type Props = {
+  isDisabled?: boolean;
   currency: CurrencySymbols;
   onPress: () => void;
 };
 
-export const DropdownButton = ({currency, onPress}: Props) => {
+export const DropdownButton = ({isDisabled, currency, onPress}: Props) => {
   return (
-    <Pressable onPress={onPress} hitSlop={16} w="140px">
+    <Pressable isDisabled={isDisabled} onPress={onPress} hitSlop={16} w="140px">
       {({isPressed}) => (
         <HStack
           w="100%"
@@ -33,11 +34,18 @@ export const DropdownButton = ({currency, onPress}: Props) => {
             h="32px"
           />
 
-          <Text fontWeight={600} fontSize="16px" color="white">
+          <Text
+            fontWeight={600}
+            fontSize="16px"
+            color={isDisabled ? AppColors.text[3] : 'white'}>
             {CurrencyMeta[currency].displaySymbol}
           </Text>
 
-          <FontAwesomeIcon icon={faChevronDown} color="white" size={12} />
+          <FontAwesomeIcon
+            icon={faChevronDown}
+            color={isDisabled ? AppColors.text[3] : 'white'}
+            size={12}
+          />
         </HStack>
       )}
     </Pressable>

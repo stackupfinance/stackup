@@ -1,13 +1,15 @@
 import create from 'zustand';
 import {devtools} from 'zustand/middleware';
 import {BigNumberish} from 'ethers';
-import {CurrencySymbols} from '../config';
+import {CurrencySymbols, OptimalQuote, Fee} from '../config';
 
 interface SwapData {
   baseCurrency: CurrencySymbols;
   quoteCurrency: CurrencySymbols;
   baseCurrencyValue: BigNumberish;
   quoteCurrencyValue: BigNumberish;
+  quote: OptimalQuote | null;
+  fee: Fee | null;
 }
 
 interface SwapStateConstants {
@@ -26,6 +28,8 @@ const defaults: SwapStateConstants = {
     quoteCurrency: 'ETH',
     baseCurrencyValue: '0',
     quoteCurrencyValue: '0',
+    quote: null,
+    fee: null,
   },
 };
 
@@ -48,6 +52,9 @@ const useSwapStore = create<SwapState>()(
 );
 
 export const useSwapStoreRemoveWalletSelector = () =>
+  useSwapStore(state => ({clear: state.clear}));
+
+export const useSwapStoreHomeSelector = () =>
   useSwapStore(state => ({clear: state.clear}));
 
 export const useSwapStoreSwapSelector = () =>

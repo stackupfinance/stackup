@@ -1,10 +1,10 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, {useEffect, useMemo} from 'react';
 import {RefreshControl} from 'react-native';
-import {Box, Button, ScrollView} from 'native-base';
+import {Box, Button, ScrollView, useToast} from 'native-base';
 import type {MaterialTopTabScreenProps} from '@react-navigation/material-top-tabs';
 import {BigNumberish, ethers} from 'ethers';
-import {HomeTabParamList} from '../../config';
+import {CurrencySymbols, HomeTabParamList, AppColors} from '../../config';
 import {
   TabScreenContainer,
   TabScreenHeader,
@@ -16,19 +16,23 @@ import {
   useNavigationStoreSwapSelector,
   useSettingsStoreSwapSelector,
   useExplorerStoreSwapSelector,
+  useWalletStoreSwapSelector,
   useSwapStoreSwapSelector,
 } from '../../state';
+import {formatCurrency, formatRate} from '../../utils/currency';
 
 type Props = MaterialTopTabScreenProps<HomeTabParamList, 'Swap'>;
 
 export default function SwapScreen({}: Props) {
+  const toast = useToast();
   const {setShowSwapSelectTokenSheet} = useNavigationStoreSwapSelector();
-  const {quoteCurrency} = useSettingsStoreSwapSelector();
-  const {currencies} = useExplorerStoreSwapSelector();
+  const {network, quoteCurrency} = useSettingsStoreSwapSelector();
+  const {instance} = useWalletStoreSwapSelector();
+  const {loading, currencies, fetchSwapQuote} = useExplorerStoreSwapSelector();
   const {data, update} = useSwapStoreSwapSelector();
 
-  const isDisabled = true;
-  const isLoading = false;
+  const isDisabled = data.quote === null || data.fee === null;
+  const isLoading = loading;
 
   const currencyBalances = useMemo(
     () =>
@@ -43,61 +47,126 @@ export default function SwapScreen({}: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [quoteCurrency]);
 
-  const swapCurrencies = () => {
+  const getQuote = async (
+    bc: CurrencySymbols,
+    qc: CurrencySymbols,
+    v: BigNumberish,
+  ) => {
+    try {
+      toast.show({
+        title: 'Fetching the latest quotes...',
+        backgroundColor: AppColors.palettes.primary[600],
+        placement: 'bottom',
+        duration: 15000,
+      });
+
+      const quote = await fetchSwapQuote(
+        network,
+        bc,
+        qc,
+        v,
+        instance.walletAddress,
+      );
+      toast.closeAll();
+
+      if (quote === null) {
+        toast.show({
+          title: 'Not enough liquidity',
+          backgroundColor: AppColors.singletons.warning,
+          placement: 'top',
+        });
+      }
+      return quote;
+    } catch (error) {
+      toast.closeAll();
+      throw error;
+    }
+  };
+
+  const swapCurrencies = async () => {
+    const quote = ethers.BigNumber.from(data.quoteCurrencyValue).isZero()
+      ? null
+      : await getQuote(
+          data.quoteCurrency,
+          data.baseCurrency,
+          data.quoteCurrencyValue,
+        );
     update({
       baseCurrency: data.quoteCurrency,
       quoteCurrency: data.baseCurrency,
       baseCurrencyValue: data.quoteCurrencyValue,
-      quoteCurrencyValue: data.baseCurrencyValue,
+      quoteCurrencyValue: quote?.amount || '0',
+      quote,
     });
   };
 
   const onBaseCurrencyChange = () => {
-    setShowSwapSelectTokenSheet(true, currency => {
+    setShowSwapSelectTokenSheet(true, async currency => {
+      setShowSwapSelectTokenSheet(false);
       if (currency !== data.baseCurrency) {
         if (currency === data.quoteCurrency) {
           swapCurrencies();
         } else {
-          update({baseCurrency: currency, baseCurrencyValue: '0'});
+          update({
+            baseCurrency: currency,
+            baseCurrencyValue: '0',
+            quoteCurrencyValue: '0',
+            quote: null,
+          });
         }
       }
-      setShowSwapSelectTokenSheet(false);
     });
   };
 
   const onQuoteCurrencyChange = () => {
-    setShowSwapSelectTokenSheet(true, currency => {
+    setShowSwapSelectTokenSheet(true, async currency => {
+      setShowSwapSelectTokenSheet(false);
       if (currency !== data.quoteCurrency) {
         if (currency === data.baseCurrency) {
           swapCurrencies();
         } else {
-          update({quoteCurrency: currency, quoteCurrencyValue: '0'});
+          const quote = ethers.BigNumber.from(data.baseCurrencyValue).isZero()
+            ? null
+            : await getQuote(
+                data.baseCurrency,
+                currency,
+                data.baseCurrencyValue,
+              );
+          update({
+            quoteCurrency: currency,
+            quoteCurrencyValue: quote?.amount ?? '0',
+            quote,
+          });
         }
       }
-      setShowSwapSelectTokenSheet(false);
     });
   };
 
-  const onBaseCurrencyValueChange = (value: BigNumberish) => {
+  const onBaseCurrencyValueChange = async (value: BigNumberish) => {
+    const quote = ethers.BigNumber.from(value).isZero()
+      ? null
+      : await getQuote(data.baseCurrency, data.quoteCurrency, value);
     update({
       baseCurrencyValue: value,
-      quoteCurrencyValue: ethers.BigNumber.from(value).isZero()
-        ? '0'
-        : data.quoteCurrencyValue,
-    });
-  };
-
-  const onQuoteCurrencyValueChange = (value: BigNumberish) => {
-    update({
-      quoteCurrencyValue: value,
-      baseCurrencyValue: ethers.BigNumber.from(value).isZero()
-        ? '0'
-        : data.baseCurrencyValue,
+      quoteCurrencyValue: quote?.amount ?? '0',
+      quote,
     });
   };
 
   const onSwapPress = () => {
     swapCurrencies();
+  };
+
+  const onRefresh = async () => {
+    const quote = await getQuote(
+      data.baseCurrency,
+      data.quoteCurrency,
+      data.baseCurrencyValue,
+    );
+    update({
+      quoteCurrencyValue: quote?.amount ?? '0',
+      quote,
+    });
   };
 
   return (
@@ -113,10 +182,11 @@ export default function SwapScreen({}: Props) {
       <ScrollView
         contentContainerStyle={{flex: 1}}
         refreshControl={
-          <RefreshControl refreshing={isLoading} onRefresh={() => {}} />
+          <RefreshControl refreshing={isLoading} onRefresh={onRefresh} />
         }>
         <Box mt="54px">
           <CurrencySwap
+            isDisabled={isLoading}
             baseCurrency={data.baseCurrency}
             quoteCurrency={data.quoteCurrency}
             baseCurrencyValue={data.baseCurrencyValue}
@@ -125,17 +195,29 @@ export default function SwapScreen({}: Props) {
             onBaseCurrencyPress={onBaseCurrencyChange}
             onQuoteCurrencyPress={onQuoteCurrencyChange}
             onBaseCurrencyValueChange={onBaseCurrencyValueChange}
-            onQuoteCurrencyValueChange={onQuoteCurrencyValueChange}
             onSwapPress={onSwapPress}
           />
         </Box>
 
-        {!isDisabled && (
+        {data.quote !== null && (
           <Box mt="42px">
             <SummaryTable
               rows={[
-                {key: 'Rate', value: '1 USD ≈ 0.00081 ETH'},
-                {key: 'Fee', value: '$0.11'},
+                {
+                  key: 'Rate',
+                  value: formatRate(
+                    data.baseCurrency,
+                    data.quoteCurrency,
+                    data.quote?.rate || '0',
+                  ),
+                },
+                {
+                  key: 'Fee',
+                  value: data.fee
+                    ? formatCurrency(data.fee.value, data.fee.currency)
+                    : '',
+                  isLoading: true,
+                },
               ]}
             />
           </Box>

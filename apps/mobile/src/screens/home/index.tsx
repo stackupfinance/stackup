@@ -15,21 +15,26 @@ import AssetsSheetsScreen from './assetsSheets';
 import SwapScreen from './swap';
 import SwapSheets from './swapSheets';
 // import ActivityScreen from './activity';
-import {useNavigationStoreHomeSelector} from '../../state';
+import {
+  useNavigationStoreHomeSelector,
+  useSwapStoreHomeSelector,
+} from '../../state';
 
 const Tab = createMaterialTopTabNavigator<HomeTabParamList>();
 
 export const HomeScreen = () => {
   const {resetAllSheets} = useNavigationStoreHomeSelector();
+  const {clear: clearSwap} = useSwapStoreHomeSelector();
   const [routeName, setRouteName] = useState<keyof HomeTabParamList>('Assets');
 
   useEffect(() => {
     resetAllSheets();
+    clearSwap();
 
     return () => {
       resetAllSheets();
     };
-  }, [resetAllSheets, routeName]);
+  }, [resetAllSheets, clearSwap, routeName]);
 
   const renderSheets = () => {
     switch (routeName) {
