@@ -158,11 +158,13 @@ export default function SwapScreen({}: Props) {
   };
 
   const onRefresh = async () => {
-    const quote = await getQuote(
-      data.baseCurrency,
-      data.quoteCurrency,
-      data.baseCurrencyValue,
-    );
+    const quote = ethers.BigNumber.from(data.baseCurrencyValue).isZero()
+      ? null
+      : await getQuote(
+          data.baseCurrency,
+          data.quoteCurrency,
+          data.baseCurrencyValue,
+        );
     update({
       quoteCurrencyValue: quote?.amount ?? '0',
       quote,
