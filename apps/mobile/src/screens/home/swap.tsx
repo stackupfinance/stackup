@@ -21,6 +21,7 @@ import {
   useSwapStoreSwapSelector,
 } from '../../state';
 import {formatCurrency, formatRate} from '../../utils/currency';
+import {logEvent} from '../../utils/analytics';
 
 type Props = MaterialTopTabScreenProps<HomeTabParamList, 'Swap'>;
 
@@ -82,6 +83,7 @@ export default function SwapScreen({}: Props) {
         fetchGasEstimate(network),
         fetchPaymasterStatus(instance.walletAddress, network),
       ]);
+      logEvent('SWAP_GET_QUOTE', {baseCurrency: bc, quoteCurrency: qc});
       setDebounceLoading(false);
       toast.closeAll();
 
@@ -188,6 +190,7 @@ export default function SwapScreen({}: Props) {
   };
 
   const onReviewOrderPress = () => {
+    logEvent('SWAP_REVIEW_ORDER');
     setShowSwapReviewOrderSheet(true);
   };
 

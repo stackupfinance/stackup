@@ -16,6 +16,7 @@ import {
   useFingerprintStoreSwapSheetsSelector,
 } from '../../state';
 import {AppColors} from '../../config';
+import {logEvent} from '../../utils/analytics';
 
 export default function SwapSheets() {
   const toast = useToast();
@@ -68,6 +69,7 @@ export default function SwapSheets() {
   };
 
   const onSwapReviewOrderClose = () => {
+    logEvent('SWAP_REVIEW_ORDER_CLOSE');
     setShowSwapReviewOrderSheet(false);
   };
 
@@ -124,6 +126,7 @@ export default function SwapSheets() {
         return;
       }
 
+      logEvent('SWAP_CONFIRM');
       toast.show({
         title: 'Transaction sent, this might take a minute...',
         backgroundColor: AppColors.palettes.primary[600],
