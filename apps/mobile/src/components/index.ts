@@ -22,6 +22,7 @@ export * from './selectCurrencyItem';
 export * from './stackScreenContainer';
 export * from './stackScreenHeader';
 export * from './summaryTable';
+export * from './swapSummary';
 export * from './switch';
 export * from './tabScreenContainer';
 export * from './tabScreenHeader';

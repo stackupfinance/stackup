@@ -219,10 +219,13 @@ export const useExplorerStoreSwapSelector = () =>
   useExplorerStore(state => ({
     loading: state.loading,
     currencies: state.currencies,
+    fetchGasEstimate: state.fetchGasEstimate,
     fetchSwapQuote: state.fetchSwapQuote,
   }));
 
 export const useExplorerStoreSwapSheetsSelector = () =>
   useExplorerStore(state => ({
     currencies: state.currencies,
+    walletStatus: state.walletStatus,
+    fetchAddressOverview: state.fetchAddressOverview,
   }));

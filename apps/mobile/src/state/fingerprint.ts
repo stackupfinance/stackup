@@ -53,10 +53,14 @@ const useFingerprintStore = create<FingerprintState>()(
         getMasterPassword: async () => {
           set({loading: true});
 
-          const credentials = await Keychain.getGenericPassword();
-
-          set({loading: false});
-          return credentials ? credentials.password : undefined;
+          try {
+            const credentials = await Keychain.getGenericPassword();
+            set({loading: false});
+            return credentials ? credentials.password : undefined;
+          } catch (error) {
+            set({loading: false});
+            return undefined;
+          }
         },
 
         resetMasterPassword: async () => {
@@ -102,6 +106,12 @@ export const useFingerprintStoreAuthSelector = () =>
   }));
 
 export const useFingerprintStoreAssetsSheetsSelector = () =>
+  useFingerprintStore(state => ({
+    isEnabled: state.isEnabled,
+    getMasterPassword: state.getMasterPassword,
+  }));
+
+export const useFingerprintStoreSwapSheetsSelector = () =>
   useFingerprintStore(state => ({
     isEnabled: state.isEnabled,
     getMasterPassword: state.getMasterPassword,

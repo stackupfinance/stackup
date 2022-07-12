@@ -4,6 +4,7 @@ export * from './externalLinks';
 export * from './fee';
 export * from './gas';
 export * from './network';
+export * from './paymaster';
 export * from './routes';
 export * from './security';
 export * from './swap';

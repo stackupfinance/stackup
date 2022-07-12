@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useEffect, useMemo} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {RefreshControl} from 'react-native';
 import {Box, Button, ScrollView, useToast} from 'native-base';
 import type {MaterialTopTabScreenProps} from '@react-navigation/material-top-tabs';
@@ -17,6 +17,7 @@ import {
   useSettingsStoreSwapSelector,
   useExplorerStoreSwapSelector,
   useWalletStoreSwapSelector,
+  useBundlerStoreSwapSelector,
   useSwapStoreSwapSelector,
 } from '../../state';
 import {formatCurrency, formatRate} from '../../utils/currency';
@@ -25,14 +26,25 @@ type Props = MaterialTopTabScreenProps<HomeTabParamList, 'Swap'>;
 
 export default function SwapScreen({}: Props) {
   const toast = useToast();
-  const {setShowSwapSelectTokenSheet} = useNavigationStoreSwapSelector();
-  const {network, quoteCurrency} = useSettingsStoreSwapSelector();
+  const {setShowSwapSelectTokenSheet, setShowSwapReviewOrderSheet} =
+    useNavigationStoreSwapSelector();
+  const {network, quoteCurrency: defaultCurrency} =
+    useSettingsStoreSwapSelector();
   const {instance} = useWalletStoreSwapSelector();
-  const {loading, currencies, fetchSwapQuote} = useExplorerStoreSwapSelector();
+  const {
+    loading: explorerLoading,
+    currencies,
+    fetchGasEstimate,
+    fetchSwapQuote,
+  } = useExplorerStoreSwapSelector();
+  const {loading: bundlerLoading, fetchPaymasterStatus} =
+    useBundlerStoreSwapSelector();
   const {data, update} = useSwapStoreSwapSelector();
+  const [debounceLoading, setDebounceLoading] = useState<boolean>(false);
 
-  const isDisabled = data.quote === null || data.fee === null;
-  const isLoading = loading;
+  const isDisabled =
+    data.quote === null || data.gasEstimate === null || data.status === null;
+  const isLoading = debounceLoading || explorerLoading || bundlerLoading;
 
   const currencyBalances = useMemo(
     () =>
@@ -43,15 +55,19 @@ export default function SwapScreen({}: Props) {
   );
 
   useEffect(() => {
-    update({baseCurrency: quoteCurrency});
+    update({baseCurrency: defaultCurrency});
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [quoteCurrency]);
+  }, [defaultCurrency]);
 
-  const getQuote = async (
+  const getSwapData = async (
     bc: CurrencySymbols,
     qc: CurrencySymbols,
     v: BigNumberish,
   ) => {
+    if (ethers.BigNumber.from(v).isZero()) {
+      return {quote: null, gasEstimate: null, status: null};
+    }
+
     try {
       toast.show({
         title: 'Fetching the latest quotes...',
@@ -60,13 +76,13 @@ export default function SwapScreen({}: Props) {
         duration: 15000,
       });
 
-      const quote = await fetchSwapQuote(
-        network,
-        bc,
-        qc,
-        v,
-        instance.walletAddress,
-      );
+      setDebounceLoading(true);
+      const [quote, gasEstimate, status] = await Promise.all([
+        fetchSwapQuote(network, bc, qc, v, instance.walletAddress),
+        fetchGasEstimate(network),
+        fetchPaymasterStatus(instance.walletAddress, network),
+      ]);
+      setDebounceLoading(false);
       toast.closeAll();
 
       if (quote === null) {
@@ -75,28 +91,30 @@ export default function SwapScreen({}: Props) {
           backgroundColor: AppColors.singletons.warning,
           placement: 'top',
         });
+
+        return {quote: null, gasEstimate: null, status: null};
       }
-      return quote;
+
+      return {quote, gasEstimate, status};
     } catch (error) {
+      setDebounceLoading(false);
       toast.closeAll();
       throw error;
     }
   };
 
   const swapCurrencies = async () => {
-    const quote = ethers.BigNumber.from(data.quoteCurrencyValue).isZero()
-      ? null
-      : await getQuote(
-          data.quoteCurrency,
-          data.baseCurrency,
-          data.quoteCurrencyValue,
-        );
+    const swapData = await getSwapData(
+      data.quoteCurrency,
+      data.baseCurrency,
+      data.quoteCurrencyValue,
+    );
     update({
       baseCurrency: data.quoteCurrency,
       quoteCurrency: data.baseCurrency,
       baseCurrencyValue: data.quoteCurrencyValue,
-      quoteCurrencyValue: quote?.amount || '0',
-      quote,
+      quoteCurrencyValue: swapData.quote?.amount || '0',
+      ...swapData,
     });
   };
 
@@ -111,7 +129,7 @@ export default function SwapScreen({}: Props) {
             baseCurrency: currency,
             baseCurrencyValue: '0',
             quoteCurrencyValue: '0',
-            quote: null,
+            ...(await getSwapData(data.baseCurrency, data.quoteCurrency, '0')),
           });
         }
       }
@@ -125,17 +143,15 @@ export default function SwapScreen({}: Props) {
         if (currency === data.baseCurrency) {
           swapCurrencies();
         } else {
-          const quote = ethers.BigNumber.from(data.baseCurrencyValue).isZero()
-            ? null
-            : await getQuote(
-                data.baseCurrency,
-                currency,
-                data.baseCurrencyValue,
-              );
+          const swapData = await getSwapData(
+            data.baseCurrency,
+            currency,
+            data.baseCurrencyValue,
+          );
           update({
             quoteCurrency: currency,
-            quoteCurrencyValue: quote?.amount ?? '0',
-            quote,
+            quoteCurrencyValue: swapData.quote?.amount || '0',
+            ...swapData,
           });
         }
       }
@@ -143,13 +159,15 @@ export default function SwapScreen({}: Props) {
   };
 
   const onBaseCurrencyValueChange = async (value: BigNumberish) => {
-    const quote = ethers.BigNumber.from(value).isZero()
-      ? null
-      : await getQuote(data.baseCurrency, data.quoteCurrency, value);
+    const swapData = await getSwapData(
+      data.baseCurrency,
+      data.quoteCurrency,
+      value,
+    );
     update({
       baseCurrencyValue: value,
-      quoteCurrencyValue: quote?.amount ?? '0',
-      quote,
+      quoteCurrencyValue: swapData.quote?.amount || '0',
+      ...swapData,
     });
   };
 
@@ -158,17 +176,19 @@ export default function SwapScreen({}: Props) {
   };
 
   const onRefresh = async () => {
-    const quote = ethers.BigNumber.from(data.baseCurrencyValue).isZero()
-      ? null
-      : await getQuote(
-          data.baseCurrency,
-          data.quoteCurrency,
-          data.baseCurrencyValue,
-        );
+    const swapData = await getSwapData(
+      data.baseCurrency,
+      data.quoteCurrency,
+      data.baseCurrencyValue,
+    );
     update({
-      quoteCurrencyValue: quote?.amount ?? '0',
-      quote,
+      quoteCurrencyValue: swapData.quote?.amount || '0',
+      ...swapData,
     });
+  };
+
+  const onReviewOrderPress = () => {
+    setShowSwapReviewOrderSheet(true);
   };
 
   return (
@@ -201,7 +221,7 @@ export default function SwapScreen({}: Props) {
           />
         </Box>
 
-        {data.quote !== null && (
+        {!isDisabled && (
           <Box mt="42px">
             <SummaryTable
               rows={[
@@ -212,13 +232,17 @@ export default function SwapScreen({}: Props) {
                     data.quoteCurrency,
                     data.quote?.rate || '0',
                   ),
+                  isLoading,
                 },
                 {
                   key: 'Fee',
-                  value: data.fee
-                    ? formatCurrency(data.fee.value, data.fee.currency)
+                  value: data.status
+                    ? formatCurrency(
+                        data.status.fees[defaultCurrency] ?? '0',
+                        defaultCurrency,
+                      )
                     : '',
-                  isLoading: true,
+                  isLoading,
                 },
               ]}
             />
@@ -227,7 +251,11 @@ export default function SwapScreen({}: Props) {
 
         <Box flex={1} />
 
-        <Button mb="34px" isDisabled={isDisabled} isLoading={isLoading}>
+        <Button
+          mb="34px"
+          isDisabled={isDisabled}
+          isLoading={isLoading}
+          onPress={onReviewOrderPress}>
           Review Order
         </Button>
       </ScrollView>

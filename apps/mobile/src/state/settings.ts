@@ -90,3 +90,10 @@ export const useSettingsStoreSwapSelector = () =>
     network: state.network,
     quoteCurrency: state.quoteCurrency,
   }));
+
+export const useSettingsStoreSwapSheetsSelector = () =>
+  useSettingsStore(state => ({
+    network: state.network,
+    quoteCurrency: state.quoteCurrency,
+    timePeriod: state.timePeriod,
+  }));

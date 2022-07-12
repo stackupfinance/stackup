@@ -12,10 +12,12 @@ const TO_FLOAT_REGEX = /[^\d.-]/g;
 
 const displayGenericToken = (value: BigNumberish, symbol: CurrencySymbols) => {
   return `${ethers.utils.commify(
-    ethers.utils.formatUnits(
-      ethers.BigNumber.from(value),
-      CurrencyMeta[symbol].decimals,
-    ),
+    parseFloat(
+      ethers.utils.formatUnits(
+        ethers.BigNumber.from(value),
+        CurrencyMeta[symbol].decimals,
+      ),
+    ).toFixed(6),
   )} ${symbol}`;
 };
 

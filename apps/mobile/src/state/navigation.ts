@@ -19,6 +19,7 @@ interface Sheets {
     value: boolean;
     onChange: (currency: CurrencySymbols) => void;
   };
+  showSwapReviewOrderSheet: boolean;
 }
 
 interface NavigationState extends Sheets {
@@ -40,8 +41,9 @@ interface NavigationState extends Sheets {
   setShowEmailConfirmedSheet: (value: boolean) => void;
   setShowSwapSelectTokenSheet: (
     value: boolean,
-    onChange?: (currency: CurrencySymbols) => void,
+    onChange?: (currency: CurrencySymbols) => void | Promise<void>,
   ) => void;
+  setShowSwapReviewOrderSheet: (value: boolean) => void;
   resetAllSheets: () => void;
   clear: () => void;
 }
@@ -59,6 +61,7 @@ const sheetDefaults: Sheets = {
   showVerifyEmailSheet: false,
   showEmailConfirmedSheet: false,
   showSwapSelectTokenSheet: {value: false, onChange: () => {}},
+  showSwapReviewOrderSheet: false,
 };
 const STORE_NAME = 'stackup-navigation-store';
 const useNavigationStore = create<NavigationState>()(
@@ -122,6 +125,10 @@ const useNavigationStore = create<NavigationState>()(
         set({...sheetDefaults, showSwapSelectTokenSheet: {value, onChange}});
       },
 
+      setShowSwapReviewOrderSheet: value => {
+        set({...sheetDefaults, showSwapReviewOrderSheet: value});
+      },
+
       resetAllSheets: () => {
         set({...sheetDefaults});
       },
@@ -181,6 +188,7 @@ export const useNavigationStoreSecurityOverviewSelector = () =>
 export const useNavigationStoreSwapSelector = () =>
   useNavigationStore(state => ({
     setShowSwapSelectTokenSheet: state.setShowSwapSelectTokenSheet,
+    setShowSwapReviewOrderSheet: state.setShowSwapReviewOrderSheet,
   }));
 
 export const useNavigationStoreAssetsSheetsSelector = () =>
@@ -204,5 +212,7 @@ export const useNavigationStoreAssetsSheetsSelector = () =>
 export const useNavigationStoreSwapSheetsSelector = () =>
   useNavigationStore(state => ({
     showSwapSelectTokenSheet: state.showSwapSelectTokenSheet,
+    showSwapReviewOrderSheet: state.showSwapReviewOrderSheet,
     setShowSwapSelectTokenSheet: state.setShowSwapSelectTokenSheet,
+    setShowSwapReviewOrderSheet: state.setShowSwapReviewOrderSheet,
   }));

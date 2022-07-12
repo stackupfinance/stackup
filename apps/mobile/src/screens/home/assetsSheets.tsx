@@ -62,6 +62,7 @@ export default function AssetsSheetsScreen() {
     verifyUserOperationsWithPaymaster,
     signUserOperations,
     relayUserOperations,
+    clear: clearBundler,
   } = useBundlerStoreAssetsSheetsSelector();
   const {isEnabled: isFingerprintEnabled, getMasterPassword} =
     useFingerprintStoreAssetsSheetsSelector();
@@ -93,6 +94,7 @@ export default function AssetsSheetsScreen() {
   );
 
   const onRequestMasterPasswordClose = () => {
+    clearBundler();
     setShowRequestMasterPassword(false);
   };
 
@@ -192,7 +194,9 @@ export default function AssetsSheetsScreen() {
 
     if (isFingerprintEnabled) {
       const masterPassword = await getMasterPassword();
-      onConfirmTransaction(userOperations)(masterPassword ?? '');
+      masterPassword
+        ? onConfirmTransaction(userOperations)(masterPassword)
+        : clearBundler();
     } else {
       setShowRequestMasterPassword(true);
     }
@@ -229,7 +233,7 @@ export default function AssetsSheetsScreen() {
 
       logEvent('SEND_SUMMARY_CONFIRM');
       toast.show({
-        title: 'Transaction sent, this might take a minute',
+        title: 'Transaction sent, this might take a minute...',
         backgroundColor: AppColors.palettes.primary[600],
         placement: 'bottom',
       });
