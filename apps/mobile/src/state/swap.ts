@@ -104,15 +104,16 @@ const useSwapStore = create<SwapState>()(
           ? wallet.userOperations.get(instance.walletAddress, {
               nonce: nonce + (shouldApprovePaymaster ? 1 : 0),
               ...gasOverrides(gasEstimate),
-              initCode: isDeployed
-                ? constants.userOperations.nullCode
-                : wallet.proxy
-                    .getInitCode(
-                      instance.initImplementation,
-                      instance.initOwner,
-                      instance.initGuardians,
-                    )
-                    .toString(),
+              initCode:
+                isDeployed || shouldApprovePaymaster
+                  ? constants.userOperations.nullCode
+                  : wallet.proxy
+                      .getInitCode(
+                        instance.initImplementation,
+                        instance.initOwner,
+                        instance.initGuardians,
+                      )
+                      .toString(),
               callData: wallet.encodeFunctionData.ERC20Approve(
                 NetworksConfig[network].currencies[baseCurrency].address,
                 quote.transaction.to,
