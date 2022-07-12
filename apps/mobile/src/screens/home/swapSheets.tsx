@@ -89,6 +89,7 @@ export default function SwapSheets() {
         backgroundColor: AppColors.singletons.warning,
         placement: 'bottom',
       });
+      clearBundler();
       return;
     }
     setUnsignedUserOperations(userOpsWithPaymaster);
