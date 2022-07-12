@@ -2,7 +2,7 @@ import create from 'zustand';
 import {devtools} from 'zustand/middleware';
 import axios from 'axios';
 import {constants, wallet} from '@stackupfinance/walletjs';
-import {Env, CurrencyBalances, Networks, NetworksConfig} from '../config';
+import {Env, Networks, NetworksConfig, PaymasterStatus} from '../config';
 
 interface PaymasterSignatureResponse {
   userOperations: Array<constants.userOperations.IUserOperation>;
@@ -10,12 +10,6 @@ interface PaymasterSignatureResponse {
 
 interface RelaySubmitResponse {
   status: 'PENDING' | 'SUCCESS' | 'FAIL';
-}
-
-interface StatusResponse {
-  address: string;
-  fees: CurrencyBalances;
-  allowances: CurrencyBalances;
 }
 
 interface BundlerStateConstants {
@@ -26,7 +20,7 @@ interface BundlerState extends BundlerStateConstants {
   fetchPaymasterStatus: (
     address: string,
     network: Networks,
-  ) => Promise<StatusResponse>;
+  ) => Promise<PaymasterStatus>;
   requestPaymasterSignature: (
     userOperations: Array<constants.userOperations.IUserOperation>,
     network: Networks,
@@ -63,7 +57,7 @@ const useBundlerStore = create<BundlerState>()(
         try {
           set({loading: true});
 
-          const response = await axios.get<StatusResponse>(
+          const response = await axios.get<PaymasterStatus>(
             `${Env.BUNDLER_URL}/v1/paymaster/status`,
             {params: {address, network}},
           );
@@ -188,4 +182,21 @@ export const useBundlerStoreAssetsSheetsSelector = () =>
     verifyUserOperationsWithPaymaster: state.verifyUserOperationsWithPaymaster,
     signUserOperations: state.signUserOperations,
     relayUserOperations: state.relayUserOperations,
+    clear: state.clear,
+  }));
+
+export const useBundlerStoreSwapSelector = () =>
+  useBundlerStore(state => ({
+    loading: state.loading,
+    fetchPaymasterStatus: state.fetchPaymasterStatus,
+  }));
+
+export const useBundlerStoreSwapSheetsSelector = () =>
+  useBundlerStore(state => ({
+    loading: state.loading,
+    requestPaymasterSignature: state.requestPaymasterSignature,
+    verifyUserOperationsWithPaymaster: state.verifyUserOperationsWithPaymaster,
+    signUserOperations: state.signUserOperations,
+    relayUserOperations: state.relayUserOperations,
+    clear: state.clear,
   }));

@@ -154,6 +154,9 @@ export const useWalletStoreAssetsSelector = () =>
 export const useWalletStoreSwapSelector = () =>
   useWalletStore(state => ({instance: state.instance}));
 
+export const useWalletStoreSwapSheetsSelector = () =>
+  useWalletStore(state => ({instance: state.instance}));
+
 export const useWalletStorePasswordSelector = () =>
   useWalletStore(state => ({
     loading: state.loading,
