@@ -31,8 +31,8 @@ export const ERC20Transfer = (
 
 export const executeUserOp = (
   to: string,
-  value: BigNumberish,
-  data: string
+  value?: BigNumberish,
+  data?: string
 ) => {
   return Wallet.interface.encodeFunctionData("executeUserOp", [
     to,

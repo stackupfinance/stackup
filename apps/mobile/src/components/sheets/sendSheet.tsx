@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {Input, Box, VStack, Text, Button, useToast} from 'native-base';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faCheck} from '@fortawesome/free-solid-svg-icons/faCheck';
@@ -39,6 +39,10 @@ export const SendSheet = ({
   const toast = useToast();
   const [address, setAddress] = useState('');
   const [value, setValue] = useState(formatCurrency('0', currency));
+
+  useEffect(() => {
+    setValue(formatCurrency('0', currency));
+  }, [currency]);
 
   const onNav = (cb: () => void) => () => {
     setAddress('');

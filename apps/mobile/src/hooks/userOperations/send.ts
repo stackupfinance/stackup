@@ -97,11 +97,14 @@ export const useSendUserOperation = (): UseSendUserOperationHook => {
       const sendOp = wallet.userOperations.get(instance.walletAddress, {
         nonce: shouldApprove ? nonce + 1 : nonce,
         ...gasOverrides(gasEstimate),
-        callData: wallet.encodeFunctionData.ERC20Transfer(
-          NetworksConfig[network].currencies[data.currency].address,
-          toAddress,
-          value,
-        ),
+        callData:
+          data.currency === NetworksConfig[network].nativeCurrency
+            ? wallet.encodeFunctionData.executeUserOp(toAddress, value)
+            : wallet.encodeFunctionData.ERC20Transfer(
+                NetworksConfig[network].currencies[data.currency].address,
+                toAddress,
+                value,
+              ),
       });
       const userOperations = approveOp ? [approveOp, sendOp] : [sendOp];
 

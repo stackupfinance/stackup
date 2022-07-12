@@ -6,5 +6,6 @@ export * from './gas';
 export * from './network';
 export * from './routes';
 export * from './security';
+export * from './swap';
 export * from './theme';
 export * from './timePeriods';

@@ -2,23 +2,33 @@ import React, {useState, useEffect} from 'react';
 import {Input} from 'native-base';
 import {BigNumberish} from 'ethers';
 import {
-  formatCurrency,
+  formatCurrencyNoSymbol,
   parseCurrency,
   stringToValidFloat,
 } from '../utils/currency';
 import {CurrencySymbols} from '../config';
 
 type Props = {
+  isDisabled?: boolean;
+  isEditable?: boolean;
   value?: BigNumberish;
   currency: CurrencySymbols;
-  onValueChange: (value: BigNumberish) => void;
+  onValueChange?: (value: BigNumberish) => void;
 };
 
-export const CurrencyInput = ({value, currency, onValueChange}: Props) => {
-  const [inputValue, setInputValue] = useState(formatCurrency('0', currency));
+export const CurrencyInput = ({
+  isDisabled,
+  isEditable = true,
+  value,
+  currency,
+  onValueChange = () => {},
+}: Props) => {
+  const [inputValue, setInputValue] = useState(
+    formatCurrencyNoSymbol('0', currency),
+  );
 
   useEffect(() => {
-    setInputValue(formatCurrency(value ?? '0', currency));
+    setInputValue(formatCurrencyNoSymbol(value ?? '0', currency));
   }, [value, currency]);
 
   const onChangeText = (text: string) => {
@@ -36,21 +46,24 @@ export const CurrencyInput = ({value, currency, onValueChange}: Props) => {
         currency,
       );
       onValueChange(currencyValue);
-      setInputValue(formatCurrency(currencyValue, currency));
+      setInputValue(formatCurrencyNoSymbol(currencyValue, currency));
     } else {
       onValueChange('0');
-      setInputValue(formatCurrency('0', currency));
+      setInputValue(formatCurrencyNoSymbol('0', currency));
     }
   };
 
   return (
     <Input
-      pr="0px"
-      borderWidth="0px"
+      p="12px"
+      isDisabled={isDisabled}
+      editable={isEditable}
+      borderWidth={isEditable ? undefined : '0px'}
+      borderRadius="16px"
       keyboardType="decimal-pad"
       value={inputValue}
       textAlign="right"
-      fontSize="24px"
+      fontSize="18px"
       fontWeight={500}
       color="white"
       onChangeText={onChangeText}

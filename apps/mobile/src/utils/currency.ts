@@ -42,6 +42,24 @@ export const formatCurrency = (
   }
 };
 
+export const formatCurrencyNoSymbol = (
+  value: BigNumberish,
+  symbol: CurrencySymbols,
+) => {
+  return formatCurrency(value, symbol).replace(`${symbol}`, '').trimEnd();
+};
+
+export const formatRate = (
+  baseCurrency: CurrencySymbols,
+  quoteCurrency: CurrencySymbols,
+  rate: BigNumberish,
+) => {
+  return `${formatCurrency(
+    ethers.utils.parseUnits('1', CurrencyMeta[baseCurrency].decimals),
+    baseCurrency,
+  )} ≈ ${formatCurrency(rate, quoteCurrency)}`;
+};
+
 export const parseCurrency = (
   value: string,
   symbol: CurrencySymbols,
