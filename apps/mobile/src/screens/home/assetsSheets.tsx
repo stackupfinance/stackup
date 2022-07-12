@@ -228,7 +228,7 @@ export default function AssetsSheetsScreen() {
           backgroundColor: AppColors.singletons.warning,
           placement: 'top',
         });
-
+        clearBundler();
         return;
       }
 

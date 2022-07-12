@@ -120,7 +120,7 @@ export default function SwapSheets() {
           backgroundColor: AppColors.singletons.warning,
           placement: 'top',
         });
-
+        clearBundler();
         return;
       }
 
