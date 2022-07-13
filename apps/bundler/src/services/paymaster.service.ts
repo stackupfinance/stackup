@@ -11,9 +11,10 @@ import {
 
 export const verifyUserOperations = (
   userOps: Array<constants.userOperations.IUserOperation>,
-  currency: CurrencySymbols,
+  feeCurrency: CurrencySymbols,
   balance: BigNumberish,
-  allowance: BigNumberish
+  allowance: BigNumberish,
+  network: Networks
 ): [boolean, string] => {
   // Must have at least 1 user op.
   if (userOps.length === 0) {
@@ -21,7 +22,7 @@ export const verifyUserOperations = (
   }
 
   // Check if allowance is below the required fee.
-  if (ethers.BigNumber.from(allowance).lt(DefaultFees[currency])) {
+  if (ethers.BigNumber.from(allowance).lt(DefaultFees[feeCurrency])) {
     const opCallData = wallet.decodeCallData.fromUserOperation(userOps[0]);
     const erc20CallData =
       wallet.decodeCallData.Erc20FromExecuteUserOp(opCallData);
@@ -31,13 +32,13 @@ export const verifyUserOperations = (
       !erc20CallData ||
       erc20CallData.signature !== ERC20FunctionSignatures.erc20Approve ||
       erc20CallData.args[0] !== Env.PAYMASTER_ADDRESS ||
-      ethers.BigNumber.from(erc20CallData.args[1]).lt(DefaultFees[currency])
+      ethers.BigNumber.from(erc20CallData.args[1]).lt(DefaultFees[feeCurrency])
     ) {
       return [false, "Paymaster unable to extract fees."];
     }
   }
 
-  let transferringCurrencyTotal = ethers.constants.Zero;
+  let transferringFeeCurrencyTotal = ethers.constants.Zero;
   let prevOpSender = userOps[0].sender;
   let prevOpNonce = userOps[0].nonce;
   const batchOk = userOps.reduce((prev, op, index) => {
@@ -48,8 +49,13 @@ export const verifyUserOperations = (
     const opCallData = wallet.decodeCallData.fromUserOperation(op);
     const erc20CallData =
       wallet.decodeCallData.Erc20FromExecuteUserOp(opCallData);
-    if (erc20CallData?.signature === ERC20FunctionSignatures.erc20Transfer) {
-      transferringCurrencyTotal = transferringCurrencyTotal.add(
+    // Add up the running total of additional transfers in the fee currency.
+    if (
+      erc20CallData?.signature === ERC20FunctionSignatures.erc20Transfer &&
+      opCallData.args[0] ===
+        NetworksConfig[network].currencies[feeCurrency].address
+    ) {
+      transferringFeeCurrencyTotal = transferringFeeCurrencyTotal.add(
         erc20CallData.args[1]
       );
     }
@@ -66,8 +72,10 @@ export const verifyUserOperations = (
   }, true);
 
   // Check sender has enough balance to cover all transfers + fees.
-  const fee = DefaultFees[currency];
-  if (ethers.BigNumber.from(balance).lt(transferringCurrencyTotal.add(fee))) {
+  const fee = DefaultFees[feeCurrency];
+  if (
+    ethers.BigNumber.from(balance).lt(transferringFeeCurrencyTotal.add(fee))
+  ) {
     return [false, "Balance will not be enough for paymaster fees."];
   }
 
@@ -76,7 +84,7 @@ export const verifyUserOperations = (
 
 export const signUserOperations = (
   userOps: Array<constants.userOperations.IUserOperation>,
-  currency: CurrencySymbols,
+  feeCurrency: CurrencySymbols,
   network: Networks
 ) => {
   const signer = ethers.Wallet.fromMnemonic(Env.MNEMONIC);
@@ -87,14 +95,14 @@ export const signUserOperations = (
       signer,
       Env.PAYMASTER_ADDRESS,
       {
-        fee: DefaultFees[currency],
+        fee: DefaultFees[feeCurrency],
         // Charge for the entire batch upfront in the first op.
         mode:
           index === 0
             ? wallet.message.PaymasterMode.FEE_ONLY
             : wallet.message.PaymasterMode.FREE,
-        token: NetworksConfig[network].currencies[currency].address,
-        feed: NetworksConfig[network].currencies[currency].priceFeed,
+        token: NetworksConfig[network].currencies[feeCurrency].address,
+        feed: NetworksConfig[network].currencies[feeCurrency].priceFeed,
       }
     );
   });

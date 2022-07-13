@@ -40,7 +40,8 @@ export const sign = catchAsync(async (req, res) => {
     userOperations,
     "USDC",
     balance,
-    allowance
+    allowance,
+    network
   );
   if (!batchOk) {
     throw new ApiError(httpStatus.BAD_REQUEST, batchError);
