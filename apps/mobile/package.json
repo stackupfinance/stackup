@@ -72,7 +72,7 @@
     "jest": "^28.1.2",
     "metro-react-native-babel-preset": "^0.71.1",
     "prettier": "2.7.1",
-    "react-native-monorepo-tools": "^1.1.4",
+    "react-native-monorepo-tools": "^1.2.0",
     "react-native-version": "^4.0.0",
     "react-test-renderer": "18.2.0",
     "typescript": "^4.7.4"
