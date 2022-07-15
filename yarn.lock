@@ -4317,15 +4317,14 @@
     "@sentry/utils" "7.3.1"
     tslib "^1.9.3"
 
-"@sentry/tracing@^6.19.7":
-  version "6.19.7"
-  resolved "https://registry.yarnpkg.com/@sentry/tracing/-/tracing-6.19.7.tgz#54bb99ed5705931cd33caf71da347af769f02a4c"
-  integrity sha512-ol4TupNnv9Zd+bZei7B6Ygnr9N3Gp1PUrNI761QSlHtPC25xXC5ssSD3GMhBgyQrcvpuRcCFHVNNM97tN5cZiA==
+"@sentry/tracing@^7.6.0":
+  version "7.6.0"
+  resolved "https://registry.yarnpkg.com/@sentry/tracing/-/tracing-7.6.0.tgz#2b34992e7a003c40393a4aab4b917db2712a1586"
+  integrity sha512-ydlIk8FpuXiQm3Y0cLwXMOUYv5UtniP8ylWw3ix0sF5sTpJWSaC/g8P8yrzkYV+pm28kde5qfE3nocGhpwxZcA==
   dependencies:
-    "@sentry/hub" "6.19.7"
-    "@sentry/minimal" "6.19.7"
-    "@sentry/types" "6.19.7"
-    "@sentry/utils" "6.19.7"
+    "@sentry/hub" "7.6.0"
+    "@sentry/types" "7.6.0"
+    "@sentry/utils" "7.6.0"
     tslib "^1.9.3"
 
 "@sentry/types@5.30.0":
