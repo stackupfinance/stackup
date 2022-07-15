@@ -69,7 +69,6 @@ export const BaseSheet = ({
         setShouldRender(false);
       }, 250);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
 
   return shouldRender ? (

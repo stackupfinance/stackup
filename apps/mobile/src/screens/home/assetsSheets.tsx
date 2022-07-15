@@ -13,6 +13,7 @@ import {
   SendSheet,
   SendSummarySheet,
   FromWalletSheet,
+  QRCodeSheet,
 } from '../../components';
 import {useRemoveWallet, useSendUserOperation} from '../../hooks';
 import {
@@ -25,6 +26,7 @@ import {
   useFingerprintStoreAssetsSheetsSelector,
   useRampStoreAssetsSheetsSelector,
 } from '../../state';
+import {isValid} from '../../utils/address';
 import {logEvent} from '../../utils/analytics';
 
 export default function AssetsSheetsScreen() {
@@ -37,6 +39,7 @@ export default function AssetsSheetsScreen() {
     showSendSheet,
     showSendSummarySheet,
     showFromWalletSheet,
+    showQRCodeSheet,
     setShowSettingsSheet,
     setShowTokenListSheet,
     setShowDepositSheet,
@@ -44,6 +47,7 @@ export default function AssetsSheetsScreen() {
     setShowSendSheet,
     setShowSendSummarySheet,
     setShowFromWalletSheet,
+    setShowQRCodeSheet,
   } = useNavigationStoreAssetsSheetsSelector();
   const {instance} = useWalletStoreAssetsSheetsSelector();
   const {openMessenger} = useIntercomStoreAssetsSheetsSelector();
@@ -101,6 +105,10 @@ export default function AssetsSheetsScreen() {
   const onCloseSettingsSheet = () => {
     logEvent('SETTINGS_CLOSE');
     setShowSettingsSheet(false);
+  };
+
+  const onCloseQRCodeSheet = () => {
+    setShowQRCodeSheet(false);
   };
 
   const onCloseTokenListSheet = () => {
@@ -282,6 +290,19 @@ export default function AssetsSheetsScreen() {
       });
     };
 
+  const onQRCodeDetected = (value: string) => {
+    if (isValid(value)) {
+      updateSendData({toAddress: value});
+      setShowSelectCurrencySheet(true);
+    } else {
+      toast.show({
+        title: 'This code is not supported.',
+        backgroundColor: AppColors.singletons.medium,
+        placement: 'top',
+      });
+    }
+  };
+
   const onFromWalletBackPress = () => {
     logEvent('DEPOSIT_TRANSFER_FROM_WALLET_BACK');
     setShowDepositSheet(true);
@@ -311,6 +332,13 @@ export default function AssetsSheetsScreen() {
         onHelpPress={onHelpPress}
         onDiscordPress={onDiscordPress}
         onRemoveWalletPress={onRemoveWalletPress}
+      />
+
+      <QRCodeSheet
+        isOpen={showQRCodeSheet}
+        onClose={onCloseQRCodeSheet}
+        network={network}
+        onQRCodeDetected={onQRCodeDetected}
       />
 
       <TokenListSheet
@@ -357,6 +385,7 @@ export default function AssetsSheetsScreen() {
         onNext={onSendNextPress}
         currency={sendData.currency}
         currencyBalances={currencyBalances}
+        addressOverride={sendData.toAddress}
       />
 
       <SendSummarySheet

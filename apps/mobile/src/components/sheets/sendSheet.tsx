@@ -25,6 +25,7 @@ type Props = {
   onNext: (toAddress: string, value: BigNumberish) => Promise<void>;
   currency: CurrencySymbols;
   currencyBalances: CurrencyBalances;
+  addressOverride?: string;
 };
 
 export const SendSheet = ({
@@ -35,10 +36,21 @@ export const SendSheet = ({
   onNext,
   currency,
   currencyBalances,
+  addressOverride,
 }: Props) => {
   const toast = useToast();
   const [address, setAddress] = useState('');
   const [value, setValue] = useState(formatCurrency('0', currency));
+
+  useEffect(() => {
+    if (
+      addressOverride !== undefined &&
+      addressOverride !== ethers.constants.AddressZero &&
+      addressOverride !== address
+    ) {
+      setAddress(addressOverride);
+    }
+  }, [addressOverride]);
 
   useEffect(() => {
     setValue(formatCurrency('0', currency));

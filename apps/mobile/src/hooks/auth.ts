@@ -97,8 +97,8 @@ export const useAuth = (): UseAuthHook => {
 
     setTimeout(async () => {
       try {
-        await getMasterPassword();
-        setIsReady(true);
+        const password = await getMasterPassword();
+        password && setIsReady(true);
       } catch (_error) {
         showUnlockPrompt();
       }
@@ -115,7 +115,6 @@ export const useAuth = (): UseAuthHook => {
         identify(instance.walletAddress);
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hasHydrated, instance]);
 
   useEffect(() => {
@@ -142,7 +141,6 @@ export const useAuth = (): UseAuthHook => {
     });
 
     return listener.remove;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return {

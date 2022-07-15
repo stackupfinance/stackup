@@ -4,6 +4,7 @@ export * from './emailConfirmedSheet';
 export * from './emailSheet';
 export * from './fromWalletSheet';
 export * from './passwordSheet';
+export * from './qrCodeSheet';
 export * from './selectCurrencySheet';
 export * from './sendSheet';
 export * from './sendSummarySheet';
