@@ -9,15 +9,22 @@ const USDCDisplay = new Intl.NumberFormat('en-US', {
 });
 
 const TO_FLOAT_REGEX = /[^\d.-]/g;
+const DECIMAL_PLACES = 6;
+const MULTIPLIER = Math.pow(10, DECIMAL_PLACES);
 
+// Return currency value to $DECIMAL_PLACES rounded down
 const displayGenericToken = (value: BigNumberish, symbol: CurrencySymbols) => {
   return `${ethers.utils.commify(
-    parseFloat(
-      ethers.utils.formatUnits(
-        ethers.BigNumber.from(value),
-        CurrencyMeta[symbol].decimals,
-      ),
-    ).toFixed(6),
+    (
+      Math.floor(
+        parseFloat(
+          ethers.utils.formatUnits(
+            ethers.BigNumber.from(value),
+            CurrencyMeta[symbol].decimals,
+          ),
+        ) * MULTIPLIER,
+      ) / MULTIPLIER
+    ).toFixed(DECIMAL_PLACES),
   )} ${symbol}`;
 };
 

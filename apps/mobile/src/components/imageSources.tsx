@@ -12,3 +12,4 @@ export const Saly31Illustration: ImageSourcePropType = require('../../assets/ima
 export const Saly43Illustration: ImageSourcePropType = require('../../assets/images/saly-43-illustration.png');
 export const ShieldWithCheckLogo: ImageSourcePropType = require('../../assets/images/shield-with-check-logo.png');
 export const UsdLogo: ImageSourcePropType = require('../../assets/images/usd-logo.png');
+export const WalletConnectLogo: ImageSourcePropType = require('../../assets/images/walletconnect-logo.png');

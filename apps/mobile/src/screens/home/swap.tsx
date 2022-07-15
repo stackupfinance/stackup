@@ -57,7 +57,6 @@ export default function SwapScreen({}: Props) {
 
   useEffect(() => {
     update({baseCurrency: defaultCurrency});
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [defaultCurrency]);
 
   const getSwapData = async (
@@ -195,8 +194,8 @@ export default function SwapScreen({}: Props) {
   };
 
   return (
-    <TabScreenContainer>
-      <TabScreenHeader>
+    <TabScreenContainer noPadding>
+      <TabScreenHeader withPadding>
         <Box />
 
         <HomeTabTitle screen="Swap" network="Polygon" />
@@ -205,6 +204,7 @@ export default function SwapScreen({}: Props) {
       </TabScreenHeader>
 
       <ScrollView
+        px="18px"
         contentContainerStyle={{flex: 1}}
         refreshControl={
           <RefreshControl refreshing={isLoading} onRefresh={onRefresh} />

@@ -20,6 +20,7 @@ interface Sheets {
     onChange: (currency: CurrencySymbols) => void;
   };
   showSwapReviewOrderSheet: boolean;
+  showQRCodeSheet: boolean;
 }
 
 interface NavigationState extends Sheets {
@@ -44,6 +45,7 @@ interface NavigationState extends Sheets {
     onChange?: (currency: CurrencySymbols) => void | Promise<void>,
   ) => void;
   setShowSwapReviewOrderSheet: (value: boolean) => void;
+  setShowQRCodeSheet: (value: boolean) => void;
   resetAllSheets: () => void;
   clear: () => void;
 }
@@ -62,6 +64,7 @@ const sheetDefaults: Sheets = {
   showEmailConfirmedSheet: false,
   showSwapSelectTokenSheet: {value: false, onChange: () => {}},
   showSwapReviewOrderSheet: false,
+  showQRCodeSheet: false,
 };
 const STORE_NAME = 'stackup-navigation-store';
 const useNavigationStore = create<NavigationState>()(
@@ -129,6 +132,10 @@ const useNavigationStore = create<NavigationState>()(
         set({...sheetDefaults, showSwapReviewOrderSheet: value});
       },
 
+      setShowQRCodeSheet: value => {
+        set({...sheetDefaults, showQRCodeSheet: value});
+      },
+
       resetAllSheets: () => {
         set({...sheetDefaults});
       },
@@ -164,6 +171,7 @@ export const useNavigationStoreAssetsSelector = () =>
     setShowTokenListSheet: state.setShowTokenListSheet,
     setShowDepositSheet: state.setShowDepositSheet,
     setShowSelectCurrencySheet: state.setShowSelectCurrencySheet,
+    setShowQRCodeSheet: state.setShowQRCodeSheet,
   }));
 
 export const useNavigationStoreSecuritySelector = () =>
@@ -200,6 +208,7 @@ export const useNavigationStoreAssetsSheetsSelector = () =>
     showSendSheet: state.showSendSheet,
     showSendSummarySheet: state.showSendSummarySheet,
     showFromWalletSheet: state.showFromWalletSheet,
+    showQRCodeSheet: state.showQRCodeSheet,
     setShowSettingsSheet: state.setShowSettingsSheet,
     setShowTokenListSheet: state.setShowTokenListSheet,
     setShowDepositSheet: state.setShowDepositSheet,
@@ -207,6 +216,7 @@ export const useNavigationStoreAssetsSheetsSelector = () =>
     setShowSendSheet: state.setShowSendSheet,
     setShowSendSummarySheet: state.setShowSendSummarySheet,
     setShowFromWalletSheet: state.setShowFromWalletSheet,
+    setShowQRCodeSheet: state.setShowQRCodeSheet,
   }));
 
 export const useNavigationStoreSwapSheetsSelector = () =>

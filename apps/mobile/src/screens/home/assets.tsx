@@ -6,12 +6,12 @@ import type {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faSliders} from '@fortawesome/free-solid-svg-icons/faSliders';
 import {faBars} from '@fortawesome/free-solid-svg-icons/faBars';
+import {faQrcode} from '@fortawesome/free-solid-svg-icons/faQrcode';
 import {RootStackParamList, HomeTabParamList, AppColors} from '../../config';
 import {
   TabScreenContainer,
   TabScreenHeader,
   HomeTabTitle,
-  // SecurityButton,
   IconButton,
   List,
   PortfolioBalance,
@@ -30,12 +30,13 @@ type Props = CompositeScreenProps<
   NativeStackScreenProps<RootStackParamList>
 >;
 
-export default function AssetsScreen({navigation}: Props) {
+export default function AssetsScreen({}: Props) {
   const {
     setShowSettingsSheet,
     setShowTokenListSheet,
     setShowDepositSheet,
     setShowSelectCurrencySheet,
+    setShowQRCodeSheet,
   } = useNavigationStoreAssetsSelector();
   const [isHidden, setIsHidden] = useState<boolean>(false);
   const {
@@ -59,13 +60,10 @@ export default function AssetsScreen({navigation}: Props) {
 
   useEffect(() => {
     onRefresh();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // TODO: Remove this when enabling security button
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const onSecurityPress = () => {
-    navigation.navigate('Security');
+  const onQRCodePress = () => {
+    setShowQRCodeSheet(true);
   };
 
   const onSettingPress = () => {
@@ -104,10 +102,7 @@ export default function AssetsScreen({navigation}: Props) {
 
         <HomeTabTitle screen="Assets" network="Polygon" />
 
-        <Box
-        // TODO: Remove this when enabling security button
-        />
-        {/* <SecurityButton onPress={onSecurityPress} /> */}
+        <IconButton icon={faQrcode} onPress={onQRCodePress} />
       </TabScreenHeader>
 
       <List
