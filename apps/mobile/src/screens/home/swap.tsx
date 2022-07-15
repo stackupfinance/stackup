@@ -195,7 +195,7 @@ export default function SwapScreen({}: Props) {
 
   return (
     <TabScreenContainer noPadding>
-      <TabScreenHeader>
+      <TabScreenHeader withPadding>
         <Box />
 
         <HomeTabTitle screen="Swap" network="Polygon" />
