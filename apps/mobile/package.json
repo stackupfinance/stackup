@@ -27,7 +27,7 @@
     "@ramp-network/react-native-sdk": "^0.3.1",
     "@react-native-async-storage/async-storage": "^1.17.7",
     "@react-native-clipboard/clipboard": "^1.10.0",
-    "@react-navigation/material-top-tabs": "^6.2.1",
+    "@react-navigation/material-top-tabs": "^6.2.2",
     "@react-navigation/native": "^6.0.10",
     "@react-navigation/native-stack": "^6.7.0",
     "@sentry/react-native": "^4.1.0",
