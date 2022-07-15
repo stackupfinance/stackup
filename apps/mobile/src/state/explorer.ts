@@ -9,6 +9,7 @@ import {
   Networks,
   TimePeriod,
   GasEstimate,
+  OptimalQuote,
   Env,
 } from '../config';
 
@@ -37,6 +38,10 @@ interface AddressOverviewResponse {
   currencies: Array<CurrencyBalance>;
 }
 
+interface SwapQuoteResponse {
+  quote: OptimalQuote | null;
+}
+
 interface ExplorerStateConstants {
   loading: boolean;
   walletStatus: WalletStatus;
@@ -52,6 +57,13 @@ interface ExplorerState extends ExplorerStateConstants {
     address: string,
   ) => Promise<void>;
   fetchGasEstimate: (network: Networks) => Promise<GasEstimate>;
+  fetchSwapQuote: (
+    network: Networks,
+    baseCurrency: CurrencySymbols,
+    quoteCurrency: CurrencySymbols,
+    value: BigNumberish,
+    address: string,
+  ) => Promise<OptimalQuote | null>;
   clear: () => void;
 
   hasHydrated: boolean;
@@ -133,6 +145,28 @@ const useExplorerStore = create<ExplorerState>()(
           }
         },
 
+        fetchSwapQuote: async (
+          network,
+          baseCurrency,
+          quoteCurrency,
+          value,
+          address,
+        ) => {
+          try {
+            set({loading: true});
+            const response = await axios.get<SwapQuoteResponse>(
+              `${Env.EXPLORER_URL}/v1/swap/quote`,
+              {params: {network, baseCurrency, quoteCurrency, value, address}},
+            );
+
+            set({loading: false});
+            return response.data.quote;
+          } catch (error) {
+            set({loading: false});
+            throw error;
+          }
+        },
+
         clear: () => {
           set({...defaults});
         },
@@ -166,7 +200,7 @@ export const useExplorerStoreUserOpHooksSelector = () =>
     fetchGasEstimate: state.fetchGasEstimate,
   }));
 
-export const useExplorerStoreHomeSelector = () =>
+export const useExplorerStoreAssetsSheetsSelector = () =>
   useExplorerStore(state => ({
     walletStatus: state.walletStatus,
     currencies: state.currencies,
@@ -178,5 +212,20 @@ export const useExplorerStoreAssetsSelector = () =>
     loading: state.loading,
     walletBalance: state.walletBalance,
     currencies: state.currencies,
+    fetchAddressOverview: state.fetchAddressOverview,
+  }));
+
+export const useExplorerStoreSwapSelector = () =>
+  useExplorerStore(state => ({
+    loading: state.loading,
+    currencies: state.currencies,
+    fetchGasEstimate: state.fetchGasEstimate,
+    fetchSwapQuote: state.fetchSwapQuote,
+  }));
+
+export const useExplorerStoreSwapSheetsSelector = () =>
+  useExplorerStore(state => ({
+    currencies: state.currencies,
+    walletStatus: state.walletStatus,
     fetchAddressOverview: state.fetchAddressOverview,
   }));

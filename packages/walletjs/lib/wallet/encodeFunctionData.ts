@@ -1,4 +1,4 @@
-import { ethers, BigNumberish } from "ethers";
+import { ethers, BigNumberish, BytesLike } from "ethers";
 import * as ERC20 from "../contracts/erc20";
 import * as EntryPoint from "../contracts/entryPoint";
 import * as Wallet from "../contracts/wallet";
@@ -31,8 +31,8 @@ export const ERC20Transfer = (
 
 export const executeUserOp = (
   to: string,
-  value: BigNumberish,
-  data: string
+  value?: BigNumberish,
+  data?: BytesLike
 ) => {
   return Wallet.interface.encodeFunctionData("executeUserOp", [
     to,

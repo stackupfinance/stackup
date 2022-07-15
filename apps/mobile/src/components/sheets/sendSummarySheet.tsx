@@ -62,7 +62,7 @@ export const SendSummarySheet = ({
     if (hasInsufficientFunds) {
       message = `Not enough ${CurrencyMeta[currency].name} for this transaction`;
     } else if (hasInsufficientFee) {
-      message = `Not enough ${CurrencyMeta[currency].name} to pay fees`;
+      message = `Not enough ${CurrencyMeta[fee.currency].name} to pay fees`;
     }
 
     return message ? (

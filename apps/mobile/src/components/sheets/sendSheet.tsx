@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {Input, Box, VStack, Text, Button, useToast} from 'native-base';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faCheck} from '@fortawesome/free-solid-svg-icons/faCheck';
@@ -10,7 +10,11 @@ import {
   CurrencyMeta,
   AppColors,
 } from '../../config';
-import {formatCurrency, parseCurrency} from '../../utils/currency';
+import {
+  formatCurrency,
+  parseCurrency,
+  stringToValidFloat,
+} from '../../utils/currency';
 import {isValid} from '../../utils/address';
 
 type Props = {
@@ -21,9 +25,8 @@ type Props = {
   onNext: (toAddress: string, value: BigNumberish) => Promise<void>;
   currency: CurrencySymbols;
   currencyBalances: CurrencyBalances;
+  addressOverride?: string;
 };
-
-const TO_FLOAT_REGEX = /[^\d.-]/g;
 
 export const SendSheet = ({
   isOpen,
@@ -33,10 +36,25 @@ export const SendSheet = ({
   onNext,
   currency,
   currencyBalances,
+  addressOverride,
 }: Props) => {
   const toast = useToast();
   const [address, setAddress] = useState('');
   const [value, setValue] = useState(formatCurrency('0', currency));
+
+  useEffect(() => {
+    if (
+      addressOverride !== undefined &&
+      addressOverride !== ethers.constants.AddressZero &&
+      addressOverride !== address
+    ) {
+      setAddress(addressOverride);
+    }
+  }, [addressOverride]);
+
+  useEffect(() => {
+    setValue(formatCurrency('0', currency));
+  }, [currency]);
 
   const onNav = (cb: () => void) => () => {
     setAddress('');
@@ -49,21 +67,23 @@ export const SendSheet = ({
   };
 
   const onFocus = () => {
-    setValue(parseFloat(value.replace(TO_FLOAT_REGEX, '')).toString());
+    setValue(stringToValidFloat(value));
   };
 
   const onBlur = () => {
     value
-      ? setValue(formatCurrency(parseCurrency(value, currency), currency))
+      ? setValue(
+          formatCurrency(
+            parseCurrency(stringToValidFloat(value), currency),
+            currency,
+          ),
+        )
       : setValue(formatCurrency('0', currency));
   };
 
   const onNextHandler = async () => {
     const toAddress = address;
-    const parsedValue = parseCurrency(
-      parseFloat(value.replace(TO_FLOAT_REGEX, '')).toString(),
-      currency,
-    );
+    const parsedValue = parseCurrency(stringToValidFloat(value), currency);
 
     if (!isValid(address)) {
       toast.show({

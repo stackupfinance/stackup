@@ -13,6 +13,7 @@ import {
   useBundlerStoreRemoveWalletSelector,
   useRampStoreRemoveWalletSelector,
   useRampStoreAuthSelector,
+  useSwapStoreRemoveWalletSelector,
 } from '../state';
 
 interface UseAuthHook {
@@ -34,6 +35,7 @@ export const useRemoveWallet = (): UseRemoveWalletHook => {
   const {clear: clearExplorer} = useExplorerStoreRemoveWalletSelector();
   const {clear: clearBundler} = useBundlerStoreRemoveWalletSelector();
   const {clear: clearRamp} = useRampStoreRemoveWalletSelector();
+  const {clear: clearSwap} = useSwapStoreRemoveWalletSelector();
 
   return async () => {
     // Clear all state here before removing wallet from device.
@@ -43,6 +45,7 @@ export const useRemoveWallet = (): UseRemoveWalletHook => {
     clearExplorer();
     clearBundler();
     clearRamp();
+    clearSwap();
 
     resetMasterPassword();
     remove();
@@ -94,8 +97,8 @@ export const useAuth = (): UseAuthHook => {
 
     setTimeout(async () => {
       try {
-        await getMasterPassword();
-        setIsReady(true);
+        const password = await getMasterPassword();
+        password && setIsReady(true);
       } catch (_error) {
         showUnlockPrompt();
       }
@@ -112,7 +115,6 @@ export const useAuth = (): UseAuthHook => {
         identify(instance.walletAddress);
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hasHydrated, instance]);
 
   useEffect(() => {
@@ -139,7 +141,6 @@ export const useAuth = (): UseAuthHook => {
     });
 
     return listener.remove;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return {

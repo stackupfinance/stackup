@@ -44,6 +44,14 @@ type Events = {
   MANAGE_CURRENCY_OPEN: undefined;
   MANAGE_CURRENCY_CLOSE: undefined;
   MANAGE_CURRENCY_ON_CHANGE: {currency: CurrencySymbols; enabled: boolean};
+
+  SWAP_GET_QUOTE: {
+    baseCurrency: CurrencySymbols;
+    quoteCurrency: CurrencySymbols;
+  };
+  SWAP_REVIEW_ORDER: undefined;
+  SWAP_REVIEW_ORDER_CLOSE: undefined;
+  SWAP_CONFIRM: undefined;
 };
 
 const ampInstance = Amplitude.getInstance();

@@ -48,7 +48,7 @@ const useRampStore = create<RampState>()(
         });
 
         set({debounceAndroidAppState: true});
-        return ramp.show();
+        ramp.show();
       },
 
       clear: () => {
@@ -68,5 +68,5 @@ export const useRampStoreAuthSelector = () =>
     setDebounceAndroidAppState: state.setDebounceAndroidAppState,
   }));
 
-export const useRampStoreHomeSelector = () =>
+export const useRampStoreAssetsSheetsSelector = () =>
   useRampStore(state => ({openRamp: state.openRamp}));

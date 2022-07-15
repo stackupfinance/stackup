@@ -8,14 +8,28 @@ const USDCDisplay = new Intl.NumberFormat('en-US', {
   maximumFractionDigits: 2,
 });
 
+const TO_FLOAT_REGEX = /[^\d.-]/g;
+const DECIMAL_PLACES = 6;
+const MULTIPLIER = Math.pow(10, DECIMAL_PLACES);
+
+// Return currency value to $DECIMAL_PLACES rounded down
 const displayGenericToken = (value: BigNumberish, symbol: CurrencySymbols) => {
   return `${ethers.utils.commify(
-    ethers.utils.formatUnits(
-      ethers.BigNumber.from(value),
-      CurrencyMeta[symbol].decimals,
-    ),
+    (
+      Math.floor(
+        parseFloat(
+          ethers.utils.formatUnits(
+            ethers.BigNumber.from(value),
+            CurrencyMeta[symbol].decimals,
+          ),
+        ) * MULTIPLIER,
+      ) / MULTIPLIER
+    ).toFixed(DECIMAL_PLACES),
   )} ${symbol}`;
 };
+
+export const stringToValidFloat = (value: string) =>
+  parseFloat(value.replace(TO_FLOAT_REGEX, '')).toString();
 
 export const formatCurrency = (
   value: BigNumberish,
@@ -35,6 +49,24 @@ export const formatCurrency = (
     default:
       return displayGenericToken(value, symbol);
   }
+};
+
+export const formatCurrencyNoSymbol = (
+  value: BigNumberish,
+  symbol: CurrencySymbols,
+) => {
+  return formatCurrency(value, symbol).replace(`${symbol}`, '').trimEnd();
+};
+
+export const formatRate = (
+  baseCurrency: CurrencySymbols,
+  quoteCurrency: CurrencySymbols,
+  rate: BigNumberish,
+) => {
+  return `${formatCurrency(
+    ethers.utils.parseUnits('1', CurrencyMeta[baseCurrency].decimals),
+    baseCurrency,
+  )} ≈ ${formatCurrency(rate, quoteCurrency)}`;
 };
 
 export const parseCurrency = (

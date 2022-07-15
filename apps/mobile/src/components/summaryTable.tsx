@@ -1,8 +1,13 @@
 import React from 'react';
-import {VStack, HStack, Text} from 'native-base';
+import {VStack, HStack, Text, Skeleton} from 'native-base';
 
 interface Props {
-  rows: Array<{key: string; value: string; color?: string}>;
+  rows: Array<{
+    key: string;
+    value: string;
+    isLoading?: boolean;
+    color?: string;
+  }>;
 }
 
 export const SummaryTable = ({rows}: Props) => {
@@ -25,9 +30,11 @@ export const SummaryTable = ({rows}: Props) => {
           <Text fontSize="14px" fontWeight={400} color={row.color ?? 'text.3'}>
             {row.key}
           </Text>
-          <Text fontSize="16px" fontWeight={500} color={row.color ?? 'white'}>
-            {row.value}
-          </Text>
+          <Skeleton.Text isLoaded={!row.isLoading} lines={1} w="64px">
+            <Text fontSize="16px" fontWeight={500} color={row.color ?? 'white'}>
+              {row.value}
+            </Text>
+          </Skeleton.Text>
         </HStack>
       ))}
     </VStack>

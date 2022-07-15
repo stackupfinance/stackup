@@ -5,13 +5,19 @@ import {IconDefinition} from '@fortawesome/fontawesome-common-types';
 import {AppColors} from '../config';
 
 type Props = {
+  isDisabled?: boolean;
   icon: IconDefinition;
   onPress: () => void;
 };
 
-export const IconButton = ({icon, onPress}: Props) => {
+export const IconButton = ({isDisabled, icon, onPress}: Props) => {
   return (
-    <Pressable onPress={onPress} hitSlop={16} w="22px" h="22px">
+    <Pressable
+      isDisabled={isDisabled}
+      onPress={onPress}
+      hitSlop={16}
+      w="22px"
+      h="22px">
       {({isPressed}) => (
         <Box justifyContent="center" alignItems="center">
           <FontAwesomeIcon

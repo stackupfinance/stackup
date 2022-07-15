@@ -26,7 +26,7 @@ interface UseSendUserOperationHook {
     network: Networks,
     isDeployed: boolean,
     nonce: number,
-    quoteCurrency: CurrencySymbols,
+    defaultCurrency: CurrencySymbols,
     toAddress: string,
     value: BigNumberish,
   ) => Promise<{
@@ -59,7 +59,7 @@ export const useSendUserOperation = (): UseSendUserOperationHook => {
       network,
       isDeployed,
       nonce,
-      quoteCurrency,
+      defaultCurrency,
       toAddress,
       value,
     ) => {
@@ -67,14 +67,15 @@ export const useSendUserOperation = (): UseSendUserOperationHook => {
         fetchPaymasterStatus(instance.walletAddress, network),
         fetchGasEstimate(network),
       ]);
-      const paymasterAddress = status.address;
-      const feeValue = ethers.BigNumber.from(status.fees[quoteCurrency] ?? '0');
-      const allowance = ethers.BigNumber.from(
-        status.allowances[quoteCurrency] ?? '0',
+      const feeValue = ethers.BigNumber.from(
+        status.fees[defaultCurrency] ?? '0',
       );
-      const shouldApprove = allowance.lt(feeValue);
+      const allowance = ethers.BigNumber.from(
+        status.allowances[defaultCurrency] ?? '0',
+      );
+      const shouldApprovePaymaster = allowance.lt(feeValue);
 
-      const approveOp = shouldApprove
+      const approvePaymasterOp = shouldApprovePaymaster
         ? wallet.userOperations.get(instance.walletAddress, {
             nonce,
             ...gasOverrides(gasEstimate),
@@ -88,26 +89,31 @@ export const useSendUserOperation = (): UseSendUserOperationHook => {
                   )
                   .toString(),
             callData: wallet.encodeFunctionData.ERC20Approve(
-              NetworksConfig[network].currencies[data.currency].address,
-              paymasterAddress,
+              NetworksConfig[network].currencies[defaultCurrency].address,
+              status.address,
               feeValue,
             ),
           })
         : undefined;
       const sendOp = wallet.userOperations.get(instance.walletAddress, {
-        nonce: shouldApprove ? nonce + 1 : nonce,
+        nonce: nonce + (shouldApprovePaymaster ? 1 : 0),
         ...gasOverrides(gasEstimate),
-        callData: wallet.encodeFunctionData.ERC20Transfer(
-          NetworksConfig[network].currencies[data.currency].address,
-          toAddress,
-          value,
-        ),
+        callData:
+          data.currency === NetworksConfig[network].nativeCurrency
+            ? wallet.encodeFunctionData.executeUserOp(toAddress, value)
+            : wallet.encodeFunctionData.ERC20Transfer(
+                NetworksConfig[network].currencies[data.currency].address,
+                toAddress,
+                value,
+              ),
       });
-      const userOperations = approveOp ? [approveOp, sendOp] : [sendOp];
+      const userOperations = [approvePaymasterOp, sendOp].filter(
+        Boolean,
+      ) as Array<constants.userOperations.IUserOperation>;
 
       return {
         userOperations,
-        fee: {currency: quoteCurrency, value: feeValue},
+        fee: {currency: defaultCurrency, value: feeValue},
       };
     },
   };

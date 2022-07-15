@@ -17,11 +17,11 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>0.0.2</string>
+	<string>0.0.3</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>8</string>
+	<string>12</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true />
 	<key>NSAppTransportSecurity</key>
@@ -38,7 +38,7 @@
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string />
 	<key>NSCameraUsageDescription</key>
-	<string>Please give us access to your camera, to complete the verification.</string>
+	<string>Please give us access to your camera.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Please give us access to your photo library.</string>
 	<key>UILaunchStoryboardName</key>

@@ -145,10 +145,16 @@ export const useWalletStoreAuthSelector = () =>
     hasHydrated: state.hasHydrated,
   }));
 
-export const useWalletStoreHomeSelector = () =>
+export const useWalletStoreAssetsSheetsSelector = () =>
   useWalletStore(state => ({instance: state.instance}));
 
 export const useWalletStoreAssetsSelector = () =>
+  useWalletStore(state => ({instance: state.instance}));
+
+export const useWalletStoreSwapSelector = () =>
+  useWalletStore(state => ({instance: state.instance}));
+
+export const useWalletStoreSwapSheetsSelector = () =>
   useWalletStore(state => ({instance: state.instance}));
 
 export const useWalletStorePasswordSelector = () =>
