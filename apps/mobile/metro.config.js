@@ -38,6 +38,9 @@ module.exports = {
   resolver: {
     // Ensure we resolve nohoist libraries from this directory.
     blockList: exclusionList(monorepoMetroTools.blockList),
-    extraNodeModules: monorepoMetroTools.extraNodeModules,
+    extraNodeModules: {
+      ...monorepoMetroTools.extraNodeModules,
+      ...require('node-libs-react-native'),
+    },
   },
 };

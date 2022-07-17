@@ -15,7 +15,7 @@ export const IconButton = ({isDisabled, icon, onPress}: Props) => {
     <Pressable
       isDisabled={isDisabled}
       onPress={onPress}
-      hitSlop={16}
+      hitSlop={32}
       w="22px"
       h="22px">
       {({isPressed}) => (
