@@ -7,6 +7,7 @@ import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faArrowRight} from '@fortawesome/free-solid-svg-icons/faArrowRight';
 import {BaseSheet} from '.';
 import {WalletConnectLogo} from '..';
+import {useHasChanged} from '../../hooks';
 import {AppColors, Networks, NetworksConfig} from '../../config';
 
 type Props = {
@@ -24,13 +25,13 @@ export const QRCodeSheet = ({
 }: Props) => {
   const toast = useToast();
   const [isActive, setIsActive] = useState(false);
-  const [value, setValue] = useState('');
   const devices = useCameraDevices();
   const device = devices.back;
 
   const [frameProcessor, barcodes] = useScanBarcodes([BarcodeFormat.QR_CODE], {
     checkInverted: true,
   });
+  const codeHasChanged = useHasChanged(barcodes[0]?.displayValue);
 
   const startCamera = async () => {
     const cameraPermission = await Camera.getCameraPermissionStatus();
@@ -66,24 +67,16 @@ export const QRCodeSheet = ({
   };
 
   useEffect(() => {
-    if (barcodes[0]?.displayValue && barcodes[0]?.displayValue !== value) {
-      setValue(barcodes[0].displayValue);
-    } else if (value && barcodes.length === 0) {
-      setValue('');
+    if (!codeHasChanged || !barcodes[0]?.displayValue) {
+      return;
     }
-  }, [barcodes]);
-
-  useEffect(() => {
-    if (value) {
-      onQRCodeDetected(value);
-    }
-  }, [value]);
+    onQRCodeDetected(barcodes[0].displayValue);
+  }, [codeHasChanged, barcodes]);
 
   useEffect(() => {
     if (isOpen) {
       startCamera();
     } else {
-      setValue('');
       setIsActive(false);
     }
   }, [isOpen]);

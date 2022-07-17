@@ -7,3 +7,4 @@ export * from './ramp';
 export * from './settings';
 export * from './swap';
 export * from './wallet';
+export * from './walletconnect';
