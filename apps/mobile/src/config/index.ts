@@ -10,3 +10,4 @@ export * from './security';
 export * from './swap';
 export * from './theme';
 export * from './timePeriods';
+export * from './walletconnect';
