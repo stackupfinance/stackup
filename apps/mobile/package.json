@@ -62,7 +62,7 @@
     "zustand": "^4.0.0-rc.1"
   },
   "devDependencies": {
-    "@babel/core": "^7.18.5",
+    "@babel/core": "^7.18.9",
     "@babel/runtime": "^7.18.3",
     "@react-native-community/eslint-config": "^3.0.3",
     "@types/jest": "^28.1.4",
