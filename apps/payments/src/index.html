@@ -7,14 +7,70 @@
   <style>
     body { padding-top: 50px; }
   </style>
+  
 </head>
 <body>
 
   <div class="container">
     <div class="jumbotron">
-      <h1>res.sendFile() Works!</h1>
+      <h1>Plaid integration test page</h1>
     </div>
+    <button id="linkButton">Open Link - Institution Select</button>
   </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script src="https://cdn.plaid.com/link/v2/stable/link-initialize.js"></script>
+  <script>
+    (async function(){
+      try {
+        const response = await axios.post('//localhost:3002/v1/plaid/create_link_token');
+        console.log(`resp :::: ${response.data.link_token}`);
+
+        var linkHandler = Plaid.create({
+          // Make a request to your server to fetch a new link_token.
+          token: response.data.link_token,
+          onSuccess: async function(public_token, metadata) {
+            // The onSuccess function is called when the user has successfully
+            // authenticated and selected an account to use.
+            //
+            // When called, you will send the public_token and the selected account ID,
+            // metadata.accounts, to your backend app server.
+            const processorTokenRequestData = {
+              public_token: public_token,
+              accounts: metadata.accounts
+            };
+
+            console.log(`processorTokenRequestData :::: ${JSON.stringify(processorTokenRequestData)}`);
+
+            try {
+              const createProcessorTokenResponse = await axios.post('//localhost:3002/v1/plaid/create_processor_token', processorTokenRequestData);
+              console.log(`Processor token success :::: ${JSON.stringify(createProcessorTokenResponse)}`);
+            } catch(error) {
+              console.log(`Processor token request error: ${error.message}`);
+            }
+            
+          },
+          onExit: function(err, metadata) {
+            // The user exited the Link flow.
+            if (err != null) {
+                // The user encountered a Plaid API error prior to exiting.
+            }
+            // metadata contains information about the institution
+            // that the user selected and the most recent API request IDs.
+            // Storing this information can be helpful for support.
+          },
+        });
+
+
+        $("#linkButton").on("click", function (e) {
+          linkHandler.open();
+        })
+        
+      } catch(err) {
+        console.log(`Error :::: ${err.message}`);
+      }
+    })();
     
+  </script>  
 </body>
 </html>
