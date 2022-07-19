@@ -1,3 +1,5 @@
+require('node-libs-react-native/globals.js');
+
 import 'react-native-get-random-values';
 import '@ethersproject/shims';
 

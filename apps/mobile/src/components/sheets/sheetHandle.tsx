@@ -13,6 +13,7 @@ type Props = {
 export const SheetHandle = ({title, onBack, onClose}: Props) => {
   return (
     <HStack
+      zIndex={999}
       backgroundColor="background.3"
       borderTopRadius="15px"
       pt="24px"
