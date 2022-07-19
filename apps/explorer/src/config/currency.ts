@@ -1,4 +1,4 @@
-export type CurrencySymbols = "USDC" | "ETH" | "MATIC";
+export type CurrencySymbols = "USDC" | "ETH" | "MATIC" | "BTC";
 
 type CurrencyMeta = {
   decimals: number;
@@ -6,7 +6,7 @@ type CurrencyMeta = {
 
 export const ValidQuoteCurrenies: Array<CurrencySymbols> = ["USDC"];
 
-export const ValidCurrencies: Array<CurrencySymbols> = ["USDC", "ETH", "MATIC"];
+export const ValidCurrencies: Array<CurrencySymbols> = ["USDC", "ETH", "MATIC", "BTC"];
 
 export const CurrencyMeta: Record<CurrencySymbols, CurrencyMeta> = {
   USDC: {
@@ -18,4 +18,7 @@ export const CurrencyMeta: Record<CurrencySymbols, CurrencyMeta> = {
   MATIC: {
     decimals: 18,
   },
+  BTC: {
+    decimals: 8,
+  }
 };

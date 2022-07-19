@@ -30,6 +30,7 @@ const BASE_CURRENCY_ID_MAP: CurrencyIdMap = {
   USDC: 3408,
   ETH: 1027,
   MATIC: 3890,
+  BTC: 1,
 };
 
 const COINMARKETCAP_URL = "https://pro-api.coinmarketcap.com";
