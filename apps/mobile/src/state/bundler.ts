@@ -11,7 +11,7 @@ interface PaymasterSignatureResponse {
 
 interface RelaySubmitResponse {
   status: 'PENDING' | 'SUCCESS' | 'FAIL';
-  hash: string | null;
+  hash?: string | null;
 }
 
 interface BundlerStateConstants {
