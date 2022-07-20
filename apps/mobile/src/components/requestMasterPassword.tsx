@@ -32,7 +32,7 @@ export const RequestMasterPassword = ({isOpen, onClose, onConfirm}: Props) => {
       onClose={onClose}>
       <AlertDialog.Content w="100%">
         <AlertDialog.CloseButton />
-        <AlertDialog.Header>Confirm transaction</AlertDialog.Header>
+        <AlertDialog.Header>Password required</AlertDialog.Header>
         <AlertDialog.Body>
           <Input
             autoFocus={true}
