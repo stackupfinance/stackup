@@ -6,7 +6,12 @@ type CurrencyMeta = {
 
 export const ValidQuoteCurrenies: Array<CurrencySymbols> = ["USDC"];
 
-export const ValidCurrencies: Array<CurrencySymbols> = ["USDC", "ETH", "MATIC", "BTC"];
+export const ValidCurrencies: Array<CurrencySymbols> = [
+  "USDC",
+  "ETH",
+  "MATIC",
+  "BTC",
+];
 
 export const CurrencyMeta: Record<CurrencySymbols, CurrencyMeta> = {
   USDC: {

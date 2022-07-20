@@ -13,7 +13,12 @@ type CurrencyMeta = {
   logo: ImageSourcePropType;
 };
 
-export const CurrencyList: Array<CurrencySymbols> = ['USDC', 'ETH', 'MATIC', 'BTC'];
+export const CurrencyList: Array<CurrencySymbols> = [
+  'USDC',
+  'ETH',
+  'MATIC',
+  'BTC',
+];
 
 export const CurrencyMeta: Record<CurrencySymbols, CurrencyMeta> = {
   USDC: {
