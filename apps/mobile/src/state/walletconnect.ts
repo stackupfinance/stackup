@@ -191,7 +191,7 @@ const useWalletConnectStore = create<WalletConnectState>()(
           );
           if (!signer) {
             set({loading: false});
-            return undefined;
+            return;
           }
 
           const signMessage = await signer.signMessage(decodeMessage(message));
