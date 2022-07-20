@@ -41,9 +41,9 @@ export const NetworksConfig: Record<Networks, NetworksConfig> = {
       },
       BTC: {
         address:
-          Env.NETWORK_ENV === 'mainnet'
-            ? '0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6'
-            : '0x0d787a4a1548f673ed375445535a6c7A1EE56180',
+          Env.NETWORK_ENV === "mainnet"
+            ? "0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6"
+            : "0x0d787a4a1548f673ed375445535a6c7A1EE56180",
       },
     },
   },

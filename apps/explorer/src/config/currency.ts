@@ -20,5 +20,5 @@ export const CurrencyMeta: Record<CurrencySymbols, CurrencyMeta> = {
   },
   BTC: {
     decimals: 8,
-  }
+  },
 };

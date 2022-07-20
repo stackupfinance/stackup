@@ -39,5 +39,5 @@ export const CurrencyMeta: Record<CurrencySymbols, CurrencyMeta> = {
     displaySymbol: 'BTC',
     decimals: 8,
     logo: BitcoinLogo,
-  }
+  },
 };
