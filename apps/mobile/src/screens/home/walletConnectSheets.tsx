@@ -118,10 +118,9 @@ export default function WalletConnectSheets() {
   const onRejectCallRequest = () => {
     approveCallRequest(false);
 
+    setHackyLoading(false);
     setShowRequestMasterPassword(false);
-
     setShowWalletConnectSignSheet(false);
-
     setShowWalletConnectTransactionSheet(false);
     setTransactionData(null);
     clearBundler();
