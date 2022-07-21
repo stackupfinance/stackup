@@ -23,6 +23,7 @@ interface WalletState extends WalletStateConstants {
     password: string,
   ) => Promise<wallet.WalletInstance | undefined>;
   setFromVerifiedBackup: (instance: wallet.WalletInstance) => void;
+  isPasswordValid: (password: string) => Promise<boolean>;
 
   remove: () => void;
 
@@ -47,7 +48,7 @@ const STORE_NAME = 'stackup-wallet-store';
 const useWalletStore = create<WalletState>()(
   devtools(
     persist(
-      set => ({
+      (set, get) => ({
         ...defaults,
 
         create: async (password, salt, callback) => {
@@ -109,6 +110,19 @@ const useWalletStore = create<WalletState>()(
 
         setFromVerifiedBackup: instance => {
           set({instance});
+        },
+
+        isPasswordValid: async password => {
+          const {instance} = get();
+          set({loading: true});
+          const signer = await wallet.decryptSigner(
+            instance,
+            password,
+            instance.salt,
+          );
+
+          set({loading: false});
+          return Boolean(signer);
         },
 
         remove: () => {
@@ -183,4 +197,11 @@ export const useWalletStoreWalletRecoveredSelector = () =>
 export const useWalletStoreWalletConnectSheetsSelector = () =>
   useWalletStore(state => ({
     instance: state.instance,
+  }));
+
+export const useWalletStoreSecuritySheetsSelector = () =>
+  useWalletStore(state => ({
+    loading: state.loading,
+    instance: state.instance,
+    isPasswordValid: state.isPasswordValid,
   }));

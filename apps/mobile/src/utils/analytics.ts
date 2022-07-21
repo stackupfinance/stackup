@@ -69,6 +69,11 @@ type Events = {
     appName?: string;
     method?: CallRequestPayloads['method'];
   };
+
+  SECURITY_OVERVIEW_OPEN: undefined;
+  SECURITY_OVERVIEW_CLOSE: undefined;
+  SECURITY_OVERVIEW_BACK: undefined;
+  SECURITY_OVERVIEW_TOGGLE_FINGERPRINT: {enableFingerprint: boolean};
 };
 
 const ampInstance = Amplitude.getInstance();

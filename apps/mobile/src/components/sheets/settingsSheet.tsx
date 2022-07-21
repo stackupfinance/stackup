@@ -2,6 +2,7 @@ import React from 'react';
 import {Dimensions} from 'react-native';
 import {HStack, VStack, Popover, Button, Divider, Text} from 'native-base';
 import {faArrowUpRightFromSquare} from '@fortawesome/free-solid-svg-icons/faArrowUpRightFromSquare';
+import {faArrowRight} from '@fortawesome/free-solid-svg-icons/faArrowRight';
 import {faDiscord} from '@fortawesome/free-brands-svg-icons/faDiscord';
 import {BaseSheet} from '.';
 import {MenuItem} from '..';
@@ -10,6 +11,7 @@ import {AppColors} from '../../config';
 type Props = {
   isOpen: boolean;
   onClose: () => void;
+  onSecurityPress: () => void;
   onHelpPress: () => void;
   onDiscordPress: () => void;
   onRemoveWalletPress: () => void;
@@ -29,6 +31,7 @@ const PopoverTrigger = (triggerProps: any) => (
 export const SettingsSheet = ({
   isOpen,
   onClose,
+  onSecurityPress,
   onHelpPress,
   onDiscordPress,
   onRemoveWalletPress,
@@ -37,6 +40,12 @@ export const SettingsSheet = ({
   return (
     <BaseSheet title="Settings" isOpen={isOpen} onClose={onClose}>
       <VStack flex={1} p="24px" backgroundColor="background.1" space="11px">
+        <MenuItem
+          heading="Security"
+          icon={faArrowRight}
+          onPress={onSecurityPress}
+        />
+
         <MenuItem
           heading="Help & Support"
           icon={faArrowUpRightFromSquare}
