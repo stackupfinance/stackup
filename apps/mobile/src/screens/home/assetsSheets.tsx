@@ -51,6 +51,7 @@ export default function AssetsSheetsScreen() {
     setShowFromWalletSheet,
     setShowQRCodeSheet,
     setShowWalletConnectSessionRequestSheet,
+    setShowSecurityOverviewSheet,
   } = useNavigationStoreAssetsSheetsSelector();
   const {instance} = useWalletStoreAssetsSheetsSelector();
   const {openMessenger} = useIntercomStoreAssetsSheetsSelector();
@@ -147,6 +148,10 @@ export default function AssetsSheetsScreen() {
     logEvent('SEND_SUMMARY_CLOSE');
     clearSendData();
     setShowSendSummarySheet(false);
+  };
+
+  const onSecurityPress = () => {
+    setShowSecurityOverviewSheet(true);
   };
 
   const onHelpPress = () => {
@@ -340,6 +345,7 @@ export default function AssetsSheetsScreen() {
       <SettingsSheet
         isOpen={showSettingsSheet}
         onClose={onCloseSettingsSheet}
+        onSecurityPress={onSecurityPress}
         onHelpPress={onHelpPress}
         onDiscordPress={onDiscordPress}
         onRemoveWalletPress={onRemoveWalletPress}

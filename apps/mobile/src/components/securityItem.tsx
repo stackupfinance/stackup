@@ -11,7 +11,7 @@ type Props = {
   heading: string;
   description: string;
   onPress: () => void;
-  isActive: boolean;
+  isActive?: boolean;
   source: ImageSourcePropType;
 };
 
@@ -39,16 +39,24 @@ export const SecurityItem = ({
                 {heading}
               </Text>
 
-              <Text
-                fontWeight={600}
-                fontSize="16px"
-                color={
-                  isActive
-                    ? AppColors.singletons.good
-                    : AppColors.singletons.warning
-                }>
-                {isActive ? 'Active' : 'Inactive'}
-              </Text>
+              {isActive !== undefined ? (
+                <Text
+                  fontWeight={600}
+                  fontSize="16px"
+                  color={
+                    isActive
+                      ? AppColors.singletons.good
+                      : AppColors.singletons.warning
+                  }>
+                  {isActive ? 'Active' : 'Inactive'}
+                </Text>
+              ) : (
+                <FontAwesomeIcon
+                  icon={faArrowRight}
+                  color={AppColors.text[1]}
+                  size={15}
+                />
+              )}
             </HStack>
 
             <HStack justifyContent="space-between" alignItems="center">
@@ -56,11 +64,13 @@ export const SecurityItem = ({
                 {description}
               </Text>
 
-              <FontAwesomeIcon
-                icon={faArrowRight}
-                color={AppColors.text[1]}
-                size={15}
-              />
+              {isActive !== undefined ? (
+                <FontAwesomeIcon
+                  icon={faArrowRight}
+                  color={AppColors.text[1]}
+                  size={15}
+                />
+              ) : undefined}
             </HStack>
           </VStack>
         </BaseItem>

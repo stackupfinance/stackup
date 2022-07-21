@@ -18,6 +18,10 @@ interface FingerprintState {
   setHasHydrated: (flag: boolean) => void;
 }
 
+const delay = (ms: number) => {
+  return new Promise(resolve => setTimeout(resolve, ms));
+};
+
 const STORE_NAME = 'stackup-fingerprint-store';
 const useFingerprintStore = create<FingerprintState>()(
   devtools(
@@ -54,6 +58,10 @@ const useFingerprintStore = create<FingerprintState>()(
           set({loading: true});
 
           try {
+            // TODO: Fix this hacky workaround.
+            // Related: https://github.com/oblador/react-native-keychain/issues/525
+            await delay(500);
+
             const credentials = await Keychain.getGenericPassword();
             set({loading: false});
             return credentials ? credentials.password : undefined;
@@ -136,6 +144,17 @@ export const useFingerprintStoreWalletRecoveredSelector = () =>
 
 export const useFingerprintStoreWalletConnectSheetsSelector = () =>
   useFingerprintStore(state => ({
+    loading: state.loading,
     isEnabled: state.isEnabled,
     getMasterPassword: state.getMasterPassword,
+  }));
+
+export const useFingerprintStoreSecuritySheetsSelector = () =>
+  useFingerprintStore(state => ({
+    loading: state.loading,
+    isSupported: state.isSupported,
+    isEnabled: state.isEnabled,
+    getMasterPassword: state.getMasterPassword,
+    setMasterPassword: state.setMasterPassword,
+    resetMasterPassword: state.resetMasterPassword,
   }));

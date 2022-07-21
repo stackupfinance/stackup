@@ -24,10 +24,6 @@ import {
 } from '../../state';
 import {logEvent} from '../../utils/analytics';
 
-const delay = (ms: number) => {
-  return new Promise(resolve => setTimeout(resolve, ms));
-};
-
 export default function WalletConnectSheets() {
   const toast = useToast();
   const {
@@ -47,8 +43,11 @@ export default function WalletConnectSheets() {
     signMessage,
     buildEthSendTransactionOps,
   } = useWalletConnectStoreWalletConnectSheetsSelector();
-  const {isEnabled: isFingerprintEnabled, getMasterPassword} =
-    useFingerprintStoreWalletConnectSheetsSelector();
+  const {
+    loading: fingerprintLoading,
+    isEnabled: isFingerprintEnabled,
+    getMasterPassword,
+  } = useFingerprintStoreWalletConnectSheetsSelector();
   const {instance} = useWalletStoreWalletConnectSheetsSelector();
   const {
     loading: bundlerLoading,
@@ -71,7 +70,6 @@ export default function WalletConnectSheets() {
     fetchGasEstimate,
     fetchAddressOverview,
   } = useExplorerStoreWalletConnectSheetsSelector();
-  const [hackyLoading, setHackyLoading] = useState<boolean>(false);
   const [showRequestMasterPassword, setShowRequestMasterPassword] =
     useState<boolean>(false);
   const [transactionData, setTransactionData] = useState<{
@@ -88,7 +86,10 @@ export default function WalletConnectSheets() {
   );
 
   const isLoading =
-    hackyLoading || walletConnectLoading || bundlerLoading || explorerLoading;
+    fingerprintLoading ||
+    walletConnectLoading ||
+    bundlerLoading ||
+    explorerLoading;
   const [, sessionRequestPayload] = sessionRequest ?? [undefined, undefined];
   const [connector, payload] = callRequest ?? [undefined, undefined];
 
@@ -145,7 +146,6 @@ export default function WalletConnectSheets() {
     });
     approveCallRequest(false);
 
-    setHackyLoading(false);
     setShowRequestMasterPassword(false);
     setShowWalletConnectSignSheet(false);
     setShowWalletConnectTransactionSheet(false);
@@ -155,11 +155,6 @@ export default function WalletConnectSheets() {
 
   const onApproveCallRequest = async () => {
     if (isFingerprintEnabled) {
-      // TODO: Fix this hacky workaround.
-      // Related: https://github.com/oblador/react-native-keychain/issues/525
-      setHackyLoading(true);
-      await delay(500);
-
       const masterPassword = await getMasterPassword();
       masterPassword
         ? confirmCallRequest(masterPassword)
@@ -195,8 +190,6 @@ export default function WalletConnectSheets() {
           break;
         }
       }
-
-      setHackyLoading(false);
     }
   };
 

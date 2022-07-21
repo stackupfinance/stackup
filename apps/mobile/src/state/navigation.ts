@@ -24,6 +24,7 @@ interface Sheets {
   showWalletConnectSessionRequestSheet: boolean;
   showWalletConnectSignSheet: boolean;
   showWalletConnectTransactionSheet: boolean;
+  showSecurityOverviewSheet: boolean;
 }
 
 interface NavigationState extends Sheets {
@@ -52,6 +53,7 @@ interface NavigationState extends Sheets {
   setShowWalletConnectSessionRequestSheet: (value: boolean) => void;
   setShowWalletConnectSignSheet: (value: boolean) => void;
   setShowWalletConnectTransactionSheet: (value: boolean) => void;
+  setShowSecurityOverviewSheet: (value: boolean) => void;
   resetAllSheets: () => void;
   clear: () => void;
 }
@@ -74,6 +76,7 @@ const sheetDefaults: Sheets = {
   showWalletConnectSessionRequestSheet: false,
   showWalletConnectSignSheet: false,
   showWalletConnectTransactionSheet: false,
+  showSecurityOverviewSheet: false,
 };
 const STORE_NAME = 'stackup-navigation-store';
 const useNavigationStore = create<NavigationState>()(
@@ -155,6 +158,10 @@ const useNavigationStore = create<NavigationState>()(
 
       setShowWalletConnectTransactionSheet: value => {
         set({...sheetDefaults, showWalletConnectTransactionSheet: value});
+      },
+
+      setShowSecurityOverviewSheet: value => {
+        set({...sheetDefaults, showSecurityOverviewSheet: value});
       },
 
       resetAllSheets: () => {
@@ -240,6 +247,7 @@ export const useNavigationStoreAssetsSheetsSelector = () =>
     setShowQRCodeSheet: state.setShowQRCodeSheet,
     setShowWalletConnectSessionRequestSheet:
       state.setShowWalletConnectSessionRequestSheet,
+    setShowSecurityOverviewSheet: state.setShowSecurityOverviewSheet,
   }));
 
 export const useNavigationStoreSwapSheetsSelector = () =>
@@ -261,4 +269,11 @@ export const useNavigationStoreWalletConnectSheetsSelector = () =>
     setShowWalletConnectSignSheet: state.setShowWalletConnectSignSheet,
     setShowWalletConnectTransactionSheet:
       state.setShowWalletConnectTransactionSheet,
+  }));
+
+export const useNavigationStoreSecuritySheetsSelector = () =>
+  useNavigationStore(state => ({
+    showSecurityOverviewSheet: state.showSecurityOverviewSheet,
+    setShowSettingsSheet: state.setShowSettingsSheet,
+    setShowSecurityOverviewSheet: state.setShowSecurityOverviewSheet,
   }));
