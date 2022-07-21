@@ -18,8 +18,8 @@
   "dependencies": {
     "@alch/alchemy-web3": "^1.4.4",
     "@meanie/mongoose-to-json": "^2.6.0",
-    "@sentry/node": "^6.19.7",
-    "@sentry/tracing": "^6.19.7",
+    "@sentry/node": "^7.7.0",
+    "@sentry/tracing": "^7.7.0",
     "@stackupfinance/walletjs": "1.0.0",
     "agenda": "^4.3.0",
     "compression": "^1.7.4",
