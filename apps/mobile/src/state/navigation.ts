@@ -230,8 +230,6 @@ export const useNavigationStoreAssetsSheetsSelector = () =>
     showSendSummarySheet: state.showSendSummarySheet,
     showFromWalletSheet: state.showFromWalletSheet,
     showQRCodeSheet: state.showQRCodeSheet,
-    showWalletConnectSessionRequestSheet:
-      state.showWalletConnectSessionRequestSheet,
     setShowSettingsSheet: state.setShowSettingsSheet,
     setShowTokenListSheet: state.setShowTokenListSheet,
     setShowDepositSheet: state.setShowDepositSheet,
@@ -254,8 +252,12 @@ export const useNavigationStoreSwapSheetsSelector = () =>
 
 export const useNavigationStoreWalletConnectSheetsSelector = () =>
   useNavigationStore(state => ({
+    showWalletConnectSessionRequestSheet:
+      state.showWalletConnectSessionRequestSheet,
     showWalletConnectSignSheet: state.showWalletConnectSignSheet,
     showWalletConnectTransactionSheet: state.showWalletConnectTransactionSheet,
+    setShowWalletConnectSessionRequestSheet:
+      state.setShowWalletConnectSessionRequestSheet,
     setShowWalletConnectSignSheet: state.setShowWalletConnectSignSheet,
     setShowWalletConnectTransactionSheet:
       state.setShowWalletConnectTransactionSheet,

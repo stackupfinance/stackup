@@ -274,15 +274,15 @@ export const useWalletConnectStoreRemoveWalletSelector = () =>
 
 export const useWalletConnectStoreAssetsSheetsSelector = () =>
   useWalletConnectStore(state => ({
-    sessionRequest: state.sessionRequest,
-    approveSessionRequest: state.approveSessionRequest,
     connect: state.connect,
   }));
 
 export const useWalletConnectStoreWalletConnectSheetsSelector = () =>
   useWalletConnectStore(state => ({
     loading: state.loading,
+    sessionRequest: state.sessionRequest,
     callRequest: state.callRequest,
+    approveSessionRequest: state.approveSessionRequest,
     approveCallRequest: state.approveCallRequest,
     signMessage: state.signMessage,
     buildEthSendTransactionOps: state.buildEthSendTransactionOps,
