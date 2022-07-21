@@ -195,6 +195,7 @@ export default function WalletConnectSheets() {
           break;
         }
       }
+
       setHackyLoading(false);
     }
   };
