@@ -1,8 +1,8 @@
 import {ImageSourcePropType} from 'react-native';
 import {BigNumberish} from 'ethers';
-import {UsdLogo, EthereumLogo, PolygonLogo} from '../components';
+import {UsdLogo, EthereumLogo, PolygonLogo, BitcoinLogo} from '../components';
 
-export type CurrencySymbols = 'USDC' | 'ETH' | 'MATIC';
+export type CurrencySymbols = 'USDC' | 'ETH' | 'MATIC' | 'BTC';
 
 export type CurrencyBalances = Partial<Record<CurrencySymbols, BigNumberish>>;
 
@@ -13,7 +13,12 @@ type CurrencyMeta = {
   logo: ImageSourcePropType;
 };
 
-export const CurrencyList: Array<CurrencySymbols> = ['USDC', 'ETH', 'MATIC'];
+export const CurrencyList: Array<CurrencySymbols> = [
+  'USDC',
+  'ETH',
+  'MATIC',
+  'BTC',
+];
 
 export const CurrencyMeta: Record<CurrencySymbols, CurrencyMeta> = {
   USDC: {
@@ -33,5 +38,11 @@ export const CurrencyMeta: Record<CurrencySymbols, CurrencyMeta> = {
     displaySymbol: 'MATIC',
     decimals: 18,
     logo: PolygonLogo,
+  },
+  BTC: {
+    name: 'Bitcoin',
+    displaySymbol: 'BTC',
+    decimals: 8,
+    logo: BitcoinLogo,
   },
 };

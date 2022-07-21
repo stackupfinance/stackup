@@ -22,6 +22,7 @@ const BASE_CURRENCY_BALANCE_MAP: CurrencyBalances = {
   USDC: ethers.constants.Zero,
   ETH: ethers.constants.Zero,
   MATIC: ethers.constants.Zero,
+  BTC: ethers.constants.Zero,
 };
 
 const ALCHEMY_POLYGON_INSTANCE = createAlchemyWeb3(Env.ALCHEMY_POLYGON_RPC);

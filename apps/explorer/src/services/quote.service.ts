@@ -8,6 +8,7 @@ const BASE_CURRENCY_QUOTE_MAP: CurrencyQuoteMap = {
   USDC: 0,
   ETH: 0,
   MATIC: 0,
+  BTC: 0,
 };
 
 export const saveBulk = async (quotes: Array<IQuote>) => {
