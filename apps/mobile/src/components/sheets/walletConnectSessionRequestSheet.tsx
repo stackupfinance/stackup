@@ -7,7 +7,7 @@ type Props = {
   isOpen: boolean;
   onClose: () => void;
   onApprove: () => void;
-  payload: SessionRequestPayload | null;
+  payload?: SessionRequestPayload;
 };
 
 export const WalletConnectSessionRequestSheet = ({

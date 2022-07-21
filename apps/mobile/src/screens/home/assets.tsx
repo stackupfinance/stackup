@@ -63,6 +63,7 @@ export default function AssetsScreen({}: Props) {
   }, []);
 
   const onQRCodePress = () => {
+    logEvent('QR_CODE_OPEN');
     setShowQRCodeSheet(true);
   };
 

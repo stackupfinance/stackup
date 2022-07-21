@@ -9,6 +9,7 @@ import {
 } from '../../config';
 import {
   RequestMasterPassword,
+  WalletConnectSessionRequestSheet,
   WalletConnectSignSheet,
   WalletConnectTransactionSheet,
 } from '../../components';
@@ -21,6 +22,7 @@ import {
   useSettingsStoreWalletConnectSheetsSelector,
   useExplorerStoreWalletConnectSheetsSelector,
 } from '../../state';
+import {logEvent} from '../../utils/analytics';
 
 const delay = (ms: number) => {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -29,14 +31,18 @@ const delay = (ms: number) => {
 export default function WalletConnectSheets() {
   const toast = useToast();
   const {
+    showWalletConnectSessionRequestSheet,
     showWalletConnectSignSheet,
     showWalletConnectTransactionSheet,
+    setShowWalletConnectSessionRequestSheet,
     setShowWalletConnectSignSheet,
     setShowWalletConnectTransactionSheet,
   } = useNavigationStoreWalletConnectSheetsSelector();
   const {
     loading: walletConnectLoading,
+    sessionRequest,
     callRequest,
+    approveSessionRequest,
     approveCallRequest,
     signMessage,
     buildEthSendTransactionOps,
@@ -83,6 +89,7 @@ export default function WalletConnectSheets() {
 
   const isLoading =
     hackyLoading || walletConnectLoading || bundlerLoading || explorerLoading;
+  const [, sessionRequestPayload] = sessionRequest ?? [undefined, undefined];
   const [connector, payload] = callRequest ?? [undefined, undefined];
 
   useEffect(() => {
@@ -115,7 +122,27 @@ export default function WalletConnectSheets() {
     setTransactionData({paymasterStatus, gasEstimate});
   };
 
+  const onRejectSessionRequest = () => {
+    logEvent('WALLET_CONNECT_REJECT_SESSION', {
+      appName: sessionRequestPayload?.params[0]?.peerMeta.name,
+    });
+    setShowWalletConnectSessionRequestSheet(false);
+    approveSessionRequest(network, instance.walletAddress, false);
+  };
+
+  const onApproveSessionRequest = () => {
+    logEvent('WALLET_CONNECT_APPROVE_SESSION', {
+      appName: sessionRequestPayload?.params[0]?.peerMeta.name,
+    });
+    setShowWalletConnectSessionRequestSheet(false);
+    approveSessionRequest(network, instance.walletAddress, true);
+  };
+
   const onRejectCallRequest = () => {
+    logEvent('WALLET_CONNECT_REJECT_CALL_REQUEST', {
+      appName: connector?.peerMeta?.name,
+      method: payload?.method,
+    });
     approveCallRequest(false);
 
     setHackyLoading(false);
@@ -149,10 +176,18 @@ export default function WalletConnectSheets() {
       switch (payload.method) {
         case 'eth_sendTransaction': {
           await submitEthSendTransaction(payload, masterPassword);
+          logEvent('WALLET_CONNECT_APPROVE_CALL_REQUEST', {
+            appName: connector.peerMeta?.name,
+            method: payload.method,
+          });
           break;
         }
         case 'personal_sign': {
           await submitPersonalSign(payload, masterPassword);
+          logEvent('WALLET_CONNECT_APPROVE_CALL_REQUEST', {
+            appName: connector.peerMeta?.name,
+            method: payload.method,
+          });
           break;
         }
         default: {
@@ -160,7 +195,6 @@ export default function WalletConnectSheets() {
           break;
         }
       }
-
       setHackyLoading(false);
     }
   };
@@ -293,6 +327,13 @@ export default function WalletConnectSheets() {
         isOpen={showRequestMasterPassword}
         onClose={onRejectCallRequest}
         onConfirm={confirmCallRequest}
+      />
+
+      <WalletConnectSessionRequestSheet
+        isOpen={showWalletConnectSessionRequestSheet || sessionRequest !== null}
+        onClose={onRejectSessionRequest}
+        onApprove={onApproveSessionRequest}
+        payload={sessionRequestPayload}
       />
 
       <WalletConnectTransactionSheet
