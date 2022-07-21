@@ -1,6 +1,7 @@
 import create from 'zustand';
 import {devtools} from 'zustand/middleware';
 import axios from 'axios';
+import {ethers} from 'ethers';
 import {constants, wallet} from '@stackupfinance/walletjs';
 import {Env, Networks, NetworksConfig, PaymasterStatus} from '../config';
 
@@ -10,6 +11,7 @@ interface PaymasterSignatureResponse {
 
 interface RelaySubmitResponse {
   status: 'PENDING' | 'SUCCESS' | 'FAIL';
+  hash?: string | null;
 }
 
 interface BundlerStateConstants {
@@ -38,7 +40,10 @@ interface BundlerState extends BundlerStateConstants {
   relayUserOperations: (
     userOperations: Array<constants.userOperations.IUserOperation>,
     network: Networks,
-    onChange: (status: RelaySubmitResponse['status']) => void,
+    onChange: (
+      status: RelaySubmitResponse['status'],
+      hash: RelaySubmitResponse['hash'],
+    ) => void,
   ) => Promise<void>;
 
   clear: () => void;
@@ -150,10 +155,13 @@ const useBundlerStore = create<BundlerState>()(
             `${Env.BUNDLER_URL}/v1/relay/submit`,
             {userOperations, network},
           );
-          onChange(response.data.status);
+          onChange(
+            response.data.status,
+            response.data.hash ?? ethers.constants.HashZero,
+          );
           set({loading: false});
         } catch (error) {
-          onChange('FAIL');
+          onChange('FAIL', ethers.constants.HashZero);
           set({loading: false});
           throw error;
         }
@@ -194,6 +202,17 @@ export const useBundlerStoreSwapSelector = () =>
 export const useBundlerStoreSwapSheetsSelector = () =>
   useBundlerStore(state => ({
     loading: state.loading,
+    requestPaymasterSignature: state.requestPaymasterSignature,
+    verifyUserOperationsWithPaymaster: state.verifyUserOperationsWithPaymaster,
+    signUserOperations: state.signUserOperations,
+    relayUserOperations: state.relayUserOperations,
+    clear: state.clear,
+  }));
+
+export const useBundlerStoreWalletConnectSheetsSelector = () =>
+  useBundlerStore(state => ({
+    loading: state.loading,
+    fetchPaymasterStatus: state.fetchPaymasterStatus,
     requestPaymasterSignature: state.requestPaymasterSignature,
     verifyUserOperationsWithPaymaster: state.verifyUserOperationsWithPaymaster,
     signUserOperations: state.signUserOperations,

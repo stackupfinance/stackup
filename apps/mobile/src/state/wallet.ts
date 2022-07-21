@@ -179,3 +179,8 @@ export const useWalletStoreWalletRecoveredSelector = () =>
   useWalletStore(state => ({
     setFromVerifiedBackup: state.setFromVerifiedBackup,
   }));
+
+export const useWalletStoreWalletConnectSheetsSelector = () =>
+  useWalletStore(state => ({
+    instance: state.instance,
+  }));

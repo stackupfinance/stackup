@@ -133,3 +133,9 @@ export const useFingerprintStoreWalletRecoveredSelector = () =>
     loading: state.loading,
     setMasterPassword: state.setMasterPassword,
   }));
+
+export const useFingerprintStoreWalletConnectSheetsSelector = () =>
+  useFingerprintStore(state => ({
+    isEnabled: state.isEnabled,
+    getMasterPassword: state.getMasterPassword,
+  }));

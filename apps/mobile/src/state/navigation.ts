@@ -22,6 +22,8 @@ interface Sheets {
   showSwapReviewOrderSheet: boolean;
   showQRCodeSheet: boolean;
   showWalletConnectSessionRequestSheet: boolean;
+  showWalletConnectSignSheet: boolean;
+  showWalletConnectTransactionSheet: boolean;
 }
 
 interface NavigationState extends Sheets {
@@ -48,6 +50,8 @@ interface NavigationState extends Sheets {
   setShowSwapReviewOrderSheet: (value: boolean) => void;
   setShowQRCodeSheet: (value: boolean) => void;
   setShowWalletConnectSessionRequestSheet: (value: boolean) => void;
+  setShowWalletConnectSignSheet: (value: boolean) => void;
+  setShowWalletConnectTransactionSheet: (value: boolean) => void;
   resetAllSheets: () => void;
   clear: () => void;
 }
@@ -68,6 +72,8 @@ const sheetDefaults: Sheets = {
   showSwapReviewOrderSheet: false,
   showQRCodeSheet: false,
   showWalletConnectSessionRequestSheet: false,
+  showWalletConnectSignSheet: false,
+  showWalletConnectTransactionSheet: false,
 };
 const STORE_NAME = 'stackup-navigation-store';
 const useNavigationStore = create<NavigationState>()(
@@ -141,6 +147,14 @@ const useNavigationStore = create<NavigationState>()(
 
       setShowWalletConnectSessionRequestSheet: value => {
         set({...sheetDefaults, showWalletConnectSessionRequestSheet: value});
+      },
+
+      setShowWalletConnectSignSheet: value => {
+        set({...sheetDefaults, showWalletConnectSignSheet: value});
+      },
+
+      setShowWalletConnectTransactionSheet: value => {
+        set({...sheetDefaults, showWalletConnectTransactionSheet: value});
       },
 
       resetAllSheets: () => {
@@ -236,4 +250,13 @@ export const useNavigationStoreSwapSheetsSelector = () =>
     showSwapReviewOrderSheet: state.showSwapReviewOrderSheet,
     setShowSwapSelectTokenSheet: state.setShowSwapSelectTokenSheet,
     setShowSwapReviewOrderSheet: state.setShowSwapReviewOrderSheet,
+  }));
+
+export const useNavigationStoreWalletConnectSheetsSelector = () =>
+  useNavigationStore(state => ({
+    showWalletConnectSignSheet: state.showWalletConnectSignSheet,
+    showWalletConnectTransactionSheet: state.showWalletConnectTransactionSheet,
+    setShowWalletConnectSignSheet: state.setShowWalletConnectSignSheet,
+    setShowWalletConnectTransactionSheet:
+      state.setShowWalletConnectTransactionSheet,
   }));

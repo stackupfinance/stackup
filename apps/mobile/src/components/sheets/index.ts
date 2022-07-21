@@ -15,3 +15,5 @@ export * from './swapSelectTokenSheet';
 export * from './tokenListSheet';
 export * from './verifyEmailSheet';
 export * from './walletConnectSessionRequestSheet';
+export * from './walletConnectSignSheet';
+export * from './walletConnectTransactionSheet';

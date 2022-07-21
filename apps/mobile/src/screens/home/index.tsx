@@ -14,6 +14,7 @@ import AssetsSheetsScreen from './assetsSheets';
 // import EarnScreen from './earn';
 import SwapScreen from './swap';
 import SwapSheets from './swapSheets';
+import WalletConnectSheets from './walletConnectSheets';
 // import ActivityScreen from './activity';
 import {
   useNavigationStoreHomeSelector,
@@ -95,6 +96,8 @@ export const HomeScreen = () => {
       </Tab.Navigator>
 
       {renderSheets()}
+
+      <WalletConnectSheets />
     </>
   );
 };

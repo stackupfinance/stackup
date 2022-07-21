@@ -102,7 +102,7 @@ export const useAuth = (): UseAuthHook => {
     setTimeout(async () => {
       try {
         const password = await getMasterPassword();
-        password && setIsReady(true);
+        password ? setIsReady(true) : showUnlockPrompt();
       } catch (_error) {
         showUnlockPrompt();
       }
