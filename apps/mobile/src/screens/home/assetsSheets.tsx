@@ -151,6 +151,7 @@ export default function AssetsSheetsScreen() {
   };
 
   const onSecurityPress = () => {
+    logEvent('SECURITY_OVERVIEW_OPEN');
     setShowSecurityOverviewSheet(true);
   };
 

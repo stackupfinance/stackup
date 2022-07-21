@@ -7,6 +7,7 @@ import {
   useWalletStoreSecuritySheetsSelector,
 } from '../../state';
 import {AppColors} from '../../config';
+import {logEvent} from '../../utils/analytics';
 
 export default function SecuritySheets() {
   const toast = useToast();
@@ -38,6 +39,7 @@ export default function SecuritySheets() {
   };
 
   const onSecurityOverviewClose = () => {
+    logEvent('SECURITY_OVERVIEW_CLOSE');
     setShowSecurityOverviewSheet(false);
   };
 
@@ -45,7 +47,7 @@ export default function SecuritySheets() {
     if (value) {
       setShowRequestMasterPassword(true);
     } else {
-      await onDisableFingerprint();
+      onDisableFingerprint();
     }
   };
 
@@ -53,6 +55,9 @@ export default function SecuritySheets() {
     setShowRequestMasterPassword(false);
 
     if (await isPasswordValid(masterPassword)) {
+      logEvent('SECURITY_OVERVIEW_TOGGLE_FINGERPRINT', {
+        enableFingerprint: true,
+      });
       await setMasterPassword(masterPassword, instance.salt);
     } else {
       toast.show({
@@ -66,11 +71,15 @@ export default function SecuritySheets() {
   const onDisableFingerprint = async () => {
     const masterPassword = await getMasterPassword();
     if (masterPassword && (await isPasswordValid(masterPassword))) {
+      logEvent('SECURITY_OVERVIEW_TOGGLE_FINGERPRINT', {
+        enableFingerprint: false,
+      });
       await resetMasterPassword();
     }
   };
 
   const onSecurityOverviewBack = () => {
+    logEvent('SECURITY_OVERVIEW_BACK');
     setShowSettingsSheet(true);
   };
 
