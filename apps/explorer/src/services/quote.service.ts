@@ -9,6 +9,17 @@ const BASE_CURRENCY_QUOTE_MAP: CurrencyQuoteMap = {
   ETH: 0,
   MATIC: 0,
   BTC: 0,
+  UNI: 0,
+  AAVE: 0,
+  CRV: 0,
+  LDO: 0,
+  LINK: 0,
+  MKR: 0,
+  DAI: 0,
+  SUSHI: 0,
+  YFI: 0,
+  DPI: 0,
+  MVI: 0,
 };
 
 export const saveBulk = async (quotes: Array<IQuote>) => {

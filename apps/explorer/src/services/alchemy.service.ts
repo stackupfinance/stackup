@@ -23,6 +23,17 @@ const BASE_CURRENCY_BALANCE_MAP: CurrencyBalances = {
   ETH: ethers.constants.Zero,
   MATIC: ethers.constants.Zero,
   BTC: ethers.constants.Zero,
+  UNI: ethers.constants.Zero,
+  AAVE: ethers.constants.Zero,
+  CRV: ethers.constants.Zero,
+  LDO: ethers.constants.Zero,
+  LINK: ethers.constants.Zero,
+  MKR: ethers.constants.Zero,
+  DAI: ethers.constants.Zero,
+  SUSHI: ethers.constants.Zero,
+  YFI: ethers.constants.Zero,
+  DPI: ethers.constants.Zero,
+  MVI: ethers.constants.Zero,
 };
 
 const ALCHEMY_POLYGON_INSTANCE = createAlchemyWeb3(Env.ALCHEMY_POLYGON_RPC);
