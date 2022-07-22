@@ -16,13 +16,33 @@
       <h1>Plaid integration test page</h1>
     </div>
     <button id="linkButton">Open Link - Institution Select</button>
+    <br />
+    <button id="wyreCreatePaymentMethodButton">Create payment method</button>
   </div>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <script src="https://cdn.plaid.com/link/v2/stable/link-initialize.js"></script>
   <script>
+    let processorToken;
+
+    const createPaymentMethodHandler = async () => {
+      if (!processorToken) return console.error('no processor token');
+
+      const data = {
+        processor_token: processorToken
+      }
+
+      try {
+        const createPaymentMethodResponse = await axios.post('//localhost:3002/v1/wyre/create_payment_method', data);
+        console.log('createPaymentMethodResponse');
+      } catch(error) {
+        console.log(`Create payment method error: ${error.message}`);
+      }
+    }
+
     (async function(){
       try {
+        processorToken = '';
         const response = await axios.post('//localhost:3002/v1/plaid/create_link_token');
         console.log(`resp :::: ${response.data.link_token}`);
 
@@ -45,6 +65,7 @@
             try {
               const createProcessorTokenResponse = await axios.post('//localhost:3002/v1/plaid/create_processor_token', processorTokenRequestData);
               console.log(`Processor token success :::: ${JSON.stringify(createProcessorTokenResponse)}`);
+              processorToken = createProcessorTokenResponse.data;
             } catch(error) {
               console.log(`Processor token request error: ${error.message}`);
             }
@@ -65,6 +86,12 @@
         $("#linkButton").on("click", function (e) {
           linkHandler.open();
         })
+
+        $("#wyreCreatePaymentMethodButton").on("click", function (e) {
+          createPaymentMethodHandler();
+        })
+
+        
         
       } catch(err) {
         console.log(`Error :::: ${err.message}`);
