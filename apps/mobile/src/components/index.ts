@@ -17,6 +17,7 @@ export * from './qrCode';
 export * from './requestMasterPassword';
 export * from './securityButton';
 export * from './securityItem';
+export * from './securitySwitch';
 export * from './securityOverview';
 export * from './selectCurrencyItem';
 export * from './stackScreenContainer';

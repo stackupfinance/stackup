@@ -1,5 +1,5 @@
 import {Amplitude} from '@amplitude/react-native';
-import {Env, CurrencySymbols} from '../config';
+import {Env, CurrencySymbols, CallRequestPayloads} from '../config';
 
 type Events = {
   JOIN_DISCORD: {screen: string};
@@ -52,6 +52,28 @@ type Events = {
   SWAP_REVIEW_ORDER: undefined;
   SWAP_REVIEW_ORDER_CLOSE: undefined;
   SWAP_CONFIRM: undefined;
+
+  QR_CODE_OPEN: undefined;
+  QR_CODE_CLOSE: undefined;
+  QR_CODE_SCAN_ADDRESS: undefined;
+  QR_CODE_SCAN_WALLET_CONNECT: undefined;
+  QR_CODE_SCAN_UNSUPPORTED: undefined;
+
+  WALLET_CONNECT_APPROVE_SESSION: {appName?: string};
+  WALLET_CONNECT_REJECT_SESSION: {appName?: string};
+  WALLET_CONNECT_APPROVE_CALL_REQUEST: {
+    appName?: string;
+    method?: CallRequestPayloads['method'];
+  };
+  WALLET_CONNECT_REJECT_CALL_REQUEST: {
+    appName?: string;
+    method?: CallRequestPayloads['method'];
+  };
+
+  SECURITY_OVERVIEW_OPEN: undefined;
+  SECURITY_OVERVIEW_CLOSE: undefined;
+  SECURITY_OVERVIEW_BACK: undefined;
+  SECURITY_OVERVIEW_TOGGLE_FINGERPRINT: {enableFingerprint: boolean};
 };
 
 const ampInstance = Amplitude.getInstance();

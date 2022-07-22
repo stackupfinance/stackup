@@ -22,6 +22,9 @@ interface Sheets {
   showSwapReviewOrderSheet: boolean;
   showQRCodeSheet: boolean;
   showWalletConnectSessionRequestSheet: boolean;
+  showWalletConnectSignSheet: boolean;
+  showWalletConnectTransactionSheet: boolean;
+  showSecurityOverviewSheet: boolean;
 }
 
 interface NavigationState extends Sheets {
@@ -48,6 +51,9 @@ interface NavigationState extends Sheets {
   setShowSwapReviewOrderSheet: (value: boolean) => void;
   setShowQRCodeSheet: (value: boolean) => void;
   setShowWalletConnectSessionRequestSheet: (value: boolean) => void;
+  setShowWalletConnectSignSheet: (value: boolean) => void;
+  setShowWalletConnectTransactionSheet: (value: boolean) => void;
+  setShowSecurityOverviewSheet: (value: boolean) => void;
   resetAllSheets: () => void;
   clear: () => void;
 }
@@ -68,6 +74,9 @@ const sheetDefaults: Sheets = {
   showSwapReviewOrderSheet: false,
   showQRCodeSheet: false,
   showWalletConnectSessionRequestSheet: false,
+  showWalletConnectSignSheet: false,
+  showWalletConnectTransactionSheet: false,
+  showSecurityOverviewSheet: false,
 };
 const STORE_NAME = 'stackup-navigation-store';
 const useNavigationStore = create<NavigationState>()(
@@ -143,6 +152,18 @@ const useNavigationStore = create<NavigationState>()(
         set({...sheetDefaults, showWalletConnectSessionRequestSheet: value});
       },
 
+      setShowWalletConnectSignSheet: value => {
+        set({...sheetDefaults, showWalletConnectSignSheet: value});
+      },
+
+      setShowWalletConnectTransactionSheet: value => {
+        set({...sheetDefaults, showWalletConnectTransactionSheet: value});
+      },
+
+      setShowSecurityOverviewSheet: value => {
+        set({...sheetDefaults, showSecurityOverviewSheet: value});
+      },
+
       resetAllSheets: () => {
         set({...sheetDefaults});
       },
@@ -216,8 +237,6 @@ export const useNavigationStoreAssetsSheetsSelector = () =>
     showSendSummarySheet: state.showSendSummarySheet,
     showFromWalletSheet: state.showFromWalletSheet,
     showQRCodeSheet: state.showQRCodeSheet,
-    showWalletConnectSessionRequestSheet:
-      state.showWalletConnectSessionRequestSheet,
     setShowSettingsSheet: state.setShowSettingsSheet,
     setShowTokenListSheet: state.setShowTokenListSheet,
     setShowDepositSheet: state.setShowDepositSheet,
@@ -228,6 +247,7 @@ export const useNavigationStoreAssetsSheetsSelector = () =>
     setShowQRCodeSheet: state.setShowQRCodeSheet,
     setShowWalletConnectSessionRequestSheet:
       state.setShowWalletConnectSessionRequestSheet,
+    setShowSecurityOverviewSheet: state.setShowSecurityOverviewSheet,
   }));
 
 export const useNavigationStoreSwapSheetsSelector = () =>
@@ -236,4 +256,24 @@ export const useNavigationStoreSwapSheetsSelector = () =>
     showSwapReviewOrderSheet: state.showSwapReviewOrderSheet,
     setShowSwapSelectTokenSheet: state.setShowSwapSelectTokenSheet,
     setShowSwapReviewOrderSheet: state.setShowSwapReviewOrderSheet,
+  }));
+
+export const useNavigationStoreWalletConnectSheetsSelector = () =>
+  useNavigationStore(state => ({
+    showWalletConnectSessionRequestSheet:
+      state.showWalletConnectSessionRequestSheet,
+    showWalletConnectSignSheet: state.showWalletConnectSignSheet,
+    showWalletConnectTransactionSheet: state.showWalletConnectTransactionSheet,
+    setShowWalletConnectSessionRequestSheet:
+      state.setShowWalletConnectSessionRequestSheet,
+    setShowWalletConnectSignSheet: state.setShowWalletConnectSignSheet,
+    setShowWalletConnectTransactionSheet:
+      state.setShowWalletConnectTransactionSheet,
+  }));
+
+export const useNavigationStoreSecuritySheetsSelector = () =>
+  useNavigationStore(state => ({
+    showSecurityOverviewSheet: state.showSecurityOverviewSheet,
+    setShowSettingsSheet: state.setShowSettingsSheet,
+    setShowSecurityOverviewSheet: state.setShowSecurityOverviewSheet,
   }));

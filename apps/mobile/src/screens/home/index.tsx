@@ -14,6 +14,8 @@ import AssetsSheetsScreen from './assetsSheets';
 // import EarnScreen from './earn';
 import SwapScreen from './swap';
 import SwapSheets from './swapSheets';
+import SecuritySheets from './securitySheets';
+import WalletConnectSheets from './walletConnectSheets';
 // import ActivityScreen from './activity';
 import {
   useNavigationStoreHomeSelector,
@@ -39,7 +41,12 @@ export const HomeScreen = () => {
   const renderSheets = () => {
     switch (routeName) {
       case 'Assets':
-        return <AssetsSheetsScreen />;
+        return (
+          <>
+            <AssetsSheetsScreen />
+            <SecuritySheets />
+          </>
+        );
 
       case 'Swap':
         return <SwapSheets />;
@@ -95,6 +102,8 @@ export const HomeScreen = () => {
       </Tab.Navigator>
 
       {renderSheets()}
+
+      <WalletConnectSheets />
     </>
   );
 };

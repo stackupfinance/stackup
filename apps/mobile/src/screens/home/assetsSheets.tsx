@@ -14,7 +14,6 @@ import {
   SendSummarySheet,
   FromWalletSheet,
   QRCodeSheet,
-  WalletConnectSessionRequestSheet,
 } from '../../components';
 import {useRemoveWallet, useSendUserOperation} from '../../hooks';
 import {
@@ -43,7 +42,6 @@ export default function AssetsSheetsScreen() {
     showSendSummarySheet,
     showFromWalletSheet,
     showQRCodeSheet,
-    showWalletConnectSessionRequestSheet,
     setShowSettingsSheet,
     setShowTokenListSheet,
     setShowDepositSheet,
@@ -53,6 +51,7 @@ export default function AssetsSheetsScreen() {
     setShowFromWalletSheet,
     setShowQRCodeSheet,
     setShowWalletConnectSessionRequestSheet,
+    setShowSecurityOverviewSheet,
   } = useNavigationStoreAssetsSheetsSelector();
   const {instance} = useWalletStoreAssetsSheetsSelector();
   const {openMessenger} = useIntercomStoreAssetsSheetsSelector();
@@ -76,8 +75,7 @@ export default function AssetsSheetsScreen() {
   const {isEnabled: isFingerprintEnabled, getMasterPassword} =
     useFingerprintStoreAssetsSheetsSelector();
   const {openRamp} = useRampStoreAssetsSheetsSelector();
-  const {sessionRequest, approveSessionRequest, connect} =
-    useWalletConnectStoreAssetsSheetsSelector();
+  const {connect} = useWalletConnectStoreAssetsSheetsSelector();
   const removeWallet = useRemoveWallet();
   const {
     data: sendData,
@@ -115,6 +113,7 @@ export default function AssetsSheetsScreen() {
   };
 
   const onCloseQRCodeSheet = () => {
+    logEvent('QR_CODE_CLOSE');
     setShowQRCodeSheet(false);
   };
 
@@ -149,6 +148,11 @@ export default function AssetsSheetsScreen() {
     logEvent('SEND_SUMMARY_CLOSE');
     clearSendData();
     setShowSendSummarySheet(false);
+  };
+
+  const onSecurityPress = () => {
+    logEvent('SECURITY_OVERVIEW_OPEN');
+    setShowSecurityOverviewSheet(true);
   };
 
   const onHelpPress = () => {
@@ -299,28 +303,21 @@ export default function AssetsSheetsScreen() {
 
   const onQRCodeDetected = (value: string) => {
     if (isValid(value)) {
+      logEvent('QR_CODE_SCAN_ADDRESS');
       updateSendData({toAddress: value});
       setShowSelectCurrencySheet(true);
     } else if (isValidWalletConnectURI(value)) {
+      logEvent('QR_CODE_SCAN_WALLET_CONNECT');
       connect(value);
       setShowWalletConnectSessionRequestSheet(true);
     } else {
+      logEvent('QR_CODE_SCAN_UNSUPPORTED');
       toast.show({
         title: 'This code is not supported.',
         backgroundColor: AppColors.singletons.medium,
         placement: 'top',
       });
     }
-  };
-
-  const onRejectSessionRequest = () => {
-    setShowWalletConnectSessionRequestSheet(false);
-    approveSessionRequest(network, instance.walletAddress, false);
-  };
-
-  const onApproveSessionRequest = () => {
-    setShowWalletConnectSessionRequestSheet(false);
-    approveSessionRequest(network, instance.walletAddress, true);
   };
 
   const onFromWalletBackPress = () => {
@@ -349,6 +346,7 @@ export default function AssetsSheetsScreen() {
       <SettingsSheet
         isOpen={showSettingsSheet}
         onClose={onCloseSettingsSheet}
+        onSecurityPress={onSecurityPress}
         onHelpPress={onHelpPress}
         onDiscordPress={onDiscordPress}
         onRemoveWalletPress={onRemoveWalletPress}
@@ -359,13 +357,6 @@ export default function AssetsSheetsScreen() {
         onClose={onCloseQRCodeSheet}
         network={network}
         onQRCodeDetected={onQRCodeDetected}
-      />
-
-      <WalletConnectSessionRequestSheet
-        isOpen={showWalletConnectSessionRequestSheet || sessionRequest !== null}
-        onClose={onRejectSessionRequest}
-        onApprove={onApproveSessionRequest}
-        payload={sessionRequest ? sessionRequest[1] : null}
       />
 
       <TokenListSheet

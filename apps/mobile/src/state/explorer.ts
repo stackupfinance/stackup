@@ -10,13 +10,9 @@ import {
   TimePeriod,
   GasEstimate,
   OptimalQuote,
+  WalletStatus,
   Env,
 } from '../config';
-
-interface WalletStatus {
-  isDeployed: boolean;
-  nonce: number;
-}
 
 interface WalletBalance {
   quoteCurrency: CurrencySymbols;
@@ -227,5 +223,14 @@ export const useExplorerStoreSwapSheetsSelector = () =>
   useExplorerStore(state => ({
     currencies: state.currencies,
     walletStatus: state.walletStatus,
+    fetchAddressOverview: state.fetchAddressOverview,
+  }));
+
+export const useExplorerStoreWalletConnectSheetsSelector = () =>
+  useExplorerStore(state => ({
+    loading: state.loading,
+    currencies: state.currencies,
+    walletStatus: state.walletStatus,
+    fetchGasEstimate: state.fetchGasEstimate,
     fetchAddressOverview: state.fetchAddressOverview,
   }));

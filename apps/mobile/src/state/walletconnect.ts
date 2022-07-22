@@ -1,12 +1,26 @@
 import create from 'zustand';
 import {devtools} from 'zustand/middleware';
 import WalletConnect from '@walletconnect/client';
-import {ethers} from 'ethers';
-import {Networks, NetworksConfig, SessionRequestPayload} from '../config';
+import {ethers, BytesLike} from 'ethers';
+import {wallet, constants} from '@stackupfinance/walletjs';
+import {
+  Networks,
+  NetworksConfig,
+  SessionRequestPayload,
+  CallRequestPayloads,
+  CurrencySymbols,
+  EthSendTransactionPayload,
+  PaymasterStatus,
+  GasEstimate,
+  WalletStatus,
+} from '../config';
+import {decodeMessage} from '../utils/walletconnect';
+import {gasOverrides} from '../utils/userOperations';
 
 interface WalletConnectStateConstants {
   loading: boolean;
   sessionRequest: [WalletConnect, SessionRequestPayload] | null;
+  callRequest: [WalletConnect, CallRequestPayloads] | null;
 }
 
 interface WalletConnectState extends WalletConnectStateConstants {
@@ -16,6 +30,21 @@ interface WalletConnectState extends WalletConnectStateConstants {
     walletAddress: string,
     value: boolean,
   ) => void;
+  approveCallRequest: (value: boolean, result?: any) => void;
+  signMessage: (
+    walletInstance: wallet.WalletInstance,
+    password: string,
+    message: BytesLike,
+  ) => Promise<BytesLike | undefined>;
+  buildEthSendTransactionOps: (
+    instance: wallet.WalletInstance,
+    network: Networks,
+    defaultCurrency: CurrencySymbols,
+    walletStatus: WalletStatus,
+    paymasterStatus: PaymasterStatus,
+    gasEstimate: GasEstimate,
+    payload: EthSendTransactionPayload,
+  ) => Array<constants.userOperations.IUserOperation>;
 
   clear: () => void;
 }
@@ -23,6 +52,7 @@ interface WalletConnectState extends WalletConnectStateConstants {
 const defaults: WalletConnectStateConstants = {
   loading: false,
   sessionRequest: null,
+  callRequest: null,
 };
 const STORE_NAME = 'stackup-walletconnect-store';
 const useWalletConnectStore = create<WalletConnectState>()(
@@ -82,9 +112,8 @@ const useWalletConnectStore = create<WalletConnectState>()(
 
         connector.on(
           'call_request',
-          handleEventError(payload => {
-            console.log('call_request');
-            console.log(payload);
+          handleEventError((payload: CallRequestPayloads) => {
+            set({callRequest: [connector, payload]});
           }),
         );
 
@@ -128,6 +157,110 @@ const useWalletConnectStore = create<WalletConnectState>()(
         set({loading: false, sessionRequest: null});
       },
 
+      approveCallRequest: (value, result) => {
+        const {callRequest} = get();
+        if (!callRequest) {
+          set({loading: false});
+          return;
+        }
+
+        const [connector, payload] = callRequest;
+        if (value && result) {
+          connector.approveRequest({
+            id: payload.id,
+            result,
+          });
+        } else {
+          connector.rejectRequest({
+            id: payload.id,
+            error: {message: 'User rejected request.'},
+          });
+        }
+
+        set({loading: false, callRequest: null});
+      },
+
+      signMessage: async (walletInstance, password, message) => {
+        set({loading: true});
+
+        try {
+          const signer = await wallet.decryptSigner(
+            walletInstance,
+            password,
+            walletInstance.salt,
+          );
+          if (!signer) {
+            set({loading: false});
+            return;
+          }
+
+          const signMessage = await signer.signMessage(decodeMessage(message));
+          set({loading: false});
+          return signMessage;
+        } catch (error) {
+          set({loading: false});
+          throw error;
+        }
+      },
+
+      buildEthSendTransactionOps: (
+        instance,
+        network,
+        defaultCurrency,
+        walletStatus,
+        paymasterStatus,
+        gasEstimate,
+        payload,
+      ) => {
+        const {nonce, isDeployed} = walletStatus;
+        const feeValue = ethers.BigNumber.from(
+          paymasterStatus.fees[defaultCurrency] ?? '0',
+        );
+        const allowance = ethers.BigNumber.from(
+          paymasterStatus.allowances[defaultCurrency] ?? '0',
+        );
+        const shouldApprovePaymaster = allowance.lt(feeValue);
+        const params = payload.params[0];
+
+        const approvePaymasterOp = shouldApprovePaymaster
+          ? wallet.userOperations.get(instance.walletAddress, {
+              nonce,
+              ...gasOverrides(gasEstimate),
+              initCode: isDeployed
+                ? constants.userOperations.nullCode
+                : wallet.proxy
+                    .getInitCode(
+                      instance.initImplementation,
+                      instance.initOwner,
+                      instance.initGuardians,
+                    )
+                    .toString(),
+              callData: wallet.encodeFunctionData.ERC20Approve(
+                NetworksConfig[network].currencies[defaultCurrency].address,
+                paymasterStatus.address,
+                feeValue,
+              ),
+            })
+          : undefined;
+        const walletConnectOp = wallet.userOperations.get(
+          instance.walletAddress,
+          {
+            nonce: nonce + (shouldApprovePaymaster ? 1 : 0),
+            ...gasOverrides(gasEstimate),
+            callGas: ethers.BigNumber.from(params.gas).toNumber(),
+            callData: wallet.encodeFunctionData.executeUserOp(
+              params.to,
+              params.value,
+              params.data,
+            ),
+          },
+        );
+        const userOperations = [approvePaymasterOp, walletConnectOp].filter(
+          Boolean,
+        ) as Array<constants.userOperations.IUserOperation>;
+        return userOperations;
+      },
+
       clear: () => {
         set({...defaults});
       },
@@ -141,7 +274,16 @@ export const useWalletConnectStoreRemoveWalletSelector = () =>
 
 export const useWalletConnectStoreAssetsSheetsSelector = () =>
   useWalletConnectStore(state => ({
-    sessionRequest: state.sessionRequest,
-    approveSessionRequest: state.approveSessionRequest,
     connect: state.connect,
+  }));
+
+export const useWalletConnectStoreWalletConnectSheetsSelector = () =>
+  useWalletConnectStore(state => ({
+    loading: state.loading,
+    sessionRequest: state.sessionRequest,
+    callRequest: state.callRequest,
+    approveSessionRequest: state.approveSessionRequest,
+    approveCallRequest: state.approveCallRequest,
+    signMessage: state.signMessage,
+    buildEthSendTransactionOps: state.buildEthSendTransactionOps,
   }));
