@@ -11,7 +11,6 @@ import {
 } from '../../config';
 import OverviewScreen from './overview';
 import {
-  PasswordSheet,
   EmailSheet,
   VerifyEmailSheet,
   EmailConfirmedSheet,
@@ -24,11 +23,9 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Security'>;
 
 export const SecurityScreen = ({navigation}: Props) => {
   const {
-    showPasswordSheet,
     showEmailSheet,
     showVerifyEmailSheet,
     showEmailConfirmedSheet,
-    setShowPasswordSheet,
     setShowEmailSheet,
     setShowVerifyEmailSheet,
     setShowEmailConfirmedSheet,
@@ -40,10 +37,6 @@ export const SecurityScreen = ({navigation}: Props) => {
       resetAllSheets();
     };
   }, [resetAllSheets]);
-
-  const onClosePasswordSheet = () => {
-    setShowPasswordSheet(false);
-  };
 
   const onCloseEmailSheet = () => {
     setShowEmailSheet(false);
@@ -82,12 +75,6 @@ export const SecurityScreen = ({navigation}: Props) => {
       <Stack.Navigator screenOptions={{headerShown: false}}>
         <Stack.Screen name="Overview" component={OverviewScreen} />
       </Stack.Navigator>
-
-      <PasswordSheet
-        isOpen={showPasswordSheet}
-        onClose={onClosePasswordSheet}
-        onSubmit={() => {}}
-      />
 
       <EmailSheet
         isOpen={showEmailSheet}

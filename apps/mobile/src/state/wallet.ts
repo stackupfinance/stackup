@@ -23,7 +23,11 @@ interface WalletState extends WalletStateConstants {
     password: string,
   ) => Promise<wallet.WalletInstance | undefined>;
   setFromVerifiedBackup: (instance: wallet.WalletInstance) => void;
-  isPasswordValid: (password: string) => Promise<boolean>;
+  getWalletSigner: (password: string) => Promise<ethers.Wallet | undefined>;
+  reencryptWalletSigner: (
+    password: string,
+    newPassword: string,
+  ) => Promise<string | undefined>;
 
   remove: () => void;
 
@@ -112,7 +116,7 @@ const useWalletStore = create<WalletState>()(
           set({instance});
         },
 
-        isPasswordValid: async password => {
+        getWalletSigner: async password => {
           const {instance} = get();
           set({loading: true});
           const signer = await wallet.decryptSigner(
@@ -122,7 +126,48 @@ const useWalletStore = create<WalletState>()(
           );
 
           set({loading: false});
-          return Boolean(signer);
+          return signer;
+        },
+
+        reencryptWalletSigner: async (password, newPassword) => {
+          const {instance} = get();
+          set({loading: true});
+
+          try {
+            const [signer, encryptedSigner] = await Promise.all([
+              wallet.decryptSigner(instance, password, instance.salt),
+              wallet.reencryptSigner(
+                instance,
+                password,
+                newPassword,
+                instance.salt,
+              ),
+            ]);
+            if (!signer || !encryptedSigner) {
+              set({loading: false});
+              return;
+            }
+
+            const timestamp = Date.now();
+            const signature = await signer.signMessage(
+              `${encryptedSigner}${timestamp}`,
+            );
+            await axios.post(
+              `${Env.BACKUP_URL}/v1/wallet/update/encrypted-signer`,
+              {
+                timestamp,
+                signature,
+                encryptedSigner,
+                walletAddress: instance.walletAddress,
+              },
+            );
+
+            set({loading: false, instance: {...instance, encryptedSigner}});
+            return encryptedSigner;
+          } catch (error) {
+            set({loading: false});
+            throw error;
+          }
         },
 
         remove: () => {
@@ -203,5 +248,6 @@ export const useWalletStoreSecuritySheetsSelector = () =>
   useWalletStore(state => ({
     loading: state.loading,
     instance: state.instance,
-    isPasswordValid: state.isPasswordValid,
+    getWalletSigner: state.getWalletSigner,
+    reencryptWalletSigner: state.reencryptWalletSigner,
   }));

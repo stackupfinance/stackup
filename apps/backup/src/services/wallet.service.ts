@@ -17,3 +17,10 @@ export const save = async (walletInstance: wallet.WalletInstance) => {
 export const findByWalletAddress = async (walletAddress: string) => {
   return Wallet.findOne({ walletAddress });
 };
+
+export const updateEncryptedSignerByWalletAddress = async (
+  walletAddress: string,
+  encryptedSigner: wallet.WalletInstance["encryptedSigner"]
+) => {
+  return Wallet.updateOne({ walletAddress }, { encryptedSigner });
+};

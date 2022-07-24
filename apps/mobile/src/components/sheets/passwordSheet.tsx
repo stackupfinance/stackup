@@ -7,8 +7,10 @@ import {AppColors} from '../../config';
 
 type Props = {
   isOpen: boolean;
+  isLoading: boolean;
   onClose: () => void;
-  onSubmit: () => void;
+  onBack: () => void;
+  onSubmit: (password: string, newPassword: string) => void;
 };
 
 type Data = {
@@ -17,7 +19,13 @@ type Data = {
   confirmPassword: string;
 };
 
-export const PasswordSheet = ({isOpen, onClose, onSubmit}: Props) => {
+export const PasswordSheet = ({
+  isOpen,
+  isLoading,
+  onClose,
+  onBack,
+  onSubmit,
+}: Props) => {
   const toast = useToast();
   const [data, setData] = useState<Data>({
     password: '',
@@ -45,12 +53,16 @@ export const PasswordSheet = ({isOpen, onClose, onSubmit}: Props) => {
         placement: 'top',
       });
     } else {
-      onSubmit();
+      onSubmit(password, newPassword);
     }
   };
 
   return (
-    <BaseSheet title="Password" isOpen={isOpen} onClose={onClose}>
+    <BaseSheet
+      title="Password"
+      isOpen={isOpen}
+      onClose={onClose}
+      onBack={onBack}>
       <Box height="100%" pt="36px" pb="47px" px="18px" alignItems="center">
         <Heading fontWeight={600} fontSize="25px" textAlign="center">
           Change Password
@@ -110,7 +122,7 @@ export const PasswordSheet = ({isOpen, onClose, onSubmit}: Props) => {
 
         <Box flex={1} />
 
-        <Button w="100%" onPress={onPress}>
+        <Button isLoading={isLoading} w="100%" onPress={onPress}>
           Change password
         </Button>
       </Box>
