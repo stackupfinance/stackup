@@ -87,22 +87,16 @@ export const getOptimalQuote = async (
   if (!route || !route.methodParameters || !route.gasPriceWei) {
     return null;
   }
+  const amount = ethers.utils.parseUnits(
+    route.quote.toSignificant(),
+    CurrencyMeta[quoteCurrency].decimals
+  );
+  const rate = amount
+    .mul(Math.pow(10, CurrencyMeta[baseCurrency].decimals))
+    .div(value);
   return {
-    amount: ethers.utils
-      .parseUnits(
-        route.quote.toSignificant(),
-        CurrencyMeta[quoteCurrency].decimals
-      )
-      .toString(),
-    rate: ethers.utils
-      .parseUnits(
-        route.quote
-          .multiply(Math.pow(10, CurrencyMeta[baseCurrency].decimals))
-          .divide(ethers.BigNumber.from(value).toString())
-          .toSignificant(CurrencyMeta[quoteCurrency].decimals),
-        CurrencyMeta[quoteCurrency].decimals
-      )
-      .toString(),
+    amount: amount.toString(),
+    rate: rate.toString(),
     transaction: {
       to: NetworksConfig[network].uniswapV3Router,
       data: route.methodParameters.calldata,
