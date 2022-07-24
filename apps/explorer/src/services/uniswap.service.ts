@@ -99,7 +99,7 @@ export const getOptimalQuote = async (
         route.quote
           .multiply(Math.pow(10, CurrencyMeta[baseCurrency].decimals))
           .divide(ethers.BigNumber.from(value).toString())
-          .toSignificant(),
+          .toSignificant(CurrencyMeta[quoteCurrency].decimals),
         CurrencyMeta[quoteCurrency].decimals
       )
       .toString(),
