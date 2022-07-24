@@ -79,7 +79,7 @@ PODS:
     - FlipperKit/FlipperKitNetworkPlugin
   - fmt (6.2.1)
   - glog (0.3.5)
-  - GoogleDataTransport (9.1.4):
+  - GoogleDataTransport (9.2.0):
     - GoogleUtilities/Environment (~> 7.7)
     - nanopb (< 2.30910.0, >= 2.30908.0)
     - PromisesObjC (< 3.0, >= 1.2)
@@ -144,7 +144,7 @@ PODS:
   - Passbase (2.13.3):
     - Microblink (= 5.16.0)
   - PromisesObjC (2.1.1)
-  - Protobuf (3.21.2)
+  - Protobuf (3.21.3)
   - Ramp (2.0.0):
     - Passbase (~> 2.8)
   - ramp-network-react-native-sdk (0.3.1):
@@ -744,7 +744,7 @@ SPEC CHECKSUMS:
   FlipperKit: cbdee19bdd4e7f05472a66ce290f1b729ba3cb86
   fmt: ff9d55029c625d3757ed641535fd4a75fedc7ce9
   glog: 476ee3e89abb49e07f822b48323c51c57124b572
-  GoogleDataTransport: 5fffe35792f8b96ec8d6775f5eccd83c998d5a3b
+  GoogleDataTransport: 1c8145da7117bd68bbbed00cf304edb6a24de00f
   GoogleMLKit: 9d072522949ff0ef4dae5359feaf3db2ef2fa658
   GoogleToolboxForMac: 8bef7c7c5cf7291c687cf5354f39f9db6399ad34
   GoogleUtilities: e0913149f6b0625b553d70dae12b49fc62914fd1
@@ -762,7 +762,7 @@ SPEC CHECKSUMS:
   OpenSSL-Universal: ebc357f1e6bc71fa463ccb2fe676756aff50e88c
   Passbase: 0a99aa0ff15364b6bb7b2bede91467074811d460
   PromisesObjC: ab77feca74fa2823e7af4249b8326368e61014cb
-  Protobuf: 818c6a87e44193a77f56b87c6a1c106efda7e062
+  Protobuf: 25e5dd0944f6f05a4db360eed782af5dc9533633
   Ramp: c522303707480a458eef7d05c96e8c9604be4840
   ramp-network-react-native-sdk: 4f3f021d49252d34d9803bf1b4eebea905996c52
   RCT-Folly: 4d8508a426467c48885f1151029bc15fa5d7b3b8
