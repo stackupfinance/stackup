@@ -1,6 +1,7 @@
 import Joi from "joi";
 import { wallet } from "@stackupfinance/walletjs";
 import { ethereumAddress } from "./custom.validation";
+import { PatchWalletInstance } from "../config";
 
 export const post = {
   body: Joi.object<wallet.WalletInstance, true>().keys({
@@ -12,6 +13,15 @@ export const post = {
       .unique()
       .required(),
     salt: Joi.string().required(),
+    encryptedSigner: Joi.string().base64().required(),
+  }),
+};
+
+export const updateEncryptedSigner = {
+  body: Joi.object<PatchWalletInstance, true>().keys({
+    signature: Joi.string().required(),
+    timestamp: Joi.number().required(),
+    walletAddress: Joi.required().custom(ethereumAddress),
     encryptedSigner: Joi.string().base64().required(),
   }),
 };

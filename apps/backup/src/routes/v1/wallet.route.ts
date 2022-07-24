@@ -8,6 +8,13 @@ const router = express.Router();
 router.route("/").post(validate(walletValidation.post), walletController.post);
 
 router
+  .route("/update/encrypted-signer")
+  .post(
+    validate(walletValidation.updateEncryptedSigner),
+    walletController.updateEncryptedSigner
+  );
+
+router
   .route("/ping")
   .post(validate(walletValidation.ping), walletController.ping);
 

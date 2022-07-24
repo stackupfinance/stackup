@@ -70,10 +70,14 @@ type Events = {
     method?: CallRequestPayloads['method'];
   };
 
-  SECURITY_OVERVIEW_OPEN: undefined;
-  SECURITY_OVERVIEW_CLOSE: undefined;
-  SECURITY_OVERVIEW_BACK: undefined;
-  SECURITY_OVERVIEW_TOGGLE_FINGERPRINT: {enableFingerprint: boolean};
+  SECURITY_SETTINGS_OPEN: undefined;
+  SECURITY_SETTINGS_CLOSE: undefined;
+  SECURITY_SETTINGS_BACK: undefined;
+  SECURITY_SETTINGS_TOGGLE_FINGERPRINT: {enableFingerprint: boolean};
+  SECURITY_SETTINGS_PASSWORD_OPEN: undefined;
+  SECURITY_SETTINGS_PASSWORD_BACK: undefined;
+  SECURITY_SETTINGS_PASSWORD_CLOSE: undefined;
+  SECURITY_SETTINGS_PASSWORD_UPDATE: undefined;
 };
 
 const ampInstance = Amplitude.getInstance();

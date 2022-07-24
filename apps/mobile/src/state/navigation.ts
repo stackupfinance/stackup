@@ -274,6 +274,8 @@ export const useNavigationStoreWalletConnectSheetsSelector = () =>
 export const useNavigationStoreSecuritySheetsSelector = () =>
   useNavigationStore(state => ({
     showSecurityOverviewSheet: state.showSecurityOverviewSheet,
+    showPasswordSheet: state.showPasswordSheet,
     setShowSettingsSheet: state.setShowSettingsSheet,
     setShowSecurityOverviewSheet: state.setShowSecurityOverviewSheet,
+    setShowPasswordSheet: state.setShowPasswordSheet,
   }));

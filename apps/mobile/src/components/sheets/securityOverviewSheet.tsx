@@ -14,6 +14,7 @@ type Props = {
   isLoading: boolean;
   onClose: () => void;
   onBack: () => void;
+  onPasswordPress: () => void;
   onFingerprintChange: (value: boolean) => void;
   isFingerprintSupported: boolean;
   isFingerprintEnabled: boolean;
@@ -24,6 +25,7 @@ export const SecurityOverviewSheet = ({
   isLoading,
   onClose,
   onBack,
+  onPasswordPress,
   onFingerprintChange,
   isFingerprintSupported,
   isFingerprintEnabled,
@@ -45,7 +47,7 @@ export const SecurityOverviewSheet = ({
           heading="Password"
           description="Old fashion yet effective security"
           source={ShieldWithCheckLogo}
-          onPress={() => {}}
+          onPress={onPasswordPress}
         />
 
         {isFingerprintSupported && (

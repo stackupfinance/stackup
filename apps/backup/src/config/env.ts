@@ -8,6 +8,7 @@ interface AppEnvironment {
   PORT: number;
   MONGO_URL: string;
   SENTRY_DSN: string;
+  ALCHEMY_POLYGON_RPC: string;
 }
 
 export const Env: AppEnvironment = {
@@ -17,4 +18,5 @@ export const Env: AppEnvironment = {
   PORT: Number(process.env.STACKUP_BACKUP_PORT),
   MONGO_URL: process.env.STACKUP_BACKUP_MONGODB_URL ?? "",
   SENTRY_DSN: process.env.STACKUP_BACKUP_SENTRY_DSN ?? "",
+  ALCHEMY_POLYGON_RPC: process.env.STACKUP_BACKUP_ALCHEMY_POLYGON_RPC ?? "",
 };
