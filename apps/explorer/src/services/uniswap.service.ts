@@ -92,7 +92,7 @@ export const getOptimalQuote = async (
     CurrencyMeta[quoteCurrency].decimals
   );
   const rate = amount
-    .mul(Math.pow(10, CurrencyMeta[baseCurrency].decimals))
+    .mul(ethers.BigNumber.from(10).pow(CurrencyMeta[baseCurrency].decimals))
     .div(value);
   return {
     amount: amount.toString(),
