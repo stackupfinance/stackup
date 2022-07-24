@@ -147,7 +147,6 @@ const useWalletStore = create<WalletState>()(
               set({loading: false});
               return;
             }
-            console.log(encryptedSigner);
 
             const timestamp = Date.now();
             const signature = await signer.signMessage(
