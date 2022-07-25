@@ -62,12 +62,17 @@ export const SendSheet = ({
     cb();
   };
 
+  const onChangeAddress = (text: string) => {
+    setAddress(text.trim());
+  };
+
   const onChangeText = (text: string) => {
     setValue(text);
   };
 
   const onFocus = () => {
-    setValue(stringToValidFloat(value));
+    const onFoucsValue = stringToValidFloat(value);
+    setValue(onFoucsValue === '0' ? '' : onFoucsValue);
   };
 
   const onBlur = () => {
@@ -121,7 +126,7 @@ export const SendSheet = ({
         height="59px"
         value={address}
         placeholder="0x..."
-        onChangeText={setAddress}
+        onChangeText={onChangeAddress}
         leftElement={
           <Box ml="13px">
             <Text fontSize="16px" fontWeight={500} color="text.5">

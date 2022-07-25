@@ -87,7 +87,7 @@ export default function WelcomeScreen({navigation}: Props) {
         variant="link"
         onPress={navigateImportWalletHandler}
         _text={{textAlign: 'center', fontWeight: 600, fontSize: '14px'}}>
-        Import wallet instead
+        Recover your Stackup account
       </Button>
     </StackScreenContainer>
   );

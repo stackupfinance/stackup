@@ -28,8 +28,15 @@ const displayGenericToken = (value: BigNumberish, symbol: CurrencySymbols) => {
   )} ${symbol}`;
 };
 
-export const stringToValidFloat = (value: string) =>
-  parseFloat(value.replace(TO_FLOAT_REGEX, '')).toString();
+export const stringToValidFloat = (value: string) => {
+  const floatString = value.replace(TO_FLOAT_REGEX, '');
+  if (floatString.split('.')[1]?.length > DECIMAL_PLACES) {
+    return parseFloat(value.replace(TO_FLOAT_REGEX, '')).toFixed(
+      DECIMAL_PLACES,
+    );
+  }
+  return parseFloat(value.replace(TO_FLOAT_REGEX, '')).toString();
+};
 
 export const formatCurrency = (
   value: BigNumberish,
