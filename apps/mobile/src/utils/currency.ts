@@ -31,11 +31,9 @@ const displayGenericToken = (value: BigNumberish, symbol: CurrencySymbols) => {
 export const stringToValidFloat = (value: string) => {
   const floatString = value.replace(TO_FLOAT_REGEX, '');
   if (floatString.split('.')[1]?.length > DECIMAL_PLACES) {
-    return parseFloat(value.replace(TO_FLOAT_REGEX, '')).toFixed(
-      DECIMAL_PLACES,
-    );
+    return parseFloat(floatString).toFixed(DECIMAL_PLACES);
   }
-  return parseFloat(value.replace(TO_FLOAT_REGEX, '')).toString();
+  return parseFloat(floatString).toString();
 };
 
 export const formatCurrency = (
