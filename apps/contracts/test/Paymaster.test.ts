@@ -567,11 +567,11 @@ describe("Paymaster", () => {
               fee: 0,
               mode: PAYMASTER_MODE_FULL,
             };
-            op.paymasterData =
-              await paymaster.signPaymasterRequestWithGuardians(
-                op,
-                paymasterData
-              );
+            const signature = await paymaster.signPaymasterRequestWithGuardians(
+              op,
+              paymasterData
+            );
+            op.paymasterData = encodePaymasterData(paymasterData, signature);
           });
 
           it("reverts", async () => {
