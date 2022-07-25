@@ -36,7 +36,8 @@ export const CurrencyInput = ({
   };
 
   const onFocus = () => {
-    setInputValue(stringToValidFloat(inputValue));
+    const onFoucsValue = stringToValidFloat(inputValue);
+    setInputValue(onFoucsValue === '0' ? '' : onFoucsValue);
   };
 
   const onBlur = () => {
