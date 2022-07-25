@@ -8271,10 +8271,10 @@ dashdash@^1.12.0:
   dependencies:
     assert-plus "^1.0.0"
 
-date-fns@^2.28.0:
-  version "2.28.0"
-  resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-2.28.0.tgz#9570d656f5fc13143e50c975a3b6bbeb46cd08b2"
-  integrity sha512-8d35hViGYx/QH0icHYCeLmsLmMUheMmTyV9Fcm6gvNwdw31yXXH+O85sOBJ+OLnLQMKZowvpKb6FgMIQjcpvQw==
+date-fns@^2.29.1:
+  version "2.29.1"
+  resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-2.29.1.tgz#9667c2615525e552b5135a3116b95b1961456e60"
+  integrity sha512-dlLD5rKaKxpFdnjrs+5azHDFOPEu4ANy/LTh04A1DTzMM7qoajmKCBc8pkKRFT41CNzw+4gQh79X5C+Jq27HAw==
 
 date.js@~0.3.3:
   version "0.3.3"
@@ -16602,10 +16602,10 @@ react-native-monorepo-tools@^1.1.4:
     find-root "^1.1.0"
     glob "^7.1.7"
 
-react-native-pager-view@^5.4.24:
-  version "5.4.24"
-  resolved "https://registry.yarnpkg.com/react-native-pager-view/-/react-native-pager-view-5.4.24.tgz#8626e757ddc55e41eca66d2f8a8a75aec54591ee"
-  integrity sha512-dRMB7i3B+mu4NCeIN6gqbR/kC/rr2wzqO0gisXDdJwJr78G24sWoTNpLEDFo3G8TFHY9nTMutVl5CUvkN2dp6g==
+react-native-pager-view@^5.4.25:
+  version "5.4.25"
+  resolved "https://registry.yarnpkg.com/react-native-pager-view/-/react-native-pager-view-5.4.25.tgz#cd639d5387a7f3d5581b55a33c5faa1cbc200f97"
+  integrity sha512-3drrYwaLat2fYszymZe3nHMPASJ4aJMaxiejfA1V5SK3OygYmdtmV2u5prX7TnjueJzGSyyaCYEr2JlrRt4YPg==
 
 react-native-qrcode-svg@^6.1.2:
   version "6.1.2"
