@@ -50,7 +50,7 @@
     "eslint-config-prettier": "^8.5.0",
     "ethereum-waffle": "^3.4.4",
     "hardhat": "^2.9.3",
-    "hardhat-contract-sizer": "^2.5.1",
+    "hardhat-contract-sizer": "^2.6.1",
     "mocha": "^10.0.0",
     "prettier": "2.7.1",
     "prettier-plugin-solidity": "^1.0.0-dev.23",
