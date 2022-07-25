@@ -47,7 +47,7 @@
     "react-native-gesture-handler": "^2.5.0",
     "react-native-get-random-values": "^1.8.0",
     "react-native-keychain": "^8.1.1",
-    "react-native-pager-view": "^5.4.24",
+    "react-native-pager-view": "^5.4.25",
     "react-native-qrcode-svg": "^6.1.2",
     "react-native-randombytes": "^3.6.1",
     "react-native-reanimated": "^2.9.1",
