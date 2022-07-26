@@ -59,7 +59,7 @@
     "react-native-vision-camera": "^2.13.5",
     "toggle-switch-react-native": "^3.3.0",
     "vision-camera-code-scanner": "^0.2.0",
-    "zustand": "^4.0.0-rc.4"
+    "zustand": "^4.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.18.9",
