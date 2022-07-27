@@ -30,7 +30,9 @@ export default async function Processor(job: Job) {
       throw new Error(`receipts not found: ${JSON.stringify(data)}`);
     } else {
       await ReceiptService.saveBulk(network, receipts);
-      logger.info(`blockNumber: ${blockNumber}, receipts: ${receipts.length}`);
+      logger.info(
+        `network: ${network}, blockNumber: ${blockNumber}, receipts: ${receipts.length}, attempt: ${attempt}`
+      );
     }
   } catch (error: any) {
     if (attempt < MAX_ATTEMPTS) {
