@@ -31,7 +31,7 @@ export default async function Processor(job: Job) {
     } else {
       await ReceiptService.saveBulk(network, receipts);
       logger.info(
-        `network: ${network}, blockNumber: ${blockNumber}, receipts: ${receipts.length}, attempt: ${attempt}`
+        `parseBlock, network: ${network}, blockNumber: ${blockNumber}, receipts: ${receipts.length}, attempt: ${attempt}`
       );
     }
   } catch (error: any) {
