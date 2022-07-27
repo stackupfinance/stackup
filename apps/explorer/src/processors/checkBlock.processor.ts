@@ -27,7 +27,9 @@ export default async function Processor(job: Job) {
     }
 
     await CheckpointService.updateCheckpoint(network, blockNumber);
-    logger.info(`network: ${network}, lastBlockNumber: ${blockNumber}`);
+    logger.info(
+      `checkBlock, network: ${network}, lastBlockNumber: ${blockNumber}, attempt: ${attempt}`
+    );
   } catch (error) {
     if (attempt < MAX_ATTEMPTS) {
       initJob(

@@ -22,6 +22,7 @@ mongoose.connect(Env.MONGO_URL).then(() => {
     defineJob("fetchQuotes", fetchQuotesProcessor);
 
     await cancelJob("parseBlock");
+    await cancelJob("checkBlock");
     await repeatJob(
       "checkBlock",
       { network: "Polygon", attempt: 0 },
