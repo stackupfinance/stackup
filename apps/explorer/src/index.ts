@@ -22,9 +22,6 @@ mongoose.connect(Env.MONGO_URL).then((mongooseInstance) => {
     defineJob("parseBlock", parseBlockProcessor);
     defineJob("fetchQuotes", fetchQuotesProcessor);
 
-    // TODO: Remove in followup deployment
-    await cancelJob("parseBlock");
-
     await jobsCollection.createIndex(
       { "data.network": 1 },
       {
