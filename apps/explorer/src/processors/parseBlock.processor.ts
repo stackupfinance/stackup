@@ -33,6 +33,7 @@ export default async function Processor(job: Job) {
       logger.info(
         `parseBlock, network: ${network}, blockNumber: ${blockNumber}, receipts: ${receipts.length}, attempt: ${attempt}`
       );
+      job.remove();
     }
   } catch (error: any) {
     if (attempt < MAX_ATTEMPTS) {

@@ -7,7 +7,7 @@ import fetchQuotesProcessor from "./processors/fetchQuotes.processor";
 import { Env, ValidQuoteCurrenies } from "./config";
 import { logger } from "./utils";
 
-mongoose.connect(Env.MONGO_URL).then(() => {
+mongoose.connect(Env.MONGO_URL).then((mongooseInstance) => {
   logger.info("Connected to MongoDB");
 
   app.listen(Env.PORT, () => {
@@ -16,13 +16,22 @@ mongoose.connect(Env.MONGO_URL).then(() => {
 
   queue.start().then(async () => {
     logger.info("Connected to job queue");
+    const jobsCollection = mongooseInstance.connection.db.collection("jobs");
 
     defineJob("checkBlock", CheckBlockProcessor);
     defineJob("parseBlock", parseBlockProcessor);
     defineJob("fetchQuotes", fetchQuotesProcessor);
 
+    // TODO: Remove in followup deployment
     await cancelJob("parseBlock");
-    await cancelJob("checkBlock");
+
+    await jobsCollection.createIndex(
+      { "data.network": 1 },
+      {
+        unique: true,
+        partialFilterExpression: { name: { $eq: "checkBlock" } },
+      }
+    );
     await repeatJob(
       "checkBlock",
       { network: "Polygon", attempt: 0 },
@@ -30,7 +39,13 @@ mongoose.connect(Env.MONGO_URL).then(() => {
       "network"
     );
 
-    await cancelJob("fetchQuotes");
+    await jobsCollection.createIndex(
+      { "data.quoteCurrency": 1 },
+      {
+        unique: true,
+        partialFilterExpression: { name: { $eq: "fetchQuotes" } },
+      }
+    );
     await Promise.all(
       ValidQuoteCurrenies.map((quoteCurrency) =>
         repeatJob(
