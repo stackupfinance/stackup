@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import app from "./app";
-import queue, { defineJob, cancelJob, repeatJob } from "./queue";
+import queue, { defineJob, repeatJob } from "./queue";
 import CheckBlockProcessor from "./processors/checkBlock.processor";
 import parseBlockProcessor from "./processors/parseBlock.processor";
 import fetchQuotesProcessor from "./processors/fetchQuotes.processor";
