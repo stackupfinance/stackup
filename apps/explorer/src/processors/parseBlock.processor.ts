@@ -42,6 +42,7 @@ export default async function Processor(job: Job) {
         { network, blockNumber, attempt: attempt + 1 },
         exponentialBackoffDelay(attempt)
       );
+      job.remove();
     } else {
       logger.error(error);
       throw error;

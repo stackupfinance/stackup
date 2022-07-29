@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import app from "./app";
-import queue, { defineJob, repeatJob } from "./queue";
+import queue, { defineJob, cancelJob, repeatJob } from "./queue";
 import CheckBlockProcessor from "./processors/checkBlock.processor";
 import parseBlockProcessor from "./processors/parseBlock.processor";
 import fetchQuotesProcessor from "./processors/fetchQuotes.processor";
@@ -21,6 +21,9 @@ mongoose.connect(Env.MONGO_URL).then((mongooseInstance) => {
     defineJob("checkBlock", CheckBlockProcessor);
     defineJob("parseBlock", parseBlockProcessor);
     defineJob("fetchQuotes", fetchQuotesProcessor);
+
+    // TODO: Remove in followup deployment
+    await cancelJob("parseBlock");
 
     await jobsCollection.createIndex(
       { "data.network": 1 },
