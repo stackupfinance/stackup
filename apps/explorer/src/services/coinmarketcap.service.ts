@@ -31,6 +31,17 @@ const BASE_CURRENCY_ID_MAP: CurrencyIdMap = {
   ETH: 1027,
   MATIC: 3890,
   BTC: 1,
+  UNI: 7083,
+  AAVE: 7278,
+  CRV: 6538,
+  LDO: 8000,
+  LINK: 1975,
+  MKR: 1518,
+  DAI: 4943,
+  SUSHI: 6758,
+  YFI: 5864,
+  DPI: 7055,
+  MVI: 9207,
 };
 
 const COINMARKETCAP_URL = "https://pro-api.coinmarketcap.com";
