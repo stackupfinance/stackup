@@ -26,6 +26,7 @@ export default async function Processor(job: Job) {
         { network, blockNumber, attempt: attempt + 1 },
         exponentialBackoffDelay(attempt)
       );
+      job.remove();
     } else if (!receipts) {
       throw new Error(`receipts not found: ${JSON.stringify(data)}`);
     } else {
