@@ -1,7 +1,6 @@
 import { TransactionReceipt } from "@alch/alchemy-web3";
 import Receipt from "../models/receipt.model";
-import { Networks, TimePeriod } from "../config";
-import { dateForTimePeriod } from "../utils";
+import { Networks } from "../config";
 
 export const saveBulk = async (
   network: Networks,
@@ -16,18 +15,4 @@ export const saveBulk = async (
       },
     }))
   );
-};
-
-export const getClosestBlockForTimePeriod = async (
-  network: Networks,
-  timePeriod: TimePeriod
-) => {
-  const startDate = dateForTimePeriod(timePeriod);
-  const recepit = await Receipt.findOne(
-    { network, updatedAt: { $gt: startDate } },
-    undefined,
-    { sort: { updatedAt: "asc" } }
-  );
-
-  return recepit?.blockNumber ?? "latest";
 };

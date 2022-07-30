@@ -12,6 +12,7 @@ import {
   OptimalQuote,
   WalletStatus,
   Env,
+  ActivityItem,
 } from '../config';
 
 interface WalletBalance {
@@ -34,6 +35,10 @@ interface AddressOverviewResponse {
   currencies: Array<CurrencyBalance>;
 }
 
+interface GetActivityResponse {
+  items: Array<ActivityItem>;
+}
+
 interface SwapQuoteResponse {
   quote: OptimalQuote | null;
 }
@@ -43,6 +48,7 @@ interface ExplorerStateConstants {
   walletStatus: WalletStatus;
   walletBalance: WalletBalance;
   currencies: Array<CurrencyBalance>;
+  activity: Array<ActivityItem>;
 }
 
 interface ExplorerState extends ExplorerStateConstants {
@@ -86,6 +92,7 @@ const defaults: ExplorerStateConstants = {
       currentBalanceInQuoteCurrency: '0',
     },
   ],
+  activity: [],
 };
 const STORE_NAME = 'stackup-explorer-store';
 const useExplorerStore = create<ExplorerState>()(
@@ -102,22 +109,30 @@ const useExplorerStore = create<ExplorerState>()(
         ) => {
           try {
             set({loading: true});
-            const response = await axios.post<AddressOverviewResponse>(
-              `${Env.EXPLORER_URL}/v1/address/${address}`,
-              {
-                network,
-                quoteCurrency,
-                timePeriod,
-                currencies: CurrencyList,
-              },
-            );
-            const data = response.data;
+            const [addressResponse, activityResponse] = await Promise.all([
+              axios.post<AddressOverviewResponse>(
+                `${Env.EXPLORER_URL}/v1/address/${address}`,
+                {
+                  network,
+                  quoteCurrency,
+                  timePeriod,
+                  currencies: CurrencyList,
+                },
+              ),
+              axios.get<GetActivityResponse>(
+                `${Env.EXPLORER_URL}/v1/address/${address}/activity`,
+                {params: {network, page: 1}},
+              ),
+            ]);
+            const addressData = addressResponse.data;
+            const activityData = activityResponse.data;
 
             set({
               loading: false,
-              walletStatus: data.walletStatus,
-              walletBalance: data.walletBalance,
-              currencies: data.currencies,
+              walletStatus: addressData.walletStatus,
+              walletBalance: addressData.walletBalance,
+              currencies: addressData.currencies,
+              activity: activityData.items,
             });
           } catch (error) {
             set({loading: false});
@@ -232,5 +247,12 @@ export const useExplorerStoreWalletConnectSheetsSelector = () =>
     currencies: state.currencies,
     walletStatus: state.walletStatus,
     fetchGasEstimate: state.fetchGasEstimate,
+    fetchAddressOverview: state.fetchAddressOverview,
+  }));
+
+export const useExplorerStoreActivitySelector = () =>
+  useExplorerStore(state => ({
+    loading: state.loading,
+    activity: state.activity,
     fetchAddressOverview: state.fetchAddressOverview,
   }));

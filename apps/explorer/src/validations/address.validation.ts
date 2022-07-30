@@ -29,3 +29,15 @@ export const post = {
       .max(10),
   }),
 };
+
+export const getActivity = {
+  params: Joi.object().keys({
+    address: Joi.required().custom(ethereumAddress),
+  }),
+  query: Joi.object().keys({
+    network: Joi.string()
+      .valid(...ValidNetworks)
+      .required(),
+    page: Joi.number().min(1).required(),
+  }),
+};

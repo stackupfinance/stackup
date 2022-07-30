@@ -101,7 +101,7 @@ export default function AssetsScreen({}: Props) {
       <TabScreenHeader>
         <IconButton icon={faBars} onPress={onSettingPress} />
 
-        <HomeTabTitle screen="Assets" network="Polygon" />
+        <HomeTabTitle screen="Assets" network={network} />
 
         <IconButton icon={faQrcode} onPress={onQRCodePress} />
       </TabScreenHeader>
@@ -111,15 +111,13 @@ export default function AssetsScreen({}: Props) {
         isRefreshing={explorerLoading}
         header={
           <Box key="assets-header">
-            <Box mt="20px">
-              <PortfolioBalance
-                previousBalance={walletBalance.previousBalance}
-                currentBalance={walletBalance.currentBalance}
-                currency={quoteCurrency}
-                isHidden={isHidden}
-                onToggleVisibility={() => setIsHidden(!isHidden)}
-              />
-            </Box>
+            <PortfolioBalance
+              previousBalance={walletBalance.previousBalance}
+              currentBalance={walletBalance.currentBalance}
+              currency={quoteCurrency}
+              isHidden={isHidden}
+              onToggleVisibility={() => setIsHidden(!isHidden)}
+            />
 
             <HStack mt="33px" mb="31px" space="14px">
               <Button flex={1} onPress={onDepositPress}>

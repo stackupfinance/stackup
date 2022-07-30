@@ -104,3 +104,10 @@ export const useSettingsStoreWalletConnectSheetsSelector = () =>
     quoteCurrency: state.quoteCurrency,
     timePeriod: state.timePeriod,
   }));
+
+export const useSettingsStoreActivitySelector = () =>
+  useSettingsStore(state => ({
+    network: state.network,
+    quoteCurrency: state.quoteCurrency,
+    timePeriod: state.timePeriod,
+  }));
