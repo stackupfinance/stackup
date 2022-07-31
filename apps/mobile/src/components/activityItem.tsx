@@ -39,7 +39,7 @@ export const ActivityItem = ({currency, type, value, from, to}: Props) => {
     case 'OUTGOING_CURRENCY':
       sourceIcon = faArrowUp;
       heading = 'Sent';
-      currencyValue = `${currencyValue}`;
+      currencyValue = `-${currencyValue}`;
       description = `${truncate(to)}`;
       break;
     default:
