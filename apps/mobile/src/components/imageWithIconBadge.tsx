@@ -7,24 +7,36 @@ import {IconDefinition} from '@fortawesome/fontawesome-common-types';
 type Props = {
   source: ImageSourcePropType;
   icon: IconDefinition;
+  small?: boolean;
 };
 
-export const ImageWithIconBadge = ({source, icon}: Props) => {
+export const ImageWithIconBadge = ({source, icon, small}: Props) => {
+  const imageContainerDimension = small ? '45px' : '75px';
+  const imageDimension = small ? '40px' : '68px';
+  const iconContainerDimension = small ? '18px' : '32px';
+  const iconContainerOffset = small ? '25px' : '43px';
+  const iconDimension = small ? 10 : 16;
+
   return (
-    <Box h="75px">
-      <Image source={source} w="68px" h="68px" alt="image-with-icon-badge" />
+    <Box h={imageContainerDimension}>
+      <Image
+        source={source}
+        w={imageDimension}
+        h={imageDimension}
+        alt="image-with-icon-badge"
+      />
 
       <Box
         position="absolute"
-        top="43px"
-        left="43px"
+        top={iconContainerOffset}
+        left={iconContainerOffset}
         backgroundColor="primary.600"
         borderRadius="50"
-        w="32px"
-        h="32px"
+        w={iconContainerDimension}
+        h={iconContainerDimension}
         justifyContent="center"
         alignItems="center">
-        <FontAwesomeIcon icon={icon} color="white" size={16} />
+        <FontAwesomeIcon icon={icon} color="white" size={iconDimension} />
       </Box>
     </Box>
   );

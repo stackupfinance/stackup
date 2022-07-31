@@ -9,4 +9,8 @@ router
   .route("/:address")
   .post(validate(addressValidation.post), addressController.post);
 
+router
+  .route("/:address/activity")
+  .get(validate(addressValidation.getActivity), addressController.getActivity);
+
 export default router;

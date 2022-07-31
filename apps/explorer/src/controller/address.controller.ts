@@ -1,9 +1,15 @@
 import { ethers, BigNumberish } from "ethers";
 import { catchAsync, convertToQuoteCurrency } from "../utils";
-import { CurrencySymbols, Networks, TimePeriod, WalletStatus } from "../config";
-import * as ReceiptService from "../services/receipt.service";
+import {
+  CurrencySymbols,
+  Networks,
+  TimePeriod,
+  WalletStatus,
+  ActivityItem,
+} from "../config";
 import * as AlchemyService from "../services/alchemy.service";
 import * as QuoteService from "../services/quote.service";
+import * as EtherscanService from "../services/etherscan.service";
 
 interface RequestBody {
   quoteCurrency: CurrencySymbols;
@@ -32,6 +38,10 @@ interface PostResponse {
   currencies: Array<CurrencyBalance>;
 }
 
+interface GetActivityResponse {
+  items: Array<ActivityItem>;
+}
+
 export const post = catchAsync(async (req, res) => {
   const { address } = req.params;
   const { quoteCurrency, network, timePeriod, currencies } =
@@ -45,7 +55,7 @@ export const post = catchAsync(async (req, res) => {
     currentQuotes,
   ] = await Promise.all([
     AlchemyService.getWalletStatus(network, address),
-    ReceiptService.getClosestBlockForTimePeriod(network, timePeriod).then(
+    EtherscanService.getClosestBlockForTimePeriod(network, timePeriod).then(
       (blockNumber) =>
         AlchemyService.getCurrencyBalances(
           network,
@@ -113,6 +123,23 @@ export const post = catchAsync(async (req, res) => {
         currentQuotes[currency]
       ).toString(),
     })),
+  };
+
+  res.send(response);
+});
+
+export const getActivity = catchAsync(async (req, res) => {
+  const { address } = req.params;
+  const { network, page } = req.query as { network: Networks; page: string };
+
+  const [internalTransactions, erc20Transactions] = await Promise.all([
+    EtherscanService.getInternalTransactions(network, address, parseInt(page)),
+    EtherscanService.getERC20TokenTransfers(network, address, parseInt(page)),
+  ]);
+  const response: GetActivityResponse = {
+    items: [...internalTransactions, ...erc20Transactions].sort(
+      (a, b) => b.timestamp - a.timestamp
+    ),
   };
 
   res.send(response);

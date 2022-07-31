@@ -251,3 +251,8 @@ export const useWalletStoreSecuritySheetsSelector = () =>
     getWalletSigner: state.getWalletSigner,
     reencryptWalletSigner: state.reencryptWalletSigner,
   }));
+
+export const useWalletStoreActivitySelector = () =>
+  useWalletStore(state => ({
+    instance: state.instance,
+  }));

@@ -16,7 +16,7 @@ type Props = {
 };
 
 const SectionSeparator = ({leadingItem}: any) => {
-  return leadingItem ? <Box mt="21px" /> : null;
+  return leadingItem ? <Box mt="18px" /> : null;
 };
 
 export const List = ({
@@ -29,6 +29,7 @@ export const List = ({
   return (
     <SectionList
       w="100%"
+      px="18px"
       refreshControl={
         <RefreshControl
           refreshing={Boolean(isRefreshing)}

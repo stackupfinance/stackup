@@ -194,35 +194,35 @@ export default function SwapScreen({}: Props) {
   };
 
   return (
-    <TabScreenContainer noPadding>
-      <TabScreenHeader withPadding>
+    <TabScreenContainer>
+      <TabScreenHeader>
         <Box />
 
-        <HomeTabTitle screen="Swap" network="Polygon" />
+        <HomeTabTitle screen="Swap" network={network} />
 
         <Box />
       </TabScreenHeader>
 
       <ScrollView
         px="18px"
+        pt="54px"
+        pb="18px"
         contentContainerStyle={{flex: 1}}
         refreshControl={
           <RefreshControl refreshing={isLoading} onRefresh={onRefresh} />
         }>
-        <Box mt="54px">
-          <CurrencySwap
-            isDisabled={isLoading}
-            baseCurrency={data.baseCurrency}
-            quoteCurrency={data.quoteCurrency}
-            baseCurrencyValue={data.baseCurrencyValue}
-            quoteCurrencyValue={data.quoteCurrencyValue}
-            currencyBalances={currencyBalances}
-            onBaseCurrencyPress={onBaseCurrencyChange}
-            onQuoteCurrencyPress={onQuoteCurrencyChange}
-            onBaseCurrencyValueChange={onBaseCurrencyValueChange}
-            onSwapPress={onSwapPress}
-          />
-        </Box>
+        <CurrencySwap
+          isDisabled={isLoading}
+          baseCurrency={data.baseCurrency}
+          quoteCurrency={data.quoteCurrency}
+          baseCurrencyValue={data.baseCurrencyValue}
+          quoteCurrencyValue={data.quoteCurrencyValue}
+          currencyBalances={currencyBalances}
+          onBaseCurrencyPress={onBaseCurrencyChange}
+          onQuoteCurrencyPress={onQuoteCurrencyChange}
+          onBaseCurrencyValueChange={onBaseCurrencyValueChange}
+          onSwapPress={onSwapPress}
+        />
 
         {!isDisabled && (
           <Box mt="42px">
@@ -255,7 +255,6 @@ export default function SwapScreen({}: Props) {
         <Box flex={1} />
 
         <Button
-          mb="34px"
           isDisabled={isDisabled}
           isLoading={isLoading}
           onPress={onReviewOrderPress}>

@@ -10,6 +10,7 @@ type NetworksConfig = {
   wrappedNativeCurrency: (networkEnv?: AppEnvironment["NETWORK_ENV"]) => string;
   chainId: (networkEnv?: AppEnvironment["NETWORK_ENV"]) => BigNumberish;
   uniswapV3Router: string;
+  etherScanUrl: string;
   currencies: Record<CurrencySymbols, { address: string }>;
 };
 
@@ -25,6 +26,10 @@ export const NetworksConfig: Record<Networks, NetworksConfig> = {
     chainId: (networkEnv = Env.NETWORK_ENV) =>
       networkEnv === "mainnet" ? "137" : "80001",
     uniswapV3Router: "0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45",
+    etherScanUrl:
+      Env.NETWORK_ENV === "mainnet"
+        ? `https://api.polygonscan.com/api?apikey=${Env.POLYGONSCAN_API_KEY}`
+        : `https://api-testnet.polygonscan.com/api?apikey=${Env.POLYGONSCAN_API_KEY}`,
     currencies: {
       MATIC: { address: ethers.constants.AddressZero },
       USDC: {

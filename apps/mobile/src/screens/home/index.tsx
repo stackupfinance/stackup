@@ -16,7 +16,7 @@ import SwapScreen from './swap';
 import SwapSheets from './swapSheets';
 import SecuritySheets from './securitySheets';
 import WalletConnectSheets from './walletConnectSheets';
-// import ActivityScreen from './activity';
+import ActivityScreen from './activity';
 import {
   useNavigationStoreHomeSelector,
   useSwapStoreHomeSelector,
@@ -98,7 +98,7 @@ export const HomeScreen = () => {
         <Tab.Screen name="Assets" component={AssetsScreen} />
         {/* <Tab.Screen name="Earn" component={EarnScreen} /> */}
         <Tab.Screen name="Swap" component={SwapScreen} />
-        {/* <Tab.Screen name="Activity" component={ActivityScreen} /> */}
+        <Tab.Screen name="Activity" component={ActivityScreen} />
       </Tab.Navigator>
 
       {renderSheets()}
