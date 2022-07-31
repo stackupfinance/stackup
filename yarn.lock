@@ -16496,10 +16496,10 @@ react-native-keychain@^8.1.1:
   resolved "https://registry.yarnpkg.com/react-native-keychain/-/react-native-keychain-8.1.1.tgz#3bb5e37946b964a7bcf7df2fe470dd244e01a340"
   integrity sha512-8fxgeHKwGcL657eAYpdBTkDIxNhbIHI+kyyO0Yac2dgVAN184JoIwQcW2z6snahwDaCObQOu0biLFHnsH+4KSg==
 
-react-native-monorepo-tools@^1.1.4:
-  version "1.1.4"
-  resolved "https://registry.yarnpkg.com/react-native-monorepo-tools/-/react-native-monorepo-tools-1.1.4.tgz#ef4a400bd6d362dea3859b2a579104cd198dc5f6"
-  integrity sha512-V7/zLwsy9e4glfVI6AodEOibf8kL2cueDel2cpdecISk7WqnmbeXP0v+opLSl07QuxuwOdslCgc8zRbv4Dc1hQ==
+react-native-monorepo-tools@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/react-native-monorepo-tools/-/react-native-monorepo-tools-1.2.0.tgz#0214788c41deacd2ba54785ad9f12c6cae86087d"
+  integrity sha512-FBD99QSQciWqFjCJI3KrWxrHDFaTwOmeJ1JrXHAeMSInu1S32mvNq4NOtYPhj72fylTbobAeYJmwMDyzrFK7Qw==
   dependencies:
     find-root "^1.1.0"
     glob "^7.1.7"
