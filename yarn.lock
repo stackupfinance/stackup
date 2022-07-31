@@ -16598,10 +16598,10 @@ react-native-version@^4.0.0:
     resolve-from "^5.0.0"
     semver "^7.0.0"
 
-react-native-vision-camera@^2.13.5:
-  version "2.13.5"
-  resolved "https://registry.yarnpkg.com/react-native-vision-camera/-/react-native-vision-camera-2.13.5.tgz#fe64bbb3186959d5bdf82d1e23cd04c899c02bca"
-  integrity sha512-qhOqS+DuKkEb6nlgxKT+hCJTTOPCAtXQ5PdQXd3v85qENBn3K08RtnBz1VOWSeKsj+B52KjA5rcDo50BaaE33A==
+react-native-vision-camera@^2.14.0:
+  version "2.14.0"
+  resolved "https://registry.yarnpkg.com/react-native-vision-camera/-/react-native-vision-camera-2.14.0.tgz#8030b8fc63ecf111cfdcfd3047b6d2d78c46d56a"
+  integrity sha512-fKmDd3e7TRmG86UMch7aBfNDUl6w2JTsclhBOH69IFCs+a72c6QN2HDzeo/dEZYTlCbacZPH/QeBBM5/TWvySg==
 
 react-native@0.68.2:
   version "0.68.2"
